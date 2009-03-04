@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace Shrimp
     {
         public void Load(string filename)
         {
+            Debug.Assert(File.Exists(filename));
             XmlDocument doc = new XmlDocument();
             doc.Load(filename);
             string dir = Path.GetDirectoryName(filename);
@@ -21,8 +23,9 @@ namespace Shrimp
 
         public void Save()
         {
-            string filename =
-                Path.Combine(Path.Combine(this.BasePath, this.DirectoryName), "Game.shrp");
+            string dir = Path.Combine(this.BasePath, this.DirectoryName);
+            Debug.Assert(Directory.Exists(dir));
+            string filename = Path.Combine(dir, "Game.shrp");
             using (XmlWriter writer = new XmlTextWriter(filename, new UTF8Encoding(false)))
             {
                 writer.WriteStartDocument();

@@ -96,11 +96,13 @@ namespace Shrimp
                     if (this.project != null)
                     {
                         this.project.Updated -= this.Project_Updated;
+                        this.MapsTreeView.Nodes.Clear();
                     }
                     this.project = value;
                     if (this.project != null)
                     {
                         this.project.Updated += this.Project_Updated;
+                        this.MapsTreeView.Nodes.Add(this.Project.GameTitle);
                     }
                     this.UpdateState();
                 }
@@ -132,6 +134,7 @@ namespace Shrimp
 
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
+            Debug.Assert(this.Project == null);
             var dialog = new NewProjectDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -169,6 +172,7 @@ namespace Shrimp
 
         private void OpenToolStripButton_Click(object sender, EventArgs e)
         {
+            Debug.Assert(this.Project == null);
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 this.PaletteIndex = 0;
@@ -180,6 +184,7 @@ namespace Shrimp
 
         private void CloseToolStripButton_Click(object sender, EventArgs e)
         {
+            Debug.Assert(this.Project != null);
             this.Project = null;
         }
 
