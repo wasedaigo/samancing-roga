@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace Shrimp
 {
@@ -49,7 +50,7 @@ namespace Shrimp
 
         private void UpdateState()
         {
-            bool hasProject = this.ProjectDirectoryPath != null;
+            bool hasProject = (this.Project != null);
             this.MapsTreeView.Enabled = hasProject;
             this.MapEditor.Enabled = hasProject;
             this.NewToolStripButton.Enabled = !hasProject;
@@ -58,8 +59,11 @@ namespace Shrimp
             this.TilesPaletteToolStrip.Enabled = hasProject;
             if (hasProject)
             {
+                this.Text = this.Project.GameTitle + " - Shrimp";
+                string directoryPath =
+                    Path.Combine(this.Project.BasePath, this.Project.DirectoryName);
                 string tilesBitmapPath =
-                    Path.Combine(Path.Combine(this.ProjectDirectoryPath, "Graphics"), "Tiles.png");
+                    Path.Combine(Path.Combine(directoryPath, "Graphics"), "Tiles.png");
                 this.TilesPalette.TilesBitmap = Bitmap.FromFile(tilesBitmapPath) as Bitmap;
                 var items = this.TilesPaletteSwitchers.ToArray();
                 for (int i = 0; i < items.Length; i++)
@@ -69,6 +73,7 @@ namespace Shrimp
             }
             else
             {
+                this.Text = "Shrimp";
                 this.TilesPalette.TilesBitmap = null;
                 foreach (var item in this.TilesPaletteSwitchers)
                 {
@@ -77,22 +82,35 @@ namespace Shrimp
             }
         }
 
-        private string ProjectDirectoryPath
+        private Project Project
         {
             get
             {
-                return this.projectDirectoryPath;
+                return this.project;
             }
             set
             {
-                if (this.projectDirectoryPath != value)
+                if (this.project != value)
                 {
-                    this.projectDirectoryPath = value;
+                    if (this.project != null)
+                    {
+                        this.project.Updated -= this.Project_Updated;
+                    }
+                    this.project = value;
+                    if (this.project != null)
+                    {
+                        this.project.Updated += this.Project_Updated;
+                    }
                     this.UpdateState();
                 }
             }
         }
-        private string projectDirectoryPath;
+        private Project project;
+
+        private void Project_Updated(object sender, EventArgs e)
+        {
+            this.UpdateState();
+        }
 
         private int PaletteIndex
         {
@@ -120,7 +138,12 @@ namespace Shrimp
                 Debug.Assert(!Directory.Exists(path));
                 CopyDirectory("ProjectTemplate", path);
                 this.PaletteIndex = 0;
-                this.ProjectDirectoryPath = path;
+                Project project = new Project();
+                project.BasePath = dialog.BasePath;
+                project.DirectoryName = dialog.DirectoryName;
+                project.GameTitle = dialog.GameTitle;
+                project.Save();
+                this.Project = project;
             }
         }
 
@@ -148,14 +171,15 @@ namespace Shrimp
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 this.PaletteIndex = 0;
-                this.ProjectDirectoryPath =
-                    Path.GetDirectoryName(this.OpenFileDialog.FileName);
+                Project project = new Project();
+                project.Load(this.OpenFileDialog.FileName);
+                this.Project = project;
             }
         }
 
         private void CloseToolStripButton_Click(object sender, EventArgs e)
         {
-            this.ProjectDirectoryPath = null;
+            this.Project = null;
         }
     }
 }

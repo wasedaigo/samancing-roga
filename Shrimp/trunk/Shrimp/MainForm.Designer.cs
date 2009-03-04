@@ -35,13 +35,13 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.MapsTreeView = new System.Windows.Forms.TreeView();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.MapsTreeView = new System.Windows.Forms.TreeView();
             this.TilesPalette = new Shrimp.TilesPalette();
             this.MapEditor = new Shrimp.MapEditor();
             this.MainSplitContainer.Panel1.SuspendLayout();
@@ -139,6 +139,15 @@
             this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton3.Text = "C";
             // 
+            // MapsTreeView
+            // 
+            this.MapsTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.MapsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapsTreeView.Location = new System.Drawing.Point(0, 0);
+            this.MapsTreeView.Name = "MapsTreeView";
+            this.MapsTreeView.Size = new System.Drawing.Size(296, 231);
+            this.MapsTreeView.TabIndex = 0;
+            // 
             // ToolStripContainer
             // 
             // 
@@ -209,15 +218,6 @@
             // OpenFileDialog
             // 
             this.OpenFileDialog.Filter = "Project File|*.shrp|All Files|*.*";
-            // 
-            // MapsTreeView
-            // 
-            this.MapsTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.MapsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapsTreeView.Location = new System.Drawing.Point(0, 0);
-            this.MapsTreeView.Name = "MapsTreeView";
-            this.MapsTreeView.Size = new System.Drawing.Size(296, 231);
-            this.MapsTreeView.TabIndex = 0;
             // 
             // TilesPalette
             // 
