@@ -69,6 +69,7 @@
       <DependentUpon>NewProjectDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Util.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">

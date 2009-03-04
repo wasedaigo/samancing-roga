@@ -10,12 +10,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    public class ViewModel
+    internal class ViewModel
     {
         public ViewModel(string directoryPath)
         {
             this.DirectoryPath = directoryPath;
         }
+
+        private string DirectoryPath { get; set; }
 
         public void Load()
         {
@@ -23,6 +25,12 @@ namespace Shrimp
             Debug.Assert(File.Exists(path));
             JObject jObject = JObject.Parse(File.ReadAllText(path, new UTF8Encoding(false)));
             this.GameTitle = jObject["GameTitle"].Value<string>();
+        }
+
+        public void InitializeAndSave()
+        {
+            Util.CopyDirectory("ProjectTemplate", this.DirectoryPath);
+            this.Save();
         }
 
         public void Save()
@@ -50,8 +58,6 @@ namespace Shrimp
             }
         }
 
-        public string DirectoryPath { get; private set; }
-
         public string GameTitle
         {
             get
@@ -68,6 +74,23 @@ namespace Shrimp
             }
         }
         private string gameTitle;
+
+        public int TileSetIndex
+        {
+            get
+            {
+                return this.tileSetIndex;
+            }
+            set
+            {
+                if (this.tileSetIndex != value)
+                {
+                    this.tileSetIndex = value;
+                    this.OnUpdated(EventArgs.Empty);
+                }
+            }
+        }
+        private int tileSetIndex;
 
         public Bitmap GetTilesBitmap()
         {

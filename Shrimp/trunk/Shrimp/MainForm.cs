@@ -34,7 +34,7 @@ namespace Shrimp
             for (int i = 0; i < items.Length; i++)
             {
                 var j = i;
-                items[i].Click += (sender, e) => { this.PaletteIndex = j; };
+                items[i].Click += (sender, e) => { this.ViewModel.TileSetIndex = j; };
             }
             this.UpdateState();
         }
@@ -64,7 +64,7 @@ namespace Shrimp
                 var items = this.TilesPaletteSwitchers.ToArray();
                 for (int i = 0; i < items.Length; i++)
                 {
-                    items[i].Checked = (i == this.PaletteIndex);
+                    items[i].Checked = (i == this.ViewModel.TileSetIndex);
                 }
             }
             else
@@ -110,57 +110,17 @@ namespace Shrimp
             this.UpdateState();
         }
 
-        private int PaletteIndex
-        {
-            get
-            {
-                return this.paletteIndex;
-            }
-            set
-            {
-                if (this.paletteIndex != value)
-                {
-                    this.paletteIndex = value;
-                    this.UpdateState();
-                }
-            }
-        }
-        private int paletteIndex;
-
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(this.ViewModel == null);
             var dialog = new NewProjectDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                string path = Path.Combine(dialog.BasePath, dialog.DirectoryName);
-                Debug.Assert(!Directory.Exists(path));
-                CopyDirectory("ProjectTemplate", path);
-                this.PaletteIndex = 0;
                 string directoryPath = Path.Combine(dialog.BasePath, dialog.DirectoryName);
                 ViewModel viewModel = new ViewModel(directoryPath);
                 viewModel.GameTitle = dialog.GameTitle;
-                viewModel.Save();
+                viewModel.InitializeAndSave();
                 this.ViewModel = viewModel;
-            }
-        }
-
-        private static void CopyDirectory(string src, string dst)
-        {
-            if (!Directory.Exists(dst))
-            {
-                Directory.CreateDirectory(dst);
-                File.SetAttributes(dst, File.GetAttributes(src));
-            }
-            foreach (string file in Directory.GetFiles(src))
-            {
-                string dstFile = Path.Combine(dst, Path.GetFileName(file));
-                File.Copy(file, dstFile);
-                File.SetAttributes(dstFile, File.GetAttributes(file));
-            }
-            foreach (string dir in Directory.GetDirectories(src))
-            {
-                CopyDirectory(dir, Path.Combine(dst, Path.GetFileName(dir)));
             }
         }
 
@@ -169,7 +129,6 @@ namespace Shrimp
             Debug.Assert(this.ViewModel == null);
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
-                this.PaletteIndex = 0;
                 string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
                 ViewModel viewModel = new ViewModel(directoryPath);
                 viewModel.Load();
