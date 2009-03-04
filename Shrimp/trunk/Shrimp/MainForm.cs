@@ -15,14 +15,15 @@ namespace Shrimp
         public MainForm()
         {
             InitializeComponent();
+            this.TilesPalette.Height = this.TilesPalette.Parent.ClientSize.Height;
+            this.MainSplitContainer.SplitterDistance -=
+                this.TilesPalette.Parent.ClientSize.Width - this.TilesPalette.Width;
             this.UpdateState();
-
         }
 
         private void UpdateState()
         {
             bool hasProject = this.ProjectDirectoryPath != null;
-            this.PaletteTabControl.Enabled = hasProject;
             //this.MapsTreeView.Enabled = hasProject;
             this.MapEditor.Enabled = hasProject;
             this.NewToolStripButton.Enabled = !hasProject;

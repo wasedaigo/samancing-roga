@@ -15,6 +15,7 @@ namespace Shrimp
         public TilesPalette()
         {
             InitializeComponent();
+            this.Width = 256 + SystemInformation.VerticalScrollBarWidth;
             this.UpdateState();
         }
 
@@ -76,13 +77,16 @@ namespace Shrimp
                 return;
             }
             Graphics g = e.Graphics;
-            Rectangle srcRect = new Rectangle();
-            srcRect.X = 0;
-            srcRect.Y = -this.AutoScrollPosition.Y + e.ClipRectangle.Y;
-            srcRect.Width = e.ClipRectangle.Width;
-            srcRect.Height = e.ClipRectangle.Height;
-            g.DrawImage(this.DoubleSizedTilesBitmap, e.ClipRectangle,
-                srcRect, GraphicsUnit.Pixel);
+            g.DrawImage(this.DoubleSizedTilesBitmap,
+                e.ClipRectangle.X, e.ClipRectangle.Y,
+                new Rectangle
+                {
+                    X = 0,
+                    Y = -this.AutoScrollPosition.Y + e.ClipRectangle.Y,
+                    Width = e.ClipRectangle.Width,
+                    Height = e.ClipRectangle.Height,
+                },
+                GraphicsUnit.Pixel);
         }
     }
 }

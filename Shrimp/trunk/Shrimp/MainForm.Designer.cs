@@ -31,14 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.LeftSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.PaletteTabControl = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.TilesPalette = new Shrimp.TilesPalette();
             this.MapEditor = new Shrimp.MapEditor();
             this.MainSplitContainer.Panel1.SuspendLayout();
@@ -46,8 +44,6 @@
             this.MainSplitContainer.SuspendLayout();
             this.LeftSplitContainer.Panel1.SuspendLayout();
             this.LeftSplitContainer.SuspendLayout();
-            this.PaletteTabControl.SuspendLayout();
-            this.tabPage1.SuspendLayout();
             this.ToolStripContainer.ContentPanel.SuspendLayout();
             this.ToolStripContainer.TopToolStripPanel.SuspendLayout();
             this.ToolStripContainer.SuspendLayout();
@@ -69,8 +65,9 @@
             // MainSplitContainer.Panel2
             // 
             this.MainSplitContainer.Panel2.Controls.Add(this.MapEditor);
-            this.MainSplitContainer.Size = new System.Drawing.Size(632, 418);
+            this.MainSplitContainer.Size = new System.Drawing.Size(792, 538);
             this.MainSplitContainer.SplitterDistance = 300;
+            this.MainSplitContainer.SplitterWidth = 3;
             this.MainSplitContainer.TabIndex = 0;
             // 
             // LeftSplitContainer
@@ -83,30 +80,11 @@
             // 
             // LeftSplitContainer.Panel1
             // 
-            this.LeftSplitContainer.Panel1.Controls.Add(this.PaletteTabControl);
-            this.LeftSplitContainer.Size = new System.Drawing.Size(300, 418);
-            this.LeftSplitContainer.SplitterDistance = 217;
+            this.LeftSplitContainer.Panel1.Controls.Add(this.TilesPalette);
+            this.LeftSplitContainer.Size = new System.Drawing.Size(300, 538);
+            this.LeftSplitContainer.SplitterDistance = 279;
+            this.LeftSplitContainer.SplitterWidth = 3;
             this.LeftSplitContainer.TabIndex = 0;
-            // 
-            // PaletteTabControl
-            // 
-            this.PaletteTabControl.Controls.Add(this.tabPage1);
-            this.PaletteTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PaletteTabControl.Location = new System.Drawing.Point(0, 0);
-            this.PaletteTabControl.Name = "PaletteTabControl";
-            this.PaletteTabControl.SelectedIndex = 0;
-            this.PaletteTabControl.Size = new System.Drawing.Size(296, 213);
-            this.PaletteTabControl.TabIndex = 0;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.TilesPalette);
-            this.tabPage1.Location = new System.Drawing.Point(4, 21);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(288, 188);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "A";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // ToolStripContainer
             // 
@@ -118,11 +96,11 @@
             // ToolStripContainer.ContentPanel
             // 
             this.ToolStripContainer.ContentPanel.Controls.Add(this.MainSplitContainer);
-            this.ToolStripContainer.ContentPanel.Size = new System.Drawing.Size(632, 418);
+            this.ToolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 538);
             this.ToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ToolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.ToolStripContainer.Name = "ToolStripContainer";
-            this.ToolStripContainer.Size = new System.Drawing.Size(632, 453);
+            this.ToolStripContainer.Size = new System.Drawing.Size(792, 573);
             this.ToolStripContainer.TabIndex = 1;
             this.ToolStripContainer.Text = "toolStripContainer1";
             // 
@@ -164,10 +142,6 @@
             this.OpenToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.OpenToolStripButton.Click += new System.EventHandler(this.OpenToolStripButton_Click);
             // 
-            // OpenFileDialog
-            // 
-            this.OpenFileDialog.Filter = "Project File|*.shrp|All Files|*.*";
-            // 
             // CloseToolStripButton
             // 
             this.CloseToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("CloseToolStripButton.Image")));
@@ -178,14 +152,19 @@
             this.CloseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.CloseToolStripButton.Click += new System.EventHandler(this.CloseToolStripButton_Click);
             // 
+            // OpenFileDialog
+            // 
+            this.OpenFileDialog.Filter = "Project File|*.shrp|All Files|*.*";
+            // 
             // TilesPalette
             // 
+            this.TilesPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.TilesPalette.AutoScroll = true;
             this.TilesPalette.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.TilesPalette.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TilesPalette.Location = new System.Drawing.Point(0, 0);
             this.TilesPalette.Name = "TilesPalette";
-            this.TilesPalette.Size = new System.Drawing.Size(288, 188);
+            this.TilesPalette.Size = new System.Drawing.Size(272, 448);
             this.TilesPalette.TabIndex = 0;
             this.TilesPalette.TilesBitmap = null;
             // 
@@ -196,14 +175,14 @@
             this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapEditor.Location = new System.Drawing.Point(0, 0);
             this.MapEditor.Name = "MapEditor";
-            this.MapEditor.Size = new System.Drawing.Size(328, 418);
+            this.MapEditor.Size = new System.Drawing.Size(489, 538);
             this.MapEditor.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(632, 453);
+            this.ClientSize = new System.Drawing.Size(792, 573);
             this.Controls.Add(this.ToolStripContainer);
             this.Name = "MainForm";
             this.Text = "Shrimp";
@@ -212,8 +191,6 @@
             this.MainSplitContainer.ResumeLayout(false);
             this.LeftSplitContainer.Panel1.ResumeLayout(false);
             this.LeftSplitContainer.ResumeLayout(false);
-            this.PaletteTabControl.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
             this.ToolStripContainer.ContentPanel.ResumeLayout(false);
             this.ToolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this.ToolStripContainer.TopToolStripPanel.PerformLayout();
@@ -233,8 +210,6 @@
         private System.Windows.Forms.ToolStripButton NewToolStripButton;
         private MapEditor MapEditor;
         private System.Windows.Forms.SplitContainer LeftSplitContainer;
-        private System.Windows.Forms.TabControl PaletteTabControl;
-        private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.ToolStripButton OpenToolStripButton;
         private System.Windows.Forms.OpenFileDialog OpenFileDialog;
         private System.Windows.Forms.ToolStripButton CloseToolStripButton;
