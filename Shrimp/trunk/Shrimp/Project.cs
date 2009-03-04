@@ -4,21 +4,22 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
+using Newtonsoft.Json;
 
 namespace Shrimp
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class Project
     {
-        public void Load(string filename)
+        public static Project LoadFile(string filename)
         {
             Debug.Assert(File.Exists(filename));
-            XmlDocument doc = new XmlDocument();
-            doc.Load(filename);
+            string json = File.ReadAllText(filename, new UTF8Encoding(false));
+            Project project = JsonConvert.DeserializeObject<Project>(json);
             string dir = Path.GetDirectoryName(filename);
-            this.BasePath = Path.GetDirectoryName(dir);
-            this.DirectoryName = Path.GetFileName(dir);
-            this.GameTitle = doc.SelectSingleNode("/Project/GameTitle").InnerText;
+            project.BasePath = Path.GetDirectoryName(dir);
+            project.DirectoryName = Path.GetFileName(dir);
+            return project;
         }
 
         public void Save()
@@ -26,18 +27,8 @@ namespace Shrimp
             string dir = Path.Combine(this.BasePath, this.DirectoryName);
             Debug.Assert(Directory.Exists(dir));
             string filename = Path.Combine(dir, "Game.shrp");
-            using (XmlWriter writer = new XmlTextWriter(filename, new UTF8Encoding(false)))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Project");
-
-                writer.WriteStartElement("GameTitle");
-                writer.WriteString(this.GameTitle);
-                writer.WriteEndElement();
-
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-            }
+            string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(filename, json, new UTF8Encoding(false));
             this.OnUpdated(EventArgs.Empty);
         }
 
@@ -68,6 +59,7 @@ namespace Shrimp
         }
         private string directoryName;
 
+        [JsonProperty]
         public string GameTitle
         {
             get

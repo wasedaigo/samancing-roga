@@ -43,8 +43,8 @@
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.SaveToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -238,10 +238,6 @@
             this.CloseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.CloseToolStripButton.Click += new System.EventHandler(this.CloseToolStripButton_Click);
             // 
-            // OpenFileDialog
-            // 
-            this.OpenFileDialog.Filter = "Project File|*.shrp|All Files|*.*";
-            // 
             // SaveToolStripButton
             // 
             this.SaveToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("SaveToolStripButton.Image")));
@@ -251,6 +247,10 @@
             this.SaveToolStripButton.Text = "Save";
             this.SaveToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.SaveToolStripButton.Click += new System.EventHandler(this.SaveToolStripButton_Click);
+            // 
+            // OpenFileDialog
+            // 
+            this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
             // 
             // MainForm
             // 

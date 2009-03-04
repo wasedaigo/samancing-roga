@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace Shrimp
 {
@@ -176,9 +175,7 @@ namespace Shrimp
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 this.PaletteIndex = 0;
-                Project project = new Project();
-                project.Load(this.OpenFileDialog.FileName);
-                this.Project = project;
+                this.Project = Project.LoadFile(this.OpenFileDialog.FileName);
             }
         }
 
