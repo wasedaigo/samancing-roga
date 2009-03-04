@@ -56,6 +56,7 @@ namespace Shrimp
             this.NewToolStripButton.Enabled = !hasProject;
             this.OpenToolStripButton.Enabled = !hasProject;
             this.CloseToolStripButton.Enabled = hasProject;
+            this.SaveToolStripButton.Enabled = hasProject;
             this.TilesPaletteToolStrip.Enabled = hasProject;
             if (hasProject)
             {
@@ -180,6 +181,12 @@ namespace Shrimp
         private void CloseToolStripButton_Click(object sender, EventArgs e)
         {
             this.Project = null;
+        }
+
+        private void SaveToolStripButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.Project != null);
+            this.Project.Save();
         }
     }
 }

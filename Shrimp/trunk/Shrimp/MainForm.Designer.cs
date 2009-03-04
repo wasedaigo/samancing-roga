@@ -35,15 +35,16 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.TilesPalette = new Shrimp.TilesPalette();
             this.MapsTreeView = new System.Windows.Forms.TreeView();
+            this.MapEditor = new Shrimp.MapEditor();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.TilesPalette = new Shrimp.TilesPalette();
-            this.MapEditor = new Shrimp.MapEditor();
+            this.SaveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -139,6 +140,17 @@
             this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton3.Text = "C";
             // 
+            // TilesPalette
+            // 
+            this.TilesPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.TilesPalette.AutoScroll = true;
+            this.TilesPalette.Location = new System.Drawing.Point(0, 0);
+            this.TilesPalette.Name = "TilesPalette";
+            this.TilesPalette.Size = new System.Drawing.Size(272, 171);
+            this.TilesPalette.TabIndex = 0;
+            this.TilesPalette.TilesBitmap = null;
+            // 
             // MapsTreeView
             // 
             this.MapsTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -147,6 +159,16 @@
             this.MapsTreeView.Name = "MapsTreeView";
             this.MapsTreeView.Size = new System.Drawing.Size(296, 231);
             this.MapsTreeView.TabIndex = 0;
+            // 
+            // MapEditor
+            // 
+            this.MapEditor.AutoScroll = true;
+            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapEditor.Location = new System.Drawing.Point(0, 0);
+            this.MapEditor.Name = "MapEditor";
+            this.MapEditor.Size = new System.Drawing.Size(489, 538);
+            this.MapEditor.TabIndex = 0;
             // 
             // ToolStripContainer
             // 
@@ -178,7 +200,8 @@
             this.ToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.NewToolStripButton,
             this.OpenToolStripButton,
-            this.CloseToolStripButton});
+            this.CloseToolStripButton,
+            this.SaveToolStripButton});
             this.ToolStrip.Location = new System.Drawing.Point(0, 0);
             this.ToolStrip.Name = "ToolStrip";
             this.ToolStrip.Size = new System.Drawing.Size(792, 35);
@@ -219,26 +242,15 @@
             // 
             this.OpenFileDialog.Filter = "Project File|*.shrp|All Files|*.*";
             // 
-            // TilesPalette
+            // SaveToolStripButton
             // 
-            this.TilesPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
-            this.TilesPalette.AutoScroll = true;
-            this.TilesPalette.Location = new System.Drawing.Point(0, 0);
-            this.TilesPalette.Name = "TilesPalette";
-            this.TilesPalette.Size = new System.Drawing.Size(272, 171);
-            this.TilesPalette.TabIndex = 0;
-            this.TilesPalette.TilesBitmap = null;
-            // 
-            // MapEditor
-            // 
-            this.MapEditor.AutoScroll = true;
-            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapEditor.Location = new System.Drawing.Point(0, 0);
-            this.MapEditor.Name = "MapEditor";
-            this.MapEditor.Size = new System.Drawing.Size(489, 538);
-            this.MapEditor.TabIndex = 0;
+            this.SaveToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("SaveToolStripButton.Image")));
+            this.SaveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SaveToolStripButton.Name = "SaveToolStripButton";
+            this.SaveToolStripButton.Size = new System.Drawing.Size(34, 32);
+            this.SaveToolStripButton.Text = "Save";
+            this.SaveToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.SaveToolStripButton.Click += new System.EventHandler(this.SaveToolStripButton_Click);
             // 
             // MainForm
             // 
@@ -285,6 +297,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.TreeView MapsTreeView;
+        private System.Windows.Forms.ToolStripButton SaveToolStripButton;
     }
 }
 

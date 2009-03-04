@@ -35,6 +35,7 @@ namespace Shrimp
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
             }
+            this.OnUpdated(EventArgs.Empty);
         }
 
         public event EventHandler Updated;
