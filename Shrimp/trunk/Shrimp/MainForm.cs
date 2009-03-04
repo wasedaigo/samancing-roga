@@ -12,12 +12,30 @@ namespace Shrimp
 {
     public partial class MainForm : Form
     {
+        private class CustomToolStripSystemRenderer : ToolStripSystemRenderer
+        {
+            protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+            {
+                // Do nothing
+            }
+        }
+
         public MainForm()
         {
-            InitializeComponent();
-            this.TilesPalette.Height = this.TilesPalette.Parent.ClientSize.Height;
+            this.InitializeComponent();
+            this.ToolStrip.Renderer = new CustomToolStripSystemRenderer();
+            this.TilesPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
+            this.TilesPalette.Height =
+                this.TilesPalette.Parent.ClientSize.Height - this.TilesPaletteToolStrip.Height;
             this.MainSplitContainer.SplitterDistance -=
                 this.TilesPalette.Parent.ClientSize.Width - this.TilesPalette.Width;
+            var items = this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>().ToArray();
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+                var j = i;
+                item.Click += (sender, e) => { this.PaletteIndex = j; };
+            }
             this.UpdateState();
         }
 
@@ -29,15 +47,26 @@ namespace Shrimp
             this.NewToolStripButton.Enabled = !hasProject;
             this.OpenToolStripButton.Enabled = !hasProject;
             this.CloseToolStripButton.Enabled = hasProject;
+            this.TilesPaletteToolStrip.Enabled = hasProject;
             if (hasProject)
             {
                 string tilesBitmapPath =
                     Path.Combine(Path.Combine(this.ProjectDirectoryPath, "Graphics"), "Tiles.png");
                 this.TilesPalette.TilesBitmap = Bitmap.FromFile(tilesBitmapPath) as Bitmap;
+                var items = this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>().ToArray();
+                foreach (var item in items)
+                {
+                    item.Checked = false;
+                }
+                items[this.paletteIndex].Checked = true;
             }
             else
             {
                 this.TilesPalette.TilesBitmap = null;
+                foreach (var item in this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>())
+                {
+                    item.Checked = false;
+                }
             }
         }
 
@@ -57,6 +86,23 @@ namespace Shrimp
             }
         }
         private string projectDirectoryPath;
+
+        private int PaletteIndex
+        {
+            get
+            {
+                return this.paletteIndex;
+            }
+            set
+            {
+                if (this.paletteIndex != value)
+                {
+                    this.paletteIndex = value;
+                    this.UpdateState();
+                }
+            }
+        }
+        private int paletteIndex;
 
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
