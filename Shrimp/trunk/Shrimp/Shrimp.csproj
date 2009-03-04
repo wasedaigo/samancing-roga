@@ -55,6 +55,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MapCollection.cs" />
     <Compile Include="MapEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -68,7 +69,7 @@
       <DependentUpon>NewProjectDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="Project.cs" />
+    <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

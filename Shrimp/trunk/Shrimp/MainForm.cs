@@ -49,22 +49,18 @@ namespace Shrimp
 
         private void UpdateState()
         {
-            bool hasProject = (this.Project != null);
-            this.MapsTreeView.Enabled = hasProject;
-            this.MapEditor.Enabled = hasProject;
-            this.NewToolStripButton.Enabled = !hasProject;
-            this.OpenToolStripButton.Enabled = !hasProject;
-            this.CloseToolStripButton.Enabled = hasProject;
-            this.SaveToolStripButton.Enabled = hasProject;
-            this.TilesPaletteToolStrip.Enabled = hasProject;
-            if (hasProject)
+            bool hasViewModel = (this.ViewModel != null);
+            this.MapsTreeView.Enabled = hasViewModel;
+            this.MapEditor.Enabled = hasViewModel;
+            this.NewToolStripButton.Enabled = !hasViewModel;
+            this.OpenToolStripButton.Enabled = !hasViewModel;
+            this.CloseToolStripButton.Enabled = hasViewModel;
+            this.SaveToolStripButton.Enabled = hasViewModel;
+            this.TilesPaletteToolStrip.Enabled = hasViewModel;
+            if (hasViewModel)
             {
-                this.Text = this.Project.GameTitle + " - Shrimp";
-                string directoryPath =
-                    Path.Combine(this.Project.BasePath, this.Project.DirectoryName);
-                string tilesBitmapPath =
-                    Path.Combine(Path.Combine(directoryPath, "Graphics"), "Tiles.png");
-                this.TilesPalette.TilesBitmap = Bitmap.FromFile(tilesBitmapPath) as Bitmap;
+                this.Text = this.ViewModel.GameTitle + " - Shrimp";
+                this.TilesPalette.TilesBitmap = this.ViewModel.GetTilesBitmap();
                 var items = this.TilesPaletteSwitchers.ToArray();
                 for (int i = 0; i < items.Length; i++)
                 {
@@ -82,32 +78,32 @@ namespace Shrimp
             }
         }
 
-        private Project Project
+        private ViewModel ViewModel
         {
             get
             {
-                return this.project;
+                return this.viewModel;
             }
             set
             {
-                if (this.project != value)
+                if (this.viewModel != value)
                 {
-                    if (this.project != null)
+                    if (this.viewModel != null)
                     {
-                        this.project.Updated -= this.Project_Updated;
+                        this.viewModel.Updated -= this.Project_Updated;
                         this.MapsTreeView.Nodes.Clear();
                     }
-                    this.project = value;
-                    if (this.project != null)
+                    this.viewModel = value;
+                    if (this.viewModel != null)
                     {
-                        this.project.Updated += this.Project_Updated;
-                        this.MapsTreeView.Nodes.Add(this.Project.GameTitle);
+                        this.viewModel.Updated += this.Project_Updated;
+                        this.MapsTreeView.Nodes.Add(this.ViewModel.GameTitle);
                     }
                     this.UpdateState();
                 }
             }
         }
-        private Project project;
+        private ViewModel viewModel;
 
         private void Project_Updated(object sender, EventArgs e)
         {
@@ -133,7 +129,7 @@ namespace Shrimp
 
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Project == null);
+            Debug.Assert(this.ViewModel == null);
             var dialog = new NewProjectDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -141,12 +137,11 @@ namespace Shrimp
                 Debug.Assert(!Directory.Exists(path));
                 CopyDirectory("ProjectTemplate", path);
                 this.PaletteIndex = 0;
-                Project project = new Project();
-                project.BasePath = dialog.BasePath;
-                project.DirectoryName = dialog.DirectoryName;
-                project.GameTitle = dialog.GameTitle;
-                project.Save();
-                this.Project = project;
+                string directoryPath = Path.Combine(dialog.BasePath, dialog.DirectoryName);
+                ViewModel viewModel = new ViewModel(directoryPath);
+                viewModel.GameTitle = dialog.GameTitle;
+                viewModel.Save();
+                this.ViewModel = viewModel;
             }
         }
 
@@ -171,24 +166,27 @@ namespace Shrimp
 
         private void OpenToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Project == null);
+            Debug.Assert(this.ViewModel == null);
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 this.PaletteIndex = 0;
-                this.Project = Project.LoadFile(this.OpenFileDialog.FileName);
+                string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
+                ViewModel viewModel = new ViewModel(directoryPath);
+                viewModel.Load();
+                this.ViewModel = viewModel;
             }
         }
 
         private void CloseToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Project != null);
-            this.Project = null;
+            Debug.Assert(this.ViewModel != null);
+            this.ViewModel = null;
         }
 
         private void SaveToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Project != null);
-            this.Project.Save();
+            Debug.Assert(this.ViewModel != null);
+            this.ViewModel.Save();
         }
     }
 }
