@@ -35,10 +35,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.DoubleBuffered = true;
             this.Name = "TilesPalette";
-            this.Size = new System.Drawing.Size(256, 512);
             this.ResumeLayout(false);
 
         }

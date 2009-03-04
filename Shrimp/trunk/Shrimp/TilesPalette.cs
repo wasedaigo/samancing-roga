@@ -60,8 +60,7 @@ namespace Shrimp
             this.Invalidate();
             if (this.DoubleSizedTilesBitmap != null)
             {
-                Size size = new Size(256, this.DoubleSizedTilesBitmap.Height);
-                this.AutoScrollMinSize = size;
+                this.AutoScrollMinSize = new Size(256, this.DoubleSizedTilesBitmap.Height);
             }
             else
             {

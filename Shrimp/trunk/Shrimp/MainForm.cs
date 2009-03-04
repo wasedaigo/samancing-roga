@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -29,20 +30,27 @@ namespace Shrimp
                 this.TilesPalette.Parent.ClientSize.Height - this.TilesPaletteToolStrip.Height;
             this.MainSplitContainer.SplitterDistance -=
                 this.TilesPalette.Parent.ClientSize.Width - this.TilesPalette.Width;
-            var items = this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>().ToArray();
+            var items = this.TilesPaletteSwitchers.ToArray();
             for (int i = 0; i < items.Length; i++)
             {
-                var item = items[i];
                 var j = i;
-                item.Click += (sender, e) => { this.PaletteIndex = j; };
+                items[i].Click += (sender, e) => { this.PaletteIndex = j; };
             }
             this.UpdateState();
+        }
+
+        private IEnumerable<ToolStripButton> TilesPaletteSwitchers
+        {
+            get
+            {
+                return this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>();
+            }
         }
 
         private void UpdateState()
         {
             bool hasProject = this.ProjectDirectoryPath != null;
-            //this.MapsTreeView.Enabled = hasProject;
+            this.MapsTreeView.Enabled = hasProject;
             this.MapEditor.Enabled = hasProject;
             this.NewToolStripButton.Enabled = !hasProject;
             this.OpenToolStripButton.Enabled = !hasProject;
@@ -53,17 +61,16 @@ namespace Shrimp
                 string tilesBitmapPath =
                     Path.Combine(Path.Combine(this.ProjectDirectoryPath, "Graphics"), "Tiles.png");
                 this.TilesPalette.TilesBitmap = Bitmap.FromFile(tilesBitmapPath) as Bitmap;
-                var items = this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>().ToArray();
-                foreach (var item in items)
+                var items = this.TilesPaletteSwitchers.ToArray();
+                for (int i = 0; i < items.Length; i++)
                 {
-                    item.Checked = false;
+                    items[i].Checked = (i == this.PaletteIndex);
                 }
-                items[this.paletteIndex].Checked = true;
             }
             else
             {
                 this.TilesPalette.TilesBitmap = null;
-                foreach (var item in this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>())
+                foreach (var item in this.TilesPaletteSwitchers)
                 {
                     item.Checked = false;
                 }
@@ -106,17 +113,13 @@ namespace Shrimp
 
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
-            var d = new NewProjectDialog();
-            if (d.ShowDialog() == DialogResult.OK)
+            var dialog = new NewProjectDialog();
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                string basePath = d.BasePath;
-                string directoryName = d.DirectoryName;
-                string path = Path.Combine(basePath, directoryName);
-                if (Directory.Exists(path))
-                {
-                    throw new Exception("directory already exists");
-                }
+                string path = Path.Combine(dialog.BasePath, dialog.DirectoryName);
+                Debug.Assert(!Directory.Exists(path));
                 CopyDirectory("ProjectTemplate", path);
+                this.PaletteIndex = 0;
                 this.ProjectDirectoryPath = path;
             }
         }
@@ -130,7 +133,9 @@ namespace Shrimp
             }
             foreach (string file in Directory.GetFiles(src))
             {
-                File.Copy(file, Path.Combine(dst, Path.GetFileName(file)));
+                string dstFile = Path.Combine(dst, Path.GetFileName(file));
+                File.Copy(file, dstFile);
+                File.SetAttributes(dstFile, File.GetAttributes(file));
             }
             foreach (string dir in Directory.GetDirectories(src))
             {
@@ -142,8 +147,9 @@ namespace Shrimp
         {
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string path = Path.GetDirectoryName(this.OpenFileDialog.FileName);
-                this.ProjectDirectoryPath = path;
+                this.PaletteIndex = 0;
+                this.ProjectDirectoryPath =
+                    Path.GetDirectoryName(this.OpenFileDialog.FileName);
             }
         }
 
