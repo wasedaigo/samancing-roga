@@ -82,7 +82,7 @@ namespace Shrimp
                 switch (e.KeyCode)
                 {
                 case Keys.Insert:
-                    this.Tree.Add(id, "Parent is " + id.ToString(), null);
+                    this.Tree.Add(id);
                     break;
                 case Keys.Delete:
                     if (id != this.Tree.Root)
@@ -102,7 +102,7 @@ namespace Shrimp
         int GetParent(int id);
         int[] GetChildren(int id);
 
-        void Add(int parentId, string title, object tag);
+        void Add(int parentId);
         void Remove(int id);
 
         event EventHandler<NodeEventArgs> NodeAdded;

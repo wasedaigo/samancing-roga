@@ -21,22 +21,24 @@ namespace Shrimp
     {
         private class Node
         {
-            public Node(Map map)
+            public Node(int id, Map map)
             {
+                this.Id = id;
                 this.Map = map;
-                this.ChildrenIds = new List<int>();
+                this.Children = new List<Node>();
             }
 
+            public int Id { get; private set; }
             public Map Map { get; private set; }
             public virtual string Name { get { return this.Map.Name; } }
-            public int ParentId { get; set; }
-            public List<int> ChildrenIds { get; set; }
+            public Node Parent { get; set; }
+            public List<Node> Children { get; private set; }
         }
 
         private class RootNode : Node
         {
             public RootNode(string name)
-                : base(null)
+                : base(0, null)
             {
                 this.name = name;
             }
@@ -48,52 +50,72 @@ namespace Shrimp
         public MapCollection(string name)
         {
             Node node = new RootNode(name);
-            this.Nodes[this.Root] = node;
+            this.RootNodeInstance = node;
         }
 
-        private Dictionary<int, Node> Nodes = new Dictionary<int, Node>();
+        private IEnumerable<Node> Nodes
+        {
+            get
+            {
+                return this.Traverse(this.RootNodeInstance);
+            }
+        }
+
+        private IEnumerable<Node> Traverse(Node node)
+        {
+            yield return node;
+            foreach (Node child in node.Children)
+            {
+                foreach (Node child2 in this.Traverse(child))
+                {
+                    yield return child2;
+                }
+            }
+        }
 
         public int Root
         {
-            get { return 0; }
+            get { return this.RootNodeInstance.Id; }
         }
+
+        private Node RootNodeInstance;
 
         public string GetName(int id)
         {
-            return this.Nodes[id].Name;
+            return this.Nodes.First(n => n.Id == id).Name;
         }
 
         public int GetParent(int id)
         {
-            return this.Nodes[id].ParentId;
+            return this.Nodes.First(n => n.Id == id).Parent.Id;
         }
 
         public int[] GetChildren(int id)
         {
-            return this.Nodes[id].ChildrenIds.ToArray();
+            return this.Nodes.First(n => n.Id == id).Children.Select(n => n.Id).ToArray();
         }
 
-        public void Add(int parentId, string name, object tag)
+        public void Add(int parentId)
         {
-            if (!this.Nodes.ContainsKey(parentId))
+            IEnumerable<int> ids = this.Nodes.Select(n => n.Id);
+            if (!ids.Contains(parentId))
             {
                 throw new ArgumentException("Invalid id", "parentId");
             }
             int id = 0;
-            int maxId = this.Nodes.Keys.Max();
+            int maxId = ids.Max();
             for (int i = 0; i <= maxId + 1; i++)
             {
-                if (!this.Nodes.ContainsKey(i))
+                if (!ids.Contains(i))
                 {
                     id = i;
                     break;
                 }
             }
-            Debug.Assert(!this.Nodes.ContainsKey(id));
-            Node node = new Node(new Map(name));
-            node.ParentId = parentId;
-            this.Nodes[id] = node;
-            this.Nodes[parentId].ChildrenIds.Add(id);
+            Debug.Assert(!ids.Contains(id));
+            Node node = new Node(id, new Map("Map (ID: " + id + ")"));
+            node.Parent = this.Nodes.First(n => n.Id == parentId);
+            node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
         }
 
@@ -103,16 +125,15 @@ namespace Shrimp
             {
                 throw new ArgumentException("Couldn't remove the root", "id");
             }
-            if (!this.Nodes.ContainsKey(id))
+            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
+            if (node == null)
             {
                 throw new ArgumentException("Invalid id", "id");
             }
-            Node node = this.Nodes[id];
-            Node parentNode = this.Nodes[node.ParentId];
+            Node parentNode = node.Parent;
             Debug.Assert(parentNode != null);
-            Debug.Assert(parentNode.ChildrenIds.Contains(id));
-            parentNode.ChildrenIds.Remove(id);
-            this.Nodes.Remove(id);
+            Debug.Assert(parentNode.Children.Contains(node));
+            parentNode.Children.Remove(node);
             this.OnNodeRemoved(new NodeEventArgs(id));
         }
 
