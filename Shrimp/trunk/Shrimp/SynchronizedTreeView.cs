@@ -67,15 +67,30 @@ namespace Shrimp
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
+            int id = e.NodeId;
+            TreeNode node = this.TreeNodeMap[id];
+            node.Remove();
+            this.TreeNodeMap.Remove(id);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyUp(e);
-            if (e.KeyCode == Keys.Insert && this.SelectedNode != null)
+            if (this.SelectedNode != null)
             {
                 int id = (int)this.SelectedNode.Tag;
-                this.Tree.Add(id, "Parent is " + id.ToString(), null);
+                switch (e.KeyCode)
+                {
+                case Keys.Insert:
+                    this.Tree.Add(id, "Parent is " + id.ToString(), null);
+                    break;
+                case Keys.Delete:
+                    if (id != this.Tree.Root)
+                    {
+                        this.Tree.Remove(id);
+                    }
+                    break;
+                }
             }
         }
     }

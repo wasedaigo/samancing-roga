@@ -77,7 +77,7 @@ namespace Shrimp
         {
             if (!this.Nodes.ContainsKey(parentId))
             {
-                throw new ArgumentException("invalid id", "parentId");
+                throw new ArgumentException("Invalid id", "parentId");
             }
             int id = 0;
             int maxId = this.Nodes.Keys.Max();
@@ -99,9 +99,13 @@ namespace Shrimp
 
         public void Remove(int id)
         {
+            if (id == this.Root)
+            {
+                throw new ArgumentException("Couldn't remove the root", "id");
+            }
             if (!this.Nodes.ContainsKey(id))
             {
-                throw new ArgumentException("invalid id", "id");
+                throw new ArgumentException("Invalid id", "id");
             }
             Node node = this.Nodes[id];
             Node parentNode = this.Nodes[node.ParentId];
