@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -9,6 +10,15 @@ namespace Shrimp
 {
     internal class SynchronizedTreeView : TreeView
     {
+        public SynchronizedTreeView()
+            : base()
+        {
+            this.DrawMode = TreeViewDrawMode.OwnerDrawAll;
+            this.ItemHeight = (int)(this.ItemHeight * 1.2);
+            this.Indent = this.ItemHeight;
+            this.
+        }
+
         private IEnumerable<TreeNode> AllNodes
         {
             get { return this.Traverse(this.Nodes); }
@@ -44,6 +54,10 @@ namespace Shrimp
                         this.tree.NodeAdded += this.Tree_NodeAdded;
                         this.tree.NodeRemoved += this.Tree_NodeRemoved;
                         this.Initialize();
+                    }
+                    else
+                    {
+                        this.Nodes.Clear();
                     }
                 }
             }
@@ -102,6 +116,42 @@ namespace Shrimp
                     }
                     break;
                 }
+            }
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            TreeNode node = this.GetNodeAt(e.X, e.Y);
+            if (node != null)
+            {
+                this.SelectedNode = node;
+            }
+        }
+
+        protected override void OnDrawNode(DrawTreeNodeEventArgs e)
+        {
+            base.OnDrawNode(e);
+            Graphics g = e.Graphics;
+            TreeNode node = e.Node;
+            Rectangle bounds = e.Bounds;
+            int x = bounds.X + this.Indent * node.Level + 16;
+            int y = bounds.Y + (this.ItemHeight - (int)this.Font.Size) / 2;
+            string text = node.Text;
+            if (this.SelectedNode == node)
+            {
+                g.FillRectangle(SystemBrushes.Highlight, bounds);
+                if ((e.State & TreeNodeStates.Focused) != 0)
+                {
+                    ControlPaint.DrawFocusRectangle(g, bounds,
+                        SystemColors.HighlightText, SystemColors.Highlight);
+                }
+                g.DrawString(text, this.Font, SystemBrushes.HighlightText, x, y);
+            }
+            else
+            {
+                g.FillRectangle(new SolidBrush(this.BackColor), bounds);
+                g.DrawString(text, this.Font, new SolidBrush(this.ForeColor), x, y);
             }
         }
     }
