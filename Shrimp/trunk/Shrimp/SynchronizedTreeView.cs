@@ -16,7 +16,6 @@ namespace Shrimp
             this.DrawMode = TreeViewDrawMode.OwnerDrawAll;
             this.ItemHeight = (int)(this.ItemHeight * 1.2);
             this.Indent = this.ItemHeight;
-            this.
         }
 
         private IEnumerable<TreeNode> AllNodes
