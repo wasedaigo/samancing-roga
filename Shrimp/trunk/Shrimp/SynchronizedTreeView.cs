@@ -14,6 +14,8 @@ namespace Shrimp
             : base()
         {
             this.DrawMode = TreeViewDrawMode.OwnerDrawAll;
+            this.FullRowSelect = true;
+            this.HideSelection = false;
             this.ItemHeight = (int)(this.ItemHeight * 1.2);
             this.Indent = this.ItemHeight;
         }
@@ -89,6 +91,7 @@ namespace Shrimp
             TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
             parentNode.Nodes.Add(node);
             parentNode.Expand();
+            this.SelectedNode = node;
         }
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
@@ -137,7 +140,7 @@ namespace Shrimp
             int x = bounds.X + this.Indent * node.Level + 16;
             int y = bounds.Y + (this.ItemHeight - (int)this.Font.Size) / 2;
             string text = node.Text;
-            if (this.SelectedNode == node)
+            if ((e.State & TreeNodeStates.Selected) != 0)
             {
                 g.FillRectangle(SystemBrushes.Highlight, bounds);
                 if ((e.State & TreeNodeStates.Focused) != 0)
@@ -149,7 +152,6 @@ namespace Shrimp
             }
             else
             {
-                g.FillRectangle(new SolidBrush(this.BackColor), bounds);
                 g.DrawString(text, this.Font, new SolidBrush(this.ForeColor), x, y);
             }
         }
