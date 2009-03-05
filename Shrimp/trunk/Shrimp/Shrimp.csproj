@@ -89,9 +89,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SynchronizedTreeView.resx">
-      <DependentUpon>SynchronizedTreeView.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="TilesPalette.resx">
       <DependentUpon>TilesPalette.cs</DependentUpon>
     </EmbeddedResource>
