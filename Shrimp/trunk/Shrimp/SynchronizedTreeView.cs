@@ -16,8 +16,9 @@ namespace Shrimp
             this.DrawMode = TreeViewDrawMode.OwnerDrawAll;
             this.FullRowSelect = true;
             this.HideSelection = false;
-            this.ItemHeight = (int)(this.ItemHeight * 1.2);
+            this.ItemHeight = (int)(this.Font.Height * 1.5);
             this.Indent = this.ItemHeight;
+            this.ShowLines = false;
         }
 
         private IEnumerable<TreeNode> AllNodes
@@ -121,16 +122,6 @@ namespace Shrimp
             }
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
-            TreeNode node = this.GetNodeAt(e.X, e.Y);
-            if (node != null)
-            {
-                this.SelectedNode = node;
-            }
-        }
-
         protected override void OnDrawNode(DrawTreeNodeEventArgs e)
         {
             base.OnDrawNode(e);
@@ -138,7 +129,7 @@ namespace Shrimp
             TreeNode node = e.Node;
             Rectangle bounds = e.Bounds;
             int x = bounds.X + this.Indent * node.Level + 16;
-            int y = bounds.Y + (this.ItemHeight - (int)this.Font.Size) / 2;
+            int y = bounds.Y + (this.ItemHeight - this.Font.Height) / 2;
             string text = node.Text;
             if ((e.State & TreeNodeStates.Selected) != 0)
             {
