@@ -12,25 +12,35 @@ namespace Shrimp
 {
     internal class ViewModel
     {
-        public ViewModel(string directoryPath)
+        public MapCollection MapCollection { get; private set; }
+
+        private string DirectoryPath;
+
+        public void New(string directoryPath, string gameTitle)
         {
             this.DirectoryPath = directoryPath;
+            this.GameTitle = gameTitle;
+            Util.CopyDirectory("ProjectTemplate", this.DirectoryPath);
+            this.MapCollection = new MapCollection(this.GameTitle);
+            this.Save();
+            this.IsOpened = true;
         }
 
-        private string DirectoryPath { get; set; }
-
-        public void Load()
+        public void Open(string directoryPath)
         {
+            this.DirectoryPath = directoryPath;
             string path = Path.Combine(this.DirectoryPath, "Game.shrp");
             Debug.Assert(File.Exists(path));
             JObject jObject = JObject.Parse(File.ReadAllText(path, new UTF8Encoding(false)));
             this.GameTitle = jObject["GameTitle"].Value<string>();
+            this.MapCollection = new MapCollection(this.GameTitle);
+            this.IsOpened = true;
         }
 
-        public void InitializeAndSave()
+        public void Close()
         {
-            Util.CopyDirectory("ProjectTemplate", this.DirectoryPath);
-            this.Save();
+            this.MapCollection = null;
+            this.IsOpened = false;
         }
 
         public void Save()
@@ -48,49 +58,65 @@ namespace Shrimp
             }
         }
 
-        public event EventHandler Updated;
-
-        protected virtual void OnUpdated(EventArgs e)
+        public bool IsOpened
         {
-            if (this.Updated != null)
+            get { return this.isOpened; }
+            private set
             {
-                this.Updated(this, e);
+                if (this.isOpened != value)
+                {
+                    this.isOpened = value;
+                    this.OnIsOpenedChanged(EventArgs.Empty);
+                }
             }
+        }
+        private bool isOpened = false;
+        public event EventHandler IsOpenedChanged;
+        protected virtual void OnIsOpenedChanged(EventArgs e)
+        {
+            if (this.IsOpenedChanged != null) { this.IsOpenedChanged(this, e); }
         }
 
         public string GameTitle
         {
-            get
-            {
-                return this.gameTitle;
-            }
+            get { return this.gameTitle; }
             set
             {
                 if (this.gameTitle != value)
                 {
                     this.gameTitle = value;
-                    this.OnUpdated(EventArgs.Empty);
+                    this.OnGameTitleChanged(EventArgs.Empty);
                 }
             }
         }
         private string gameTitle;
-
-        public int TileSetIndex
+        public event EventHandler GameTitleChanged;
+        protected virtual void OnGameTitleChanged(EventArgs e)
         {
-            get
-            {
-                return this.tileSetIndex;
-            }
+            if (this.GameTitleChanged != null) { this.GameTitleChanged(this, e); }
+        }
+
+        public int SelectedTileSetIndex
+        {
+            get { return this.selectedTileSetIndex; }
             set
             {
-                if (this.tileSetIndex != value)
+                if (this.selectedTileSetIndex != value)
                 {
-                    this.tileSetIndex = value;
-                    this.OnUpdated(EventArgs.Empty);
+                    this.selectedTileSetIndex = value;
+                    this.OnSelectedTileSetIndexChanged(EventArgs.Empty);
                 }
             }
         }
-        private int tileSetIndex;
+        private int selectedTileSetIndex;
+        public event EventHandler SelectedTileSetIndexChanged;
+        protected virtual void OnSelectedTileSetIndexChanged(EventArgs e)
+        {
+            if (this.SelectedTileSetIndexChanged != null)
+            {
+                this.SelectedTileSetIndexChanged(this, e);
+            }
+        }
 
         public Bitmap GetTilesBitmap()
         {

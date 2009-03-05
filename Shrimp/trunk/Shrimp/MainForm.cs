@@ -34,10 +34,25 @@ namespace Shrimp
             for (int i = 0; i < items.Length; i++)
             {
                 var j = i;
-                items[i].Click += (sender, e) => { this.ViewModel.TileSetIndex = j; };
+                items[i].Click += (sender, e) => { this.ViewModel.SelectedTileSetIndex = j; };
             }
-            this.UpdateState();
+            this.ViewModel = new ViewModel();
+            this.ViewModel.IsOpenedChanged += delegate
+            {
+                this.IsOpenedChanged();
+            };
+            this.ViewModel.SelectedTileSetIndexChanged += delegate
+            {
+                this.SelectedTileSetIndexChanged();
+            };
+            this.ViewModel.GameTitleChanged += delegate
+            {
+                this.GameTitleChanged();
+            };
+            this.IsOpenedChanged();
         }
+
+        private ViewModel ViewModel { get; set; }
 
         private IEnumerable<ToolStripButton> TilesPaletteSwitchers
         {
@@ -47,29 +62,41 @@ namespace Shrimp
             }
         }
 
-        private void UpdateState()
+        private void IsOpenedChanged()
         {
-            bool hasViewModel = (this.ViewModel != null);
-            this.MapsTreeView.Enabled = hasViewModel;
-            this.MapEditor.Enabled = hasViewModel;
-            this.NewToolStripButton.Enabled = !hasViewModel;
-            this.OpenToolStripButton.Enabled = !hasViewModel;
-            this.CloseToolStripButton.Enabled = hasViewModel;
-            this.SaveToolStripButton.Enabled = hasViewModel;
-            this.TilesPaletteToolStrip.Enabled = hasViewModel;
-            if (hasViewModel)
+            bool isOpened = this.ViewModel.IsOpened;
+            this.MapTreeView.Enabled = isOpened;
+            this.MapEditor.Enabled = isOpened;
+            this.NewToolStripButton.Enabled = !isOpened;
+            this.OpenToolStripButton.Enabled = !isOpened;
+            this.CloseToolStripButton.Enabled = isOpened;
+            this.SaveToolStripButton.Enabled = isOpened;
+            this.TilesPaletteToolStrip.Enabled = isOpened;
+            if (isOpened)
             {
-                this.Text = this.ViewModel.GameTitle + " - Shrimp";
+                this.MapTreeView.Tree = this.ViewModel.MapCollection;
+            }
+            else
+            {
+                this.MapTreeView.Tree = null;
+            }
+            this.SelectedTileSetIndexChanged();
+            this.GameTitleChanged();
+        }
+
+        private void SelectedTileSetIndexChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
                 this.TilesPalette.TilesBitmap = this.ViewModel.GetTilesBitmap();
                 var items = this.TilesPaletteSwitchers.ToArray();
                 for (int i = 0; i < items.Length; i++)
                 {
-                    items[i].Checked = (i == this.ViewModel.TileSetIndex);
+                    items[i].Checked = (i == this.ViewModel.SelectedTileSetIndex);
                 }
             }
             else
             {
-                this.Text = "Shrimp";
                 this.TilesPalette.TilesBitmap = null;
                 foreach (var item in this.TilesPaletteSwitchers)
                 {
@@ -78,74 +105,53 @@ namespace Shrimp
             }
         }
 
-        private ViewModel ViewModel
+        private void GameTitleChanged()
         {
-            get
+            if (this.ViewModel.IsOpened)
             {
-                return this.viewModel;
+                this.Text = this.ViewModel.GameTitle + " - Shrimp";
             }
-            set
+            else
             {
-                if (this.viewModel != value)
-                {
-                    if (this.viewModel != null)
-                    {
-                        this.viewModel.Updated -= this.Project_Updated;
-                        this.MapsTreeView.Nodes.Clear();
-                    }
-                    this.viewModel = value;
-                    if (this.viewModel != null)
-                    {
-                        this.viewModel.Updated += this.Project_Updated;
-                        this.MapsTreeView.Nodes.Add(this.ViewModel.GameTitle);
-                    }
-                    this.UpdateState();
-                }
+                this.Text = "Shrimp";
             }
-        }
-        private ViewModel viewModel;
-
-        private void Project_Updated(object sender, EventArgs e)
-        {
-            this.UpdateState();
         }
 
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.ViewModel == null);
+            Debug.Assert(!this.ViewModel.IsOpened);
             var dialog = new NewProjectDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 string directoryPath = Path.Combine(dialog.BasePath, dialog.DirectoryName);
-                ViewModel viewModel = new ViewModel(directoryPath);
-                viewModel.GameTitle = dialog.GameTitle;
-                viewModel.InitializeAndSave();
-                this.ViewModel = viewModel;
+                this.ViewModel.New(directoryPath, dialog.GameTitle);
+                Debug.Assert(this.ViewModel.IsOpened);
             }
         }
 
         private void OpenToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.ViewModel == null);
+            Debug.Assert(!this.ViewModel.IsOpened);
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
-                ViewModel viewModel = new ViewModel(directoryPath);
-                viewModel.Load();
-                this.ViewModel = viewModel;
+                this.ViewModel.Open(directoryPath);
+                Debug.Assert(this.ViewModel.IsOpened);
             }
         }
 
         private void CloseToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.ViewModel != null);
-            this.ViewModel = null;
+            Debug.Assert(this.ViewModel.IsOpened);
+            this.ViewModel.Close();
+            Debug.Assert(!this.ViewModel.IsOpened);
         }
 
         private void SaveToolStripButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.ViewModel != null);
+            Debug.Assert(this.ViewModel.IsOpened);
             this.ViewModel.Save();
+            Debug.Assert(this.ViewModel.IsOpened);
         }
     }
 }

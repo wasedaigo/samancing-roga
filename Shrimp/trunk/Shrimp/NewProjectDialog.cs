@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Shrimp
@@ -64,7 +65,12 @@ namespace Shrimp
         {
             this.ErrorProvider.Clear();
             bool isValidate = true;
-            if (Directory.Exists(Path.Combine(this.BasePath, this.DirectoryName)))
+            if (!(new Regex(@"^[a-zA-Z0-9_-]+$")).IsMatch(this.DirectoryName))
+            {
+                this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Invalid folder name");
+                isValidate = false;
+            }
+            else if (Directory.Exists(Path.Combine(this.BasePath, this.DirectoryName)))
             {
                 this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Already exists");
                 isValidate = false;
