@@ -9,7 +9,22 @@ namespace Shrimp
 {
     internal class SynchronizedTreeView : TreeView
     {
-        private Dictionary<int, TreeNode> TreeNodeMap = new Dictionary<int, TreeNode>();
+        private IEnumerable<TreeNode> AllNodes
+        {
+            get { return this.Traverse(this.Nodes); }
+        }
+
+        private IEnumerable<TreeNode> Traverse(TreeNodeCollection nodeCollection)
+        {
+            foreach (TreeNode node in nodeCollection)
+            {
+                yield return node;
+                foreach (TreeNode node2 in this.Traverse(node.Nodes))
+                {
+                    yield return node2;
+                }
+            }
+        }
 
         public ITree Tree
         {
@@ -46,7 +61,6 @@ namespace Shrimp
             TreeNode node = new TreeNode(this.Tree.GetName(this.Tree.Root));
             node.Tag = id;
             this.Nodes.Add(node);
-            this.TreeNodeMap[id] = node;
             foreach (int childId in this.Tree.GetChildren(id))
             {
                 this.Initialize2(childId);
@@ -59,18 +73,15 @@ namespace Shrimp
             TreeNode node = new TreeNode(this.Tree.GetName(id));
             node.Tag = id;
             int parentId = this.Tree.GetParent(id);
-            TreeNode parentNode = this.TreeNodeMap[parentId];
+            TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
             parentNode.Nodes.Add(node);
-            this.TreeNodeMap[id] = node;
             parentNode.Expand();
         }
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
-            TreeNode node = this.TreeNodeMap[id];
-            node.Remove();
-            this.TreeNodeMap.Remove(id);
+            this.AllNodes.First(n => (int)n.Tag == id).Remove();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

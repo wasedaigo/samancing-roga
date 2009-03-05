@@ -35,10 +35,12 @@ namespace Shrimp
             public List<Node> Children { get; private set; }
         }
 
+        private const int RootNodeId = 0;
+
         private class RootNode : Node
         {
             public RootNode(string name)
-                : base(0, null)
+                : base(RootNodeId, null)
             {
                 this.name = name;
             }
@@ -49,9 +51,10 @@ namespace Shrimp
 
         public MapCollection(string name)
         {
-            Node node = new RootNode(name);
-            this.RootNodeInstance = node;
+            this.RootNodeInstance = new RootNode(name);
         }
+
+        private Node RootNodeInstance;
 
         private IEnumerable<Node> Nodes
         {
@@ -75,10 +78,8 @@ namespace Shrimp
 
         public int Root
         {
-            get { return this.RootNodeInstance.Id; }
+            get { return RootNodeId; }
         }
-
-        private Node RootNodeInstance;
 
         public string GetName(int id)
         {
@@ -92,7 +93,8 @@ namespace Shrimp
 
         public int[] GetChildren(int id)
         {
-            return this.Nodes.First(n => n.Id == id).Children.Select(n => n.Id).ToArray();
+            return (from n in this.Nodes.First(n => n.Id == id).Children
+                    select n.Id).ToArray();
         }
 
         public void Add(int parentId)

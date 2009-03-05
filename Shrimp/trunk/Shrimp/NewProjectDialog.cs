@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Shrimp
 {
-    public partial class NewProjectDialog : Form
+    internal partial class NewProjectDialog : Form
     {
         public NewProjectDialog()
         {

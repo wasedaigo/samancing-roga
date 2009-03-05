@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Shrimp
 {
-    public partial class MapEditor : UserControl
+    internal partial class MapEditor : UserControl
     {
         public MapEditor()
         {

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Shrimp
 {
-    public partial class TilesPalette : UserControl
+    partial class TilesPalette : UserControl
     {
         public TilesPalette()
         {

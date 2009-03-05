@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Shrimp
 {
-    public partial class MainForm : Form
+    internal partial class MainForm : Form
     {
         private class CustomToolStripSystemRenderer : ToolStripSystemRenderer
         {
