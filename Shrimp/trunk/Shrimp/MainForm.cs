@@ -57,7 +57,7 @@ namespace Shrimp
             this.IsOpenedChanged();
         }
 
-        private ViewModel ViewModel { get; set; }
+        private ViewModel ViewModel;
 
         private IEnumerable<ToolStripButton> TilesPaletteSwitchers
         {
@@ -77,14 +77,6 @@ namespace Shrimp
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened && this.ViewModel.IsDirty;
             this.TilesPaletteToolStrip.Enabled = isOpened;
-            /*if (isOpened)
-            {
-                this.MapTreeView.Tree = this.ViewModel.MapCollection;
-            }
-            else
-            {
-                this.MapTreeView.Tree = null;
-            }*/
             this.IsDirtyChanged();
             this.SelectedTileSetIndexChanged();
             this.GameTitleChanged();
