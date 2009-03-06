@@ -40,7 +40,12 @@ namespace Shrimp
         public void Clear()
         {
             this.GameTitle = "";
-            this.OnUpdadted(EventArgs.Empty);
+            this.OnCleared(EventArgs.Empty);
+        }
+        public event EventHandler Cleared;
+        protected virtual void OnCleared(EventArgs e)
+        {
+            if (this.Cleared != null) { this.Cleared(this, e); }
         }
 
         public JObject ToJson()
@@ -52,6 +57,12 @@ namespace Shrimp
         {
             this.Clear();
             this.GameTitle = json["GameTitle"].Value<string>();
+            this.OnLoaded(EventArgs.Empty);
+        }
+        public event EventHandler Loaded;
+        protected virtual void OnLoaded(EventArgs e)
+        {
+            if (this.Loaded != null) { this.Loaded(this, e); }
         }
 
         public event EventHandler Updated;

@@ -49,10 +49,11 @@ namespace Shrimp
             {
                 this.SelectedTileSetIndexChanged();
             };
-            /*this.ViewModel.GameTitleChanged += delegate
+            this.ViewModel.Project.GameTitleChanged += delegate
             {
                 this.GameTitleChanged();
-            };*/
+            };
+            this.MapTreeView.Tree = this.ViewModel.MapCollection;
             this.IsOpenedChanged();
         }
 
@@ -76,14 +77,14 @@ namespace Shrimp
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened && this.ViewModel.IsDirty;
             this.TilesPaletteToolStrip.Enabled = isOpened;
-            if (isOpened)
+            /*if (isOpened)
             {
                 this.MapTreeView.Tree = this.ViewModel.MapCollection;
             }
             else
             {
                 this.MapTreeView.Tree = null;
-            }
+            }*/
             this.IsDirtyChanged();
             this.SelectedTileSetIndexChanged();
             this.GameTitleChanged();

@@ -47,39 +47,49 @@ namespace Shrimp
                 {
                     if (this.tree != null)
                     {
+                        this.tree.Loaded -= this.Tree_Loaded;
                         this.tree.NodeAdded -= this.Tree_NodeAdded;
                         this.tree.NodeRemoved -= this.Tree_NodeRemoved;
+                        this.tree.NodeNameChanged -= this.Tree_NodeNameChanged;
+                        this.tree.Cleared -= this.Tree_Cleared;
                     }
                     this.tree = value;
                     if (this.tree != null)
                     {
+                        this.tree.Loaded += this.Tree_Loaded;
                         this.tree.NodeAdded += this.Tree_NodeAdded;
                         this.tree.NodeRemoved += this.Tree_NodeRemoved;
-                        this.Initialize();
+                        this.tree.NodeNameChanged += this.Tree_NodeNameChanged;
+                        this.tree.Cleared += this.Tree_Cleared;
                     }
-                    else
-                    {
-                        this.Nodes.Clear();
-                    }
+                    this.Initialize();
                 }
             }
         }
         private ITree tree;
 
+        private void Tree_Loaded(object sender, EventArgs e)
+        {
+            this.Initialize();
+        }
+
         private void Initialize()
         {
             this.Nodes.Clear();
-            this.Initialize2(this.Tree.Root);
+            if (this.Tree != null)
+            {
+                this.AddTreeNode(this.Tree.Root);
+            }
         }
 
-        private void Initialize2(int id)
+        private void AddTreeNode(int id)
         {
-            TreeNode node = new TreeNode(this.Tree.GetName(this.Tree.Root));
+            TreeNode node = new TreeNode(this.Tree.GetName(id));
             node.Tag = id;
             this.Nodes.Add(node);
             foreach (int childId in this.Tree.GetChildren(id))
             {
-                this.Initialize2(childId);
+                this.AddTreeNode(childId);
             }
         }
 
@@ -99,6 +109,18 @@ namespace Shrimp
         {
             int id = e.NodeId;
             this.AllNodes.First(n => (int)n.Tag == id).Remove();
+        }
+
+        private void Tree_NodeNameChanged(object sender, NodeEventArgs e)
+        {
+            int id = e.NodeId;
+            string text = this.Tree.GetName(e.NodeId);
+            this.AllNodes.First(n => (int)n.Tag == id).Text = text;
+        }
+
+        private void Tree_Cleared(object sender, EventArgs e)
+        {
+            this.Initialize();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -146,30 +168,5 @@ namespace Shrimp
                 g.DrawString(text, this.Font, new SolidBrush(this.ForeColor), x, y);
             }
         }
-    }
-
-    internal interface ITree
-    {
-        int Root { get; }
-        string GetName(int id);
-        int GetParent(int id);
-        int[] GetChildren(int id);
-
-        void Add(int parentId);
-        void Remove(int id);
-
-        event EventHandler<NodeEventArgs> NodeAdded;
-        event EventHandler<NodeEventArgs> NodeRemoved;
-        event EventHandler<NodeEventArgs> NodeNameChanged;
-    }
-
-    internal class NodeEventArgs : EventArgs
-    {
-        public NodeEventArgs(int nodeId)
-        {
-            this.NodeId = nodeId;
-        }
-
-        public int NodeId { get; private set; }
     }
 }

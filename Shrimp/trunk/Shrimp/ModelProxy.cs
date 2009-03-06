@@ -8,19 +8,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal interface IModel
-    {
-        ViewModel ViewModel { get; }
-
-        event EventHandler Updated;
-
-        void Clear();
-
-        JObject ToJson();
-
-        void LoadJson(JObject json);
-    }
-
     internal class ModelProxy<T> where T : class, IModel
     {
         public ModelProxy(T model)
@@ -43,12 +30,17 @@ namespace Shrimp
             this.IsDirty = false;
         }
 
-        public void Load(string path)
+        public bool Load(string path)
         {
             this.Model.Clear();
-            JObject json = JObject.Parse(File.ReadAllText(path, Util.UTF8N));
-            this.Model.LoadJson(json);
+            bool result;
+            if (result = File.Exists(path))
+            {
+                JObject json = JObject.Parse(File.ReadAllText(path, Util.UTF8N));
+                this.Model.LoadJson(json);
+            }
             this.IsDirty = false;
+            return result;
         }
 
         public bool IsDirty

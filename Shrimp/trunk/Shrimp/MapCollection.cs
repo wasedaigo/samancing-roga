@@ -19,7 +19,7 @@ namespace Shrimp
         public string Name { get; private set; }
     }
 
-    internal class MapCollection : ITree, IModel
+    internal class MapCollection : ITree
     {
         private class Node
         {
@@ -66,6 +66,10 @@ namespace Shrimp
         {
             this.ViewModel = viewModel;
             this.Clear();
+            this.ViewModel.Project.GameTitleChanged += delegate
+            {
+                this.OnNodeNameChanged(new NodeEventArgs(RootNodeId));
+            };
         }
 
         public ViewModel ViewModel { get; private set; }
@@ -176,12 +180,6 @@ namespace Shrimp
             this.OnUpdated(EventArgs.Empty);
         }
 
-        public void Clear()
-        {
-            this.RootNodeInstance = new RootNode(this);
-            this.OnUpdated(EventArgs.Empty);
-        }
-
         public JObject ToJson()
         {
             return this.RootNodeInstance.ToJson();
@@ -191,6 +189,23 @@ namespace Shrimp
         {
             this.Clear();
             // TODO
+            this.OnLoaded(EventArgs.Empty);
+        }
+        public event EventHandler Loaded;
+        protected virtual void OnLoaded(EventArgs e)
+        {
+            if (this.Loaded != null) { this.Loaded(this, e); }
+        }
+
+        public void Clear()
+        {
+            this.RootNodeInstance = new RootNode(this);
+            this.OnCleared(EventArgs.Empty);
+        }
+        public event EventHandler Cleared;
+        protected virtual void OnCleared(EventArgs e)
+        {
+            if (this.Cleared != null) { this.Cleared(this, e); }
         }
 
         public event EventHandler Updated;
