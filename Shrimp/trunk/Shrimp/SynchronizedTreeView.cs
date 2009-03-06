@@ -48,19 +48,20 @@ namespace Shrimp
                     if (this.tree != null)
                     {
                         this.tree.Loaded -= this.Tree_Loaded;
+                        this.tree.Cleared -= this.Tree_Cleared;
                         this.tree.NodeAdded -= this.Tree_NodeAdded;
                         this.tree.NodeRemoved -= this.Tree_NodeRemoved;
                         this.tree.NodeNameChanged -= this.Tree_NodeNameChanged;
-                        this.tree.Cleared -= this.Tree_Cleared;
+                        
                     }
                     this.tree = value;
                     if (this.tree != null)
                     {
                         this.tree.Loaded += this.Tree_Loaded;
+                        this.tree.Cleared += this.Tree_Cleared;
                         this.tree.NodeAdded += this.Tree_NodeAdded;
                         this.tree.NodeRemoved += this.Tree_NodeRemoved;
                         this.tree.NodeNameChanged += this.Tree_NodeNameChanged;
-                        this.tree.Cleared += this.Tree_Cleared;
                     }
                     this.Initialize();
                 }
@@ -69,6 +70,11 @@ namespace Shrimp
         private ITree tree;
 
         private void Tree_Loaded(object sender, EventArgs e)
+        {
+            this.Initialize();
+        }
+
+        private void Tree_Cleared(object sender, EventArgs e)
         {
             this.Initialize();
         }
@@ -116,11 +122,6 @@ namespace Shrimp
             int id = e.NodeId;
             string text = this.Tree.GetName(e.NodeId);
             this.AllNodes.First(n => (int)n.Tag == id).Text = text;
-        }
-
-        private void Tree_Cleared(object sender, EventArgs e)
-        {
-            this.Initialize();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

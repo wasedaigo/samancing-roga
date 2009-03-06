@@ -19,7 +19,7 @@ namespace Shrimp
         public string Name { get; private set; }
     }
 
-    internal class MapCollection : ITree
+    internal class MapCollection : ITree, IModel
     {
         private class Node
         {
