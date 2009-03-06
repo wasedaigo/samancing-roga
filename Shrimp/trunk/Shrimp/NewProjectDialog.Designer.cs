@@ -36,7 +36,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.GameTitleTextBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.PathButton = new System.Windows.Forms.Button();
+            this.BasePathButton = new System.Windows.Forms.Button();
             this.BasePathTextBox = new System.Windows.Forms.TextBox();
             this.FolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.ErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
@@ -102,10 +102,11 @@
             this.GameTitleTextBox.Size = new System.Drawing.Size(424, 19);
             this.GameTitleTextBox.TabIndex = 0;
             this.GameTitleTextBox.Text = "Samancing Roga";
+            this.GameTitleTextBox.TextChanged += new System.EventHandler(this.GameTitleTextBox_TextChanged);
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.PathButton);
+            this.groupBox3.Controls.Add(this.BasePathButton);
             this.groupBox3.Controls.Add(this.BasePathTextBox);
             this.groupBox3.Location = new System.Drawing.Point(8, 120);
             this.groupBox3.Name = "groupBox3";
@@ -114,15 +115,15 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Path";
             // 
-            // PathButton
+            // BasePathButton
             // 
-            this.PathButton.Location = new System.Drawing.Point(408, 16);
-            this.PathButton.Name = "PathButton";
-            this.PathButton.Size = new System.Drawing.Size(24, 20);
-            this.PathButton.TabIndex = 1;
-            this.PathButton.Text = "...";
-            this.PathButton.UseVisualStyleBackColor = true;
-            this.PathButton.Click += new System.EventHandler(this.FolderPathButton_Click);
+            this.BasePathButton.Location = new System.Drawing.Point(408, 16);
+            this.BasePathButton.Name = "BasePathButton";
+            this.BasePathButton.Size = new System.Drawing.Size(24, 20);
+            this.BasePathButton.TabIndex = 1;
+            this.BasePathButton.Text = "...";
+            this.BasePathButton.UseVisualStyleBackColor = true;
+            this.BasePathButton.Click += new System.EventHandler(this.FolderPathButton_Click);
             // 
             // BasePathTextBox
             // 
@@ -130,6 +131,7 @@
             this.BasePathTextBox.Name = "BasePathTextBox";
             this.BasePathTextBox.Size = new System.Drawing.Size(400, 19);
             this.BasePathTextBox.TabIndex = 0;
+            this.BasePathTextBox.TextChanged += new System.EventHandler(this.BasePathTextBox_TextChanged);
             // 
             // FolderBrowserDialog
             // 
@@ -180,7 +182,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox GameTitleTextBox;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Button PathButton;
+        private System.Windows.Forms.Button BasePathButton;
         private System.Windows.Forms.TextBox BasePathTextBox;
         private System.Windows.Forms.FolderBrowserDialog FolderBrowserDialog;
         private System.Windows.Forms.ErrorProvider ErrorProvider;

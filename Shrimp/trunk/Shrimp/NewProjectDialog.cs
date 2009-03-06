@@ -61,6 +61,16 @@ namespace Shrimp
             this.ValidateValues();
         }
 
+        private void GameTitleTextBox_TextChanged(object sender, EventArgs e)
+        {
+            this.ValidateValues();
+        }
+
+        private void BasePathTextBox_TextChanged(object sender, EventArgs e)
+        {
+            this.ValidateValues();
+        }
+
         private void ValidateValues()
         {
             this.ErrorProvider.Clear();
@@ -73,6 +83,16 @@ namespace Shrimp
             else if (Directory.Exists(Path.Combine(this.BasePath, this.DirectoryName)))
             {
                 this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Already exists");
+                isValidate = false;
+            }
+            if (this.GameTitle == "")
+            {
+                this.ErrorProvider.SetError(this.GameTitleTextBox, "Input game title");
+                isValidate = false;
+            }
+            if (!Directory.Exists(this.BasePath))
+            {
+                this.ErrorProvider.SetError(this.BasePathButton, "Directory not found");
                 isValidate = false;
             }
             this.OKButton.Enabled = isValidate;

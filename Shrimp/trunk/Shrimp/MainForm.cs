@@ -41,6 +41,10 @@ namespace Shrimp
             {
                 this.IsOpenedChanged();
             };
+            this.ViewModel.IsDirtyChanged += delegate
+            {
+                this.IsDirtyChanged();
+            };
             this.ViewModel.SelectedTileSetIndexChanged += delegate
             {
                 this.SelectedTileSetIndexChanged();
@@ -70,7 +74,7 @@ namespace Shrimp
             this.NewToolStripButton.Enabled = !isOpened;
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
-            this.SaveToolStripButton.Enabled = isOpened;
+            this.SaveToolStripButton.Enabled = isOpened && this.ViewModel.IsDirty;
             this.TilesPaletteToolStrip.Enabled = isOpened;
             if (isOpened)
             {
@@ -80,8 +84,15 @@ namespace Shrimp
             {
                 this.MapTreeView.Tree = null;
             }
+            this.IsDirtyChanged();
             this.SelectedTileSetIndexChanged();
             this.GameTitleChanged();
+        }
+
+        private void IsDirtyChanged()
+        {
+            this.SaveToolStripButton.Enabled =
+                this.ViewModel.IsOpened && this.ViewModel.IsDirty;
         }
 
         private void SelectedTileSetIndexChanged()
@@ -126,6 +137,7 @@ namespace Shrimp
                 string directoryPath = Path.Combine(dialog.BasePath, dialog.DirectoryName);
                 this.ViewModel.New(directoryPath, dialog.GameTitle);
                 Debug.Assert(this.ViewModel.IsOpened);
+                Debug.Assert(!this.ViewModel.IsDirty);
             }
         }
 
@@ -137,6 +149,7 @@ namespace Shrimp
                 string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
                 this.ViewModel.Open(directoryPath);
                 Debug.Assert(this.ViewModel.IsOpened);
+                Debug.Assert(!this.ViewModel.IsDirty);
             }
         }
 
@@ -145,13 +158,16 @@ namespace Shrimp
             Debug.Assert(this.ViewModel.IsOpened);
             this.ViewModel.Close();
             Debug.Assert(!this.ViewModel.IsOpened);
+            Debug.Assert(!this.ViewModel.IsDirty);
         }
 
         private void SaveToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(this.ViewModel.IsOpened);
+            Debug.Assert(this.ViewModel.IsDirty);
             this.ViewModel.Save();
             Debug.Assert(this.ViewModel.IsOpened);
+            Debug.Assert(!this.ViewModel.IsDirty);
         }
     }
 }

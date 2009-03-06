@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
@@ -33,6 +35,14 @@ namespace Shrimp
             public virtual string Name { get { return this.Map.Name; } }
             public Node Parent { get; set; }
             public List<Node> Children { get; private set; }
+
+            public JObject ToJson()
+            {
+                return new JObject(
+                    new JProperty("Id", this.Id),
+                    new JProperty("Children",
+                        new JArray(this.Children.Select(n => n.ToJson()))));
+            }
         }
 
         private const int RootNodeId = 0;
@@ -52,6 +62,7 @@ namespace Shrimp
         public MapCollection(string name)
         {
             this.RootNodeInstance = new RootNode(name);
+            this.IsDirty = false;
         }
 
         private Node RootNodeInstance;
@@ -119,6 +130,7 @@ namespace Shrimp
             node.Parent = this.Nodes.First(n => n.Id == parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
+            this.IsDirty = true;
         }
 
         public void Remove(int id)
@@ -137,6 +149,7 @@ namespace Shrimp
             Debug.Assert(parentNode.Children.Contains(node));
             parentNode.Children.Remove(node);
             this.OnNodeRemoved(new NodeEventArgs(id));
+            this.IsDirty = true;
         }
 
         public event EventHandler<NodeEventArgs> NodeAdded;
@@ -155,6 +168,30 @@ namespace Shrimp
         protected virtual void OnNodeNameChanged(NodeEventArgs e)
         {
             if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
+        }
+
+        public bool IsDirty
+        {
+            get { return this.isDirty; }
+            set
+            {
+                if (this.isDirty != value)
+                {
+                    this.isDirty = value;
+                    this.OnIsDirtyChanged(EventArgs.Empty);
+                }
+            }
+        }
+        private bool isDirty = false;
+        public event EventHandler IsDirtyChanged;
+        protected virtual void OnIsDirtyChanged(EventArgs e)
+        {
+            if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
+        }
+
+        public JObject ToJson()
+        {
+            return this.RootNodeInstance.ToJson();
         }
     }
 }

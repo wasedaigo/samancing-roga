@@ -12,7 +12,30 @@ namespace Shrimp
 {
     internal class ViewModel
     {
-        public MapCollection MapCollection { get; private set; }
+        public MapCollection MapCollection
+        {
+            get { return this.mapCollection; }
+            private set
+            {
+                if (this.mapCollection != value)
+                {
+                    if (this.mapCollection != null)
+                    {
+                        this.MapCollection.IsDirtyChanged -= this.MapCollection_IsDirtyChanged;
+                    }
+                    this.mapCollection = value;
+                    if (this.mapCollection != null)
+                    {
+                        this.MapCollection.IsDirtyChanged += this.MapCollection_IsDirtyChanged;
+                    }
+                }
+            }
+        }
+        private MapCollection mapCollection;
+        private void MapCollection_IsDirtyChanged(object sender, EventArgs e)
+        {
+            this.IsDirty |= this.MapCollection.IsDirty;
+        }
 
         private string DirectoryPath;
 
@@ -24,6 +47,7 @@ namespace Shrimp
             this.MapCollection = new MapCollection(this.GameTitle);
             this.Save();
             this.IsOpened = true;
+            this.IsDirty = false;
         }
 
         public void Open(string directoryPath)
@@ -35,26 +59,58 @@ namespace Shrimp
             this.GameTitle = jObject["GameTitle"].Value<string>();
             this.MapCollection = new MapCollection(this.GameTitle);
             this.IsOpened = true;
+            this.IsDirty = false;
         }
 
         public void Close()
         {
             this.MapCollection = null;
             this.IsOpened = false;
+            this.IsDirty = false;
+        }
+
+        private string GraphicsPath
+        {
+            get { return Path.Combine(this.DirectoryPath, "Graphics"); }
+        }
+
+        private string DataPath
+        {
+            get { return Path.Combine(this.DirectoryPath, "Data"); }
         }
 
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
-            string path = Path.Combine(this.DirectoryPath, "Game.shrp");
-            using (var sw = new StreamWriter(path, false, new UTF8Encoding(false)))
-            using (var writer = new JsonTextWriter(sw))
+            if (this.IsDirty)
             {
-                writer.Formatting = Formatting.Indented;
-                writer.WriteStartObject();
-                writer.WritePropertyName("GameTitle");
-                writer.WriteValue(this.GameTitle);
-                writer.WriteEndObject();
+                // TODO: fix this block
+                string path = Path.Combine(this.DirectoryPath, "Game.shrp");
+                using (var sw = new StreamWriter(path, false, new UTF8Encoding(false)))
+                using (var writer = new JsonTextWriter(sw))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("GameTitle");
+                    writer.WriteValue(this.GameTitle);
+                    writer.WriteEndObject();
+                }
+                this.IsDirty = false;
+            }
+            if (this.MapCollection.IsDirty)
+            {
+                if (!Directory.Exists(this.DataPath))
+                {
+                    Directory.CreateDirectory(this.DataPath);
+                }
+                string path = Path.Combine(this.DataPath, "MapCollection.json");
+                using (var sw = new StreamWriter(path, false, new UTF8Encoding(false)))
+                using (var writer = new JsonTextWriter(sw))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    this.MapCollection.ToJson().WriteTo(writer);
+                }
+                this.MapCollection.IsDirty = false;
             }
         }
 
@@ -77,6 +133,25 @@ namespace Shrimp
             if (this.IsOpenedChanged != null) { this.IsOpenedChanged(this, e); }
         }
 
+        public bool IsDirty
+        {
+            get { return this.isDirty; }
+            private set
+            {
+                if (this.isDirty != value)
+                {
+                    this.isDirty = value;
+                    this.OnIsDirtyChanged(EventArgs.Empty);
+                }
+            }
+        }
+        private bool isDirty = false;
+        public event EventHandler IsDirtyChanged;
+        protected virtual void OnIsDirtyChanged(EventArgs e)
+        {
+            if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
+        }
+
         public string GameTitle
         {
             get { return this.gameTitle; }
@@ -85,6 +160,7 @@ namespace Shrimp
                 if (this.gameTitle != value)
                 {
                     this.gameTitle = value;
+                    this.IsDirty = true;
                     this.OnGameTitleChanged(EventArgs.Empty);
                 }
             }
@@ -120,8 +196,7 @@ namespace Shrimp
 
         public Bitmap GetTilesBitmap()
         {
-            string tilesBitmapPath =
-                Path.Combine(Path.Combine(this.DirectoryPath, "Graphics"), "Tiles.png");
+            string tilesBitmapPath = Path.Combine(this.GraphicsPath, "Tiles.png");
             return Bitmap.FromFile(tilesBitmapPath) as Bitmap;
         }
     }
