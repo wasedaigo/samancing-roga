@@ -79,6 +79,11 @@ namespace Shrimp
             get { return Path.Combine(this.DirectoryPath, "Data"); }
         }
 
+        private string AudioPath
+        {
+            get { return Path.Combine(this.DirectoryPath, "Audio"); }
+        }
+
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
@@ -90,10 +95,7 @@ namespace Shrimp
                 using (var writer = new JsonTextWriter(sw))
                 {
                     writer.Formatting = Formatting.Indented;
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("GameTitle");
-                    writer.WriteValue(this.GameTitle);
-                    writer.WriteEndObject();
+                    new JObject(new JProperty("GameTitle", this.GameTitle)).WriteTo(writer);
                 }
                 this.IsDirty = false;
             }
