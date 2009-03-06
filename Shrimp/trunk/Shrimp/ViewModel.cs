@@ -12,61 +12,65 @@ namespace Shrimp
 {
     internal class ViewModel
     {
+        public ViewModel()
+        {
+            this.ProjectProxy = new ModelProxy<Project>(new Project(this));
+            this.ProjectProxy.IsDirtyChanged += delegate
+            {
+                this.OnIsDirtyChanged(EventArgs.Empty);
+            };
+            this.MapCollectionProxy = new ModelProxy<MapCollection>(new MapCollection(this));
+            this.MapCollectionProxy.IsDirtyChanged += delegate
+            {
+                this.OnIsDirtyChanged(EventArgs.Empty);
+            };
+        }
+
         public MapCollection MapCollection
         {
-            get { return this.mapCollection; }
-            private set
-            {
-                if (this.mapCollection != value)
-                {
-                    if (this.mapCollection != null)
-                    {
-                        this.MapCollection.IsDirtyChanged -= this.MapCollection_IsDirtyChanged;
-                    }
-                    this.mapCollection = value;
-                    if (this.mapCollection != null)
-                    {
-                        this.MapCollection.IsDirtyChanged += this.MapCollection_IsDirtyChanged;
-                    }
-                }
-            }
+            get { return this.MapCollectionProxy.Model; }
         }
-        private MapCollection mapCollection;
-        private void MapCollection_IsDirtyChanged(object sender, EventArgs e)
+        private ModelProxy<MapCollection> MapCollectionProxy;
+
+        public Project Project
         {
-            this.IsDirty |= this.MapCollection.IsDirty;
+            get { return this.ProjectProxy.Model; }
         }
+        private ModelProxy<Project> ProjectProxy;
 
         private string DirectoryPath;
 
         public void New(string directoryPath, string gameTitle)
         {
+            this.ProjectProxy.Clear();
+            this.MapCollectionProxy.Clear();
             this.DirectoryPath = directoryPath;
-            this.GameTitle = gameTitle;
+            this.Project.GameTitle = gameTitle;
             Util.CopyDirectory("ProjectTemplate", this.DirectoryPath);
-            this.MapCollection = new MapCollection(this.GameTitle);
             this.Save();
             this.IsOpened = true;
-            this.IsDirty = false;
         }
 
         public void Open(string directoryPath)
         {
             this.DirectoryPath = directoryPath;
-            string path = Path.Combine(this.DirectoryPath, "Game.shrp");
-            Debug.Assert(File.Exists(path));
-            JObject jObject = JObject.Parse(File.ReadAllText(path, Util.UTF8N));
-            this.GameTitle = jObject["GameTitle"].Value<string>();
-            this.MapCollection = new MapCollection(this.GameTitle);
+            {
+                string path = Path.Combine(this.DirectoryPath, "Game.shrp");
+                Debug.Assert(File.Exists(path));
+                this.ProjectProxy.Load(path);
+            }
+            {
+                string path = Path.Combine(this.DataPath, "MapCollection.json");
+                this.MapCollectionProxy.Load(path);
+            }
             this.IsOpened = true;
-            this.IsDirty = false;
         }
 
         public void Close()
         {
-            this.MapCollection = null;
+            this.ProjectProxy.Clear();
+            this.MapCollectionProxy.Clear();
             this.IsOpened = false;
-            this.IsDirty = false;
         }
 
         private string GraphicsPath
@@ -87,32 +91,19 @@ namespace Shrimp
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
-            if (this.IsDirty)
+            if (this.ProjectProxy.IsDirty)
             {
-                // TODO: fix this block
                 string path = Path.Combine(this.DirectoryPath, "Game.shrp");
-                using (var sw = new StreamWriter(path, false, Util.UTF8N))
-                using (var writer = new JsonTextWriter(sw))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    new JObject(new JProperty("GameTitle", this.GameTitle)).WriteTo(writer);
-                }
-                this.IsDirty = false;
+                this.ProjectProxy.Save(path);
             }
-            if (this.MapCollection.IsDirty)
+            if (this.MapCollectionProxy.IsDirty)
             {
                 if (!Directory.Exists(this.DataPath))
                 {
                     Directory.CreateDirectory(this.DataPath);
                 }
                 string path = Path.Combine(this.DataPath, "MapCollection.json");
-                using (var sw = new StreamWriter(path, false, Util.UTF8N))
-                using (var writer = new JsonTextWriter(sw))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    this.MapCollection.ToJson().WriteTo(writer);
-                }
-                this.MapCollection.IsDirty = false;
+                this.MapCollectionProxy.Save(path);
             }
         }
 
@@ -137,41 +128,15 @@ namespace Shrimp
 
         public bool IsDirty
         {
-            get { return this.isDirty; }
-            private set
+            get
             {
-                if (this.isDirty != value)
-                {
-                    this.isDirty = value;
-                    this.OnIsDirtyChanged(EventArgs.Empty);
-                }
+                return this.ProjectProxy.IsDirty || this.MapCollectionProxy.IsDirty;
             }
         }
-        private bool isDirty = false;
         public event EventHandler IsDirtyChanged;
         protected virtual void OnIsDirtyChanged(EventArgs e)
         {
             if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
-        }
-
-        public string GameTitle
-        {
-            get { return this.gameTitle; }
-            set
-            {
-                if (this.gameTitle != value)
-                {
-                    this.gameTitle = value;
-                    this.IsDirty = true;
-                    this.OnGameTitleChanged(EventArgs.Empty);
-                }
-            }
-        }
-        private string gameTitle;
-        public event EventHandler GameTitleChanged;
-        protected virtual void OnGameTitleChanged(EventArgs e)
-        {
-            if (this.GameTitleChanged != null) { this.GameTitleChanged(this, e); }
         }
 
         public int SelectedTileSetIndex

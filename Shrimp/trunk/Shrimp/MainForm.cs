@@ -49,10 +49,10 @@ namespace Shrimp
             {
                 this.SelectedTileSetIndexChanged();
             };
-            this.ViewModel.GameTitleChanged += delegate
+            /*this.ViewModel.GameTitleChanged += delegate
             {
                 this.GameTitleChanged();
-            };
+            };*/
             this.IsOpenedChanged();
         }
 
@@ -120,7 +120,7 @@ namespace Shrimp
         {
             if (this.ViewModel.IsOpened)
             {
-                this.Text = this.ViewModel.GameTitle + " - Shrimp";
+                this.Text = this.ViewModel.Project.GameTitle + " - Shrimp";
             }
             else
             {

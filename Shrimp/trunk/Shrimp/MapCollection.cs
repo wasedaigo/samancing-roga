@@ -19,7 +19,7 @@ namespace Shrimp
         public string Name { get; private set; }
     }
 
-    internal class MapCollection : ITree
+    internal class MapCollection : ITree, IModel
     {
         private class Node
         {
@@ -49,21 +49,26 @@ namespace Shrimp
 
         private class RootNode : Node
         {
-            public RootNode(string name)
+            public RootNode(MapCollection mapCollection)
                 : base(RootNodeId, null)
             {
-                this.name = name;
+                this.MapCollection = mapCollection;
             }
 
-            public override string Name { get { return this.name; } }
-            private string name;
+            public override string Name
+            {
+                get { return this.MapCollection.ViewModel.Project.GameTitle; }
+            }
+            private MapCollection MapCollection;
         }
 
-        public MapCollection(string name)
+        public MapCollection(ViewModel viewModel)
         {
-            this.RootNodeInstance = new RootNode(name);
-            this.IsDirty = false;
+            this.ViewModel = viewModel;
+            this.Clear();
         }
+
+        public ViewModel ViewModel { get; private set; }
 
         private Node RootNodeInstance;
 
@@ -130,7 +135,6 @@ namespace Shrimp
             node.Parent = this.Nodes.First(n => n.Id == parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
-            this.IsDirty = true;
         }
 
         public void Remove(int id)
@@ -149,49 +153,50 @@ namespace Shrimp
             Debug.Assert(parentNode.Children.Contains(node));
             parentNode.Children.Remove(node);
             this.OnNodeRemoved(new NodeEventArgs(id));
-            this.IsDirty = true;
         }
 
         public event EventHandler<NodeEventArgs> NodeAdded;
         protected virtual void OnNodeAdded(NodeEventArgs e)
         {
             if (this.NodeAdded != null) { this.NodeAdded(this, e); }
+            this.OnUpdated(EventArgs.Empty);
         }
 
         public event EventHandler<NodeEventArgs> NodeRemoved;
         protected virtual void OnNodeRemoved(NodeEventArgs e)
         {
             if (this.NodeRemoved != null) { this.NodeRemoved(this, e); }
+            this.OnUpdated(EventArgs.Empty);
         }
 
         public event EventHandler<NodeEventArgs> NodeNameChanged;
         protected virtual void OnNodeNameChanged(NodeEventArgs e)
         {
             if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
+            this.OnUpdated(EventArgs.Empty);
         }
 
-        public bool IsDirty
+        public void Clear()
         {
-            get { return this.isDirty; }
-            set
-            {
-                if (this.isDirty != value)
-                {
-                    this.isDirty = value;
-                    this.OnIsDirtyChanged(EventArgs.Empty);
-                }
-            }
-        }
-        private bool isDirty = false;
-        public event EventHandler IsDirtyChanged;
-        protected virtual void OnIsDirtyChanged(EventArgs e)
-        {
-            if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
+            this.RootNodeInstance = new RootNode(this);
+            this.OnUpdated(EventArgs.Empty);
         }
 
         public JObject ToJson()
         {
             return this.RootNodeInstance.ToJson();
+        }
+
+        public void LoadJson(JObject json)
+        {
+            this.Clear();
+            // TODO
+        }
+
+        public event EventHandler Updated;
+        protected virtual void OnUpdated(EventArgs e)
+        {
+            if (this.Updated != null) { this.Updated(this, e); }
         }
     }
 }
