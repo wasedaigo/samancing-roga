@@ -55,7 +55,7 @@ namespace Shrimp
             this.DirectoryPath = directoryPath;
             string path = Path.Combine(this.DirectoryPath, "Game.shrp");
             Debug.Assert(File.Exists(path));
-            JObject jObject = JObject.Parse(File.ReadAllText(path, new UTF8Encoding(false)));
+            JObject jObject = JObject.Parse(File.ReadAllText(path, Util.UTF8N));
             this.GameTitle = jObject["GameTitle"].Value<string>();
             this.MapCollection = new MapCollection(this.GameTitle);
             this.IsOpened = true;
@@ -86,7 +86,7 @@ namespace Shrimp
             {
                 // TODO: fix this block
                 string path = Path.Combine(this.DirectoryPath, "Game.shrp");
-                using (var sw = new StreamWriter(path, false, new UTF8Encoding(false)))
+                using (var sw = new StreamWriter(path, false, Util.UTF8N))
                 using (var writer = new JsonTextWriter(sw))
                 {
                     writer.Formatting = Formatting.Indented;
@@ -104,7 +104,7 @@ namespace Shrimp
                     Directory.CreateDirectory(this.DataPath);
                 }
                 string path = Path.Combine(this.DataPath, "MapCollection.json");
-                using (var sw = new StreamWriter(path, false, new UTF8Encoding(false)))
+                using (var sw = new StreamWriter(path, false, Util.UTF8N))
                 using (var writer = new JsonTextWriter(sw))
                 {
                     writer.Formatting = Formatting.Indented;
