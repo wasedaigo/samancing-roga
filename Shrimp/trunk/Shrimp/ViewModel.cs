@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -46,7 +47,9 @@ namespace Shrimp
             this.MapCollectionProxy.Clear();
             this.DirectoryPath = directoryPath;
             this.Project.GameTitle = gameTitle;
-            Util.CopyDirectory("ProjectTemplate", this.DirectoryPath);
+            string srcDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string src = Path.Combine(srcDir, "ProjectTemplate");
+            Util.CopyDirectory(src, this.DirectoryPath);
             this.Save();
             this.IsOpened = true;
         }
