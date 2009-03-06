@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IProject.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,7 +64,6 @@
     </Compile>
     <Compile Include="ModelProxy.cs" />
     <Compile Include="Project.cs" />
-    <Compile Include="ProjectProxy.cs" />
     <Compile Include="SynchronizedTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
