@@ -9,27 +9,31 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class MapCollection : Model, ITree
+    internal class MapCollection : Model
     {
         private class Node
         {
-            public Node(int id, Map map)
+            public Node(int id, string name)
             {
                 this.Id = id;
-                this.Map = map;
+                this.Name = name;
                 this.Children = new List<Node>();
             }
 
             public int Id { get; private set; }
-            public Map Map { get; private set; }
-            public virtual string Name { get { return this.Map.Name; } }
+            public virtual string Name
+            {
+                get;
+                set; // TODO
+            }
             public Node Parent { get; set; }
             public List<Node> Children { get; private set; }
 
-            public JObject ToJson()
+            public virtual JObject ToJson()
             {
                 return new JObject(
                     new JProperty("Id", this.Id),
+                    new JProperty("Name", this.Name),
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
@@ -48,6 +52,14 @@ namespace Shrimp
                 get { return this.MapCollection.ViewModel.Project.GameTitle; }
             }
             private MapCollection MapCollection;
+
+            public override JObject ToJson()
+            {
+                return new JObject(
+                    new JProperty("Id", this.Id),
+                    new JProperty("Children",
+                        new JArray(this.Children.Select(n => n.ToJson()))));
+            }
         }
 
         private class TrashNode : Node
@@ -58,6 +70,14 @@ namespace Shrimp
             }
 
             public override string Name { get { return "Trash"; } }
+
+            public override JObject ToJson()
+            {
+                return new JObject(
+                    new JProperty("Id", this.Id),
+                    new JProperty("Children",
+                        new JArray(this.Children.Select(n => n.ToJson()))));
+            }
         }
 
         public MapCollection(ViewModel viewModel)
@@ -120,6 +140,16 @@ namespace Shrimp
             get { return new[] { this.ProjectNodeInstance, this.TrashNodeInstance }; }
         }
 
+        public int ProjectNodeId
+        {
+            get { return this.ProjectNodeInstance.Id; }
+        }
+
+        public int TrashNodeId
+        {
+            get { return this.TrashNodeInstance.Id; }
+        }
+
         public string GetName(int id)
         {
             return this.Nodes.First(n => n.Id == id).Name;
@@ -128,6 +158,16 @@ namespace Shrimp
         public int GetParent(int id)
         {
             return this.Nodes.First(n => n.Id == id).Parent.Id;
+        }
+
+        public int GetRoot(int id)
+        {
+            Node node = this.Nodes.First(n => n.Id == id);
+            while (node.Parent != null)
+            {
+                node = node.Parent;
+            }
+            return node.Id;
         }
 
         public int[] GetChildren(int id)
@@ -154,7 +194,7 @@ namespace Shrimp
                 }
             }
             Debug.Assert(!ids.Contains(id));
-            Node node = new Node(id, new Map("Map (ID: " + id + ")"));
+            Node node = new Node(id, "Map (ID: " + id + ")");
             node.Parent = this.Nodes.First(n => n.Id == parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
@@ -178,9 +218,36 @@ namespace Shrimp
             this.OnNodeRemoved(new NodeEventArgs(id));
         }
 
+        public void Move(int id, int parentId)
+        {
+            if (this.Roots.Contains(id))
+            {
+                throw new ArgumentException("Couldn't remove the root", "id");
+            }
+            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
+            if (node == null)
+            {
+                throw new ArgumentException("Invalid id", "id");
+            }
+            Node newParentNode = this.Nodes.FirstOrDefault(n => n.Id == parentId);
+            if (newParentNode == null)
+            {
+                throw new ArgumentException("Invalid id", "parentId");
+            }
+            Node oldParentNode = node.Parent;
+            Debug.Assert(oldParentNode != null);
+            Debug.Assert(oldParentNode.Children.Contains(node));
+            oldParentNode.Children.Remove(node);
+            newParentNode.Children.Add(node);
+            node.Parent = newParentNode;
+            this.OnNodeMoved(new NodeEventArgs(id));
+        }
+
         public override JObject ToJson()
         {
-            return this.ProjectNodeInstance.ToJson();
+            return new JObject(
+                new JProperty("Project", this.ProjectNodeInstance.ToJson()),
+                new JProperty("Trash", this.TrashNodeInstance.ToJson()));
         }
 
         public override void LoadJson(JObject json)
@@ -208,6 +275,13 @@ namespace Shrimp
         protected virtual void OnNodeRemoved(NodeEventArgs e)
         {
             if (this.NodeRemoved != null) { this.NodeRemoved(this, e); }
+            this.OnUpdated(new UpdatedEventArgs(null, null));
+        }
+
+        public event EventHandler<NodeEventArgs> NodeMoved;
+        protected virtual void OnNodeMoved(NodeEventArgs e)
+        {
+            if (this.NodeMoved != null) { this.NodeMoved(this, e); }
             this.OnUpdated(new UpdatedEventArgs(null, null));
         }
 

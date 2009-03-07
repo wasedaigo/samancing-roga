@@ -60,7 +60,7 @@ namespace Shrimp
                     throw new ArgumentException("Invalid property name", "e");
                 }
             };
-            this.MapTreeView.Tree = this.ViewModel.MapCollection;
+            this.MapTreeView.MapCollection = this.ViewModel.MapCollection;
             this.IsOpenedChanged();
         }
 

@@ -68,7 +68,7 @@
     <Compile Include="Model.cs" />
     <Compile Include="ModelProxy.cs" />
     <Compile Include="Project.cs" />
-    <Compile Include="SynchronizedTreeView.cs">
+    <Compile Include="MapTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="NewProjectDialog.cs">

@@ -44,7 +44,7 @@
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.SaveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.MapTreeView = new Shrimp.SynchronizedTreeView();
+            this.MapTreeView = new Shrimp.MapTreeView();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -297,7 +297,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripButton SaveToolStripButton;
-        private SynchronizedTreeView MapTreeView;
+        private MapTreeView MapTreeView;
     }
 }
 
