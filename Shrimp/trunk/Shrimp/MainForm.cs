@@ -51,7 +51,7 @@ namespace Shrimp
             };
             this.ViewModel.Project.Updated += (s, e) =>
             {
-                switch (e.PropertyName)
+                switch (e.EventName)
                 {
                 case "GameTitle":
                     this.GameTitleChanged();

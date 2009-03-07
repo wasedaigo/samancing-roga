@@ -58,7 +58,7 @@ namespace Shrimp
             this.Clear();
             this.ViewModel.Project.Updated += (s, e) =>
             {
-                switch (e.PropertyName)
+                switch (e.EventName)
                 {
                 case "GameTitle":
                     this.OnUpdated(new UpdatedEventArgs("NodeNameChanged", RootNodeId));

@@ -97,8 +97,8 @@ namespace Shrimp
 
         private void Tree_Updated(object sender, UpdatedEventArgs e)
         {
-            int id = (int)e.PropertyValue;
-            switch (e.PropertyName)
+            int id = (int)e.Value;
+            switch (e.EventName)
             {
             case "NodeAdded":
                 TreeNode node = new TreeNode(this.Tree.GetName(id));
