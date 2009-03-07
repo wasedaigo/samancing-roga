@@ -56,6 +56,8 @@ namespace Shrimp
                 case "GameTitle":
                     this.GameTitleChanged();
                     break;
+                default:
+                    throw new ArgumentException("Invalid event name", "e");
                 }
             };
             this.MapTreeView.Tree = this.ViewModel.MapCollection;

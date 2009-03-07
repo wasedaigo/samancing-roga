@@ -116,6 +116,8 @@ namespace Shrimp
                 string text = this.Tree.GetName(id);
                 this.AllNodes.First(n => (int)n.Tag == id).Text = text;
                 break;
+            default:
+                throw new ArgumentException("Invalid event name", "e");
             }
         }
 

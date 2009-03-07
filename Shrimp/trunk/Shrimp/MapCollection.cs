@@ -63,6 +63,8 @@ namespace Shrimp
                 case "GameTitle":
                     this.OnUpdated(new UpdatedEventArgs("NodeNameChanged", RootNodeId));
                     break;
+                default:
+                    throw new ArgumentException("Invalid event name", "e");
                 }
             };
         }
