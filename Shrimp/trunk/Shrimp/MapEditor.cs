@@ -13,7 +13,7 @@ namespace Shrimp
     {
         public MapEditor()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         protected override void OnPaint(PaintEventArgs e)

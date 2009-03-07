@@ -13,12 +13,14 @@ namespace Shrimp
         public MapTreeView()
             : base()
         {
+            this.InitializeComponent();
             this.DrawMode = TreeViewDrawMode.OwnerDrawAll;
             this.FullRowSelect = true;
             this.HideSelection = false;
-            this.ItemHeight = (int)(this.Font.Height * 1.5);
-            this.Indent = this.ItemHeight;
+            this.ItemHeight = (int)(this.Font.Height * 1.8);
+            this.Indent = 19;
             this.ShowLines = false;
+            this.ShowRootLines = false;
         }
 
         private IEnumerable<TreeNode> AllNodes
@@ -37,6 +39,8 @@ namespace Shrimp
                 }
             }
         }
+
+        private ImageList imageList;
 
         public MapCollection MapCollection
         {
@@ -90,11 +94,14 @@ namespace Shrimp
                     this.AddTreeNode(id);
                 }
             }
+            this.AllNodes.First(n => (int)n.Tag == this.MapCollection.ProjectNodeId).ImageKey = "Folder";
+            this.AllNodes.First(n => (int)n.Tag == this.MapCollection.TrashNodeId).ImageKey = "Bin";
         }
 
         private void AddTreeNode(int id)
         {
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
+            node.ImageKey = "PageWhite";
             node.Tag = id;
             this.Nodes.Add(node);
             foreach (int childId in this.MapCollection.GetChildren(id))
@@ -107,22 +114,19 @@ namespace Shrimp
         {
             int id = e.NodeId;
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
+            node.ImageKey = "PageWhite";
             node.Tag = id;
             int parentId = this.MapCollection.GetParent(id);
             TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
-            this.SuspendLayout();
             parentNode.Nodes.Add(node);
             parentNode.Expand();
-            this.ResumeLayout();
             this.SelectedNode = node;
         }
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
-            this.SuspendLayout();
             this.AllNodes.First(n => (int)n.Tag == id).Remove();
-            this.ResumeLayout();
         }
 
         private void Tree_NodeMoved(object sender, NodeEventArgs e)
@@ -131,20 +135,17 @@ namespace Shrimp
             TreeNode node = this.AllNodes.First(n => (int)n.Tag == id);
             int newParentId = this.MapCollection.GetParent(id);
             TreeNode newParentNode = this.AllNodes.First(n => (int)n.Tag == newParentId);
-            this.SuspendLayout();
             node.Remove();
             newParentNode.Nodes.Add(node);
             newParentNode.Expand();
-            this.ResumeLayout();
+            this.Invalidate();
         }
 
         private void Tree_NodeNameChanged(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
             string text = this.MapCollection.GetName(id);
-            this.SuspendLayout();
             this.AllNodes.First(n => (int)n.Tag == id).Text = text;
-            this.ResumeLayout();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -193,10 +194,8 @@ namespace Shrimp
             Graphics g = e.Graphics;
             TreeNode node = e.Node;
             Rectangle bounds = e.Bounds;
-            int x = bounds.X + this.Indent * node.Level + 16;
-            int y = bounds.Y + (this.ItemHeight - this.Font.Height) / 2;
-            string text = node.Text;
-            if ((e.State & TreeNodeStates.Selected) != 0)
+            bool isSelected = (e.State & TreeNodeStates.Selected) != 0;
+            if (isSelected)
             {
                 g.FillRectangle(SystemBrushes.Highlight, bounds);
                 if ((e.State & TreeNodeStates.Focused) != 0)
@@ -204,12 +203,50 @@ namespace Shrimp
                     ControlPaint.DrawFocusRectangle(g, bounds,
                         SystemColors.HighlightText, SystemColors.Highlight);
                 }
-                g.DrawString(text, this.Font, SystemBrushes.HighlightText, x, y);
             }
-            else
+            if (0 < node.Level && 0 < node.GetNodeCount(false))
             {
-                g.DrawString(text, this.Font, new SolidBrush(this.ForeColor), x, y);
+                Image toggleImage = 
+                    this.ImageList.Images["BulletToggle" + (node.IsExpanded ? "Minus" : "Plus")];
+                g.DrawImage(toggleImage, bounds.X + this.Indent * (node.Level - 1) + 1, bounds.Y + 1);
             }
+            Image image = this.ImageList.Images[node.ImageKey];
+            if (image != null)
+            {
+                g.DrawImage(image, bounds.X + this.Indent * node.Level + 1, bounds.Y + 1);
+            }
+            g.DrawString(node.Text, this.Font,
+                isSelected ? SystemBrushes.HighlightText : new SolidBrush(this.ForeColor),
+                bounds.X + this.Indent * node.Level + 16,
+                bounds.Y + (this.ItemHeight - this.Font.Height) / 2);
         }
+
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapTreeView));
+            this.imageList = new System.Windows.Forms.ImageList(this.components);
+            this.SuspendLayout();
+            // 
+            // imageList
+            // 
+            this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
+            this.imageList.TransparentColor = System.Drawing.Color.Empty;
+            this.imageList.Images.SetKeyName(0, "PageWhite");
+            this.imageList.Images.SetKeyName(1, "Bin");
+            this.imageList.Images.SetKeyName(2, "Folder");
+            this.imageList.Images.SetKeyName(3, "BulletTogglePlus");
+            this.imageList.Images.SetKeyName(4, "BulletToggleMinus");
+            // 
+            // MapTreeView
+            // 
+            this.ImageKey = "PageWhite";
+            this.ImageList = this.imageList;
+            this.SelectedImageIndex = 0;
+            this.ResumeLayout(false);
+
+        }
+
+        private System.ComponentModel.IContainer components;
     }
 }
