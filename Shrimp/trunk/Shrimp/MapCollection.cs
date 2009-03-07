@@ -233,8 +233,26 @@ namespace Shrimp
         public override void LoadJson(JObject json)
         {
             this.Clear();
-            // TODO
+            foreach (JObject childJson in json["Project"]["Children"])
+            {
+                this.AddNodeFromJson(this.ProjectNodeInstance, childJson);
+            }
+            foreach (JObject childJson in json["Trash"]["Children"])
+            {
+                this.AddNodeFromJson(this.TrashNodeInstance, childJson);
+            }
             this.OnLoaded(EventArgs.Empty);
+        }
+
+        private void AddNodeFromJson(Node parentNode, JObject json)
+        {
+            Node node = new Node(json.Value<int>("Id"), json.Value<string>("Name"));
+            parentNode.Children.Add(node);
+            node.Parent = parentNode;
+            foreach (JObject childJson in json["Children"])
+            {
+                this.AddNodeFromJson(node, childJson);
+            }
         }
 
         public override void Clear()

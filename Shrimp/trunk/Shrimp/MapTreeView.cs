@@ -91,22 +91,22 @@ namespace Shrimp
             {
                 foreach (int id in this.MapCollection.Roots)
                 {
-                    this.AddTreeNode(id);
+                    this.AddTreeNode(this.Nodes, id);
                 }
             }
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.ProjectNodeId).ImageKey = "Folder";
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.TrashNodeId).ImageKey = "Bin";
         }
 
-        private void AddTreeNode(int id)
+        private void AddTreeNode(TreeNodeCollection parentNode, int id)
         {
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
             node.ImageKey = "PageWhite";
             node.Tag = id;
-            this.Nodes.Add(node);
+            parentNode.Add(node);
             foreach (int childId in this.MapCollection.GetChildren(id))
             {
-                this.AddTreeNode(childId);
+                this.AddTreeNode(node.Nodes, childId);
             }
         }
 
@@ -121,12 +121,14 @@ namespace Shrimp
             parentNode.Nodes.Add(node);
             parentNode.Expand();
             this.SelectedNode = node;
+            this.Invalidate();
         }
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
             this.AllNodes.First(n => (int)n.Tag == id).Remove();
+            this.Invalidate();
         }
 
         private void Tree_NodeMoved(object sender, NodeEventArgs e)
@@ -146,6 +148,7 @@ namespace Shrimp
             int id = e.NodeId;
             string text = this.MapCollection.GetName(id);
             this.AllNodes.First(n => (int)n.Tag == id).Text = text;
+            this.Invalidate();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
