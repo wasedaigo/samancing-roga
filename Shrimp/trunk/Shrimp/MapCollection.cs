@@ -41,17 +41,10 @@ namespace Shrimp
 
         private class ProjectNode : Node
         {
-            public ProjectNode(MapCollection mapCollection)
-                : base(0, null)
+            public ProjectNode()
+                : base(0, "Project")
             {
-                this.MapCollection = mapCollection;
             }
-
-            public override string Name
-            {
-                get { return this.MapCollection.ViewModel.Project.GameTitle; }
-            }
-            private MapCollection MapCollection;
 
             public override JObject ToJson()
             {
@@ -65,11 +58,9 @@ namespace Shrimp
         private class TrashNode : Node
         {
             public TrashNode()
-                : base(-1, null)
+                : base(-1, "Trash")
             {
             }
-
-            public override string Name { get { return "Trash"; } }
 
             public override JObject ToJson()
             {
@@ -83,20 +74,9 @@ namespace Shrimp
         public MapCollection(ViewModel viewModel)
         {
             this.ViewModel = viewModel;
-            this.ProjectNodeInstance = new ProjectNode(this);
+            this.ProjectNodeInstance = new ProjectNode();
             this.TrashNodeInstance = new TrashNode();
             this.Clear();
-            this.ViewModel.Project.Updated += (s, e) =>
-            {
-                switch (e.EventName)
-                {
-                case "GameTitle":
-                    this.OnNodeNameChanged(new NodeEventArgs(this.ProjectNodeInstance.Id));
-                    break;
-                default:
-                    throw new ArgumentException("Invalid property name", "e");
-                }
-            };
         }
 
         public ViewModel ViewModel { get; private set; }

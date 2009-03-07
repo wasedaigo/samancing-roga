@@ -110,15 +110,19 @@ namespace Shrimp
             node.Tag = id;
             int parentId = this.MapCollection.GetParent(id);
             TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
+            this.SuspendLayout();
             parentNode.Nodes.Add(node);
             parentNode.Expand();
+            this.ResumeLayout();
             this.SelectedNode = node;
         }
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
+            this.SuspendLayout();
             this.AllNodes.First(n => (int)n.Tag == id).Remove();
+            this.ResumeLayout();
         }
 
         private void Tree_NodeMoved(object sender, NodeEventArgs e)
@@ -127,16 +131,20 @@ namespace Shrimp
             TreeNode node = this.AllNodes.First(n => (int)n.Tag == id);
             int newParentId = this.MapCollection.GetParent(id);
             TreeNode newParentNode = this.AllNodes.First(n => (int)n.Tag == newParentId);
+            this.SuspendLayout();
             node.Remove();
             newParentNode.Nodes.Add(node);
             newParentNode.Expand();
+            this.ResumeLayout();
         }
 
         private void Tree_NodeNameChanged(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
             string text = this.MapCollection.GetName(id);
+            this.SuspendLayout();
             this.AllNodes.First(n => (int)n.Tag == id).Text = text;
+            this.ResumeLayout();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
