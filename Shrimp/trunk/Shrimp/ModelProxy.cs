@@ -10,6 +10,8 @@ namespace Shrimp
 {
     internal class ModelProxy<T> where T : class, IModel
     {
+        private static readonly Encoding UTF8N = new UTF8Encoding(false);
+
         public ModelProxy(T model)
         {
             this.Model = model;
@@ -21,7 +23,7 @@ namespace Shrimp
 
         public void Save(string path)
         {
-            using (var sw = new StreamWriter(path, false, Util.UTF8N))
+            using (var sw = new StreamWriter(path, false, UTF8N))
             using (var writer = new JsonTextWriter(sw))
             {
                 writer.Formatting = Formatting.Indented;
@@ -36,7 +38,7 @@ namespace Shrimp
             bool result;
             if (result = File.Exists(path))
             {
-                JObject json = JObject.Parse(File.ReadAllText(path, Util.UTF8N));
+                JObject json = JObject.Parse(File.ReadAllText(path, UTF8N));
                 this.Model.LoadJson(json);
             }
             this.IsDirty = false;

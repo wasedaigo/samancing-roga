@@ -26,7 +26,5 @@ namespace Shrimp
                 CopyDirectory(dir, Path.Combine(dst, Path.GetFileName(dir)));
             }
         }
-
-        public static readonly Encoding UTF8N = new UTF8Encoding(false);
     }
 }

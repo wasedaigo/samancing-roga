@@ -9,8 +9,6 @@ namespace Shrimp
 {
     internal interface IModel
     {
-        ViewModel ViewModel { get; }
-
         void Clear();
 
         event EventHandler Updated;

@@ -7,15 +7,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class Project : IModel
+    internal class Project : Model
     {
-        public Project(ViewModel viewModel)
+        public Project()
         {
-            this.ViewModel = viewModel;
             this.Clear();
         }
-
-        public ViewModel ViewModel { get; private set; }
 
         public string GameTitle
         {
@@ -34,41 +31,25 @@ namespace Shrimp
         protected virtual void OnGameTitleChanged(EventArgs e)
         {
             if (this.GameTitleChanged != null) { this.GameTitleChanged(this, e); }
-            this.OnUpdadted(EventArgs.Empty);
+            this.OnUpdated(EventArgs.Empty);
         }
 
-        public void Clear()
+        public override void Clear()
         {
             this.GameTitle = "";
             this.OnCleared(EventArgs.Empty);
         }
-        public event EventHandler Cleared;
-        protected virtual void OnCleared(EventArgs e)
-        {
-            if (this.Cleared != null) { this.Cleared(this, e); }
-        }
 
-        public JObject ToJson()
+        public override JObject ToJson()
         {
             return new JObject(new JProperty("GameTitle", this.GameTitle));
         }
 
-        public void LoadJson(JObject json)
+        public override void LoadJson(JObject json)
         {
             this.Clear();
             this.GameTitle = json["GameTitle"].Value<string>();
             this.OnLoaded(EventArgs.Empty);
-        }
-        public event EventHandler Loaded;
-        protected virtual void OnLoaded(EventArgs e)
-        {
-            if (this.Loaded != null) { this.Loaded(this, e); }
-        }
-
-        public event EventHandler Updated;
-        protected virtual void OnUpdadted(EventArgs e)
-        {
-            if (this.Updated != null) { this.Updated(this, e); }
         }
     }
 }

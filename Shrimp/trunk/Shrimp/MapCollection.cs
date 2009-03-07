@@ -9,17 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class Map
-    {
-        public Map(string name)
-        {
-            this.Name = name;
-        }
-
-        public string Name { get; private set; }
-    }
-
-    internal class MapCollection : ITree, IModel
+    internal class MapCollection : Model, ITree
     {
         private class Node
         {
@@ -180,38 +170,22 @@ namespace Shrimp
             this.OnUpdated(EventArgs.Empty);
         }
 
-        public JObject ToJson()
+        public override JObject ToJson()
         {
             return this.RootNodeInstance.ToJson();
         }
 
-        public void LoadJson(JObject json)
+        public override void LoadJson(JObject json)
         {
             this.Clear();
             // TODO
             this.OnLoaded(EventArgs.Empty);
         }
-        public event EventHandler Loaded;
-        protected virtual void OnLoaded(EventArgs e)
-        {
-            if (this.Loaded != null) { this.Loaded(this, e); }
-        }
 
-        public void Clear()
+        public override void Clear()
         {
             this.RootNodeInstance = new RootNode(this);
             this.OnCleared(EventArgs.Empty);
-        }
-        public event EventHandler Cleared;
-        protected virtual void OnCleared(EventArgs e)
-        {
-            if (this.Cleared != null) { this.Cleared(this, e); }
-        }
-
-        public event EventHandler Updated;
-        protected virtual void OnUpdated(EventArgs e)
-        {
-            if (this.Updated != null) { this.Updated(this, e); }
         }
     }
 }

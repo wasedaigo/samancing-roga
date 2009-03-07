@@ -15,7 +15,7 @@ namespace Shrimp
     {
         public ViewModel()
         {
-            this.ProjectProxy = new ModelProxy<Project>(new Project(this));
+            this.ProjectProxy = new ModelProxy<Project>(new Project());
             this.ProjectProxy.IsDirtyChanged += delegate
             {
                 this.OnIsDirtyChanged(EventArgs.Empty);
