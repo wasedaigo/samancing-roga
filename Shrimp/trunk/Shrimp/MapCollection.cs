@@ -61,10 +61,10 @@ namespace Shrimp
                 switch (e.EventName)
                 {
                 case "GameTitle":
-                    this.OnUpdated(new UpdatedEventArgs("NodeNameChanged", RootNodeId));
+                    this.OnNodeNameChanged(new NodeEventArgs(RootNodeId));
                     break;
                 default:
-                    throw new ArgumentException("Invalid event name", "e");
+                    throw new ArgumentException("Invalid property name", "e");
                 }
             };
         }
@@ -135,7 +135,7 @@ namespace Shrimp
             Node node = new Node(id, new Map("Map (ID: " + id + ")"));
             node.Parent = this.Nodes.First(n => n.Id == parentId);
             node.Parent.Children.Add(node);
-            this.OnUpdated(new UpdatedEventArgs("NodeAdded", id));
+            this.OnNodeAdded(new NodeEventArgs(id));
         }
 
         public void Remove(int id)
@@ -153,7 +153,7 @@ namespace Shrimp
             Debug.Assert(parentNode != null);
             Debug.Assert(parentNode.Children.Contains(node));
             parentNode.Children.Remove(node);
-            this.OnUpdated(new UpdatedEventArgs("NodeRemoved", id));
+            this.OnNodeRemoved(new NodeEventArgs(id));
         }
 
         public override JObject ToJson()
@@ -172,6 +172,27 @@ namespace Shrimp
         {
             this.RootNodeInstance = new RootNode(this);
             this.OnCleared(EventArgs.Empty);
+        }
+
+        public event EventHandler<NodeEventArgs> NodeAdded;
+        protected virtual void OnNodeAdded(NodeEventArgs e)
+        {
+            if (this.NodeAdded != null) { this.NodeAdded(this, e); }
+            this.OnUpdated(new UpdatedEventArgs(null, null));
+        }
+
+        public event EventHandler<NodeEventArgs> NodeRemoved;
+        protected virtual void OnNodeRemoved(NodeEventArgs e)
+        {
+            if (this.NodeRemoved != null) { this.NodeRemoved(this, e); }
+            this.OnUpdated(new UpdatedEventArgs(null, null));
+        }
+
+        public event EventHandler<NodeEventArgs> NodeNameChanged;
+        protected virtual void OnNodeNameChanged(NodeEventArgs e)
+        {
+            if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
+            this.OnUpdated(new UpdatedEventArgs(null, null));
         }
     }
 }

@@ -14,5 +14,19 @@ namespace Shrimp
 
         void Add(int parentId);
         void Remove(int id);
+
+        event EventHandler<NodeEventArgs> NodeAdded;
+        event EventHandler<NodeEventArgs> NodeRemoved;
+        event EventHandler<NodeEventArgs> NodeNameChanged;
+    }
+
+    internal class NodeEventArgs : EventArgs
+    {
+        public NodeEventArgs(int nodeId)
+        {
+            this.NodeId = nodeId;
+        }
+
+        public int NodeId { get; private set; }
     }
 }

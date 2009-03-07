@@ -49,15 +49,18 @@ namespace Shrimp
                     {
                         this.tree.Loaded -= this.Tree_Loaded;
                         this.tree.Cleared -= this.Tree_Cleared;
-                        this.tree.Updated -= this.Tree_Updated;
-                        
+                        this.tree.NodeAdded -= this.Tree_NodeAdded;
+                        this.tree.NodeRemoved -= this.Tree_NodeRemoved;
+                        this.tree.NodeNameChanged -= this.Tree_NodeNameChanged;
                     }
                     this.tree = value;
                     if (this.tree != null)
                     {
                         this.tree.Loaded += this.Tree_Loaded;
                         this.tree.Cleared += this.Tree_Cleared;
-                        this.tree.Updated += this.Tree_Updated;
+                        this.tree.NodeAdded += this.Tree_NodeAdded;
+                        this.tree.NodeRemoved += this.Tree_NodeRemoved;
+                        this.tree.NodeNameChanged += this.Tree_NodeNameChanged;
                     }
                     this.Initialize();
                 }
@@ -95,30 +98,29 @@ namespace Shrimp
             }
         }
 
-        private void Tree_Updated(object sender, UpdatedEventArgs e)
+        private void Tree_NodeAdded(object sender, NodeEventArgs e)
         {
-            int id = (int)e.Value;
-            switch (e.EventName)
-            {
-            case "NodeAdded":
-                TreeNode node = new TreeNode(this.Tree.GetName(id));
-                node.Tag = id;
-                int parentId = this.Tree.GetParent(id);
-                TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
-                parentNode.Nodes.Add(node);
-                parentNode.Expand();
-                this.SelectedNode = node;
-                break;
-            case "NodeRemoved":
-                this.AllNodes.First(n => (int)n.Tag == id).Remove();
-                break;
-            case "NodeNameChanged":
-                string text = this.Tree.GetName(id);
-                this.AllNodes.First(n => (int)n.Tag == id).Text = text;
-                break;
-            default:
-                throw new ArgumentException("Invalid event name", "e");
-            }
+            int id = e.NodeId;
+            TreeNode node = new TreeNode(this.Tree.GetName(id));
+            node.Tag = id;
+            int parentId = this.Tree.GetParent(id);
+            TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
+            parentNode.Nodes.Add(node);
+            parentNode.Expand();
+            this.SelectedNode = node;
+        }
+
+        private void Tree_NodeRemoved(object sender, NodeEventArgs e)
+        {
+            int id = e.NodeId;
+            this.AllNodes.First(n => (int)n.Tag == id).Remove();
+        }
+
+        private void Tree_NodeNameChanged(object sender, NodeEventArgs e)
+        {
+            int id = e.NodeId;
+            string text = this.Tree.GetName(id);
+            this.AllNodes.First(n => (int)n.Tag == id).Text = text;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
