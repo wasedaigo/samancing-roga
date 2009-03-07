@@ -12,10 +12,18 @@ namespace Shrimp
 {
     partial class TilesPalette : UserControl
     {
+        private const int GridSize = 32;
+
         public TilesPalette()
         {
             InitializeComponent();
-            this.Width = 256 + SystemInformation.VerticalScrollBarWidth;
+            this.ClientSize = new Size
+            {
+                Width = GridSize + SystemInformation.VerticalScrollBarWidth,
+                Height = this.ClientSize.Height,
+            };
+            this.VScroll = true;
+            this.VerticalScroll.SmallChange = GridSize;
             this.UpdateState();
         }
 
@@ -60,7 +68,11 @@ namespace Shrimp
             this.Invalidate();
             if (this.DoubleSizedTilesBitmap != null)
             {
-                this.AutoScrollMinSize = new Size(256, this.DoubleSizedTilesBitmap.Height);
+                this.AutoScrollMinSize = new Size
+                {
+                    Width = GridSize * 8,
+                    Height = this.DoubleSizedTilesBitmap.Height,
+                };
             }
             else
             {
