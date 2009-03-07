@@ -83,7 +83,10 @@ namespace Shrimp
             this.Nodes.Clear();
             if (this.Tree != null)
             {
-                this.AddTreeNode(this.Tree.Root);
+                foreach (int id in this.Tree.Roots)
+                {
+                    this.AddTreeNode(id);
+                }
             }
         }
 
@@ -135,7 +138,7 @@ namespace Shrimp
                     this.Tree.Add(id);
                     break;
                 case Keys.Delete:
-                    if (id != this.Tree.Root)
+                    if (this.Tree.Roots.Contains(id))
                     {
                         this.Tree.Remove(id);
                     }
@@ -148,6 +151,7 @@ namespace Shrimp
         {
             base.OnDrawNode(e);
             Graphics g = e.Graphics;
+            if (!this.Enabled) { return; }
             TreeNode node = e.Node;
             Rectangle bounds = e.Bounds;
             int x = bounds.X + this.Indent * node.Level + 16;

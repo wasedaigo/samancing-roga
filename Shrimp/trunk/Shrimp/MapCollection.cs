@@ -35,12 +35,10 @@ namespace Shrimp
             }
         }
 
-        private const int RootNodeId = 0;
-
-        private class RootNode : Node
+        private class ProjectNode : Node
         {
-            public RootNode(MapCollection mapCollection)
-                : base(RootNodeId, null)
+            public ProjectNode(MapCollection mapCollection)
+                : base(0, null)
             {
                 this.MapCollection = mapCollection;
             }
@@ -52,16 +50,28 @@ namespace Shrimp
             private MapCollection MapCollection;
         }
 
+        private class TrashNode : Node
+        {
+            public TrashNode()
+                : base(-1, null)
+            {
+            }
+
+            public override string Name { get { return "Trash"; } }
+        }
+
         public MapCollection(ViewModel viewModel)
         {
             this.ViewModel = viewModel;
+            this.ProjectNodeInstance = new ProjectNode(this);
+            this.TrashNodeInstance = new TrashNode();
             this.Clear();
             this.ViewModel.Project.Updated += (s, e) =>
             {
                 switch (e.EventName)
                 {
                 case "GameTitle":
-                    this.OnNodeNameChanged(new NodeEventArgs(RootNodeId));
+                    this.OnNodeNameChanged(new NodeEventArgs(this.ProjectNodeInstance.Id));
                     break;
                 default:
                     throw new ArgumentException("Invalid property name", "e");
@@ -71,13 +81,20 @@ namespace Shrimp
 
         public ViewModel ViewModel { get; private set; }
 
-        private Node RootNodeInstance;
+        private Node ProjectNodeInstance;
+        private Node TrashNodeInstance;
 
         private IEnumerable<Node> Nodes
         {
             get
             {
-                return this.Traverse(this.RootNodeInstance);
+                foreach (Node node in this.RootNodes)
+                {
+                    foreach (Node node2 in this.Traverse(node))
+                    {
+                        yield return node2;
+                    }
+                }
             }
         }
 
@@ -93,9 +110,14 @@ namespace Shrimp
             }
         }
 
-        public int Root
+        public int[] Roots
         {
-            get { return RootNodeId; }
+            get { return this.RootNodes.Select(n => n.Id).ToArray(); }
+        }
+
+        private Node[] RootNodes
+        {
+            get { return new[] { this.ProjectNodeInstance, this.TrashNodeInstance }; }
         }
 
         public string GetName(int id)
@@ -121,9 +143,9 @@ namespace Shrimp
             {
                 throw new ArgumentException("Invalid id", "parentId");
             }
-            int id = 0;
+            int id = this.Roots.Min();
             int maxId = ids.Max();
-            for (int i = 0; i <= maxId + 1; i++)
+            for (int i = id; i <= maxId + 1; i++)
             {
                 if (!ids.Contains(i))
                 {
@@ -140,7 +162,7 @@ namespace Shrimp
 
         public void Remove(int id)
         {
-            if (id == this.Root)
+            if (this.Roots.Contains(id))
             {
                 throw new ArgumentException("Couldn't remove the root", "id");
             }
@@ -158,7 +180,7 @@ namespace Shrimp
 
         public override JObject ToJson()
         {
-            return this.RootNodeInstance.ToJson();
+            return this.ProjectNodeInstance.ToJson();
         }
 
         public override void LoadJson(JObject json)
@@ -170,7 +192,8 @@ namespace Shrimp
 
         public override void Clear()
         {
-            this.RootNodeInstance = new RootNode(this);
+            this.ProjectNodeInstance.Children.Clear();
+            this.TrashNodeInstance.Children.Clear();
             this.OnCleared(EventArgs.Empty);
         }
 

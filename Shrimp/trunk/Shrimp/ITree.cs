@@ -7,7 +7,7 @@ namespace Shrimp
 {
     internal interface ITree : IModel
     {
-        int Root { get; }
+        int[] Roots { get; }
         string GetName(int id);
         int GetParent(int id);
         int[] GetChildren(int id);
