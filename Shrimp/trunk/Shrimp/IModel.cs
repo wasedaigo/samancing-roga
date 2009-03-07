@@ -11,11 +11,23 @@ namespace Shrimp
     {
         void Clear();
 
-        event EventHandler Updated;
+        event EventHandler<UpdatedEventArgs> Updated;
         event EventHandler Cleared;
         event EventHandler Loaded;
 
         JObject ToJson();
         void LoadJson(JObject json);
+    }
+
+    internal class UpdatedEventArgs : EventArgs
+    {
+        public UpdatedEventArgs(string name, object value)
+        {
+            this.PropertyName = name;
+            this.PropertyValue = value;
+        }
+
+        public string PropertyName { get; private set; }
+        public object PropertyValue { get; private set; }
     }
 }

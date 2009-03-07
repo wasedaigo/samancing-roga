@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Shrimp
 {
-    internal interface ITree
+    internal interface ITree : IModel
     {
         int Root { get; }
         string GetName(int id);
@@ -15,11 +15,9 @@ namespace Shrimp
         void Add(int parentId);
         void Remove(int id);
 
-        event EventHandler Loaded;
-        event EventHandler Cleared;
-        event EventHandler<NodeEventArgs> NodeAdded;
+        /*event EventHandler<NodeEventArgs> NodeAdded;
         event EventHandler<NodeEventArgs> NodeRemoved;
-        event EventHandler<NodeEventArgs> NodeNameChanged;
+        event EventHandler<NodeEventArgs> NodeNameChanged;*/
     }
 
     internal class NodeEventArgs : EventArgs

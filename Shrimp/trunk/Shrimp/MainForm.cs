@@ -49,9 +49,14 @@ namespace Shrimp
             {
                 this.SelectedTileSetIndexChanged();
             };
-            this.ViewModel.Project.GameTitleChanged += delegate
+            this.ViewModel.Project.Updated += (s, e) =>
             {
-                this.GameTitleChanged();
+                switch (e.PropertyName)
+                {
+                case "GameTitle":
+                    this.GameTitleChanged();
+                    break;
+                }
             };
             this.MapTreeView.Tree = this.ViewModel.MapCollection;
             this.IsOpenedChanged();

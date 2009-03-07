@@ -11,8 +11,8 @@ namespace Shrimp
     {
         public abstract void Clear();
 
-        public event EventHandler Updated;
-        protected virtual void OnUpdated(EventArgs e)
+        public event EventHandler<UpdatedEventArgs> Updated;
+        protected virtual void OnUpdated(UpdatedEventArgs e)
         {
             if (this.Updated != null) { this.Updated(this, e); }
         }

@@ -22,17 +22,11 @@ namespace Shrimp
                 if (this.gameTitle != value)
                 {
                     this.gameTitle = value;
-                    this.OnGameTitleChanged(EventArgs.Empty);
+                    this.OnUpdated(new UpdatedEventArgs("GameTitle", this.GameTitle));
                 }
             }
         }
         private string gameTitle;
-        public event EventHandler GameTitleChanged;
-        protected virtual void OnGameTitleChanged(EventArgs e)
-        {
-            if (this.GameTitleChanged != null) { this.GameTitleChanged(this, e); }
-            this.OnUpdated(EventArgs.Empty);
-        }
 
         public override void Clear()
         {

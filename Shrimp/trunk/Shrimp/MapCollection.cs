@@ -56,9 +56,14 @@ namespace Shrimp
         {
             this.ViewModel = viewModel;
             this.Clear();
-            this.ViewModel.Project.GameTitleChanged += delegate
+            this.ViewModel.Project.Updated += (s, e) =>
             {
-                this.OnNodeNameChanged(new NodeEventArgs(RootNodeId));
+                switch (e.PropertyName)
+                {
+                case "GameTitle":
+                    this.OnUpdated(new UpdatedEventArgs("NodeNameChanged", RootNodeId));
+                    break;
+                }
             };
         }
 
@@ -128,7 +133,7 @@ namespace Shrimp
             Node node = new Node(id, new Map("Map (ID: " + id + ")"));
             node.Parent = this.Nodes.First(n => n.Id == parentId);
             node.Parent.Children.Add(node);
-            this.OnNodeAdded(new NodeEventArgs(id));
+            this.OnUpdated(new UpdatedEventArgs("NodeAdded", id));
         }
 
         public void Remove(int id)
@@ -146,28 +151,7 @@ namespace Shrimp
             Debug.Assert(parentNode != null);
             Debug.Assert(parentNode.Children.Contains(node));
             parentNode.Children.Remove(node);
-            this.OnNodeRemoved(new NodeEventArgs(id));
-        }
-
-        public event EventHandler<NodeEventArgs> NodeAdded;
-        protected virtual void OnNodeAdded(NodeEventArgs e)
-        {
-            if (this.NodeAdded != null) { this.NodeAdded(this, e); }
-            this.OnUpdated(EventArgs.Empty);
-        }
-
-        public event EventHandler<NodeEventArgs> NodeRemoved;
-        protected virtual void OnNodeRemoved(NodeEventArgs e)
-        {
-            if (this.NodeRemoved != null) { this.NodeRemoved(this, e); }
-            this.OnUpdated(EventArgs.Empty);
-        }
-
-        public event EventHandler<NodeEventArgs> NodeNameChanged;
-        protected virtual void OnNodeNameChanged(NodeEventArgs e)
-        {
-            if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
-            this.OnUpdated(EventArgs.Empty);
+            this.OnUpdated(new UpdatedEventArgs("NodeRemoved", id));
         }
 
         public override JObject ToJson()
