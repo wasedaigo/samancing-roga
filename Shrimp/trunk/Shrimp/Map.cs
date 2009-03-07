@@ -11,6 +11,7 @@ namespace Shrimp
     {
         public Map(string name)
         {
+            this.Clear();
             this.Name = name;
         }
 
@@ -58,6 +59,8 @@ namespace Shrimp
         public override void Clear()
         {
             this.Name = "";
+            this.Width = 0;
+            this.Height = 0;
             this.OnCleared(EventArgs.Empty);
         }
 
