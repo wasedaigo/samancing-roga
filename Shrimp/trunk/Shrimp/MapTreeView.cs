@@ -121,14 +121,12 @@ namespace Shrimp
             parentNode.Nodes.Add(node);
             parentNode.Expand();
             this.SelectedNode = node;
-            this.Invalidate();
         }
 
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
             this.AllNodes.First(n => (int)n.Tag == id).Remove();
-            this.Invalidate();
         }
 
         private void Tree_NodeMoved(object sender, NodeEventArgs e)
@@ -140,7 +138,6 @@ namespace Shrimp
             node.Remove();
             newParentNode.Nodes.Add(node);
             newParentNode.Expand();
-            this.Invalidate();
         }
 
         private void Tree_NodeNameChanged(object sender, NodeEventArgs e)
@@ -148,6 +145,11 @@ namespace Shrimp
             int id = e.NodeId;
             string text = this.MapCollection.GetName(id);
             this.AllNodes.First(n => (int)n.Tag == id).Text = text;
+        }
+
+        protected override void OnAfterExpand(TreeViewEventArgs e)
+        {
+            base.OnAfterExpand(e);
             this.Invalidate();
         }
 
