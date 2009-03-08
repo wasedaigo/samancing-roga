@@ -8,7 +8,16 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class ModelProxy<T> where T : class, IModel
+    internal interface IModelProxy
+    {
+        void Save(string path);
+        bool Load(string path);
+        void Clear();
+        bool IsDirty { get; }
+        event EventHandler IsDirtyChanged;
+    }
+
+    internal class ModelProxy<T> : IModelProxy where T : class, IModel
     {
         private static readonly Encoding UTF8N = new UTF8Encoding(false);
 

@@ -42,37 +42,67 @@ namespace Shrimp
 
         private ImageList imageList;
 
-        public MapCollection MapCollection
+        public ViewModel ViewModel
         {
-            get { return this.mapCollection; }
+            get { return this.viewModel; }
             set
             {
-                if (this.mapCollection != value)
+                if (this.viewModel != value)
                 {
-                    if (this.mapCollection != null)
+                    if (this.viewModel != null)
                     {
-                        this.mapCollection.Loaded -= this.Tree_Loaded;
-                        this.mapCollection.Cleared -= this.Tree_Cleared;
-                        this.mapCollection.NodeAdded -= this.Tree_NodeAdded;
-                        this.mapCollection.NodeRemoved -= this.Tree_NodeRemoved;
-                        this.mapCollection.NodeMoved -= this.Tree_NodeMoved;
-                        this.mapCollection.NodeNameChanged -= this.Tree_NodeNameChanged;
+                        this.viewModel.MapCollection.Loaded -= this.Tree_Loaded;
+                        this.viewModel.MapCollection.Cleared -= this.Tree_Cleared;
+                        this.viewModel.MapCollection.NodeAdded -= this.Tree_NodeAdded;
+                        this.viewModel.MapCollection.NodeRemoved -= this.Tree_NodeRemoved;
+                        this.viewModel.MapCollection.NodeMoved -= this.Tree_NodeMoved;
+                        this.viewModel.MapCollection.NodeNameChanged -= this.Tree_NodeNameChanged;
                     }
-                    this.mapCollection = value;
-                    if (this.mapCollection != null)
+                    this.viewModel = value;
+                    if (this.viewModel != null)
                     {
-                        this.mapCollection.Loaded += this.Tree_Loaded;
-                        this.mapCollection.Cleared += this.Tree_Cleared;
-                        this.mapCollection.NodeAdded += this.Tree_NodeAdded;
-                        this.mapCollection.NodeRemoved += this.Tree_NodeRemoved;
-                        this.mapCollection.NodeMoved += this.Tree_NodeMoved;
-                        this.mapCollection.NodeNameChanged += this.Tree_NodeNameChanged;
+                        this.viewModel.MapCollection.Loaded += this.Tree_Loaded;
+                        this.viewModel.MapCollection.Cleared += this.Tree_Cleared;
+                        this.viewModel.MapCollection.NodeAdded += this.Tree_NodeAdded;
+                        this.viewModel.MapCollection.NodeRemoved += this.Tree_NodeRemoved;
+                        this.viewModel.MapCollection.NodeMoved += this.Tree_NodeMoved;
+                        this.viewModel.MapCollection.NodeNameChanged += this.Tree_NodeNameChanged;
                     }
                     this.Initialize();
                 }
             }
         }
-        private MapCollection mapCollection;
+        private ViewModel viewModel;
+
+        private MapCollection MapCollection
+        {
+            get
+            {
+                if (this.ViewModel != null)
+                {
+                    return this.ViewModel.MapCollection;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private EditorState EditorState
+        {
+            get
+            {
+                if (this.ViewModel != null)
+                {
+                    return this.ViewModel.EditorState;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         private void Tree_Loaded(object sender, EventArgs e)
         {
@@ -96,6 +126,12 @@ namespace Shrimp
             }
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.ProjectNodeId).ImageKey = "Folder";
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.TrashNodeId).ImageKey = "Bin";
+            int selectedId = this.EditorState.SelectedMapId;
+            TreeNode selectedNode = this.AllNodes.FirstOrDefault(n => (int)n.Tag == selectedId);
+            if (selectedNode != null)
+            {
+                this.SelectedNode = selectedNode;
+            }
         }
 
         private void AddTreeNode(TreeNodeCollection parentNodes, int id)
@@ -163,6 +199,12 @@ namespace Shrimp
             base.OnAfterCollapse(e);
             this.MapCollection.CollapseNode((int)e.Node.Tag);
             this.Invalidate();
+        }
+
+        protected override void OnAfterSelect(TreeViewEventArgs e)
+        {
+            base.OnAfterSelect(e);
+            this.EditorState.SelectedMapId = (int)this.SelectedNode.Tag;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

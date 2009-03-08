@@ -51,7 +51,7 @@ namespace Shrimp
             };
             this.ViewModel.Project.Updated += (s, e) =>
             {
-                switch (e.EventName)
+                switch (e.PropertyName)
                 {
                 case "GameTitle":
                     this.GameTitleChanged();
@@ -60,7 +60,9 @@ namespace Shrimp
                     throw new ArgumentException("Invalid property name", "e");
                 }
             };
-            this.MapTreeView.MapCollection = this.ViewModel.MapCollection;
+            this.MapTreeView.ViewModel = this.ViewModel;
+            this.MapEditor.ViewModel = this.ViewModel;
+            this.TilesPalette.ViewModel = this.ViewModel;
             this.IsOpenedChanged();
         }
 

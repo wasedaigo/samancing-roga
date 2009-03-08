@@ -23,7 +23,7 @@ namespace Shrimp
                 if (this.name != value)
                 {
                     this.name = value;
-                    this.OnUpdated(new UpdatedEventArgs("Name", this.Name));
+                    this.OnUpdated(new UpdatedEventArgs("Name"));
                 }
             }
         }
@@ -37,7 +37,7 @@ namespace Shrimp
                 if (this.width != value)
                 {
                     this.width = value;
-                    this.OnUpdated(new UpdatedEventArgs("Width", this.Width));
+                    this.OnUpdated(new UpdatedEventArgs("Width"));
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace Shrimp
                 if (this.height != value)
                 {
                     this.height = value;
-                    this.OnUpdated(new UpdatedEventArgs("Height", this.Height));
+                    this.OnUpdated(new UpdatedEventArgs("Height"));
                 }
             }
         }

@@ -230,14 +230,14 @@ namespace Shrimp
         {
             Node node = this.GetNode(id);
             node.IsExpanded = true;
-            this.OnUpdated(new UpdatedEventArgs(null, null));
+            this.OnUpdated(new UpdatedEventArgs(null));
         }
 
         public void CollapseNode(int id)
         {
             Node node = this.GetNode(id);
             node.IsExpanded = false;
-            this.OnUpdated(new UpdatedEventArgs(null, null));
+            this.OnUpdated(new UpdatedEventArgs(null));
         }
 
         public override JObject ToJson()
@@ -289,28 +289,28 @@ namespace Shrimp
         protected virtual void OnNodeAdded(NodeEventArgs e)
         {
             if (this.NodeAdded != null) { this.NodeAdded(this, e); }
-            this.OnUpdated(new UpdatedEventArgs(null, null));
+            this.OnUpdated(new UpdatedEventArgs(null));
         }
 
         public event EventHandler<NodeEventArgs> NodeRemoved;
         protected virtual void OnNodeRemoved(NodeEventArgs e)
         {
             if (this.NodeRemoved != null) { this.NodeRemoved(this, e); }
-            this.OnUpdated(new UpdatedEventArgs(null, null));
+            this.OnUpdated(new UpdatedEventArgs(null));
         }
 
         public event EventHandler<NodeEventArgs> NodeMoved;
         protected virtual void OnNodeMoved(NodeEventArgs e)
         {
             if (this.NodeMoved != null) { this.NodeMoved(this, e); }
-            this.OnUpdated(new UpdatedEventArgs(null, null));
+            this.OnUpdated(new UpdatedEventArgs(null));
         }
 
         public event EventHandler<NodeEventArgs> NodeNameChanged;
         protected virtual void OnNodeNameChanged(NodeEventArgs e)
         {
             if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
-            this.OnUpdated(new UpdatedEventArgs(null, null));
+            this.OnUpdated(new UpdatedEventArgs(null));
         }
     }
 }

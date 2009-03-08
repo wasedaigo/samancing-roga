@@ -7,42 +7,42 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class Project : Model
+    internal class EditorState : Model
     {
-        public Project()
+        public EditorState()
         {
             this.Clear();
         }
 
-        public string GameTitle
+        public int SelectedMapId
         {
-            get { return this.gameTitle; }
+            get { return this.selectedMapId; }
             set
             {
-                if (this.gameTitle != value)
+                if (this.selectedMapId != value)
                 {
-                    this.gameTitle = value;
-                    this.OnUpdated(new UpdatedEventArgs("GameTitle"));
+                    this.selectedMapId = value;
+                    this.OnUpdated(new UpdatedEventArgs("SelectedMapId"));
                 }
             }
         }
-        private string gameTitle;
+        private int selectedMapId;
 
         public override void Clear()
         {
-            this.GameTitle = "";
-            this.OnCleared(EventArgs.Empty);
+            this.SelectedMapId = 0;
         }
 
         public override JObject ToJson()
         {
-            return new JObject(new JProperty("GameTitle", this.GameTitle));
+            return new JObject(
+                new JProperty("SelectedMapId", this.SelectedMapId));
         }
 
         public override void LoadJson(JObject json)
         {
             this.Clear();
-            this.GameTitle = json["GameTitle"].Value<string>();
+            this.SelectedMapId = json["SelectedMapId"].Value<int>();
             this.OnLoaded(EventArgs.Empty);
         }
     }

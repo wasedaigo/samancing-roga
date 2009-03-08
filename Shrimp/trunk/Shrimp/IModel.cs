@@ -21,13 +21,11 @@ namespace Shrimp
 
     internal class UpdatedEventArgs : EventArgs
     {
-        public UpdatedEventArgs(string eventName, object value)
+        public UpdatedEventArgs(string propertyName)
         {
-            this.EventName = eventName;
-            this.Value = value;
+            this.PropertyName = propertyName;
         }
 
-        public string EventName { get; private set; }
-        public object Value { get; private set; }
+        public string PropertyName { get; private set; }
     }
 }

@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorState.cs" />
     <Compile Include="IModel.cs" />
     <Compile Include="ITree.cs" />
     <Compile Include="MainForm.cs">

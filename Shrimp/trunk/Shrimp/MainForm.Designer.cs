@@ -163,7 +163,6 @@
             this.MapTreeView.Indent = 19;
             this.MapTreeView.ItemHeight = 21;
             this.MapTreeView.Location = new System.Drawing.Point(0, 0);
-            this.MapTreeView.MapCollection = null;
             this.MapTreeView.Name = "MapTreeView";
             this.MapTreeView.SelectedImageIndex = 0;
             this.MapTreeView.ShowLines = false;

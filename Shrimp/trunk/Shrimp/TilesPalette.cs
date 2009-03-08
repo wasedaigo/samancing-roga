@@ -27,6 +27,8 @@ namespace Shrimp
             this.UpdateState();
         }
 
+        public ViewModel ViewModel { get; set; }
+
         public Bitmap TilesBitmap
         {
             get
