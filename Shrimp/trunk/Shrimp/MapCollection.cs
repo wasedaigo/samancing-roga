@@ -13,19 +13,17 @@ namespace Shrimp
     {
         private class Node
         {
-            public Node(int id, string name)
+            public Node(int id, string name, bool isExpanded)
             {
                 this.Id = id;
                 this.Name = name;
+                this.IsExpanded = isExpanded;
                 this.Children = new List<Node>();
             }
 
             public int Id { get; private set; }
-            public virtual string Name
-            {
-                get;
-                set; // TODO
-            }
+            public virtual string Name { get; private set; }
+            public bool IsExpanded { get; set; }
             public Node Parent { get; set; }
             public List<Node> Children { get; private set; }
 
@@ -34,6 +32,7 @@ namespace Shrimp
                 return new JObject(
                     new JProperty("Id", this.Id),
                     new JProperty("Name", this.Name),
+                    new JProperty("IsExpanded", this.IsExpanded),
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
@@ -41,8 +40,8 @@ namespace Shrimp
 
         private class ProjectNode : Node
         {
-            public ProjectNode()
-                : base(0, "Project")
+            public ProjectNode(bool isExpanded)
+                : base(0, "Project", isExpanded)
             {
             }
 
@@ -50,6 +49,7 @@ namespace Shrimp
             {
                 return new JObject(
                     new JProperty("Id", this.Id),
+                    new JProperty("IsExpanded", this.IsExpanded),
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
@@ -57,8 +57,8 @@ namespace Shrimp
 
         private class TrashNode : Node
         {
-            public TrashNode()
-                : base(-1, "Trash")
+            public TrashNode(bool isExpanded)
+                : base(-1, "Trash", isExpanded)
             {
             }
 
@@ -66,6 +66,7 @@ namespace Shrimp
             {
                 return new JObject(
                     new JProperty("Id", this.Id),
+                    new JProperty("IsExpanded", this.IsExpanded),
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
@@ -74,8 +75,8 @@ namespace Shrimp
         public MapCollection(ViewModel viewModel)
         {
             this.ViewModel = viewModel;
-            this.ProjectNodeInstance = new ProjectNode();
-            this.TrashNodeInstance = new TrashNode();
+            this.ProjectNodeInstance = new ProjectNode(false);
+            this.TrashNodeInstance = new TrashNode(false);
             this.Clear();
         }
 
@@ -135,6 +136,11 @@ namespace Shrimp
             return this.Nodes.First(n => n.Id == id).Name;
         }
 
+        public bool IsExpanded(int id)
+        {
+            return this.Nodes.First(n => n.Id == id).IsExpanded;
+        }
+
         public int GetParent(int id)
         {
             return this.Nodes.First(n => n.Id == id).Parent.Id;
@@ -174,7 +180,7 @@ namespace Shrimp
                 }
             }
             Debug.Assert(!ids.Contains(id));
-            Node node = new Node(id, "Map (ID: " + id + ")");
+            Node node = new Node(id, "Map (ID: " + id + ")", false);
             node.Parent = this.Nodes.First(n => n.Id == parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
@@ -223,6 +229,26 @@ namespace Shrimp
             this.OnNodeMoved(new NodeEventArgs(id));
         }
 
+        public void ExpandNode(int id)
+        {
+            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
+            if (node == null)
+            {
+                throw new ArgumentException("Invalid id", "id");
+            }
+            node.IsExpanded = true;
+        }
+
+        public void CollapseNode(int id)
+        {
+            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
+            if (node == null)
+            {
+                throw new ArgumentException("Invalid id", "id");
+            }
+            node.IsExpanded = false;
+        }
+
         public override JObject ToJson()
         {
             return new JObject(
@@ -233,11 +259,15 @@ namespace Shrimp
         public override void LoadJson(JObject json)
         {
             this.Clear();
-            foreach (JObject childJson in json["Project"]["Children"])
+            JObject projectJson = json["Project"] as JObject;
+            JObject trashJson = json["Trash"] as JObject;
+            this.ProjectNodeInstance.IsExpanded = projectJson["IsExpanded"].Value<bool>();
+            this.TrashNodeInstance.IsExpanded = projectJson["IsExpanded"].Value<bool>();
+            foreach (JObject childJson in projectJson["Children"])
             {
                 this.AddNodeFromJson(this.ProjectNodeInstance, childJson);
             }
-            foreach (JObject childJson in json["Trash"]["Children"])
+            foreach (JObject childJson in trashJson["Children"])
             {
                 this.AddNodeFromJson(this.TrashNodeInstance, childJson);
             }
@@ -246,7 +276,9 @@ namespace Shrimp
 
         private void AddNodeFromJson(Node parentNode, JObject json)
         {
-            Node node = new Node(json.Value<int>("Id"), json.Value<string>("Name"));
+            Node node = new Node(json.Value<int>("Id"),
+                json.Value<string>("Name"),
+                json.Value<bool>("IsExpanded"));
             parentNode.Children.Add(node);
             node.Parent = parentNode;
             foreach (JObject childJson in json["Children"])

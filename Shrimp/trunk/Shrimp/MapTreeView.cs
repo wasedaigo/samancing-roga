@@ -98,15 +98,19 @@ namespace Shrimp
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.TrashNodeId).ImageKey = "Bin";
         }
 
-        private void AddTreeNode(TreeNodeCollection parentNode, int id)
+        private void AddTreeNode(TreeNodeCollection parentNodes, int id)
         {
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
             node.ImageKey = "PageWhite";
             node.Tag = id;
-            parentNode.Add(node);
+            parentNodes.Add(node);
             foreach (int childId in this.MapCollection.GetChildren(id))
             {
                 this.AddTreeNode(node.Nodes, childId);
+            }
+            if (this.MapCollection.IsExpanded(id))
+            {
+                node.Expand();
             }
         }
 
@@ -150,6 +154,14 @@ namespace Shrimp
         protected override void OnAfterExpand(TreeViewEventArgs e)
         {
             base.OnAfterExpand(e);
+            this.MapCollection.ExpandNode((int)e.Node.Tag);
+            this.Invalidate();
+        }
+
+        protected override void OnAfterCollapse(TreeViewEventArgs e)
+        {
+            base.OnAfterCollapse(e);
+            this.MapCollection.CollapseNode((int)e.Node.Tag);
             this.Invalidate();
         }
 
@@ -195,7 +207,10 @@ namespace Shrimp
         protected override void OnDrawNode(DrawTreeNodeEventArgs e)
         {
             base.OnDrawNode(e);
-            if (!this.Enabled) return;
+            if (!this.Enabled)
+            {
+                return;
+            }
             Graphics g = e.Graphics;
             TreeNode node = e.Node;
             Rectangle bounds = e.Bounds;
@@ -211,9 +226,11 @@ namespace Shrimp
             }
             if (0 < node.Level && 0 < node.GetNodeCount(false))
             {
-                Image toggleImage = 
-                    this.ImageList.Images["BulletToggle" + (node.IsExpanded ? "Minus" : "Plus")];
-                g.DrawImage(toggleImage, bounds.X + this.Indent * (node.Level - 1) + 1, bounds.Y + 1);
+                string key = "BulletToggle" + (node.IsExpanded ? "Minus" : "Plus");
+                Image toggleImage = this.ImageList.Images[key];
+                g.DrawImage(toggleImage,
+                    bounds.X + this.Indent * (node.Level - 1) + 1,
+                    bounds.Y + 1);
             }
             Image image = this.ImageList.Images[node.ImageKey];
             if (image != null)
