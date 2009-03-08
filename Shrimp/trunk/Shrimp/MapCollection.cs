@@ -38,10 +38,10 @@ namespace Shrimp
             }
         }
 
-        private class ProjectNode : Node
+        private abstract class RootNode : Node
         {
-            public ProjectNode(bool isExpanded)
-                : base(0, "Project", isExpanded)
+            public RootNode(int id, string name, bool isExpanded)
+                : base(id, name, isExpanded)
             {
             }
 
@@ -55,20 +55,19 @@ namespace Shrimp
             }
         }
 
-        private class TrashNode : Node
+        private class ProjectNode : RootNode
+        {
+            public ProjectNode(bool isExpanded)
+                : base(0, "Project", isExpanded)
+            {
+            }
+        }
+
+        private class TrashNode : RootNode
         {
             public TrashNode(bool isExpanded)
                 : base(-1, "Trash", isExpanded)
             {
-            }
-
-            public override JObject ToJson()
-            {
-                return new JObject(
-                    new JProperty("Id", this.Id),
-                    new JProperty("IsExpanded", this.IsExpanded),
-                    new JProperty("Children",
-                        new JArray(this.Children.Select(n => n.ToJson()))));
             }
         }
 
@@ -237,6 +236,7 @@ namespace Shrimp
                 throw new ArgumentException("Invalid id", "id");
             }
             node.IsExpanded = true;
+            this.OnUpdated(new UpdatedEventArgs(null, null));
         }
 
         public void CollapseNode(int id)
@@ -247,6 +247,7 @@ namespace Shrimp
                 throw new ArgumentException("Invalid id", "id");
             }
             node.IsExpanded = false;
+            this.OnUpdated(new UpdatedEventArgs(null, null));
         }
 
         public override JObject ToJson()
