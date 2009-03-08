@@ -84,7 +84,7 @@ namespace Shrimp
             this.NewToolStripButton.Enabled = !isOpened;
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
-            this.SaveToolStripButton.Enabled = isOpened && this.ViewModel.IsDirty;
+            this.SaveToolStripButton.Enabled = isOpened;
             this.TilesPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
             this.SelectedTileSetIndexChanged();
@@ -93,8 +93,6 @@ namespace Shrimp
 
         private void IsDirtyChanged()
         {
-            this.SaveToolStripButton.Enabled =
-                this.ViewModel.IsOpened && this.ViewModel.IsDirty;
         }
 
         private void SelectedTileSetIndexChanged()
@@ -183,8 +181,10 @@ namespace Shrimp
         private void SaveToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(this.ViewModel.IsOpened);
-            Debug.Assert(this.ViewModel.IsDirty);
-            this.ViewModel.Save();
+            if (this.ViewModel.IsDirty)
+            {
+                this.ViewModel.Save();
+            }
             Debug.Assert(this.ViewModel.IsOpened);
             Debug.Assert(!this.ViewModel.IsDirty);
         }

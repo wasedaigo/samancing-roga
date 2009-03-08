@@ -57,18 +57,12 @@ namespace Shrimp
 
         private class ProjectNode : RootNode
         {
-            public ProjectNode(bool isExpanded)
-                : base(0, "Project", isExpanded)
-            {
-            }
+            public ProjectNode(bool isExpanded) : base(0, "Project", isExpanded) { }
         }
 
         private class TrashNode : RootNode
         {
-            public TrashNode(bool isExpanded)
-                : base(-1, "Trash", isExpanded)
-            {
-            }
+            public TrashNode(bool isExpanded) : base(-1, "Trash", isExpanded) { }
         }
 
         public MapCollection(ViewModel viewModel)

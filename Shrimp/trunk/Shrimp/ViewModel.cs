@@ -17,10 +17,13 @@ namespace Shrimp
         {
             this.ProjectProxy = new ModelProxy<Project>(new Project());
             this.ModelProxies.Add(this.ProjectProxy);
+
             this.EditorStateProxy = new ModelProxy<EditorState>(new EditorState());
             this.ModelProxies.Add(this.EditorStateProxy);
+
             this.MapCollectionProxy = new ModelProxy<MapCollection>(new MapCollection(this));
             this.ModelProxies.Add(this.MapCollectionProxy);
+
             foreach (IModelProxy modelProxy in this.ModelProxies)
             {
                 modelProxy.IsDirtyChanged += delegate
@@ -35,18 +38,30 @@ namespace Shrimp
             get { return this.ProjectProxy.Model; }
         }
         private ModelProxy<Project> ProjectProxy;
+        private string ProjectPath
+        {
+            get { return Path.Combine(this.DirectoryPath, "Game.shrp"); }
+        }
 
         public EditorState EditorState
         {
             get { return this.EditorStateProxy.Model; }
         }
         private ModelProxy<EditorState> EditorStateProxy;
+        private string EditorStatePath
+        {
+            get { return Path.Combine(this.DirectoryPath, "EditorState.json"); }
+        }
 
         public MapCollection MapCollection
         {
             get { return this.MapCollectionProxy.Model; }
         }
         private ModelProxy<MapCollection> MapCollectionProxy;
+        private string MapCollectionPath
+        {
+            get { return Path.Combine(this.DataPath, "MapCollection.json"); }
+        }
 
         private List<IModelProxy> ModelProxies = new List<IModelProxy>();
 
@@ -68,33 +83,9 @@ namespace Shrimp
         public void Open(string directoryPath)
         {
             this.DirectoryPath = directoryPath;
-            {
-                string path = Path.Combine(this.DirectoryPath, "Game.shrp");
-                Debug.Assert(File.Exists(path));
-                this.ProjectProxy.Load(path);
-            }
-            {
-                string path = Path.Combine(this.DirectoryPath, "EditorState.json");
-                if (File.Exists(path))
-                {
-                    this.EditorStateProxy.Load(path);
-                }
-                else
-                {
-                    this.EditorStateProxy.Clear();
-                }
-            }
-            {
-                string path = Path.Combine(this.DataPath, "MapCollection.json");
-                if (File.Exists(path))
-                {
-                    this.MapCollectionProxy.Load(path);
-                }
-                else
-                {
-                    this.MapCollectionProxy.Clear();
-                }
-            }
+            this.ProjectProxy.Load(this.ProjectPath);
+            this.EditorStateProxy.Load(this.EditorStatePath);
+            this.MapCollectionProxy.Load(this.MapCollectionPath);
             this.IsOpened = true;
         }
 
@@ -125,13 +116,11 @@ namespace Shrimp
             Debug.Assert(Directory.Exists(this.DirectoryPath));
             if (this.ProjectProxy.IsDirty)
             {
-                string path = Path.Combine(this.DirectoryPath, "Game.shrp");
-                this.ProjectProxy.Save(path);
+                this.ProjectProxy.Save(this.ProjectPath);
             }
             if (this.EditorStateProxy.IsDirty)
             {
-                string path = Path.Combine(this.DirectoryPath, "EditorState.json");
-                this.EditorStateProxy.Save(path);
+                this.EditorStateProxy.Save(this.EditorStatePath);
             }
             if (this.MapCollectionProxy.IsDirty)
             {
@@ -139,8 +128,7 @@ namespace Shrimp
                 {
                     Directory.CreateDirectory(this.DataPath);
                 }
-                string path = Path.Combine(this.DataPath, "MapCollection.json");
-                this.MapCollectionProxy.Save(path);
+                this.MapCollectionProxy.Save(this.MapCollectionPath);
             }
         }
 
