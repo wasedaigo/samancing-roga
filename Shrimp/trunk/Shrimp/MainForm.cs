@@ -156,6 +156,23 @@ namespace Shrimp
         private void CloseToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(this.ViewModel.IsOpened);
+            if (this.ViewModel.IsDirty)
+            {
+                DialogResult result = MessageBox.Show("Save?", "",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1);
+                switch (result)
+                {
+                case DialogResult.Yes:
+                    this.ViewModel.Save();
+                    break;
+                case DialogResult.No:
+                    break;
+                case DialogResult.Cancel:
+                    return;
+                }
+            }
             this.ViewModel.Close();
             Debug.Assert(!this.ViewModel.IsOpened);
             Debug.Assert(!this.ViewModel.IsDirty);
@@ -168,6 +185,28 @@ namespace Shrimp
             this.ViewModel.Save();
             Debug.Assert(this.ViewModel.IsOpened);
             Debug.Assert(!this.ViewModel.IsDirty);
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this.ViewModel.IsDirty)
+            {
+                DialogResult result = MessageBox.Show("Save?", "",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1);
+                switch (result)
+                {
+                case DialogResult.Yes:
+                    this.ViewModel.Save();
+                    break;
+                case DialogResult.No:
+                    break;
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    return;
+                }
+            }
         }
     }
 }

@@ -191,7 +191,7 @@ namespace Shrimp
                         {
                             DialogResult result = MessageBox.Show("Really?", "",
                                 MessageBoxButtons.YesNo,
-                                MessageBoxIcon.Information,
+                                MessageBoxIcon.Question,
                                 MessageBoxDefaultButton.Button2);
                             if (result == DialogResult.Yes)
                             {

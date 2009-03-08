@@ -130,24 +130,34 @@ namespace Shrimp
             get { return this.TrashNodeInstance.Id; }
         }
 
+        private Node GetNode(int id)
+        {
+            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
+            if (node == null)
+            {
+                throw new ArgumentException("Node not found", "id");
+            }
+            return node;
+        }
+
         public string GetName(int id)
         {
-            return this.Nodes.First(n => n.Id == id).Name;
+            return this.GetNode(id).Name;
         }
 
         public bool IsExpanded(int id)
         {
-            return this.Nodes.First(n => n.Id == id).IsExpanded;
+            return this.GetNode(id).IsExpanded;
         }
 
         public int GetParent(int id)
         {
-            return this.Nodes.First(n => n.Id == id).Parent.Id;
+            return this.GetNode(id).Parent.Id;
         }
 
         public int GetRoot(int id)
         {
-            Node node = this.Nodes.First(n => n.Id == id);
+            Node node = this.GetNode(id);
             while (node.Parent != null)
             {
                 node = node.Parent;
@@ -157,7 +167,7 @@ namespace Shrimp
 
         public int[] GetChildren(int id)
         {
-            return (from n in this.Nodes.First(n => n.Id == id).Children
+            return (from n in this.GetNode(id).Children
                     select n.Id).ToArray();
         }
 
@@ -180,7 +190,7 @@ namespace Shrimp
             }
             Debug.Assert(!ids.Contains(id));
             Node node = new Node(id, "Map (ID: " + id + ")", false);
-            node.Parent = this.Nodes.First(n => n.Id == parentId);
+            node.Parent = this.GetNode(parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
         }
@@ -191,11 +201,7 @@ namespace Shrimp
             {
                 throw new ArgumentException("Couldn't remove the root", "id");
             }
-            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
-            if (node == null)
-            {
-                throw new ArgumentException("Invalid id", "id");
-            }
+            Node node = this.GetNode(id);
             Node parentNode = node.Parent;
             Debug.Assert(parentNode != null);
             Debug.Assert(parentNode.Children.Contains(node));
@@ -209,16 +215,8 @@ namespace Shrimp
             {
                 throw new ArgumentException("Couldn't remove the root", "id");
             }
-            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
-            if (node == null)
-            {
-                throw new ArgumentException("Invalid id", "id");
-            }
-            Node newParentNode = this.Nodes.FirstOrDefault(n => n.Id == parentId);
-            if (newParentNode == null)
-            {
-                throw new ArgumentException("Invalid id", "parentId");
-            }
+            Node node = this.GetNode(id);
+            Node newParentNode = this.GetNode(parentId);
             Node oldParentNode = node.Parent;
             Debug.Assert(oldParentNode != null);
             Debug.Assert(oldParentNode.Children.Contains(node));
@@ -230,22 +228,14 @@ namespace Shrimp
 
         public void ExpandNode(int id)
         {
-            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
-            if (node == null)
-            {
-                throw new ArgumentException("Invalid id", "id");
-            }
+            Node node = this.GetNode(id);
             node.IsExpanded = true;
             this.OnUpdated(new UpdatedEventArgs(null, null));
         }
 
         public void CollapseNode(int id)
         {
-            Node node = this.Nodes.FirstOrDefault(n => n.Id == id);
-            if (node == null)
-            {
-                throw new ArgumentException("Invalid id", "id");
-            }
+            Node node = this.GetNode(id);
             node.IsExpanded = false;
             this.OnUpdated(new UpdatedEventArgs(null, null));
         }
