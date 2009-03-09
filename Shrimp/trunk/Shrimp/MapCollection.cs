@@ -13,16 +13,18 @@ namespace Shrimp
     {
         private class Node
         {
-            public Node(int id, string name, bool isExpanded)
+            public Node(int id, string name, Map map, bool isExpanded)
             {
                 this.Id = id;
                 this.Name = name;
+                this.Map = map;
                 this.IsExpanded = isExpanded;
                 this.Children = new List<Node>();
             }
 
             public int Id { get; private set; }
             public virtual string Name { get; private set; }
+            public Map Map { get; private set; }
             public bool IsExpanded { get; set; }
             public Node Parent { get; set; }
             public List<Node> Children { get; private set; }
@@ -41,7 +43,7 @@ namespace Shrimp
         private abstract class RootNode : Node
         {
             public RootNode(int id, string name, bool isExpanded)
-                : base(id, name, isExpanded)
+                : base(id, name, null, isExpanded)
             {
             }
 
@@ -104,6 +106,14 @@ namespace Shrimp
             }
         }
 
+        public IEnumerable<int> NodeIds
+        {
+            get
+            {
+                return this.Nodes.Select(n => n.Id);
+            }
+        }
+
         public int[] Roots
         {
             get { return this.RootNodes.Select(n => n.Id).ToArray(); }
@@ -137,6 +147,16 @@ namespace Shrimp
         public string GetName(int id)
         {
             return this.GetNode(id).Name;
+        }
+
+        public Map GetMap(int id)
+        {
+            return this.GetNode(id).Map;
+        }
+
+        public int GetId(Map map)
+        {
+            return this.Nodes.First(n => n.Map == map).Id;
         }
 
         public bool IsExpanded(int id)
@@ -182,7 +202,7 @@ namespace Shrimp
                 }
             }
             Debug.Assert(!ids.Contains(id));
-            Node node = new Node(id, "Map (ID: " + id + ")", false);
+            Node node = new Node(id, "Map (ID: " + id + ")", new Map(this), false);
             node.Parent = this.GetNode(parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
@@ -260,6 +280,7 @@ namespace Shrimp
         {
             Node node = new Node(json.Value<int>("Id"),
                 json.Value<string>("Name"),
+                new Map(this),
                 json.Value<bool>("IsExpanded"));
             parentNode.Children.Add(node);
             node.Parent = parentNode;

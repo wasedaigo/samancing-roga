@@ -9,25 +9,13 @@ namespace Shrimp
 {
     internal class Map : Model
     {
-        public Map(string name)
+        public Map(MapCollection mapCollection)
         {
+            this.MapCollection = mapCollection;
             this.Clear();
-            this.Name = name;
         }
 
-        public string Name
-        {
-            get { return this.name; }
-            set
-            {
-                if (this.name != value)
-                {
-                    this.name = value;
-                    this.OnUpdated(new UpdatedEventArgs("Name"));
-                }
-            }
-        }
-        private string name;
+        public MapCollection MapCollection { get; private set; }
 
         public int Width
         {
@@ -58,7 +46,6 @@ namespace Shrimp
 
         public override void Clear()
         {
-            this.Name = "";
             this.Width = 0;
             this.Height = 0;
             this.OnCleared(EventArgs.Empty);
@@ -67,8 +54,7 @@ namespace Shrimp
         public override JObject ToJson()
         {
             return new JObject(
-                new JProperty("Name", this.Name),
-                new JProperty("Width"), this.Width,
+                new JProperty("Width", this.Width),
                 new JProperty("Height", this.Height),
                 new JProperty("Tiles", null));
         }

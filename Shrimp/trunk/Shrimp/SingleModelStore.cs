@@ -8,15 +8,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal interface IModelStore
-    {
-        void Save(string path);
-        bool Load(string path);
-        void Clear();
-        bool IsDirty { get; }
-        event EventHandler IsDirtyChanged;
-    }
-
     internal class SingleModelStore<T> : IModelStore where T : class, IModel
     {
         private static readonly Encoding UTF8N = new UTF8Encoding(false);
@@ -57,8 +48,19 @@ namespace Shrimp
             string path = Path.Combine(directory, this.FilePath);
             if (result = File.Exists(path))
             {
-                JObject json = JObject.Parse(File.ReadAllText(path, UTF8N));
-                this.Model.LoadJson(json);
+                JObject json;
+                try
+                {
+                    json = JObject.Parse(File.ReadAllText(path, UTF8N));
+                }
+                catch (Exception)
+                {
+                    json = null;
+                }
+                if (json != null)
+                {
+                    this.Model.LoadJson(json);
+                }
             }
             this.IsDirty = false;
             return result;
@@ -89,56 +91,4 @@ namespace Shrimp
             this.IsDirty = false;
         }
     }
-
-    internal class MapCollectionStore : IModelStore
-    {
-        public MapCollectionStore(MapCollection model, string filePath)
-        {
-            this.MapCollectionSingleStore = new SingleModelStore<MapCollection>(model, filePath);
-            this.MapCollectionSingleStore.IsDirtyChanged += delegate
-            {
-                this.OnIsDirtyChanged(EventArgs.Empty);
-            };
-        }
-
-        private SingleModelStore<MapCollection> MapCollectionSingleStore;
-
-        public MapCollection Model
-        {
-            get { return this.MapCollectionSingleStore.Model; }
-        }
-
-        public void Save(string path)
-        {
-            this.MapCollectionSingleStore.Save(path);
-        }
-
-        public bool Load(string path)
-        {
-            bool result = true;
-            result &= this.MapCollectionSingleStore.Load(path);
-            return result;
-        }
-
-        public void Clear()
-        {
-            this.MapCollectionSingleStore.Clear();
-        }
-
-        public bool IsDirty
-        {
-            get
-            {
-                return this.MapCollectionSingleStore.IsDirty;
-            }
-        }
-
-        public event EventHandler IsDirtyChanged;
-        protected virtual void OnIsDirtyChanged(EventArgs e)
-        {
-            if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
-        }
-    }
-
-
 }

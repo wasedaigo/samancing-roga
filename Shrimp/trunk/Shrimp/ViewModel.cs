@@ -47,7 +47,7 @@ namespace Shrimp
 
         public MapCollection MapCollection
         {
-            get { return this.MapCollectionStore.Model; }
+            get { return this.MapCollectionStore.MapCollection; }
         }
         private MapCollectionStore MapCollectionStore;
 

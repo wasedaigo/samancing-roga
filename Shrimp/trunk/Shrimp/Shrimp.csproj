@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="EditorState.cs" />
     <Compile Include="IModel.cs" />
+    <Compile Include="IModelStore.cs" />
     <Compile Include="ITree.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -67,7 +68,7 @@
       <DependentUpon>MapEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Model.cs" />
-    <Compile Include="ModelStore.cs" />
+    <Compile Include="MapCollectionStore.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="MapTreeView.cs">
       <SubType>Component</SubType>
@@ -79,6 +80,7 @@
       <DependentUpon>NewProjectDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="SingleModelStore.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
