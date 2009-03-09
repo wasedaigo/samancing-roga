@@ -21,17 +21,26 @@ namespace Shrimp
     {
         private static readonly Encoding UTF8N = new UTF8Encoding(false);
 
-        public ModelProxy(T model)
+        public ModelProxy(T model, string filePath)
         {
             this.Model = model;
             this.Model.Updated += delegate { this.IsDirty = true; };
+            this.FilePath = filePath;
             this.IsDirty = false;
         }
 
         public T Model { get; private set; }
 
-        public void Save(string path)
+        public string FilePath { get; private set; }
+
+        public void Save(string directory)
         {
+            string path = Path.Combine(directory, this.FilePath);
+            string directory2 = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory2))
+            {
+                Directory.CreateDirectory(directory2);
+            }
             using (var sw = new StreamWriter(path, false, UTF8N))
             using (var writer = new JsonTextWriter(sw))
             {
@@ -41,10 +50,11 @@ namespace Shrimp
             this.IsDirty = false;
         }
 
-        public bool Load(string path)
+        public bool Load(string directory)
         {
             this.Model.Clear();
             bool result;
+            string path = Path.Combine(directory, this.FilePath);
             if (result = File.Exists(path))
             {
                 JObject json = JObject.Parse(File.ReadAllText(path, UTF8N));

@@ -16,7 +16,7 @@ namespace Shrimp
 
         public TilesPalette()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.ClientSize = new Size
             {
                 Width = GridSize + SystemInformation.VerticalScrollBarWidth,

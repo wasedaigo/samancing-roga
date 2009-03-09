@@ -15,13 +15,13 @@ namespace Shrimp
     {
         public ViewModel()
         {
-            this.ProjectProxy = new ModelProxy<Project>(new Project());
+            this.ProjectProxy = new ModelProxy<Project>(new Project(), "Game.shrp");
             this.ModelProxies.Add(this.ProjectProxy);
 
-            this.EditorStateProxy = new ModelProxy<EditorState>(new EditorState());
+            this.EditorStateProxy = new ModelProxy<EditorState>(new EditorState(), "EditorState.json");
             this.ModelProxies.Add(this.EditorStateProxy);
 
-            this.MapCollectionProxy = new ModelProxy<MapCollection>(new MapCollection(this));
+            this.MapCollectionProxy = new ModelProxy<MapCollection>(new MapCollection(this), "Data/MapCollection.json");
             this.ModelProxies.Add(this.MapCollectionProxy);
 
             foreach (IModelProxy modelProxy in this.ModelProxies)
@@ -38,30 +38,18 @@ namespace Shrimp
             get { return this.ProjectProxy.Model; }
         }
         private ModelProxy<Project> ProjectProxy;
-        private string ProjectPath
-        {
-            get { return Path.Combine(this.DirectoryPath, "Game.shrp"); }
-        }
 
         public EditorState EditorState
         {
             get { return this.EditorStateProxy.Model; }
         }
         private ModelProxy<EditorState> EditorStateProxy;
-        private string EditorStatePath
-        {
-            get { return Path.Combine(this.DirectoryPath, "EditorState.json"); }
-        }
 
         public MapCollection MapCollection
         {
             get { return this.MapCollectionProxy.Model; }
         }
         private ModelProxy<MapCollection> MapCollectionProxy;
-        private string MapCollectionPath
-        {
-            get { return Path.Combine(this.DataPath, "MapCollection.json"); }
-        }
 
         private List<IModelProxy> ModelProxies = new List<IModelProxy>();
 
@@ -83,9 +71,9 @@ namespace Shrimp
         public void Open(string directoryPath)
         {
             this.DirectoryPath = directoryPath;
-            this.ProjectProxy.Load(this.ProjectPath);
-            this.EditorStateProxy.Load(this.EditorStatePath);
-            this.MapCollectionProxy.Load(this.MapCollectionPath);
+            this.ProjectProxy.Load(this.DirectoryPath);
+            this.EditorStateProxy.Load(this.DirectoryPath);
+            this.MapCollectionProxy.Load(this.DirectoryPath);
             this.IsOpened = true;
         }
 
@@ -96,39 +84,20 @@ namespace Shrimp
             this.IsOpened = false;
         }
 
-        private string GraphicsPath
-        {
-            get { return Path.Combine(this.DirectoryPath, "Graphics"); }
-        }
-
-        private string DataPath
-        {
-            get { return Path.Combine(this.DirectoryPath, "Data"); }
-        }
-
-        private string AudioPath
-        {
-            get { return Path.Combine(this.DirectoryPath, "Audio"); }
-        }
-
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
             if (this.ProjectProxy.IsDirty)
             {
-                this.ProjectProxy.Save(this.ProjectPath);
+                this.ProjectProxy.Save(this.DirectoryPath);
             }
             if (this.EditorStateProxy.IsDirty)
             {
-                this.EditorStateProxy.Save(this.EditorStatePath);
+                this.EditorStateProxy.Save(this.DirectoryPath);
             }
             if (this.MapCollectionProxy.IsDirty)
             {
-                if (!Directory.Exists(this.DataPath))
-                {
-                    Directory.CreateDirectory(this.DataPath);
-                }
-                this.MapCollectionProxy.Save(this.MapCollectionPath);
+                this.MapCollectionProxy.Save(this.DirectoryPath);
             }
         }
 
@@ -188,7 +157,7 @@ namespace Shrimp
 
         public Bitmap GetTilesBitmap()
         {
-            string tilesBitmapPath = Path.Combine(this.GraphicsPath, "Tiles.png");
+            string tilesBitmapPath = Path.Combine(this.DirectoryPath, "Graphics/Tiles.png");
             return Bitmap.FromFile(tilesBitmapPath) as Bitmap;
         }
     }
