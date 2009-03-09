@@ -51,6 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatabaseDialog.Designer.cs">
+      <DependentUpon>DatabaseDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditorState.cs" />
     <Compile Include="IModel.cs" />
     <Compile Include="IModelStore.cs" />
@@ -86,6 +92,9 @@
     <Compile Include="Util.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="DatabaseDialog.resx">
+      <DependentUpon>DatabaseDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

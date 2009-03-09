@@ -36,6 +36,7 @@ namespace Shrimp
                 var j = i;
                 items[i].Click += (sender, e) => { this.ViewModel.SelectedTileSetIndex = j; };
             }
+            this.DatabaseDialog = new DatabaseDialog();
             this.ViewModel = new ViewModel();
             this.ViewModel.IsOpenedChanged += delegate
             {
@@ -68,6 +69,8 @@ namespace Shrimp
 
         private ViewModel ViewModel;
 
+        private DatabaseDialog DatabaseDialog;
+
         private IEnumerable<ToolStripButton> TilesPaletteSwitchers
         {
             get
@@ -85,6 +88,7 @@ namespace Shrimp
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened;
+            this.DatabaseToolStripButton.Enabled = isOpened;
             this.TilesPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
             this.SelectedTileSetIndexChanged();
@@ -187,6 +191,13 @@ namespace Shrimp
             }
             Debug.Assert(this.ViewModel.IsOpened);
             Debug.Assert(!this.ViewModel.IsDirty);
+        }
+
+        private void DatabaseToolStripButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.ViewModel.IsOpened);
+            this.DatabaseDialog.ShowDialog();
+            Debug.Assert(this.ViewModel.IsOpened);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
