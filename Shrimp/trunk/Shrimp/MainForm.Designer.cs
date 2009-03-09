@@ -89,7 +89,6 @@
             // 
             // LeftSplitContainer.Panel1
             // 
-            this.LeftSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.LeftSplitContainer.Panel1.Controls.Add(this.TilesPaletteToolStrip);
             this.LeftSplitContainer.Panel1.Controls.Add(this.TilesPalette);
             // 
