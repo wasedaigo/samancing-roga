@@ -24,6 +24,10 @@ namespace Shrimp
             {
                 if (this.width != value)
                 {
+                    if (value < 20)
+                    {
+                        throw new ArgumentOutOfRangeException("Width too small");
+                    }
                     this.width = value;
                     this.OnUpdated(new UpdatedEventArgs("Width"));
                 }
@@ -37,6 +41,10 @@ namespace Shrimp
             {
                 if (this.height != value)
                 {
+                    if (value < 15)
+                    {
+                        throw new ArgumentOutOfRangeException("Height too small");
+                    }
                     this.height = value;
                     this.OnUpdated(new UpdatedEventArgs("Height"));
                 }
@@ -46,8 +54,8 @@ namespace Shrimp
 
         public override void Clear()
         {
-            this.Width = 0;
-            this.Height = 0;
+            this.Width = 20;
+            this.Height = 15;
             this.OnCleared(EventArgs.Empty);
         }
 

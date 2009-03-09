@@ -53,9 +53,19 @@ namespace Shrimp
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
-            /*if (this.ViewModel.SelectedMap != null)
+            Map map = this.ViewModel.EditorState.SelectedMap;
+            if (map != null)
             {
-            }*/
+                int width = map.Width;
+                int height = map.Height;
+                for (int j = 0; j < height; j++)
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        g.DrawImage(Util.BackgroundBitmap, i * 32, j * 32);
+                    }
+                }
+            }
         }
     }
 }

@@ -48,10 +48,11 @@ namespace Shrimp
             string path = Path.Combine(directory, this.FilePath);
             if (result = File.Exists(path))
             {
+                string jsonText = File.ReadAllText(path, UTF8N);
                 JObject json;
                 try
                 {
-                    json = JObject.Parse(File.ReadAllText(path, UTF8N));
+                    json = JObject.Parse(jsonText);
                 }
                 catch (Exception)
                 {

@@ -36,9 +36,6 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-            this.TilesPalette = new Shrimp.TilesPalette();
-            this.MapTreeView = new Shrimp.MapTreeView();
-            this.MapEditor = new Shrimp.MapEditor();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -46,6 +43,9 @@
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.SaveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.TilesPalette = new Shrimp.TilesPalette();
+            this.MapTreeView = new Shrimp.MapTreeView();
+            this.MapEditor = new Shrimp.MapEditor();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -141,45 +141,6 @@
             this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton3.Text = "C";
             // 
-            // TilesPalette
-            // 
-            this.TilesPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
-            this.TilesPalette.AutoScroll = true;
-            this.TilesPalette.Location = new System.Drawing.Point(0, 0);
-            this.TilesPalette.Name = "TilesPalette";
-            this.TilesPalette.Size = new System.Drawing.Size(272, 171);
-            this.TilesPalette.TabIndex = 0;
-            this.TilesPalette.TilesBitmap = null;
-            // 
-            // MapTreeView
-            // 
-            this.MapTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.MapTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
-            this.MapTreeView.FullRowSelect = true;
-            this.MapTreeView.HideSelection = false;
-            this.MapTreeView.ImageKey = "PageWhite";
-            this.MapTreeView.Indent = 19;
-            this.MapTreeView.ItemHeight = 21;
-            this.MapTreeView.Location = new System.Drawing.Point(0, 0);
-            this.MapTreeView.Name = "MapTreeView";
-            this.MapTreeView.SelectedImageIndex = 0;
-            this.MapTreeView.ShowLines = false;
-            this.MapTreeView.ShowRootLines = false;
-            this.MapTreeView.Size = new System.Drawing.Size(296, 231);
-            this.MapTreeView.TabIndex = 0;
-            // 
-            // MapEditor
-            // 
-            this.MapEditor.AutoScroll = true;
-            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapEditor.Location = new System.Drawing.Point(0, 0);
-            this.MapEditor.Name = "MapEditor";
-            this.MapEditor.Size = new System.Drawing.Size(489, 538);
-            this.MapEditor.TabIndex = 0;
-            // 
             // ToolStripContainer
             // 
             // 
@@ -261,6 +222,48 @@
             // OpenFileDialog
             // 
             this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
+            // 
+            // TilesPalette
+            // 
+            this.TilesPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.TilesPalette.AutoScroll = true;
+            this.TilesPalette.Location = new System.Drawing.Point(0, 0);
+            this.TilesPalette.Name = "TilesPalette";
+            this.TilesPalette.Size = new System.Drawing.Size(272, 171);
+            this.TilesPalette.TabIndex = 0;
+            this.TilesPalette.TilesBitmap = null;
+            this.TilesPalette.ViewModel = null;
+            // 
+            // MapTreeView
+            // 
+            this.MapTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.MapTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+            this.MapTreeView.FullRowSelect = true;
+            this.MapTreeView.HideSelection = false;
+            this.MapTreeView.ImageKey = "PageWhite";
+            this.MapTreeView.Indent = 19;
+            this.MapTreeView.ItemHeight = 21;
+            this.MapTreeView.Location = new System.Drawing.Point(0, 0);
+            this.MapTreeView.Name = "MapTreeView";
+            this.MapTreeView.SelectedImageIndex = 0;
+            this.MapTreeView.ShowLines = false;
+            this.MapTreeView.ShowRootLines = false;
+            this.MapTreeView.Size = new System.Drawing.Size(296, 231);
+            this.MapTreeView.TabIndex = 0;
+            this.MapTreeView.ViewModel = null;
+            // 
+            // MapEditor
+            // 
+            this.MapEditor.AutoScroll = true;
+            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapEditor.Location = new System.Drawing.Point(0, 0);
+            this.MapEditor.Name = "MapEditor";
+            this.MapEditor.Size = new System.Drawing.Size(489, 538);
+            this.MapEditor.TabIndex = 0;
+            this.MapEditor.ViewModel = null;
             // 
             // MainForm
             // 

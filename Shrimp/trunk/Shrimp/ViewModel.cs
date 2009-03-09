@@ -15,13 +15,16 @@ namespace Shrimp
     {
         public ViewModel()
         {
-            this.ProjectStore = new SingleModelStore<Project>(new Project(), "Game.shrp");
+            this.ProjectStore =
+                new SingleModelStore<Project>(new Project(), "Game.shrp");
             this.ModelStores.Add(this.ProjectStore);
 
-            this.EditorStateStore = new SingleModelStore<EditorState>(new EditorState(), "EditorState.json");
+            this.EditorStateStore =
+                new SingleModelStore<EditorState>(new EditorState(this), "EditorState.json");
             this.ModelStores.Add(this.EditorStateStore);
 
-            this.MapCollectionStore = new MapCollectionStore(new MapCollection(this), "Data/MapCollection.json");
+            this.MapCollectionStore =
+                new MapCollectionStore(new MapCollection(this), "Data/MapCollection.json");
             this.ModelStores.Add(this.MapCollectionStore);
 
             foreach (IModelStore modelStore in this.ModelStores)

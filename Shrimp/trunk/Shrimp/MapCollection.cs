@@ -144,6 +144,12 @@ namespace Shrimp
             return node;
         }
 
+        private bool TryGetNode(int id, out Node node)
+        {
+            node = this.Nodes.FirstOrDefault(n => n.Id == id);
+            return node != null;
+        }
+
         public string GetName(int id)
         {
             return this.GetNode(id).Name;
@@ -152,6 +158,17 @@ namespace Shrimp
         public Map GetMap(int id)
         {
             return this.GetNode(id).Map;
+        }
+
+        public bool TryGetMap(int id, out Map map)
+        {
+            Node node;
+            map = null;
+            if (this.TryGetNode(id, out node))
+            {
+                map = node.Map;
+            }
+            return map != null;
         }
 
         public int GetId(Map map)

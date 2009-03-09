@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,26 @@ namespace Shrimp
 {
     internal static class Util
     {
+        static Util()
+        {
+            BackgroundBitmap = new Bitmap(32, 32);
+            using (Graphics g = Graphics.FromImage(BackgroundBitmap))
+            {
+                Color color1 = Color.FromArgb(0, 0, 0x66);
+                Brush brush1 = new SolidBrush(color1);
+                Color color2 = Color.FromArgb(0, 0, 0x33);
+                Brush brush2 = new SolidBrush(color2);
+                g.FillRectangle(brush1, 0, 0, 16, 16);
+                g.FillRectangle(brush2, 0, 16, 16, 16);
+                g.FillRectangle(brush2, 16, 0, 16, 16);
+                g.FillRectangle(brush1, 16, 16, 16, 16);
+            }
+        }
+
+        public static readonly Bitmap BackgroundBitmap;
+
+        public const int GridSize = 32;
+
         public static void CopyDirectory(string src, string dst)
         {
             if (!Directory.Exists(dst))

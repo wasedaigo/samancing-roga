@@ -9,9 +9,28 @@ namespace Shrimp
 {
     internal class EditorState : Model
     {
-        public EditorState()
+        public EditorState(ViewModel viewModel)
         {
+            this.ViewModel = viewModel;
             this.Clear();
+        }
+
+        public ViewModel ViewModel { get; private set; }
+
+        public Map SelectedMap
+        {
+            get
+            {
+                Map map;
+                if (this.ViewModel.MapCollection.TryGetMap(this.selectedMapId, out map))
+                {
+                    return map;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public int SelectedMapId
