@@ -71,9 +71,10 @@ namespace Shrimp
         public void Open(string directoryPath)
         {
             this.DirectoryPath = directoryPath;
-            this.ProjectProxy.Load(this.DirectoryPath);
-            this.EditorStateProxy.Load(this.DirectoryPath);
-            this.MapCollectionProxy.Load(this.DirectoryPath);
+            foreach (IModelProxy modelProxy in this.ModelProxies)
+            {
+                modelProxy.Load(this.DirectoryPath);
+            }
             this.IsOpened = true;
         }
 
@@ -87,17 +88,9 @@ namespace Shrimp
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
-            if (this.ProjectProxy.IsDirty)
+            foreach (IModelProxy modelProxy in this.ModelProxies)
             {
-                this.ProjectProxy.Save(this.DirectoryPath);
-            }
-            if (this.EditorStateProxy.IsDirty)
-            {
-                this.EditorStateProxy.Save(this.DirectoryPath);
-            }
-            if (this.MapCollectionProxy.IsDirty)
-            {
-                this.MapCollectionProxy.Save(this.DirectoryPath);
+                modelProxy.Save(this.DirectoryPath);
             }
         }
 
