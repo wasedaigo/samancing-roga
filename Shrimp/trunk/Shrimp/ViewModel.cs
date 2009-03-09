@@ -61,11 +61,18 @@ namespace Shrimp
             this.MapCollectionProxy.Clear();
             this.DirectoryPath = directoryPath;
             this.Project.GameTitle = gameTitle;
-            string srcDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string src = Path.Combine(srcDir, "ProjectTemplate");
-            Util.CopyDirectory(src, this.DirectoryPath);
+            Util.CopyDirectory(ProjectTemplatePath, this.DirectoryPath);
             this.Save();
             this.IsOpened = true;
+        }
+
+        private static string ProjectTemplatePath
+        {
+            get
+            {
+                string location = Assembly.GetExecutingAssembly().Location;
+                return Path.Combine(Path.GetDirectoryName(location), "ProjectTemplate");
+            }
         }
 
         public void Open(string directoryPath)
