@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal interface IModelProxy
+    internal interface IModelStore
     {
         void Save(string path);
         bool Load(string path);
@@ -17,11 +17,11 @@ namespace Shrimp
         event EventHandler IsDirtyChanged;
     }
 
-    internal class ModelProxy<T> : IModelProxy where T : class, IModel
+    internal class SingleModelStore<T> : IModelStore where T : class, IModel
     {
         private static readonly Encoding UTF8N = new UTF8Encoding(false);
 
-        public ModelProxy(T model, string filePath)
+        public SingleModelStore(T model, string filePath)
         {
             this.Model = model;
             this.Model.Updated += delegate { this.IsDirty = true; };
@@ -89,4 +89,56 @@ namespace Shrimp
             this.IsDirty = false;
         }
     }
+
+    internal class MapCollectionStore : IModelStore
+    {
+        public MapCollectionStore(MapCollection model, string filePath)
+        {
+            this.MapCollectionSingleStore = new SingleModelStore<MapCollection>(model, filePath);
+            this.MapCollectionSingleStore.IsDirtyChanged += delegate
+            {
+                this.OnIsDirtyChanged(EventArgs.Empty);
+            };
+        }
+
+        private SingleModelStore<MapCollection> MapCollectionSingleStore;
+
+        public MapCollection Model
+        {
+            get { return this.MapCollectionSingleStore.Model; }
+        }
+
+        public void Save(string path)
+        {
+            this.MapCollectionSingleStore.Save(path);
+        }
+
+        public bool Load(string path)
+        {
+            bool result = true;
+            result &= this.MapCollectionSingleStore.Load(path);
+            return result;
+        }
+
+        public void Clear()
+        {
+            this.MapCollectionSingleStore.Clear();
+        }
+
+        public bool IsDirty
+        {
+            get
+            {
+                return this.MapCollectionSingleStore.IsDirty;
+            }
+        }
+
+        public event EventHandler IsDirtyChanged;
+        protected virtual void OnIsDirtyChanged(EventArgs e)
+        {
+            if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
+        }
+    }
+
+
 }

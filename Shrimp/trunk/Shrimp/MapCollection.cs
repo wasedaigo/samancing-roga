@@ -161,8 +161,7 @@ namespace Shrimp
 
         public int[] GetChildren(int id)
         {
-            return (from n in this.GetNode(id).Children
-                    select n.Id).ToArray();
+            return this.GetNode(id).Children.Select(n => n.Id).ToArray();
         }
 
         public void Add(int parentId)
@@ -207,7 +206,7 @@ namespace Shrimp
         {
             if (this.Roots.Contains(id))
             {
-                throw new ArgumentException("Couldn't remove the root", "id");
+                throw new ArgumentException("Couldn't move the root", "id");
             }
             Node node = this.GetNode(id);
             Node newParentNode = this.GetNode(parentId);
@@ -222,15 +221,13 @@ namespace Shrimp
 
         public void ExpandNode(int id)
         {
-            Node node = this.GetNode(id);
-            node.IsExpanded = true;
+            this.GetNode(id).IsExpanded = true;
             this.OnUpdated(new UpdatedEventArgs(null));
         }
 
         public void CollapseNode(int id)
         {
-            Node node = this.GetNode(id);
-            node.IsExpanded = false;
+            this.GetNode(id).IsExpanded = false;
             this.OnUpdated(new UpdatedEventArgs(null));
         }
 

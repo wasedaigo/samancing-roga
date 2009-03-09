@@ -67,7 +67,7 @@
       <DependentUpon>MapEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Model.cs" />
-    <Compile Include="ModelProxy.cs" />
+    <Compile Include="ModelStore.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="MapTreeView.cs">
       <SubType>Component</SubType>

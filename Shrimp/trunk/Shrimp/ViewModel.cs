@@ -15,18 +15,18 @@ namespace Shrimp
     {
         public ViewModel()
         {
-            this.ProjectProxy = new ModelProxy<Project>(new Project(), "Game.shrp");
-            this.ModelProxies.Add(this.ProjectProxy);
+            this.ProjectStore = new SingleModelStore<Project>(new Project(), "Game.shrp");
+            this.ModelStores.Add(this.ProjectStore);
 
-            this.EditorStateProxy = new ModelProxy<EditorState>(new EditorState(), "EditorState.json");
-            this.ModelProxies.Add(this.EditorStateProxy);
+            this.EditorStateStore = new SingleModelStore<EditorState>(new EditorState(), "EditorState.json");
+            this.ModelStores.Add(this.EditorStateStore);
 
-            this.MapCollectionProxy = new ModelProxy<MapCollection>(new MapCollection(this), "Data/MapCollection.json");
-            this.ModelProxies.Add(this.MapCollectionProxy);
+            this.MapCollectionStore = new MapCollectionStore(new MapCollection(this), "Data/MapCollection.json");
+            this.ModelStores.Add(this.MapCollectionStore);
 
-            foreach (IModelProxy modelProxy in this.ModelProxies)
+            foreach (IModelStore modelStore in this.ModelStores)
             {
-                modelProxy.IsDirtyChanged += delegate
+                modelStore.IsDirtyChanged += delegate
                 {
                     this.OnIsDirtyChanged(EventArgs.Empty);
                 };
@@ -35,30 +35,30 @@ namespace Shrimp
 
         public Project Project
         {
-            get { return this.ProjectProxy.Model; }
+            get { return this.ProjectStore.Model; }
         }
-        private ModelProxy<Project> ProjectProxy;
+        private SingleModelStore<Project> ProjectStore;
 
         public EditorState EditorState
         {
-            get { return this.EditorStateProxy.Model; }
+            get { return this.EditorStateStore.Model; }
         }
-        private ModelProxy<EditorState> EditorStateProxy;
+        private SingleModelStore<EditorState> EditorStateStore;
 
         public MapCollection MapCollection
         {
-            get { return this.MapCollectionProxy.Model; }
+            get { return this.MapCollectionStore.Model; }
         }
-        private ModelProxy<MapCollection> MapCollectionProxy;
+        private MapCollectionStore MapCollectionStore;
 
-        private List<IModelProxy> ModelProxies = new List<IModelProxy>();
+        private List<IModelStore> ModelStores = new List<IModelStore>();
 
         private string DirectoryPath;
 
         public void New(string directoryPath, string gameTitle)
         {
-            this.ProjectProxy.Clear();
-            this.MapCollectionProxy.Clear();
+            this.ProjectStore.Clear();
+            this.MapCollectionStore.Clear();
             this.DirectoryPath = directoryPath;
             this.Project.GameTitle = gameTitle;
             Util.CopyDirectory(ProjectTemplatePath, this.DirectoryPath);
@@ -78,26 +78,26 @@ namespace Shrimp
         public void Open(string directoryPath)
         {
             this.DirectoryPath = directoryPath;
-            foreach (IModelProxy modelProxy in this.ModelProxies)
+            foreach (IModelStore modelStore in this.ModelStores)
             {
-                modelProxy.Load(this.DirectoryPath);
+                modelStore.Load(this.DirectoryPath);
             }
             this.IsOpened = true;
         }
 
         public void Close()
         {
-            this.ProjectProxy.Clear();
-            this.MapCollectionProxy.Clear();
+            this.ProjectStore.Clear();
+            this.MapCollectionStore.Clear();
             this.IsOpened = false;
         }
 
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
-            foreach (IModelProxy modelProxy in this.ModelProxies)
+            foreach (IModelStore modelStore in this.ModelStores)
             {
-                modelProxy.Save(this.DirectoryPath);
+                modelStore.Save(this.DirectoryPath);
             }
         }
 
@@ -124,7 +124,7 @@ namespace Shrimp
         {
             get
             {
-                return this.ModelProxies.Any(m => m.IsDirty);
+                return this.ModelStores.Any(m => m.IsDirty);
             }
         }
         public event EventHandler IsDirtyChanged;
