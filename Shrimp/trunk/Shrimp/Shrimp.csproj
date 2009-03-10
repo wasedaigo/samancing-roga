@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
@@ -57,10 +59,15 @@
     <Compile Include="DatabaseDialog.Designer.cs">
       <DependentUpon>DatabaseDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseModelEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DatabaseModelEditor.Designer.cs">
+      <DependentUpon>DatabaseModelEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditorState.cs" />
     <Compile Include="IModel.cs" />
     <Compile Include="IModelStore.cs" />
-    <Compile Include="ITree.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -77,6 +84,7 @@
     </Compile>
     <Compile Include="Model.cs" />
     <Compile Include="MapCollectionStore.cs" />
+    <Compile Include="ModelList.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="MapTreeView.cs">
       <SubType>Component</SubType>
@@ -89,11 +97,17 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="SingleModelStore.cs" />
+    <Compile Include="TileSetEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Util.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="DatabaseDialog.resx">
       <DependentUpon>DatabaseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DatabaseModelEditor.resx">
+      <DependentUpon>DatabaseModelEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -112,6 +126,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TileSetEditor.resx">
+      <DependentUpon>TileSetEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TilesPalette.resx">
       <DependentUpon>TilesPalette.cs</DependentUpon>

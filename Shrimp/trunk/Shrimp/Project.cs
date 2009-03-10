@@ -34,12 +34,12 @@ namespace Shrimp
             this.OnCleared(EventArgs.Empty);
         }
 
-        public override JObject ToJson()
+        public override JToken ToJson()
         {
             return new JObject(new JProperty("GameTitle", this.GameTitle));
         }
 
-        public override void LoadJson(JObject json)
+        public override void LoadJson(JToken json)
         {
             this.Clear();
             this.GameTitle = json["GameTitle"].Value<string>();

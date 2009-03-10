@@ -29,7 +29,7 @@ namespace Shrimp
             public Node Parent { get; set; }
             public List<Node> Children { get; private set; }
 
-            public virtual JObject ToJson()
+            public virtual JToken ToJson()
             {
                 return new JObject(
                     new JProperty("Id", this.Id),
@@ -47,7 +47,7 @@ namespace Shrimp
             {
             }
 
-            public override JObject ToJson()
+            public override JToken ToJson()
             {
                 return new JObject(
                     new JProperty("Id", this.Id),
@@ -268,14 +268,14 @@ namespace Shrimp
             this.OnUpdated(new UpdatedEventArgs(null));
         }
 
-        public override JObject ToJson()
+        public override JToken ToJson()
         {
             return new JObject(
                 new JProperty("Project", this.ProjectNodeInstance.ToJson()),
                 new JProperty("Trash", this.TrashNodeInstance.ToJson()));
         }
 
-        public override void LoadJson(JObject json)
+        public override void LoadJson(JToken json)
         {
             this.Clear();
             JObject projectJson = json["Project"] as JObject;
@@ -341,5 +341,15 @@ namespace Shrimp
             if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
             this.OnUpdated(new UpdatedEventArgs(null));
         }
+    }
+
+    internal class NodeEventArgs : EventArgs
+    {
+        public NodeEventArgs(int nodeId)
+        {
+            this.NodeId = nodeId;
+        }
+
+        public int NodeId { get; private set; }
     }
 }

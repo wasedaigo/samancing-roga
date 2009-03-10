@@ -52,13 +52,13 @@ namespace Shrimp
             this.SelectedMapId = 0;
         }
 
-        public override JObject ToJson()
+        public override JToken ToJson()
         {
             return new JObject(
                 new JProperty("SelectedMapId", this.SelectedMapId));
         }
 
-        public override void LoadJson(JObject json)
+        public override void LoadJson(JToken json)
         {
             this.Clear();
             this.SelectedMapId = json["SelectedMapId"].Value<int>();

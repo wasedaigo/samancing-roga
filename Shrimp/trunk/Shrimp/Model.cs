@@ -29,8 +29,8 @@ namespace Shrimp
             if (this.Loaded != null) { this.Loaded(this, e); }
         }
 
-        public abstract JObject ToJson();
+        public abstract JToken ToJson();
 
-        public abstract void LoadJson(JObject json);
+        public abstract void LoadJson(JToken json);
     }
 }

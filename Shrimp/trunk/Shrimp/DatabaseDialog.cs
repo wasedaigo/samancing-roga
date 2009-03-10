@@ -14,8 +14,6 @@ namespace Shrimp
         public DatabaseDialog()
         {
             InitializeComponent();
-            Font font = this.TileSetLabel.Font;
-            this.TileSetLabel.Font = new Font(font.FontFamily, font.Size * 1.5f);
         }
 
         private void OKButton_Click(object sender, EventArgs e)

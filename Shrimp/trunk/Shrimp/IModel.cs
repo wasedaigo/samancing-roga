@@ -15,8 +15,8 @@ namespace Shrimp
         event EventHandler Cleared;
         event EventHandler Loaded;
 
-        JObject ToJson();
-        void LoadJson(JObject json);
+        JToken ToJson();
+        void LoadJson(JToken json);
     }
 
     internal class UpdatedEventArgs : EventArgs

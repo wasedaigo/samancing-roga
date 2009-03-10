@@ -59,7 +59,7 @@ namespace Shrimp
             this.OnCleared(EventArgs.Empty);
         }
 
-        public override JObject ToJson()
+        public override JToken ToJson()
         {
             return new JObject(
                 new JProperty("Width", this.Width),
@@ -67,7 +67,7 @@ namespace Shrimp
                 new JProperty("Tiles", null));
         }
 
-        public override void LoadJson(JObject json)
+        public override void LoadJson(JToken json)
         {
             this.OnLoaded(EventArgs.Empty);
         }
