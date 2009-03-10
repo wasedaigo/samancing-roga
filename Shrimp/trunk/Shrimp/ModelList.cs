@@ -28,7 +28,7 @@ namespace Shrimp
                     }
                     if (this.Models.Count < value)
                     {
-                        var nulls = Enumerable.Repeat<T>(null, value - this.Models.Count);
+                        var nulls = Enumerable.Repeat(new T(), value - this.Models.Count);
                         this.Models.AddRange(nulls);
                     }
                     else
@@ -49,7 +49,7 @@ namespace Shrimp
 
         public override JToken ToJson()
         {
-            return new JArray(this.Models.Select(m => (m != null) ? m.ToJson() : null));
+            return new JArray(this.Models.Select(m => m.ToJson()));
         }
 
         public override void LoadJson(JToken json)
@@ -57,16 +57,9 @@ namespace Shrimp
             this.Clear();
             foreach (JObject jObject in json)
             {
-                if (jObject != null)
-                {
-                    T model = new T();
-                    model.LoadJson(jObject);
-                    this.Models.Add(model);
-                }
-                else
-                {
-                    this.Models.Add(null);
-                }
+                T model = new T();
+                model.LoadJson(jObject);
+                this.Models.Add(model);
             }
             this.OnLoaded(EventArgs.Empty);
         }

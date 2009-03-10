@@ -14,8 +14,11 @@ namespace Shrimp.Tests
     {
         private class MockModel : Model
         {
+            public string Name { get; private set; }
+
             public override void Clear()
             {
+                this.Name = "";
                 this.OnCleared(EventArgs.Empty);
             }
 
@@ -26,6 +29,7 @@ namespace Shrimp.Tests
 
             public override void LoadJson(JToken json)
             {
+                this.Name = json["Name"].Value<string>();
             }
         }
 
@@ -38,6 +42,25 @@ namespace Shrimp.Tests
             Assert.AreEqual(100, modelList.Count);
             modelList.Count = 50;
             Assert.AreEqual(50, modelList.Count);
+            try
+            {
+                modelList.Count = -1;
+                Assert.Fail();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+            }
+        }
+
+        [Test]
+        public void TestLoadJson()
+        {
+            ModelList<MockModel> modelList = new ModelList<MockModel>();
+            modelList.LoadJson(new JArray(
+                new JObject(
+                    new JProperty("Name", "foo")),
+                new JObject(
+                    new JProperty("Name", "bar"))));
         }
     }
 }
