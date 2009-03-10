@@ -12,35 +12,6 @@ namespace Shrimp
     {
         private List<T> Models = new List<T>();
 
-        public int Count
-        {
-            get
-            {
-                return this.Models.Count;
-            }
-            set
-            {
-                if (this.Models.Count != value)
-                {
-                    if (value < 0)
-                    {
-                        throw new ArgumentOutOfRangeException("Invalid count");
-                    }
-                    if (this.Models.Count < value)
-                    {
-                        var nulls = Enumerable.Repeat(new T(), value - this.Models.Count);
-                        this.Models.AddRange(nulls);
-                    }
-                    else
-                    {
-                        this.Models.RemoveRange(value, this.Models.Count - value);
-                    }
-                    Debug.Assert(this.Models.Count == value);
-                    this.OnUpdated(new UpdatedEventArgs("Count"));
-                }
-            }
-        }
-
         public override void Clear()
         {
             this.Models.Clear();

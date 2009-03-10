@@ -34,25 +34,6 @@ namespace Shrimp.Tests
         }
 
         [Test]
-        public void TestCount()
-        {
-            ModelList<MockModel> modelList = new ModelList<MockModel>();
-            Assert.AreEqual(0, modelList.Count);
-            modelList.Count = 100;
-            Assert.AreEqual(100, modelList.Count);
-            modelList.Count = 50;
-            Assert.AreEqual(50, modelList.Count);
-            try
-            {
-                modelList.Count = -1;
-                Assert.Fail();
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-            }
-        }
-
-        [Test]
         public void TestLoadJson()
         {
             ModelList<MockModel> modelList = new ModelList<MockModel>();

@@ -28,20 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
             this.ModelNameLabel = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(8, 568);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(160, 24);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Change Max...";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // ModelNameLabel
             // 
@@ -65,14 +54,13 @@
             this.listBox1.Location = new System.Drawing.Point(8, 48);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
-            this.listBox1.Size = new System.Drawing.Size(160, 512);
+            this.listBox1.Size = new System.Drawing.Size(160, 544);
             this.listBox1.TabIndex = 5;
             // 
             // DatabaseModelEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.ModelNameLabel);
             this.Controls.Add(this.listBox1);
             this.Name = "DatabaseModelEditor";
@@ -83,7 +71,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label ModelNameLabel;
         private System.Windows.Forms.ListBox listBox1;
     }
