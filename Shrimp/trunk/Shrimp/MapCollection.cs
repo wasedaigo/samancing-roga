@@ -23,7 +23,7 @@ namespace Shrimp
             }
 
             public int Id { get; private set; }
-            public virtual string Name { get; private set; }
+            public virtual string Name { get; set; }
             public Map Map { get; private set; }
             public bool IsExpanded { get; set; }
             public Node Parent { get; set; }
@@ -155,6 +155,12 @@ namespace Shrimp
             return this.GetNode(id).Name;
         }
 
+        public void SetName(int id, string name)
+        {
+            this.GetNode(id).Name = name;
+            this.OnNodeNameChanged(new NodeEventArgs(id));
+        }
+
         public Map GetMap(int id)
         {
             return this.GetNode(id).Map;
@@ -201,13 +207,9 @@ namespace Shrimp
             return this.GetNode(id).Children.Select(n => n.Id).ToArray();
         }
 
-        public void Add(int parentId)
+        public int GetNewId()
         {
             IEnumerable<int> ids = this.Nodes.Select(n => n.Id);
-            if (!ids.Contains(parentId))
-            {
-                throw new ArgumentException("Invalid id", "parentId");
-            }
             int id = this.Roots.Min();
             int maxId = ids.Max();
             for (int i = id; i <= maxId + 1; i++)
@@ -219,10 +221,22 @@ namespace Shrimp
                 }
             }
             Debug.Assert(!ids.Contains(id));
-            Node node = new Node(id, "Map (ID: " + id + ")", new Map(this), false);
+            return id;
+        }
+
+        public int Add(int parentId, string name)
+        {
+            IEnumerable<int> ids = this.Nodes.Select(n => n.Id);
+            if (!ids.Contains(parentId))
+            {
+                throw new ArgumentException("Invalid id", "parentId");
+            }
+            int id = this.GetNewId();
+            Node node = new Node(id, name, new Map(this), false);
             node.Parent = this.GetNode(parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
+            return id;
         }
 
         public void Remove(int id)

@@ -76,6 +76,12 @@
     </Compile>
     <Compile Include="Map.cs" />
     <Compile Include="MapCollection.cs" />
+    <Compile Include="MapDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MapDialog.Designer.cs">
+      <DependentUpon>MapDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="MapEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MapDialog.resx">
+      <DependentUpon>MapDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MapEditor.resx">
       <DependentUpon>MapEditor.cs</DependentUpon>

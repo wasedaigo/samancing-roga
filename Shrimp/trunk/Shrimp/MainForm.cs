@@ -135,13 +135,15 @@ namespace Shrimp
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(!this.ViewModel.IsOpened);
-            var dialog = new NewProjectDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            using (var dialog = new NewProjectDialog())
             {
-                string directoryPath = Path.Combine(dialog.BasePath, dialog.DirectoryName);
-                this.ViewModel.New(directoryPath, dialog.GameTitle);
-                Debug.Assert(this.ViewModel.IsOpened);
-                Debug.Assert(!this.ViewModel.IsDirty);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    string directoryPath = Path.Combine(dialog.BasePath, dialog.DirectoryName);
+                    this.ViewModel.New(directoryPath, dialog.GameTitle);
+                    Debug.Assert(this.ViewModel.IsOpened);
+                    Debug.Assert(!this.ViewModel.IsDirty);
+                }
             }
         }
 

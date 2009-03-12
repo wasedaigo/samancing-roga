@@ -15,6 +15,11 @@ namespace Shrimp
             this.Clear();
         }
 
+        public const int MinWidth = 20;
+        public const int MaxWidth = 500;
+        public const int MinHeight = 15;
+        public const int MaxHeight = 500;
+
         public MapCollection MapCollection { get; private set; }
 
         public int Width
@@ -24,9 +29,9 @@ namespace Shrimp
             {
                 if (this.width != value)
                 {
-                    if (value < 20)
+                    if (value < MinWidth || MaxWidth < value)
                     {
-                        throw new ArgumentOutOfRangeException("Width too small");
+                        throw new ArgumentOutOfRangeException("Invalid width");
                     }
                     this.width = value;
                     this.OnUpdated(new UpdatedEventArgs("Width"));
@@ -41,9 +46,9 @@ namespace Shrimp
             {
                 if (this.height != value)
                 {
-                    if (value < 15)
+                    if (value < MinHeight || MaxHeight < value)
                     {
-                        throw new ArgumentOutOfRangeException("Height too small");
+                        throw new ArgumentOutOfRangeException("Invalid height");
                     }
                     this.height = value;
                     this.OnUpdated(new UpdatedEventArgs("Height"));
@@ -54,8 +59,8 @@ namespace Shrimp
 
         public override void Clear()
         {
-            this.Width = 20;
-            this.Height = 15;
+            this.Width = MinWidth;
+            this.Height = MinHeight;
             this.OnCleared(EventArgs.Empty);
         }
 
@@ -69,6 +74,8 @@ namespace Shrimp
 
         public override void LoadJson(JToken json)
         {
+            this.Width = json["Width"].Value<int>();
+            this.Height = json["Height"].Value<int>();
             this.OnLoaded(EventArgs.Empty);
         }
     }

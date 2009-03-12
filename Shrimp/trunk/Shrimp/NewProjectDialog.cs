@@ -15,7 +15,7 @@ namespace Shrimp
     {
         public NewProjectDialog()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             string myDocumentPath =
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string defaultPath = Path.Combine(myDocumentPath, "ShrimpProjects");
@@ -74,28 +74,28 @@ namespace Shrimp
         private void ValidateValues()
         {
             this.ErrorProvider.Clear();
-            bool isValidate = true;
+            bool isValid = true;
             if (!(new Regex(@"^[a-zA-Z0-9_-]+$")).IsMatch(this.DirectoryName))
             {
                 this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Invalid folder name");
-                isValidate = false;
+                isValid = false;
             }
             else if (Directory.Exists(Path.Combine(this.BasePath, this.DirectoryName)))
             {
                 this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Already exists");
-                isValidate = false;
+                isValid = false;
             }
             if (this.GameTitle == "")
             {
                 this.ErrorProvider.SetError(this.GameTitleTextBox, "Input game title");
-                isValidate = false;
+                isValid = false;
             }
             if (!Directory.Exists(this.BasePath))
             {
                 this.ErrorProvider.SetError(this.BasePathButton, "Directory not found");
-                isValidate = false;
+                isValid = false;
             }
-            this.OKButton.Enabled = isValidate;
+            this.OKButton.Enabled = isValid;
         }
     }
 }
