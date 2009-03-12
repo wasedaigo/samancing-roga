@@ -30,10 +30,10 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TileSetTabPage = new System.Windows.Forms.TabPage();
+            this.tileSetEditor1 = new Shrimp.TileSetEditor();
             this.OKButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.ApplyButton = new System.Windows.Forms.Button();
-            this.tileSetEditor1 = new Shrimp.TileSetEditor();
             this.tabControl1.SuspendLayout();
             this.TileSetTabPage.SuspendLayout();
             this.SuspendLayout();
@@ -57,6 +57,14 @@
             this.TileSetTabPage.TabIndex = 0;
             this.TileSetTabPage.Text = "Tile Set";
             this.TileSetTabPage.UseVisualStyleBackColor = true;
+            // 
+            // tileSetEditor1
+            // 
+            this.tileSetEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tileSetEditor1.Location = new System.Drawing.Point(3, 3);
+            this.tileSetEditor1.Name = "tileSetEditor1";
+            this.tileSetEditor1.Size = new System.Drawing.Size(802, 601);
+            this.tileSetEditor1.TabIndex = 0;
             // 
             // OKButton
             // 
@@ -87,14 +95,6 @@
             this.ApplyButton.Text = "&Apply";
             this.ApplyButton.UseVisualStyleBackColor = true;
             // 
-            // tileSetEditor1
-            // 
-            this.tileSetEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tileSetEditor1.Location = new System.Drawing.Point(3, 3);
-            this.tileSetEditor1.Name = "tileSetEditor1";
-            this.tileSetEditor1.Size = new System.Drawing.Size(802, 601);
-            this.tileSetEditor1.TabIndex = 0;
-            // 
             // DatabaseDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -110,7 +110,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "DatabaseDialog";
-            this.Padding = new System.Windows.Forms.Padding(0, 0, 6, 6);
+            this.Padding = new System.Windows.Forms.Padding(0, 0, 5, 5);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Database";
             this.tabControl1.ResumeLayout(false);

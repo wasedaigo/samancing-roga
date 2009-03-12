@@ -157,7 +157,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "NewProjectDialog";
-            this.Padding = new System.Windows.Forms.Padding(0, 0, 6, 6);
+            this.Padding = new System.Windows.Forms.Padding(0, 0, 5, 5);
             this.Text = "New Project";
             ((System.ComponentModel.ISupportInitialize)(this.ErrorProvider)).EndInit();
             this.ResumeLayout(false);
