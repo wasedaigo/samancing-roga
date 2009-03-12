@@ -77,22 +77,22 @@ namespace Shrimp
             bool isValid = true;
             if (!(new Regex(@"^[a-zA-Z0-9_-]+$")).IsMatch(this.DirectoryName))
             {
-                this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Invalid folder name");
+                this.ErrorProvider.SetError(this.DirectoryNameLabel, "Invalid folder name");
                 isValid = false;
             }
             else if (Directory.Exists(Path.Combine(this.BasePath, this.DirectoryName)))
             {
-                this.ErrorProvider.SetError(this.DirectoryNameTextBox, "Already exists");
+                this.ErrorProvider.SetError(this.DirectoryNameLabel, "Already exists");
                 isValid = false;
             }
             if (this.GameTitle == "")
             {
-                this.ErrorProvider.SetError(this.GameTitleTextBox, "Input game title");
+                this.ErrorProvider.SetError(this.GameTitleLabel, "Input game title");
                 isValid = false;
             }
             if (!Directory.Exists(this.BasePath))
             {
-                this.ErrorProvider.SetError(this.BasePathButton, "Directory not found");
+                this.ErrorProvider.SetError(this.BasePathLabel, "Directory not found");
                 isValid = false;
             }
             this.OKButton.Enabled = isValid;

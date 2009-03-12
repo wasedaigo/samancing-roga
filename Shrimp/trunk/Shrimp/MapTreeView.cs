@@ -14,13 +14,7 @@ namespace Shrimp
             : base()
         {
             this.InitializeComponent();
-            this.DrawMode = TreeViewDrawMode.OwnerDrawAll;
-            this.FullRowSelect = true;
-            this.HideSelection = false;
             this.ItemHeight = (int)(this.Font.Height * 1.8);
-            this.Indent = 19;
-            this.ShowLines = false;
-            this.ShowRootLines = false;
             this.contextMenuStrip.Opening += (s, e) =>
             {
                 Point location = new Point
@@ -31,6 +25,7 @@ namespace Shrimp
                 this.SelectedNode = this.GetNodeAt(this.PointToClient(location));
                 if (this.SelectedNode != null)
                 {
+                    this.contextMenuStrip.Enabled = true;
                     int id = (int)this.SelectedNode.Tag;
                     int rootId = this.MapCollection.GetRoot(id);
                     this.EditToolStripMenuItem.Enabled =
@@ -39,6 +34,10 @@ namespace Shrimp
                         (rootId == this.MapCollection.ProjectNodeId);
                     this.DeleteToolStripMenuItem.Enabled =
                         !this.MapCollection.Roots.Contains(id);
+                }
+                else
+                {
+                    this.contextMenuStrip.Enabled = false;
                 }
             };
             this.EditToolStripMenuItem.Click += (s, e) =>
@@ -342,10 +341,10 @@ namespace Shrimp
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapTreeView));
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.InsertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.DeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.EditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.InsertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -368,40 +367,46 @@ namespace Shrimp
             this.DeleteToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
             this.contextMenuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.contextMenuStrip.Size = new System.Drawing.Size(126, 70);
+            this.contextMenuStrip.ShowImageMargin = false;
+            this.contextMenuStrip.Size = new System.Drawing.Size(101, 76);
+            // 
+            // EditToolStripMenuItem
+            // 
+            this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
+            this.EditToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.EditToolStripMenuItem.Text = "Edit";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(97, 6);
             // 
             // InsertToolStripMenuItem
             // 
             this.InsertToolStripMenuItem.Name = "InsertToolStripMenuItem";
             this.InsertToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
-            this.InsertToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.InsertToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.InsertToolStripMenuItem.Text = "Insert";
             // 
             // DeleteToolStripMenuItem
             // 
             this.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem";
             this.DeleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.DeleteToolStripMenuItem.Text = "Delete";
-            // 
-            // EditToolStripMenuItem
-            // 
-            this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
-            this.EditToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
-            this.EditToolStripMenuItem.Text = "Edit";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(122, 6);
             // 
             // MapTreeView
             // 
             this.ContextMenuStrip = this.contextMenuStrip;
+            this.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+            this.FullRowSelect = true;
+            this.HideSelection = false;
             this.ImageKey = "PageWhite";
             this.ImageList = this.imageList;
             this.LineColor = System.Drawing.Color.Black;
             this.SelectedImageIndex = 0;
+            this.ShowLines = false;
+            this.ShowRootLines = false;
             this.contextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 

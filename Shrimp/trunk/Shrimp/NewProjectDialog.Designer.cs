@@ -29,38 +29,25 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.DirectoryNameTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.OKButton = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.GameTitleTextBox = new System.Windows.Forms.TextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.BasePathButton = new System.Windows.Forms.Button();
             this.BasePathTextBox = new System.Windows.Forms.TextBox();
             this.FolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.ErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.DirectoryNameLabel = new System.Windows.Forms.Label();
+            this.GameTitleLabel = new System.Windows.Forms.Label();
+            this.BasePathLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.ErrorProvider)).BeginInit();
             this.SuspendLayout();
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.DirectoryNameTextBox);
-            this.groupBox1.Location = new System.Drawing.Point(8, 8);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(456, 48);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Folder Name";
-            // 
             // DirectoryNameTextBox
             // 
-            this.DirectoryNameTextBox.Location = new System.Drawing.Point(8, 16);
+            this.DirectoryNameTextBox.Location = new System.Drawing.Point(8, 24);
             this.DirectoryNameTextBox.Name = "DirectoryNameTextBox";
-            this.DirectoryNameTextBox.Size = new System.Drawing.Size(424, 19);
+            this.DirectoryNameTextBox.Size = new System.Drawing.Size(160, 19);
             this.DirectoryNameTextBox.TabIndex = 0;
             this.DirectoryNameTextBox.Text = "samancing-roga";
             this.DirectoryNameTextBox.TextChanged += new System.EventHandler(this.DirectoryNameTextBox_TextChanged);
@@ -68,7 +55,7 @@
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(392, 184);
+            this.cancelButton.Location = new System.Drawing.Point(272, 120);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(72, 24);
             this.cancelButton.TabIndex = 1;
@@ -78,46 +65,25 @@
             // OKButton
             // 
             this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OKButton.Location = new System.Drawing.Point(312, 184);
+            this.OKButton.Location = new System.Drawing.Point(192, 120);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new System.Drawing.Size(72, 24);
             this.OKButton.TabIndex = 2;
             this.OKButton.Text = "OK";
             this.OKButton.UseVisualStyleBackColor = true;
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.GameTitleTextBox);
-            this.groupBox2.Location = new System.Drawing.Point(8, 64);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(456, 48);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Game Title";
-            // 
             // GameTitleTextBox
             // 
-            this.GameTitleTextBox.Location = new System.Drawing.Point(8, 16);
+            this.GameTitleTextBox.Location = new System.Drawing.Point(184, 24);
             this.GameTitleTextBox.Name = "GameTitleTextBox";
-            this.GameTitleTextBox.Size = new System.Drawing.Size(424, 19);
+            this.GameTitleTextBox.Size = new System.Drawing.Size(160, 19);
             this.GameTitleTextBox.TabIndex = 0;
             this.GameTitleTextBox.Text = "Samancing Roga";
             this.GameTitleTextBox.TextChanged += new System.EventHandler(this.GameTitleTextBox_TextChanged);
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.BasePathButton);
-            this.groupBox3.Controls.Add(this.BasePathTextBox);
-            this.groupBox3.Location = new System.Drawing.Point(8, 120);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(456, 48);
-            this.groupBox3.TabIndex = 4;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Path";
-            // 
             // BasePathButton
             // 
-            this.BasePathButton.Location = new System.Drawing.Point(408, 16);
+            this.BasePathButton.Location = new System.Drawing.Point(320, 72);
             this.BasePathButton.Name = "BasePathButton";
             this.BasePathButton.Size = new System.Drawing.Size(24, 20);
             this.BasePathButton.TabIndex = 1;
@@ -127,9 +93,9 @@
             // 
             // BasePathTextBox
             // 
-            this.BasePathTextBox.Location = new System.Drawing.Point(8, 16);
+            this.BasePathTextBox.Location = new System.Drawing.Point(8, 72);
             this.BasePathTextBox.Name = "BasePathTextBox";
-            this.BasePathTextBox.Size = new System.Drawing.Size(400, 19);
+            this.BasePathTextBox.Size = new System.Drawing.Size(312, 19);
             this.BasePathTextBox.TabIndex = 0;
             this.BasePathTextBox.TextChanged += new System.EventHandler(this.BasePathTextBox_TextChanged);
             // 
@@ -142,6 +108,33 @@
             this.ErrorProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
             this.ErrorProvider.ContainerControl = this;
             // 
+            // DirectoryNameLabel
+            // 
+            this.DirectoryNameLabel.AutoSize = true;
+            this.DirectoryNameLabel.Location = new System.Drawing.Point(8, 8);
+            this.DirectoryNameLabel.Name = "DirectoryNameLabel";
+            this.DirectoryNameLabel.Size = new System.Drawing.Size(72, 12);
+            this.DirectoryNameLabel.TabIndex = 3;
+            this.DirectoryNameLabel.Text = "Folder Name:";
+            // 
+            // GameTitleLabel
+            // 
+            this.GameTitleLabel.AutoSize = true;
+            this.GameTitleLabel.Location = new System.Drawing.Point(184, 8);
+            this.GameTitleLabel.Name = "GameTitleLabel";
+            this.GameTitleLabel.Size = new System.Drawing.Size(63, 12);
+            this.GameTitleLabel.TabIndex = 4;
+            this.GameTitleLabel.Text = "Game Title:";
+            // 
+            // BasePathLabel
+            // 
+            this.BasePathLabel.AutoSize = true;
+            this.BasePathLabel.Location = new System.Drawing.Point(8, 56);
+            this.BasePathLabel.Name = "BasePathLabel";
+            this.BasePathLabel.Size = new System.Drawing.Size(30, 12);
+            this.BasePathLabel.TabIndex = 5;
+            this.BasePathLabel.Text = "Path:";
+            // 
             // NewProjectDialog
             // 
             this.AcceptButton = this.OKButton;
@@ -151,40 +144,39 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(510, 248);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.BasePathLabel);
+            this.Controls.Add(this.GameTitleLabel);
+            this.Controls.Add(this.DirectoryNameLabel);
+            this.Controls.Add(this.DirectoryNameTextBox);
+            this.Controls.Add(this.GameTitleTextBox);
+            this.Controls.Add(this.BasePathButton);
+            this.Controls.Add(this.BasePathTextBox);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "NewProjectDialog";
             this.Padding = new System.Windows.Forms.Padding(0, 0, 6, 6);
             this.Text = "New Project";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ErrorProvider)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox DirectoryNameTextBox;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button OKButton;
-        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox GameTitleTextBox;
-        private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button BasePathButton;
         private System.Windows.Forms.TextBox BasePathTextBox;
         private System.Windows.Forms.FolderBrowserDialog FolderBrowserDialog;
         private System.Windows.Forms.ErrorProvider ErrorProvider;
+        private System.Windows.Forms.Label BasePathLabel;
+        private System.Windows.Forms.Label GameTitleLabel;
+        private System.Windows.Forms.Label DirectoryNameLabel;
     }
 }
