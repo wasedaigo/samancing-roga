@@ -209,9 +209,25 @@ namespace Shrimp
                     for (int j = 0; j < height; j++)
                     {
                         int y = j * 32 + position.Y;
+                        if (y + 32 <= 0)
+                        {
+                            continue;
+                        }
+                        else if (this.ClientSize.Height <= y)
+                        {
+                            break;
+                        }
                         for (int i = 0; i < width; i++)
                         {
                             int x = i * 32 + position.X;
+                            if (x + 32 <= 0)
+                            {
+                                continue;
+                            }
+                            else if (this.ClientSize.Width <= x)
+                            {
+                                break;
+                            }
                             g.DrawImage(Util.BackgroundBitmap, x, y);
                         }
                     }
