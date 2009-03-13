@@ -10,7 +10,7 @@ namespace Shrimp
 {
     internal enum MapEditorMode
     {
-        Hand,
+        Scroll,
         Pen,
     }
 
@@ -81,7 +81,7 @@ namespace Shrimp
                 }
             }
         }
-        private MapEditorMode mapEditorMode = MapEditorMode.Hand;
+        private MapEditorMode mapEditorMode = MapEditorMode.Scroll;
 
         public override void Clear()
         {
@@ -123,8 +123,16 @@ namespace Shrimp
             }
             if ((token = json["MapEditorMode"]) != null)
             {
-                this.MapEditorMode = (MapEditorMode)Enum.Parse(typeof(MapEditorMode),
-                    token.Value<string>());
+                Type type = typeof(MapEditorMode);
+                string value = token.Value<string>();
+                if (Enum.IsDefined(type, value))
+                {
+                    this.MapEditorMode = (MapEditorMode)Enum.Parse(type, value);
+                }
+                else
+                {
+                    this.MapEditorMode = MapEditorMode.Scroll;
+                }
             }
             this.OnLoaded(EventArgs.Empty);
         }

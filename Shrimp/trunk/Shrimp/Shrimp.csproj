@@ -171,6 +171,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Readme.txt" />
+    <None Include="Resources\map.png" />
+    <None Include="Resources\pencil.png" />
     <None Include="Resources\home.png" />
     <None Include="Resources\card.png" />
     <None Include="Resources\database.png" />

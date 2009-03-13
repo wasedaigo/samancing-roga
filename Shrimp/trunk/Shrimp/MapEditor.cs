@@ -123,11 +123,11 @@ namespace Shrimp
         {
             switch (this.EditorState.MapEditorMode)
             {
-            case MapEditorMode.Hand:
+            case MapEditorMode.Scroll:
                 this.Cursor = Cursors.Hand;
                 break;
-            case MapEditorMode.Pen:
-                this.Cursor = Cursors.Arrow;
+            default:
+                this.Cursor = Cursors.Default;
                 break;
             }
         }
@@ -150,7 +150,7 @@ namespace Shrimp
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (this.EditorState.MapEditorMode == MapEditorMode.Hand &&
+            if (this.EditorState.MapEditorMode == MapEditorMode.Scroll &&
                 (e.Button & MouseButtons.Left) != 0)
             {
                 this.StartMousePoint = e.Location;
@@ -164,7 +164,7 @@ namespace Shrimp
             base.OnMouseMove(e);
             if (this.IsMoving && (e.Button & MouseButtons.Left) != 0)
             {
-                Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Hand);
+                Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Scroll);
                 int id = this.MapId;
                 Point point = this.EditorState.GetMapOffset(id);
                 point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);
@@ -180,7 +180,7 @@ namespace Shrimp
             {
                 if (this.IsMoving && (e.Button & MouseButtons.Left) != 0)
                 {
-                    Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Hand);
+                    Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Scroll);
                     int id = this.MapId;
                     Point point = this.EditorState.GetMapOffset(id);
                     point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);

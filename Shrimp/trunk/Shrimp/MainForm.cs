@@ -30,12 +30,27 @@ namespace Shrimp
                 this.TilesPalette.Parent.ClientSize.Height - this.TilesPaletteToolStrip.Height;
             this.MainSplitContainer.SplitterDistance -=
                 this.TilesPalette.Parent.ClientSize.Width - this.TilesPalette.Width;
+
             var items = this.TilesPaletteSwitchers.ToArray();
             for (int i = 0; i < items.Length; i++)
             {
                 var j = i;
-                items[i].Click += (sender, e) => { this.ViewModel.SelectedTileSetIndex = j; };
+                items[i].Click += (s, e) =>
+                {
+                    this.ViewModel.SelectedTileSetIndex = j;
+                };
             }
+            this.ScrollToolStripButton.Tag = MapEditorMode.Scroll;
+            this.PenToolStripButton.Tag = MapEditorMode.Pen;
+            foreach (var item in this.MapEditorModeSwitchers)
+            {
+                item.Click += (s, e) =>
+                {
+                    this.ViewModel.EditorState.MapEditorMode =
+                        (MapEditorMode)((ToolStripButton)s).Tag;
+                };
+            }
+            
             this.DatabaseDialog = new DatabaseDialog();
             this.ViewModel = new ViewModel();
             this.ViewModel.IsOpenedChanged += delegate
@@ -61,6 +76,21 @@ namespace Shrimp
                     throw new ArgumentException("Invalid property name", "e");
                 }
             };
+            this.ViewModel.EditorState.Updated += (s, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                case "MapEditorMode":
+                    this.MapEditorModeChanged();
+                    break;
+                case "SelectedMapId":
+                    break;
+                case "MapOffsets":
+                    break;
+                default:
+                    throw new ArgumentException("Invalid property name", "e");
+                }
+            };
             this.MapTreeView.ViewModel = this.ViewModel;
             this.MapEditor.ViewModel = this.ViewModel;
             this.TilesPalette.ViewModel = this.ViewModel;
@@ -79,6 +109,15 @@ namespace Shrimp
             }
         }
 
+        private IEnumerable<ToolStripButton> MapEditorModeSwitchers
+        {
+            get
+            {
+                yield return this.ScrollToolStripButton;
+                yield return this.PenToolStripButton;
+            }
+        }
+
         private void IsOpenedChanged()
         {
             bool isOpened = this.ViewModel.IsOpened;
@@ -88,11 +127,16 @@ namespace Shrimp
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened;
+            foreach (var item in this.MapEditorModeSwitchers)
+            {
+                item.Enabled = isOpened;
+            }
             this.DatabaseToolStripButton.Enabled = isOpened;
             this.TilesPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
             this.SelectedTileSetIndexChanged();
             this.GameTitleChanged();
+            this.MapEditorModeChanged();
         }
 
         private void IsDirtyChanged()
@@ -129,6 +173,25 @@ namespace Shrimp
             else
             {
                 this.Text = "Shrimp";
+            }
+        }
+
+        private void MapEditorModeChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                foreach (var item in this.MapEditorModeSwitchers)
+                {
+                    item.Checked =
+                        ((MapEditorMode)item.Tag == this.ViewModel.EditorState.MapEditorMode);
+                }
+            }
+            else
+            {
+                foreach (var item in this.MapEditorModeSwitchers)
+                {
+                    item.Checked = false;
+                }
             }
         }
 
