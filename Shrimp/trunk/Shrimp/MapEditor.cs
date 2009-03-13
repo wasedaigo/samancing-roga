@@ -25,27 +25,72 @@ namespace Shrimp
                 {
                     if (this.viewModel != null)
                     {
+                        this.viewModel.Opened -= this.ViewModel_Opened;
                         this.viewModel.EditorState.Updated -= this.EditorState_Updated;
                     }
                     this.viewModel = value;
                     if (this.viewModel != null)
                     {
+                        this.Map = this.viewModel.EditorState.SelectedMap;
+                        this.viewModel.Opened += this.ViewModel_Opened;
                         this.viewModel.EditorState.Updated += this.EditorState_Updated;
+                    }
+                    else
+                    {
+                        this.Map = null;
                     }
                 }
             }
         }
         private ViewModel viewModel;
 
+        private Map Map
+        {
+            get { return this.map; }
+            set
+            {
+                if (this.map != value)
+                {
+                    if (this.map != null)
+                    {
+                        this.map.Updated -= this.Map_Updated;
+                    }
+                    this.map = value;
+                    if (this.map != null)
+                    {
+                        this.map.Updated += this.Map_Updated;
+                    }
+                    this.Invalidate();
+                }
+            }
+        }
+        private Map map;
+
+        private void ViewModel_Opened(object sender, EventArgs e)
+        {
+            this.Map = this.ViewModel.EditorState.SelectedMap;
+        }
+
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
             switch (e.PropertyName)
             {
             case "SelectedMapId":
-                this.Invalidate();
+                this.Map = this.ViewModel.EditorState.SelectedMap;
                 break;
             default:
                 throw new ArgumentException("Invalid property name", "e");
+            }
+        }
+
+        private void Map_Updated(object sender, UpdatedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+            case "Width":
+            case "Height":
+                this.Invalidate();
+                break;
             }
         }
 
@@ -55,7 +100,7 @@ namespace Shrimp
             Graphics g = e.Graphics;
             if (this.ViewModel != null && this.ViewModel.EditorState != null)
             {
-                Map map = this.ViewModel.EditorState.SelectedMap;
+                Map map = this.Map;
                 if (map != null)
                 {
                     int width = map.Width;
