@@ -116,13 +116,6 @@ namespace Shrimp.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap Map {
-            get {
-                object obj = ResourceManager.GetObject("Map", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap Minus {
             get {
                 object obj = ResourceManager.GetObject("Minus", resourceCulture);

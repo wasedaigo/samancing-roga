@@ -8,10 +8,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal enum MapEditorMode
+    [Flags]
+    internal enum MapEditorModes
     {
-        Scroll,
-        Pen,
+        Pen = 0x01,
     }
 
     internal class EditorState : Model
@@ -69,7 +69,7 @@ namespace Shrimp
         }
         private Dictionary<int, Point> MapOffsets = new Dictionary<int, Point>();
 
-        public MapEditorMode MapEditorMode
+        public MapEditorModes MapEditorMode
         {
             get { return this.mapEditorMode; }
             set
@@ -81,7 +81,7 @@ namespace Shrimp
                 }
             }
         }
-        private MapEditorMode mapEditorMode = MapEditorMode.Scroll;
+        private MapEditorModes mapEditorMode = MapEditorModes.Pen;
 
         public override void Clear()
         {
@@ -123,15 +123,15 @@ namespace Shrimp
             }
             if ((token = json["MapEditorMode"]) != null)
             {
-                Type type = typeof(MapEditorMode);
+                Type type = typeof(MapEditorModes);
                 string value = token.Value<string>();
                 if (Enum.IsDefined(type, value))
                 {
-                    this.MapEditorMode = (MapEditorMode)Enum.Parse(type, value);
+                    this.MapEditorMode = (MapEditorModes)Enum.Parse(type, value);
                 }
                 else
                 {
-                    this.MapEditorMode = MapEditorMode.Scroll;
+                    this.MapEditorMode = MapEditorModes.Pen;
                 }
             }
             this.OnLoaded(EventArgs.Empty);

@@ -29,13 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.LeftSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TilesPaletteToolStrip = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.TilesPalette = new Shrimp.TilesPalette();
             this.MapTreeView = new Shrimp.MapTreeView();
             this.MapEditor = new Shrimp.MapEditor();
@@ -50,14 +46,12 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.ScrollToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
             this.LeftSplitContainer.Panel1.SuspendLayout();
             this.LeftSplitContainer.Panel2.SuspendLayout();
             this.LeftSplitContainer.SuspendLayout();
-            this.TilesPaletteToolStrip.SuspendLayout();
             this.ToolStripContainer.ContentPanel.SuspendLayout();
             this.ToolStripContainer.TopToolStripPanel.SuspendLayout();
             this.ToolStripContainer.SuspendLayout();
@@ -109,41 +103,10 @@
             // 
             this.TilesPaletteToolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.TilesPaletteToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.TilesPaletteToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.toolStripButton2,
-            this.toolStripButton3});
             this.TilesPaletteToolStrip.Location = new System.Drawing.Point(0, 271);
             this.TilesPaletteToolStrip.Name = "TilesPaletteToolStrip";
             this.TilesPaletteToolStrip.Size = new System.Drawing.Size(296, 25);
             this.TilesPaletteToolStrip.TabIndex = 1;
-            // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton1.Text = "A";
-            // 
-            // toolStripButton2
-            // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton2.Text = "B";
-            // 
-            // toolStripButton3
-            // 
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton3.Text = "C";
             // 
             // TilesPalette
             // 
@@ -218,7 +181,6 @@
             this.CloseToolStripButton,
             this.SaveToolStripButton,
             this.toolStripSeparator1,
-            this.ScrollToolStripButton,
             this.PenToolStripButton,
             this.toolStripSeparator2,
             this.DatabaseToolStripButton});
@@ -301,15 +263,6 @@
             // 
             this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
             // 
-            // ScrollToolStripButton
-            // 
-            this.ScrollToolStripButton.Image = global::Shrimp.Properties.Resources.Map;
-            this.ScrollToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.ScrollToolStripButton.Name = "ScrollToolStripButton";
-            this.ScrollToolStripButton.Size = new System.Drawing.Size(38, 32);
-            this.ScrollToolStripButton.Text = "Scroll";
-            this.ScrollToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -326,8 +279,6 @@
             this.LeftSplitContainer.Panel1.PerformLayout();
             this.LeftSplitContainer.Panel2.ResumeLayout(false);
             this.LeftSplitContainer.ResumeLayout(false);
-            this.TilesPaletteToolStrip.ResumeLayout(false);
-            this.TilesPaletteToolStrip.PerformLayout();
             this.ToolStripContainer.ContentPanel.ResumeLayout(false);
             this.ToolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this.ToolStripContainer.TopToolStripPanel.PerformLayout();
@@ -352,16 +303,12 @@
         private System.Windows.Forms.ToolStripButton CloseToolStripButton;
         private TilesPalette TilesPalette;
         private System.Windows.Forms.ToolStrip TilesPaletteToolStrip;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripButton SaveToolStripButton;
         private MapTreeView MapTreeView;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton DatabaseToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton PenToolStripButton;
-        private System.Windows.Forms.ToolStripButton ScrollToolStripButton;
     }
 }
 

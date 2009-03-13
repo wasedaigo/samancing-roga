@@ -121,15 +121,6 @@ namespace Shrimp
 
         private void MapEditorModeChanged()
         {
-            switch (this.EditorState.MapEditorMode)
-            {
-            case MapEditorMode.Scroll:
-                this.Cursor = Cursors.Hand;
-                break;
-            default:
-                this.Cursor = Cursors.Default;
-                break;
-            }
         }
 
         private void Map_Updated(object sender, UpdatedEventArgs e)
@@ -150,8 +141,7 @@ namespace Shrimp
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (this.EditorState.MapEditorMode == MapEditorMode.Scroll &&
-                (e.Button & MouseButtons.Left) != 0)
+            if ((e.Button & MouseButtons.Right) != 0)
             {
                 this.StartMousePoint = e.Location;
                 this.StartOffset = this.EditorState.GetMapOffset(this.MapId);
@@ -162,9 +152,8 @@ namespace Shrimp
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (this.IsMoving && (e.Button & MouseButtons.Left) != 0)
+            if (this.IsMoving && (e.Button & MouseButtons.Right) != 0)
             {
-                Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Scroll);
                 int id = this.MapId;
                 Point point = this.EditorState.GetMapOffset(id);
                 point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);
@@ -178,9 +167,8 @@ namespace Shrimp
             base.OnMouseUp(e);
             try
             {
-                if (this.IsMoving && (e.Button & MouseButtons.Left) != 0)
+                if (this.IsMoving && (e.Button & MouseButtons.Right) != 0)
                 {
-                    Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Scroll);
                     int id = this.MapId;
                     Point point = this.EditorState.GetMapOffset(id);
                     point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);

@@ -141,28 +141,6 @@ namespace Shrimp
             if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
         }
 
-        public int SelectedTileSetIndex
-        {
-            get { return this.selectedTileSetIndex; }
-            set
-            {
-                if (this.selectedTileSetIndex != value)
-                {
-                    this.selectedTileSetIndex = value;
-                    this.OnSelectedTileSetIndexChanged(EventArgs.Empty);
-                }
-            }
-        }
-        private int selectedTileSetIndex;
-        public event EventHandler SelectedTileSetIndexChanged;
-        protected virtual void OnSelectedTileSetIndexChanged(EventArgs e)
-        {
-            if (this.SelectedTileSetIndexChanged != null)
-            {
-                this.SelectedTileSetIndexChanged(this, e);
-            }
-        }
-
         public Bitmap GetTilesBitmap()
         {
             string tilesBitmapPath = Path.Combine(this.DirectoryPath, "Graphics/Tiles.png");

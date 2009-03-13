@@ -31,23 +31,13 @@ namespace Shrimp
             this.MainSplitContainer.SplitterDistance -=
                 this.TilesPalette.Parent.ClientSize.Width - this.TilesPalette.Width;
 
-            var items = this.TilesPaletteSwitchers.ToArray();
-            for (int i = 0; i < items.Length; i++)
-            {
-                var j = i;
-                items[i].Click += (s, e) =>
-                {
-                    this.ViewModel.SelectedTileSetIndex = j;
-                };
-            }
-            this.ScrollToolStripButton.Tag = MapEditorMode.Scroll;
-            this.PenToolStripButton.Tag = MapEditorMode.Pen;
+            this.PenToolStripButton.Tag = MapEditorModes.Pen;
             foreach (var item in this.MapEditorModeSwitchers)
             {
                 item.Click += (s, e) =>
                 {
                     this.ViewModel.EditorState.MapEditorMode =
-                        (MapEditorMode)((ToolStripButton)s).Tag;
+                        (MapEditorModes)((ToolStripButton)s).Tag;
                 };
             }
             
@@ -60,10 +50,6 @@ namespace Shrimp
             this.ViewModel.IsDirtyChanged += delegate
             {
                 this.IsDirtyChanged();
-            };
-            this.ViewModel.SelectedTileSetIndexChanged += delegate
-            {
-                this.SelectedTileSetIndexChanged();
             };
             this.ViewModel.Project.Updated += (s, e) =>
             {
@@ -113,7 +99,6 @@ namespace Shrimp
         {
             get
             {
-                yield return this.ScrollToolStripButton;
                 yield return this.PenToolStripButton;
             }
         }
@@ -134,34 +119,12 @@ namespace Shrimp
             this.DatabaseToolStripButton.Enabled = isOpened;
             this.TilesPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
-            this.SelectedTileSetIndexChanged();
             this.GameTitleChanged();
             this.MapEditorModeChanged();
         }
 
         private void IsDirtyChanged()
         {
-        }
-
-        private void SelectedTileSetIndexChanged()
-        {
-            if (this.ViewModel.IsOpened)
-            {
-                this.TilesPalette.TilesBitmap = this.ViewModel.GetTilesBitmap();
-                var items = this.TilesPaletteSwitchers.ToArray();
-                for (int i = 0; i < items.Length; i++)
-                {
-                    items[i].Checked = (i == this.ViewModel.SelectedTileSetIndex);
-                }
-            }
-            else
-            {
-                this.TilesPalette.TilesBitmap = null;
-                foreach (var item in this.TilesPaletteSwitchers)
-                {
-                    item.Checked = false;
-                }
-            }
         }
 
         private void GameTitleChanged()
@@ -183,7 +146,7 @@ namespace Shrimp
                 foreach (var item in this.MapEditorModeSwitchers)
                 {
                     item.Checked =
-                        ((MapEditorMode)item.Tag == this.ViewModel.EditorState.MapEditorMode);
+                        ((MapEditorModes)item.Tag == this.ViewModel.EditorState.MapEditorMode);
                 }
             }
             else
