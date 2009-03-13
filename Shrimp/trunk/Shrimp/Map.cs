@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
@@ -39,6 +40,7 @@ namespace Shrimp
             }
         }
         private int width;
+
         public int Height
         {
             get { return this.height; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Data;
 using System.Linq;
@@ -66,9 +67,30 @@ namespace Shrimp
         }
         private Map map;
 
+        private int MapId
+        {
+            get { return this.ViewModel.MapCollection.GetId(this.Map); }
+        }
+
+        private EditorState EditorState
+        {
+            get
+            {
+                if (this.ViewModel != null)
+                {
+                    return this.ViewModel.EditorState;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         private void ViewModel_Opened(object sender, EventArgs e)
         {
-            this.Map = this.ViewModel.EditorState.SelectedMap;
+            this.SelectedMapIdChanged();
+            this.MapEditorModeChanged();
         }
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
@@ -76,10 +98,37 @@ namespace Shrimp
             switch (e.PropertyName)
             {
             case "SelectedMapId":
-                this.Map = this.ViewModel.EditorState.SelectedMap;
+                this.SelectedMapIdChanged();
+                break;
+            case "MapEditorMode":
+                this.MapEditorModeChanged();
+                break;
+            case "MapOffsets":
+                if ((int)e.Tag == this.ViewModel.MapCollection.GetId(this.Map))
+                {
+                    this.Invalidate();
+                }
                 break;
             default:
                 throw new ArgumentException("Invalid property name", "e");
+            }
+        }
+
+        private void SelectedMapIdChanged()
+        {
+            this.Map = this.EditorState.SelectedMap;
+        }
+
+        private void MapEditorModeChanged()
+        {
+            switch (this.EditorState.MapEditorMode)
+            {
+            case MapEditorMode.Hand:
+                this.Cursor = Cursors.Hand;
+                break;
+            case MapEditorMode.Pen:
+                this.Cursor = Cursors.Arrow;
+                break;
             }
         }
 
@@ -94,22 +143,76 @@ namespace Shrimp
             }
         }
 
+        private bool IsMoving = false;
+        private Point StartMousePoint;
+        private Point StartOffset;
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (this.EditorState.MapEditorMode == MapEditorMode.Hand &&
+                (e.Button & MouseButtons.Left) != 0)
+            {
+                this.StartMousePoint = e.Location;
+                this.StartOffset = this.EditorState.GetMapOffset(this.MapId);
+                this.IsMoving = true;
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (this.IsMoving && (e.Button & MouseButtons.Left) != 0)
+            {
+                Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Hand);
+                int id = this.MapId;
+                Point point = this.EditorState.GetMapOffset(id);
+                point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);
+                point.Y = this.StartOffset.Y + (e.Y - this.StartMousePoint.Y);
+                this.EditorState.SetMapOffset(id, point);
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            try
+            {
+                if (this.IsMoving && (e.Button & MouseButtons.Left) != 0)
+                {
+                    Debug.Assert(this.EditorState.MapEditorMode == MapEditorMode.Hand);
+                    int id = this.MapId;
+                    Point point = this.EditorState.GetMapOffset(id);
+                    point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);
+                    point.Y = this.StartOffset.Y + (e.Y - this.StartMousePoint.Y);
+                    this.EditorState.SetMapOffset(id, point);
+                }
+            }
+            finally
+            {
+                this.IsMoving = false;
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
-            if (this.ViewModel != null && this.ViewModel.EditorState != null)
+            if (this.ViewModel != null && this.EditorState != null)
             {
                 Map map = this.Map;
                 if (map != null)
                 {
+                    Point position = this.EditorState.GetMapOffset(this.MapId);
                     int width = map.Width;
                     int height = map.Height;
                     for (int j = 0; j < height; j++)
                     {
+                        int y = j * 32 + position.Y;
                         for (int i = 0; i < width; i++)
                         {
-                            g.DrawImage(Util.BackgroundBitmap, i * 32, j * 32);
+                            int x = i * 32 + position.X;
+                            g.DrawImage(Util.BackgroundBitmap, x, y);
                         }
                     }
                 }
