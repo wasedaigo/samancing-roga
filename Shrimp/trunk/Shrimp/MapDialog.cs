@@ -19,9 +19,9 @@ namespace Shrimp
             this.WidthNumericUpDown.Maximum = Map.MaxWidth;
             this.HeightNumericUpDown.Minimum = Map.MinHeight;
             this.HeightNumericUpDown.Maximum = Map.MaxHeight;
+            this.Text += " (ID:" + id + ")";
             if (this.Map != null)
             {
-                this.Text += " (ID:" + id + ")";
                 this.NameTextBox.Text = name;
                 this.WidthNumericUpDown.Value = map.Width;
                 this.HeightNumericUpDown.Value = map.Height;

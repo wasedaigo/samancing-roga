@@ -18,7 +18,6 @@ Global
 		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

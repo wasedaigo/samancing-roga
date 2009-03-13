@@ -60,8 +60,10 @@ namespace Shrimp
 
         public void New(string directoryPath, string gameTitle)
         {
-            this.ProjectStore.Clear();
-            this.MapCollectionStore.Clear();
+            foreach (IModelStore modelStore in this.ModelStores)
+            {
+                modelStore.Clear();
+            }
             this.DirectoryPath = directoryPath;
             this.Project.GameTitle = gameTitle;
             Util.CopyDirectory(ProjectTemplatePath, this.DirectoryPath);
@@ -90,8 +92,10 @@ namespace Shrimp
 
         public void Close()
         {
-            this.ProjectStore.Clear();
-            this.MapCollectionStore.Clear();
+            foreach (IModelStore modelStore in this.ModelStores)
+            {
+                modelStore.Clear();
+            }
             this.IsOpened = false;
         }
 

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Shrimp.Properties;
 
 namespace Shrimp
 {
@@ -22,7 +23,11 @@ namespace Shrimp
                     X = this.contextMenuStrip.Left,
                     Y = this.contextMenuStrip.Top,
                 };
-                this.SelectedNode = this.GetNodeAt(this.PointToClient(location));
+                TreeNode treeNode = this.GetNodeAt(this.PointToClient(location));
+                if (treeNode != null)
+                {
+                    this.SelectedNode = treeNode;
+                }
                 if (this.SelectedNode != null)
                 {
                     this.contextMenuStrip.Enabled = true;
@@ -124,7 +129,6 @@ namespace Shrimp
             }
         }
 
-        private ImageList imageList;
         private ContextMenuStrip contextMenuStrip;
         private ToolStripMenuItem InsertToolStripMenuItem;
         private ToolStripMenuItem DeleteToolStripMenuItem;
@@ -226,7 +230,7 @@ namespace Shrimp
         private void AddTreeNode(TreeNodeCollection parentNodes, int id)
         {
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
-            node.ImageKey = "PageWhite";
+            node.ImageKey = "Document";
             node.Tag = id;
             parentNodes.Add(node);
             foreach (int childId in this.MapCollection.GetChildren(id))
@@ -243,7 +247,7 @@ namespace Shrimp
         {
             int id = e.NodeId;
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
-            node.ImageKey = "PageWhite";
+            node.ImageKey = "Document";
             node.Tag = id;
             int parentId = this.MapCollection.GetParent(id);
             TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
@@ -296,6 +300,15 @@ namespace Shrimp
             this.EditorState.SelectedMapId = (int)this.SelectedNode.Tag;
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.KeyCode == Keys.Space)
+            {
+                this.EditToolStripMenuItem.PerformClick();
+            }
+        }
+
         protected override void OnDrawNode(DrawTreeNodeEventArgs e)
         {
             base.OnDrawNode(e);
@@ -305,6 +318,7 @@ namespace Shrimp
             }
             Graphics g = e.Graphics;
             TreeNode node = e.Node;
+            int id = (int)node.Tag;
             Rectangle bounds = e.Bounds;
             bool isSelected = (e.State & TreeNodeStates.Selected) != 0;
             if (isSelected)
@@ -316,22 +330,30 @@ namespace Shrimp
                         SystemColors.HighlightText, SystemColors.Highlight);
                 }
             }
+            else
+            {
+                g.FillRectangle(new SolidBrush(this.BackColor), bounds);
+            }
             if (0 < node.Level && 0 < node.GetNodeCount(false))
             {
-                string key = "BulletToggle" + (node.IsExpanded ? "Minus" : "Plus");
-                Image toggleImage = this.ImageList.Images[key];
+                Image toggleImage = node.IsExpanded ? Resources.Minus : Resources.Plus;
                 g.DrawImage(toggleImage,
                     bounds.X + this.Indent * (node.Level - 1) + 1,
-                    bounds.Y + 1);
+                    bounds.Y + 2);
             }
-            Image image = this.ImageList.Images[node.ImageKey];
-            if (image != null)
+            Image image = Resources.Card;
+            if (id == this.MapCollection.ProjectNodeId)
             {
-                g.DrawImage(image, bounds.X + this.Indent * node.Level + 1, bounds.Y + 1);
+                image = Resources.Home;
             }
+            else if (id == this.MapCollection.TrashNodeId)
+            {
+                image = Resources.Bin;
+            }
+            g.DrawImage(image, bounds.X + this.Indent * node.Level + 1, bounds.Y + 2);
             g.DrawString(node.Text, this.Font,
                 isSelected ? SystemBrushes.HighlightText : new SolidBrush(this.ForeColor),
-                bounds.X + this.Indent * node.Level + 16,
+                bounds.X + this.Indent * node.Level + 16 + 2,
                 bounds.Y + (this.ItemHeight - this.Font.Height) / 2);
         }
 
@@ -339,7 +361,6 @@ namespace Shrimp
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapTreeView));
-            this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.EditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -347,16 +368,6 @@ namespace Shrimp
             this.DeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // imageList
-            // 
-            this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
-            this.imageList.TransparentColor = System.Drawing.Color.Empty;
-            this.imageList.Images.SetKeyName(0, "PageWhite");
-            this.imageList.Images.SetKeyName(1, "Bin");
-            this.imageList.Images.SetKeyName(2, "Folder");
-            this.imageList.Images.SetKeyName(3, "BulletTogglePlus");
-            this.imageList.Images.SetKeyName(4, "BulletToggleMinus");
             // 
             // contextMenuStrip
             // 
@@ -368,31 +379,33 @@ namespace Shrimp
             this.contextMenuStrip.Name = "contextMenuStrip";
             this.contextMenuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.contextMenuStrip.ShowImageMargin = false;
-            this.contextMenuStrip.Size = new System.Drawing.Size(101, 76);
+            this.contextMenuStrip.Size = new System.Drawing.Size(102, 76);
             // 
             // EditToolStripMenuItem
             // 
             this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
-            this.EditToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.EditToolStripMenuItem.ShortcutKeyDisplayString = "Space";
+            this.EditToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.EditToolStripMenuItem.Text = "Edit";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(97, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(98, 6);
             // 
             // InsertToolStripMenuItem
             // 
             this.InsertToolStripMenuItem.Name = "InsertToolStripMenuItem";
+            this.InsertToolStripMenuItem.ShortcutKeyDisplayString = "";
             this.InsertToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
-            this.InsertToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.InsertToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.InsertToolStripMenuItem.Text = "Insert";
             // 
             // DeleteToolStripMenuItem
             // 
             this.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem";
             this.DeleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.DeleteToolStripMenuItem.Text = "Delete";
             // 
             // MapTreeView
@@ -402,7 +415,6 @@ namespace Shrimp
             this.FullRowSelect = true;
             this.HideSelection = false;
             this.ImageKey = "PageWhite";
-            this.ImageList = this.imageList;
             this.LineColor = System.Drawing.Color.Black;
             this.SelectedImageIndex = 0;
             this.ShowLines = false;
