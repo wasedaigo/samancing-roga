@@ -27,7 +27,7 @@ namespace Shrimp
                 Y = this.MainPanelSize.Height,
             };
             this.HScrollBar.Width = this.MainPanelSize.Width;
-            this.DummyPanel.Location = new Point
+            /*this.DummyPanel.Location = new Point
             {
                 X = this.VScrollBar.Location.X,
                 Y = this.HScrollBar.Location.Y,
@@ -36,7 +36,7 @@ namespace Shrimp
             {
                 Width = this.VScrollBar.Width,
                 Height = this.HScrollBar.Height
-            };
+            };*/
         }
 
         private Size MainPanelSize
@@ -172,9 +172,9 @@ namespace Shrimp
         private void AdjustScrollBars()
         {
             this.HScrollBar.SmallChange = 32;
-            this.HScrollBar.LargeChange = this.MainPanelSize.Width;
+            this.HScrollBar.LargeChange = Math.Max(this.MainPanelSize.Width, 0);
             this.VScrollBar.SmallChange = 32;
-            this.VScrollBar.LargeChange = this.MainPanelSize.Height;
+            this.VScrollBar.LargeChange = Math.Max(this.MainPanelSize.Height, 0);
             if (this.Map != null)
             {
                 int max;
@@ -187,11 +187,11 @@ namespace Shrimp
                     if (max < this.HScrollBar.Value)
                     {
                         this.HScrollBar.Value = max;
-                        
                     }
                 }
                 else
                 {
+                    this.HScrollBar.Value = 0;
                     this.HScrollBar.Enabled = false;
                 }
                 max = this.Map.Height * 32 - this.MainPanelSize.Height;
@@ -207,6 +207,7 @@ namespace Shrimp
                 }
                 else
                 {
+                    this.VScrollBar.Value = 0;
                     this.VScrollBar.Enabled = false;
                 }
             }
@@ -221,6 +222,7 @@ namespace Shrimp
         {
             base.OnLayout(e);
             this.AdjustScrollBars();
+            this.Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -242,7 +244,7 @@ namespace Shrimp
                         {
                             continue;
                         }
-                        else if (this.ClientSize.Height <= y)
+                        else if (this.MainPanelSize.Height <= y)
                         {
                             break;
                         }
@@ -253,7 +255,7 @@ namespace Shrimp
                             {
                                 continue;
                             }
-                            else if (this.ClientSize.Width <= x)
+                            else if (this.MainPanelSize.Width <= x)
                             {
                                 break;
                             }
@@ -262,25 +264,14 @@ namespace Shrimp
                     }
                 }
             }
-        }
-
-        /*private void VScrollBar_Scroll(object sender, ScrollEventArgs e)
-        {
-            this.EditorState.SetMapOffset(this.MapId, new Point
+            g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
-                X = this.EditorState.GetMapOffset(this.MapId).X,
-                Y = -e.NewValue,
+                X = this.ClientSize.Width - this.VScrollBar.Width,
+                Y = this.ClientSize.Height - this.HScrollBar.Height,
+                Width = this.VScrollBar.Width,
+                Height = this.HScrollBar.Height,
             });
         }
-
-        private void HScrollBar_Scroll(object sender, ScrollEventArgs e)
-        {
-            this.EditorState.SetMapOffset(this.MapId, new Point
-            {
-                X = -e.NewValue,
-                Y = this.EditorState.GetMapOffset(this.MapId).Y,
-            });
-        }*/
 
         private void ScrollBar_ValueChanged(object sender, EventArgs e)
         {
