@@ -28,13 +28,47 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.HScrollBar = new System.Windows.Forms.HScrollBar();
+            this.VScrollBar = new System.Windows.Forms.VScrollBar();
+            this.DummyPanel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
+            // 
+            // HScrollBar
+            // 
+            this.HScrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.HScrollBar.Location = new System.Drawing.Point(24, 120);
+            this.HScrollBar.Maximum = 500;
+            this.HScrollBar.Name = "HScrollBar";
+            this.HScrollBar.Size = new System.Drawing.Size(80, 16);
+            this.HScrollBar.TabIndex = 0;
+            this.HScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.HScrollBar_Scroll);
+            // 
+            // VScrollBar
+            // 
+            this.VScrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.VScrollBar.Location = new System.Drawing.Point(120, 24);
+            this.VScrollBar.Name = "VScrollBar";
+            this.VScrollBar.Size = new System.Drawing.Size(16, 80);
+            this.VScrollBar.TabIndex = 1;
+            this.VScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.VScrollBar_Scroll);
+            // 
+            // DummyPanel
+            // 
+            this.DummyPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.DummyPanel.Location = new System.Drawing.Point(128, 120);
+            this.DummyPanel.Name = "DummyPanel";
+            this.DummyPanel.Size = new System.Drawing.Size(200, 100);
+            this.DummyPanel.TabIndex = 2;
             // 
             // MapEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoScroll = true;
+            this.Controls.Add(this.DummyPanel);
+            this.Controls.Add(this.VScrollBar);
+            this.Controls.Add(this.HScrollBar);
             this.DoubleBuffered = true;
             this.Name = "MapEditor";
             this.ResumeLayout(false);
@@ -42,6 +76,10 @@
         }
 
         #endregion
+
+        private System.Windows.Forms.HScrollBar HScrollBar;
+        private System.Windows.Forms.VScrollBar VScrollBar;
+        private System.Windows.Forms.Panel DummyPanel;
 
 
     }
