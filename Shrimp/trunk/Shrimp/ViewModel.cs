@@ -17,15 +17,12 @@ namespace Shrimp
         {
             this.ProjectStore =
                 new SingleModelStore<Project>(new Project(), "Game.shrp");
-            this.ModelStores.Add(this.ProjectStore);
-
             this.EditorStateStore =
                 new SingleModelStore<EditorState>(new EditorState(this), "EditorState.json");
-            this.ModelStores.Add(this.EditorStateStore);
-
             this.MapCollectionStore =
                 new MapCollectionStore(new MapCollection(this), "Data/MapCollection.json");
-            this.ModelStores.Add(this.MapCollectionStore);
+            this.TileSetCollectionStore =
+                new SingleModelStore<TileSetCollection>(new TileSetCollection(this), "Data/TileSetCollection.json");
 
             foreach (IModelStore modelStore in this.ModelStores)
             {
@@ -54,7 +51,22 @@ namespace Shrimp
         }
         private MapCollectionStore MapCollectionStore;
 
-        private List<IModelStore> ModelStores = new List<IModelStore>();
+        public TileSetCollection TileSetCollection
+        {
+            get { return this.TileSetCollectionStore.Model; }
+        }
+        private SingleModelStore<TileSetCollection> TileSetCollectionStore;
+
+        private IEnumerable<IModelStore> ModelStores
+        {
+            get
+            {
+                yield return this.ProjectStore;
+                yield return this.EditorStateStore;
+                yield return this.MapCollectionStore;
+                yield return this.TileSetCollectionStore;
+            }
+        }
 
         private string DirectoryPath;
 
