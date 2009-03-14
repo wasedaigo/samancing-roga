@@ -171,30 +171,42 @@ namespace Shrimp
 
         private void SetScrollBars()
         {
+            this.HScrollBar.SmallChange = 32;
+            this.HScrollBar.LargeChange = this.MainPanelSize.Width;
+            this.VScrollBar.SmallChange = 32;
+            this.VScrollBar.LargeChange = this.MainPanelSize.Height;
             if (this.Map != null)
             {
                 int max;
-                max = this.Map.Width * 32 - this.MainPanelSize.Height;
-                if (0 < max)
-                {
-                    this.VScrollBar.Enabled = true;
-                    this.VScrollBar.Minimum = 0;
-                    this.VScrollBar.Maximum = max;
-                }
-                else
-                {
-                    this.VScrollBar.Enabled = false;
-                }
-                max = this.Map.Height * 32 - this.MainPanelSize.Width;
+                max = this.Map.Width * 32 - this.MainPanelSize.Width + this.HScrollBar.LargeChange;
                 if (0 < max)
                 {
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
                     this.HScrollBar.Maximum = max;
+                    if (max < this.HScrollBar.Value)
+                    {
+                        this.HScrollBar.Value = max;
+                    }
                 }
                 else
                 {
                     this.HScrollBar.Enabled = false;
+                }
+                max = this.Map.Height * 32 - this.MainPanelSize.Height + this.VScrollBar.LargeChange;
+                if (0 < max)
+                {
+                    this.VScrollBar.Enabled = true;
+                    this.VScrollBar.Minimum = 0;
+                    this.VScrollBar.Maximum = max;
+                    if (max < this.VScrollBar.Value)
+                    {
+                        this.VScrollBar.Value = max;
+                    }
+                }
+                else
+                {
+                    this.VScrollBar.Enabled = false;
                 }
             }
             else
