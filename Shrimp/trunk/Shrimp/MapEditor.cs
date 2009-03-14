@@ -95,7 +95,7 @@ namespace Shrimp
                     {
                         this.map.Updated += this.Map_Updated;
                     }
-                    this.SetScrollBars();
+                    this.AdjustScrollBars();
                     this.Invalidate();
                 }
             }
@@ -169,7 +169,7 @@ namespace Shrimp
             }
         }
 
-        private void SetScrollBars()
+        private void AdjustScrollBars()
         {
             this.HScrollBar.SmallChange = 32;
             this.HScrollBar.LargeChange = this.MainPanelSize.Width;
@@ -178,27 +178,28 @@ namespace Shrimp
             if (this.Map != null)
             {
                 int max;
-                max = this.Map.Width * 32 - this.MainPanelSize.Width + this.HScrollBar.LargeChange;
+                max = this.Map.Width * 32 - this.MainPanelSize.Width;
                 if (0 < max)
                 {
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
-                    this.HScrollBar.Maximum = max;
+                    this.HScrollBar.Maximum = max + this.HScrollBar.LargeChange;
                     if (max < this.HScrollBar.Value)
                     {
                         this.HScrollBar.Value = max;
+                        
                     }
                 }
                 else
                 {
                     this.HScrollBar.Enabled = false;
                 }
-                max = this.Map.Height * 32 - this.MainPanelSize.Height + this.VScrollBar.LargeChange;
+                max = this.Map.Height * 32 - this.MainPanelSize.Height;
                 if (0 < max)
                 {
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
-                    this.VScrollBar.Maximum = max;
+                    this.VScrollBar.Maximum = max + this.VScrollBar.LargeChange;
                     if (max < this.VScrollBar.Value)
                     {
                         this.VScrollBar.Value = max;
@@ -216,58 +217,10 @@ namespace Shrimp
             }
         }
 
-        /*private bool IsMoving = false;
-        private Point StartMousePoint;
-        private Point StartOffset;
-
-        protected override void OnMouseDown(MouseEventArgs e)
+        protected override void OnLayout(LayoutEventArgs e)
         {
-            base.OnMouseDown(e);
-            if ((e.Button & MouseButtons.Right) != 0)
-            {
-                this.StartMousePoint = e.Location;
-                this.StartOffset = this.EditorState.GetMapOffset(this.MapId);
-                this.IsMoving = true;
-            }
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-            if (this.IsMoving && (e.Button & MouseButtons.Right) != 0)
-            {
-                int id = this.MapId;
-                Point point = this.EditorState.GetMapOffset(id);
-                point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);
-                point.Y = this.StartOffset.Y + (e.Y - this.StartMousePoint.Y);
-                this.EditorState.SetMapOffset(id, point);
-            }
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-            try
-            {
-                if (this.IsMoving && (e.Button & MouseButtons.Right) != 0)
-                {
-                    int id = this.MapId;
-                    Point point = this.EditorState.GetMapOffset(id);
-                    point.X = this.StartOffset.X + (e.X - this.StartMousePoint.X);
-                    point.Y = this.StartOffset.Y + (e.Y - this.StartMousePoint.Y);
-                    this.EditorState.SetMapOffset(id, point);
-                }
-            }
-            finally
-            {
-                this.IsMoving = false;
-            }
-        }*/
-
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            base.OnSizeChanged(e);
-            this.SetScrollBars();
+            base.OnLayout(e);
+            this.AdjustScrollBars();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -311,7 +264,7 @@ namespace Shrimp
             }
         }
 
-        private void VScrollBar_Scroll(object sender, ScrollEventArgs e)
+        /*private void VScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             this.EditorState.SetMapOffset(this.MapId, new Point
             {
@@ -326,6 +279,15 @@ namespace Shrimp
             {
                 X = -e.NewValue,
                 Y = this.EditorState.GetMapOffset(this.MapId).Y,
+            });
+        }*/
+
+        private void ScrollBar_ValueChanged(object sender, EventArgs e)
+        {
+            this.EditorState.SetMapOffset(this.MapId, new Point
+            {
+                X = -this.HScrollBar.Value,
+                Y = -this.VScrollBar.Value,
             });
         }
     }
