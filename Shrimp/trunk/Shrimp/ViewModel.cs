@@ -68,7 +68,7 @@ namespace Shrimp
             }
         }
 
-        private string DirectoryPath;
+        public string DirectoryPath { get; private set; }
 
         public void New(string directoryPath, string gameTitle)
         {
@@ -100,7 +100,6 @@ namespace Shrimp
                 modelStore.Load(this.DirectoryPath);
             }
             this.IsOpened = true;
-            this.OnOpened(EventArgs.Empty);
         }
 
         public void Close()
@@ -157,12 +156,6 @@ namespace Shrimp
         {
             string tilesBitmapPath = Path.Combine(this.DirectoryPath, "Graphics/Tiles.png");
             return Bitmap.FromFile(tilesBitmapPath) as Bitmap;
-        }
-
-        public event EventHandler Opened;
-        protected virtual void OnOpened(EventArgs e)
-        {
-            if (this.Opened != null) { this.Opened(this, e); }
         }
     }
 }

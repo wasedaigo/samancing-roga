@@ -24,6 +24,7 @@ namespace Shrimp
         public MainForm()
         {
             this.InitializeComponent();
+            this.SuspendLayout();
             this.ToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TilesPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TilesPalette.Height =
@@ -40,7 +41,7 @@ namespace Shrimp
                         (MapEditorModes)((ToolStripButton)s).Tag;
                 };
             }
-            
+
             this.DatabaseDialog = new DatabaseDialog();
             this.ViewModel = new ViewModel();
             this.ViewModel.IsOpenedChanged += delegate
@@ -80,7 +81,9 @@ namespace Shrimp
             this.MapTreeView.ViewModel = this.ViewModel;
             this.MapEditor.ViewModel = this.ViewModel;
             this.TilesPalette.ViewModel = this.ViewModel;
+
             this.IsOpenedChanged();
+            this.ResumeLayout(false);
         }
 
         private ViewModel ViewModel;
@@ -121,6 +124,11 @@ namespace Shrimp
             this.IsDirtyChanged();
             this.GameTitleChanged();
             this.MapEditorModeChanged();
+
+            // TODO
+            this.TileSetsToolStripComboBox.Items.Clear();
+            var x = this.ViewModel.TileSetCollection.Items.Select<TileSet, string>(t => t.ImageFileName);
+            this.TileSetsToolStripComboBox.Items.AddRange(x.ToArray());
         }
 
         private void IsDirtyChanged()

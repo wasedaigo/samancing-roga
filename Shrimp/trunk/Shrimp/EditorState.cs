@@ -64,8 +64,11 @@ namespace Shrimp
         }
         public void SetMapOffset(int id, Point point)
         {
-            this.MapOffsets[id] = point;
-            this.OnUpdated(new UpdatedEventArgs("MapOffsets", id));
+            if (this.MapOffsets[id] != point)
+            {
+                this.MapOffsets[id] = point;
+                this.OnUpdated(new UpdatedEventArgs("MapOffsets", id));
+            }
         }
         private Dictionary<int, Point> MapOffsets = new Dictionary<int, Point>();
 

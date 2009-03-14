@@ -30,7 +30,6 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TileSetTabPage = new System.Windows.Forms.TabPage();
-            this.tileSetEditor1 = new Shrimp.TileSetEditor();
             this.OKButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.ApplyButton = new System.Windows.Forms.Button();
@@ -49,7 +48,6 @@
             // 
             // TileSetTabPage
             // 
-            this.TileSetTabPage.Controls.Add(this.tileSetEditor1);
             this.TileSetTabPage.Location = new System.Drawing.Point(4, 21);
             this.TileSetTabPage.Name = "TileSetTabPage";
             this.TileSetTabPage.Padding = new System.Windows.Forms.Padding(3);
@@ -57,14 +55,6 @@
             this.TileSetTabPage.TabIndex = 0;
             this.TileSetTabPage.Text = "Tile Set";
             this.TileSetTabPage.UseVisualStyleBackColor = true;
-            // 
-            // tileSetEditor1
-            // 
-            this.tileSetEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tileSetEditor1.Location = new System.Drawing.Point(3, 3);
-            this.tileSetEditor1.Name = "tileSetEditor1";
-            this.tileSetEditor1.Size = new System.Drawing.Size(802, 601);
-            this.tileSetEditor1.TabIndex = 0;
             // 
             // OKButton
             // 
@@ -126,6 +116,5 @@
         private System.Windows.Forms.Button OKButton;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button ApplyButton;
-        private TileSetEditor tileSetEditor1;
     }
 }

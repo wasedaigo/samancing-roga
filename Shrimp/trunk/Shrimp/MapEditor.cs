@@ -15,6 +15,7 @@ namespace Shrimp
         public MapEditor()
         {
             this.InitializeComponent();
+            this.SuspendLayout();
             this.VScrollBar.Location = new Point
             {
                 X = this.MainPanelSize.Width,
@@ -27,6 +28,7 @@ namespace Shrimp
                 Y = this.MainPanelSize.Height,
             };
             this.HScrollBar.Width = this.MainPanelSize.Width;
+            this.ResumeLayout(false);
         }
 
         private Size MainPanelSize
@@ -50,14 +52,14 @@ namespace Shrimp
                 {
                     if (this.viewModel != null)
                     {
-                        this.viewModel.Opened -= this.ViewModel_Opened;
+                        this.viewModel.IsOpenedChanged -= this.ViewModel_IsOpenedChanged;
                         this.viewModel.EditorState.Updated -= this.EditorState_Updated;
                     }
                     this.viewModel = value;
                     if (this.viewModel != null)
                     {
                         this.Map = this.viewModel.EditorState.SelectedMap;
-                        this.viewModel.Opened += this.ViewModel_Opened;
+                        this.viewModel.IsOpenedChanged += this.ViewModel_IsOpenedChanged;
                         this.viewModel.EditorState.Updated += this.EditorState_Updated;
                     }
                     else
@@ -68,6 +70,36 @@ namespace Shrimp
             }
         }
         private ViewModel viewModel;
+
+        private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                this.SelectedMapIdChanged();
+                this.MapEditorModeChanged();
+            }
+        }
+
+        private void EditorState_Updated(object sender, UpdatedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+            case "SelectedMapId":
+                this.SelectedMapIdChanged();
+                break;
+            case "MapEditorMode":
+                this.MapEditorModeChanged();
+                break;
+            case "MapOffsets":
+                if (this.Map != null && (int)e.Tag == this.MapId)
+                {
+                    this.Invalidate();
+                }
+                break;
+            default:
+                throw new ArgumentException("Invalid property name", "e");
+            }
+        }
 
         private Map Map
         {
@@ -109,33 +141,6 @@ namespace Shrimp
                 {
                     return null;
                 }
-            }
-        }
-
-        private void ViewModel_Opened(object sender, EventArgs e)
-        {
-            this.SelectedMapIdChanged();
-            this.MapEditorModeChanged();
-        }
-
-        private void EditorState_Updated(object sender, UpdatedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-            case "SelectedMapId":
-                this.SelectedMapIdChanged();
-                break;
-            case "MapEditorMode":
-                this.MapEditorModeChanged();
-                break;
-            case "MapOffsets":
-                if (this.Map != null && (int)e.Tag == this.MapId)
-                {
-                    this.Invalidate();
-                }
-                break;
-            default:
-                throw new ArgumentException("Invalid property name", "e");
             }
         }
 
@@ -190,8 +195,8 @@ namespace Shrimp
                 }
                 else
                 {
-                    this.HScrollBar.Value = 0;
                     this.HScrollBar.Enabled = false;
+                    this.HScrollBar.Value = 0;
                 }
                 max = this.Map.Height * 32 - this.MainPanelSize.Height;
                 if (0 < max)
@@ -214,8 +219,8 @@ namespace Shrimp
                 }
                 else
                 {
-                    this.VScrollBar.Value = 0;
                     this.VScrollBar.Enabled = false;
+                    this.VScrollBar.Value = 0;
                 }
                 this.EditorState.SetMapOffset(this.MapId, new Point
                 {

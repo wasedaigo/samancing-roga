@@ -104,9 +104,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="SingleModelStore.cs" />
     <Compile Include="TileSetCollection.cs" />
-    <Compile Include="TileSetEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="Util.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -133,9 +130,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TileSetEditor.resx">
-      <DependentUpon>TileSetEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TilesPalette.resx">
       <DependentUpon>TilesPalette.cs</DependentUpon>
@@ -168,7 +162,7 @@
     <Content Include="ProjectTemplate\Graphics\Copyright.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplate\Graphics\Tiles.png">
+    <Content Include="ProjectTemplate\Graphics\Tiles\Sample.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Readme.txt">

@@ -23,12 +23,37 @@ namespace Shrimp
             };
             this.VScroll = true;
             this.VerticalScroll.SmallChange = Util.GridSize;
-            this.UpdateState();
         }
 
-        public ViewModel ViewModel { get; set; }
+        public ViewModel ViewModel
+        {
+            get { return this.viewModel; }
+            set
+            {
+                if (this.viewModel != value)
+                {
+                    if (this.viewModel != null)
+                    {
+                        this.viewModel.IsOpenedChanged -= this.ViewModel_IsOpenedChanged;
+                    }
+                    this.viewModel = value;
+                    if (this.viewModel != null)
+                    {
+                        this.viewModel.IsOpenedChanged += this.ViewModel_IsOpenedChanged;
+                    }
+                }
+            }
+        }
+        private ViewModel viewModel;
 
-        public Bitmap TilesBitmap
+        private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
+        {
+            if (this.ViewModel.IsOpened)
+            {
+            }
+        }
+
+        /*public Bitmap TilesBitmap
         {
             get
             {
@@ -46,45 +71,7 @@ namespace Shrimp
                     }
                     if (this.tilesBitmap != null)
                     {
-                        int width = this.tilesBitmap.Width;
-                        int height = this.tilesBitmap.Height;
-                        int dWidth = width * 2;
-                        int dHeight = height * 2;
-                        Bitmap dBitmap = new Bitmap(dWidth, dHeight);
-                        BitmapData srcBD = this.tilesBitmap.LockBits(new Rectangle
-                        {
-                            Width = width, Height = height,
-                        }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                        BitmapData dstBD = dBitmap.LockBits(new Rectangle
-                        {
-                            Width = dWidth, Height = dHeight,
-                        }, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                        int srcPadding = srcBD.Stride - width * 4;
-                        int dstPadding = dstBD.Stride - dWidth * 4;
-                        unsafe
-                        {
-                            byte* src = (byte*)srcBD.Scan0;
-                            byte* dst = (byte*)dstBD.Scan0;
-                            int dstPadding2 = dWidth * 4 + dstPadding * 2;
-                            int dWidthX4 = dWidth * 4;
-                            for (int j = 0; j < height;
-                                j++, src += srcPadding, dst += dstPadding2)
-                            {
-                                for (int i = 0; i < width; i++, dst += 4)
-                                {
-                                    for (int k = 0; k < 4; k++, src++, dst++)
-                                    {
-                                        dst[0] = *src;
-                                        dst[4] = *src;
-                                        dst[dWidthX4] = *src;
-                                        dst[dWidthX4 + 4] = *src;
-                                    }
-                                }
-                            }
-                        }
-                        dBitmap.UnlockBits(dstBD);
-                        this.tilesBitmap.UnlockBits(srcBD);
-                        this.DoubleSizedTilesBitmap = dBitmap;
+
                     }
                     this.UpdateState();
                 }
@@ -92,9 +79,9 @@ namespace Shrimp
         }
         private Bitmap tilesBitmap;
 
-        private Bitmap DoubleSizedTilesBitmap;
+        private Bitmap DoubleSizedTilesBitmap;*/
 
-        private void UpdateState()
+        /*private void UpdateState()
         {
             this.Invalidate();
             if (this.DoubleSizedTilesBitmap != null)
@@ -109,12 +96,12 @@ namespace Shrimp
             {
                 this.AutoScrollMinSize = new Size(0, 0);
             }
-        }
+        }*/
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            if (this.TilesBitmap == null)
+            /*if (this.TilesBitmap == null)
             {
                 return;
             }
@@ -139,7 +126,7 @@ namespace Shrimp
                     Width = e.ClipRectangle.Width,
                     Height = e.ClipRectangle.Height,
                 },
-                GraphicsUnit.Pixel);
+                GraphicsUnit.Pixel);*/
         }
     }
 }
