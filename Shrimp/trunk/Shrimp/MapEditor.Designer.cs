@@ -36,22 +36,24 @@
             // 
             this.HScrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.HScrollBar.Enabled = false;
             this.HScrollBar.Location = new System.Drawing.Point(24, 120);
             this.HScrollBar.Maximum = 500;
             this.HScrollBar.Name = "HScrollBar";
             this.HScrollBar.Size = new System.Drawing.Size(80, 16);
             this.HScrollBar.TabIndex = 0;
-            this.HScrollBar.ValueChanged += new System.EventHandler(this.ScrollBar_ValueChanged);
+            this.HScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ScrollBar_Scroll);
             // 
             // VScrollBar
             // 
             this.VScrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.VScrollBar.Enabled = false;
             this.VScrollBar.Location = new System.Drawing.Point(120, 24);
             this.VScrollBar.Name = "VScrollBar";
             this.VScrollBar.Size = new System.Drawing.Size(16, 80);
             this.VScrollBar.TabIndex = 1;
-            this.VScrollBar.ValueChanged += new System.EventHandler(this.ScrollBar_ValueChanged);
+            this.VScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ScrollBar_Scroll);
             // 
             // MapEditor
             // 

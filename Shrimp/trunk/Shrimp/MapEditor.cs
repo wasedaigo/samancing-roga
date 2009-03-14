@@ -27,16 +27,6 @@ namespace Shrimp
                 Y = this.MainPanelSize.Height,
             };
             this.HScrollBar.Width = this.MainPanelSize.Width;
-            /*this.DummyPanel.Location = new Point
-            {
-                X = this.VScrollBar.Location.X,
-                Y = this.HScrollBar.Location.Y,
-            };
-            this.DummyPanel.Size = new Size
-            {
-                Width = this.VScrollBar.Width,
-                Height = this.HScrollBar.Height
-            };*/
         }
 
         private Size MainPanelSize
@@ -139,7 +129,7 @@ namespace Shrimp
                 this.MapEditorModeChanged();
                 break;
             case "MapOffsets":
-                if ((int)e.Tag == this.ViewModel.MapCollection.GetId(this.Map))
+                if (this.Map != null && (int)e.Tag == this.MapId)
                 {
                     this.Invalidate();
                 }
@@ -177,6 +167,7 @@ namespace Shrimp
             this.VScrollBar.LargeChange = Math.Max(this.MainPanelSize.Height, 0);
             if (this.Map != null)
             {
+                Point offset = this.EditorState.GetMapOffset(this.MapId);
                 int max;
                 max = this.Map.Width * 32 - this.MainPanelSize.Width;
                 if (0 < max)
@@ -184,9 +175,17 @@ namespace Shrimp
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
                     this.HScrollBar.Maximum = max + this.HScrollBar.LargeChange;
-                    if (max < this.HScrollBar.Value)
+                    if (max <= this.HScrollBar.Value || max <= -offset.X)
                     {
                         this.HScrollBar.Value = max;
+                    }
+                    else if (-offset.X < 0)
+                    {
+                        this.HScrollBar.Value = 0;
+                    }
+                    else
+                    {
+                        this.HScrollBar.Value = -offset.X;
                     }
                 }
                 else
@@ -200,9 +199,17 @@ namespace Shrimp
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
                     this.VScrollBar.Maximum = max + this.VScrollBar.LargeChange;
-                    if (max < this.VScrollBar.Value)
+                    if (max <= this.VScrollBar.Value || max <= -offset.Y)
                     {
                         this.VScrollBar.Value = max;
+                    }
+                    else if (-offset.Y < 0)
+                    {
+                        this.VScrollBar.Value = 0;
+                    }
+                    else
+                    {
+                        this.VScrollBar.Value = -offset.Y;
                     }
                 }
                 else
@@ -210,11 +217,18 @@ namespace Shrimp
                     this.VScrollBar.Value = 0;
                     this.VScrollBar.Enabled = false;
                 }
+                this.EditorState.SetMapOffset(this.MapId, new Point
+                {
+                    X = -this.HScrollBar.Value,
+                    Y = -this.VScrollBar.Value,
+                });
             }
             else
             {
-                this.VScrollBar.Enabled = false;
+                this.HScrollBar.Value = 0;
+                this.VScrollBar.Value = 0;
                 this.HScrollBar.Enabled = false;
+                this.VScrollBar.Enabled = false;
             }
         }
 
@@ -273,7 +287,7 @@ namespace Shrimp
             });
         }
 
-        private void ScrollBar_ValueChanged(object sender, EventArgs e)
+        private void ScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             this.EditorState.SetMapOffset(this.MapId, new Point
             {

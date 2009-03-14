@@ -181,7 +181,7 @@ namespace Shrimp
                 string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
                 this.ViewModel.Open(directoryPath);
                 Debug.Assert(this.ViewModel.IsOpened);
-                Debug.Assert(!this.ViewModel.IsDirty);
+                //Debug.Assert(!this.ViewModel.IsDirty);
             }
         }
 
