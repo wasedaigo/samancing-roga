@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="SingleModelStore.cs" />
+    <Compile Include="TileSet.cs" />
     <Compile Include="TileSetCollection.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ViewModel.cs" />

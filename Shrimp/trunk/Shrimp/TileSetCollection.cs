@@ -8,45 +8,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class TileSet : Model
-    {
-        public TileSet()
-        {
-            this.Clear();
-        }
-
-        public string ImageFileName
-        {
-            get { return this.imageFileName; }
-            set
-            {
-                if (this.imageFileName != value)
-                {
-                    this.imageFileName = value;
-                    this.OnUpdated(new UpdatedEventArgs("ImageFileName"));
-                }
-            }
-        }
-        private string imageFileName;
-
-        public override void Clear()
-        {
-            this.ImageFileName = "";
-        }
-
-        public override JToken ToJson()
-        {
-            return new JObject(
-                new JProperty("ImageFileName", this.ImageFileName));
-        }
-
-        public override void LoadJson(JToken json)
-        {
-            this.Clear();
-            this.ImageFileName = json.Value<string>("ImageFileName");
-        }
-    }
-
     internal class TileSetCollection : Model
     {
         public TileSetCollection(ViewModel viewModel)
@@ -61,7 +22,17 @@ namespace Shrimp
 
         public IEnumerable<TileSet> Items
         {
-            get { return (from p in this.TileSets orderby p.Key select p.Value); }
+            get { return this.TileSets.Values; }
+        }
+
+        public IEnumerable<int> ItemIds
+        {
+            get { return this.TileSets.Keys; }
+        }
+
+        public int GetId(TileSet tileSet)
+        {
+            return this.TileSets.First(p => p.Value == tileSet).Key;
         }
 
         public override void Clear()
@@ -85,7 +56,7 @@ namespace Shrimp
             foreach (JObject j in json as JArray)
             {
                 int id = j.Value<int>("Id");
-                TileSet tileSet = new TileSet();
+                TileSet tileSet = new TileSet(this);
                 tileSet.LoadJson(j["Value"]);
                 this.TileSets.Add(id, tileSet);
             }
@@ -96,7 +67,7 @@ namespace Shrimp
             foreach (string file in files.Except(registeredFiles))
             {
                 int id = this.GetNewId();
-                TileSet tileSet = new TileSet();
+                TileSet tileSet = new TileSet(this);
                 tileSet.ImageFileName = Path.GetFileName(file);
                 this.TileSets.Add(id, tileSet);
             }

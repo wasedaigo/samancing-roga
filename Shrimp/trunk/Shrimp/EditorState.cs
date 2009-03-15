@@ -72,6 +72,25 @@ namespace Shrimp
         }
         private Dictionary<int, Point> MapOffsets = new Dictionary<int, Point>();
 
+        public int GetSelectedTileSetId(int mapId)
+        {
+            if (!this.SelectedTileSetIds.ContainsKey(mapId))
+            {
+                int minId = this.ViewModel.TileSetCollection.ItemIds.Min();
+                this.SelectedTileSetIds.Add(mapId, minId);
+            }
+            return this.SelectedTileSetIds[mapId];
+        }
+        public void SetSelectedTileSetId(int mapId, int tileSetId)
+        {
+            if (this.SelectedTileSetIds[mapId] != tileSetId)
+            {
+                this.SelectedTileSetIds[mapId] = tileSetId;
+                this.OnUpdated(new UpdatedEventArgs("SelectedTileSetIds", mapId));
+            }
+        }
+        private Dictionary<int, int> SelectedTileSetIds = new Dictionary<int, int>();
+
         public MapEditorModes MapEditorMode
         {
             get { return this.mapEditorMode; }
@@ -90,6 +109,8 @@ namespace Shrimp
         {
             this.SelectedMapId = 0;
             this.MapOffsets.Clear();
+            this.SelectedTileSetIds.Clear();
+            this.MapEditorMode = MapEditorModes.Pen;
         }
 
         public override JToken ToJson()
@@ -99,7 +120,15 @@ namespace Shrimp
                 new JProperty("MapOffsets",
                     new JArray(
                         from p in this.MapOffsets
-                        select new JArray(p.Key, new JArray(p.Value.X, p.Value.Y)))),
+                        select new JObject(
+                            new JProperty("MapId", p.Key),
+                            new JProperty("Offset", new JArray(p.Value.X, p.Value.Y))))),
+                new JProperty("SelectedTileSetIds",
+                    new JArray(
+                        from p in this.SelectedTileSetIds
+                        select new JObject(
+                            new JProperty("MapId", p.Key),
+                            new JProperty("TileSetId", p.Value)))),
                 new JProperty("MapEditorMode", this.MapEditorMode.ToString()));
         }
 
@@ -113,15 +142,25 @@ namespace Shrimp
             }
             if ((token = json["MapOffsets"]) != null)
             {
-                foreach (JArray x in token as JArray)
+                foreach (JObject j in token as JArray)
                 {
-                    int id = x[0].Value<int>();
+                    int id = j.Value<int>("MapId");
+                    int[] jOffset = (j["Offset"] as JArray).Values<int>().ToArray();
                     Point point = new Point()
                     {
-                        X = x[1][0].Value<int>(),
-                        Y = x[1][1].Value<int>(),
+                        X = jOffset[0],
+                        Y = jOffset[1],
                     };
                     this.MapOffsets.Add(id, point);
+                }
+            }
+            if ((token = json["SelectedTileSetIds"]) != null)
+            {
+                foreach (JObject j in token as JArray)
+                {
+                    int mapId = j.Value<int>("MapId");
+                    int tileSetId = j.Value<int>("TileSetId");
+                    this.SelectedTileSetIds.Add(mapId, tileSetId);
                 }
             }
             if ((token = json["MapEditorMode"]) != null)
