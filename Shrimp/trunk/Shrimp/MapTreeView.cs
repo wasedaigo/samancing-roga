@@ -353,7 +353,6 @@ namespace Shrimp
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapTreeView));
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.EditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -372,33 +371,33 @@ namespace Shrimp
             this.contextMenuStrip.Name = "contextMenuStrip";
             this.contextMenuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.contextMenuStrip.ShowImageMargin = false;
-            this.contextMenuStrip.Size = new System.Drawing.Size(102, 76);
+            this.contextMenuStrip.Size = new System.Drawing.Size(101, 76);
             // 
             // EditToolStripMenuItem
             // 
             this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
-            this.EditToolStripMenuItem.ShortcutKeyDisplayString = "Space";
-            this.EditToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.EditToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this.EditToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.EditToolStripMenuItem.Text = "Edit";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(98, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(97, 6);
             // 
             // InsertToolStripMenuItem
             // 
             this.InsertToolStripMenuItem.Name = "InsertToolStripMenuItem";
             this.InsertToolStripMenuItem.ShortcutKeyDisplayString = "";
             this.InsertToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
-            this.InsertToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.InsertToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.InsertToolStripMenuItem.Text = "Insert";
             // 
             // DeleteToolStripMenuItem
             // 
             this.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem";
             this.DeleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.DeleteToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.DeleteToolStripMenuItem.Text = "Delete";
             // 
             // MapTreeView
@@ -409,7 +408,6 @@ namespace Shrimp
             this.HideSelection = false;
             this.ImageKey = "PageWhite";
             this.LineColor = System.Drawing.Color.Black;
-            this.SelectedImageIndex = 0;
             this.ShowLines = false;
             this.ShowRootLines = false;
             this.contextMenuStrip.ResumeLayout(false);

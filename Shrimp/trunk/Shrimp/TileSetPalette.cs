@@ -16,11 +16,6 @@ namespace Shrimp
         public TileSetPalette()
         {
             this.InitializeComponent();
-            this.ClientSize = new Size
-            {
-                Width = Util.GridSize + SystemInformation.VerticalScrollBarWidth,
-                Height = this.ClientSize.Height,
-            };
             this.VScroll = true;
             this.VerticalScroll.SmallChange = Util.GridSize;
         }

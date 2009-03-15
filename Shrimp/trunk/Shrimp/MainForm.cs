@@ -27,8 +27,11 @@ namespace Shrimp
             this.SuspendLayout();
             this.ToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TileSetPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
-            this.TileSetPalette.Height =
-                this.TileSetPalette.Parent.ClientSize.Height - this.TileSetPaletteToolStrip.Height;
+            this.TileSetPalette.Size = new Size
+            {
+                Width = Util.GridSize * 8 + SystemInformation.VerticalScrollBarWidth,
+                Height = this.TileSetPalette.Parent.ClientSize.Height - this.TileSetPaletteToolStrip.Height,
+            };
             this.MainSplitContainer.SplitterDistance -=
                 this.TileSetPalette.Parent.ClientSize.Width - this.TileSetPalette.Width;
 
@@ -287,7 +290,10 @@ namespace Shrimp
                     int tileSetId = indexToId[selectedIndex];
                     this.ViewModel.EditorState.SetSelectedTileSetId(mapId, tileSetId);
                 }
-                this.TileSetPalette.Focus();
+                if (this.TileSetsToolStripComboBox.Focused)
+                {
+                    this.TileSetPalette.Focus();
+                }
             }
         }
 

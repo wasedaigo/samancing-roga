@@ -124,6 +124,9 @@
       <DependentUpon>MapEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="MapTreeView.resx">
+      <DependentUpon>MapTreeView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewProjectDialog.resx">
       <DependentUpon>NewProjectDialog.cs</DependentUpon>
     </EmbeddedResource>
