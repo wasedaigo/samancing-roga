@@ -42,5 +42,10 @@ namespace Shrimp.Tests
                 new JObject(
                     new JProperty("Name", "bar"))));
         }
+
+        public void TestJson()
+        {
+            
+        }
     }
 }

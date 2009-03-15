@@ -52,11 +52,7 @@ namespace Shrimp
         public TileSetCollection(ViewModel viewModel)
         {
             this.ViewModel = viewModel;
-            this.ViewModel.IsOpenedChanged += delegate
-            {
-                this.Initialize();
-            };
-            this.Initialize();
+            this.Clear();
         }
 
         public ViewModel ViewModel { get; private set; }
@@ -68,15 +64,6 @@ namespace Shrimp
             get { return (from p in this.TileSets orderby p.Key select p.Value); }
         }
 
-        private void Initialize()
-        {
-            if (this.ViewModel.IsOpened)
-            {
-                this.TileSets.Clear();
-                
-            }
-        }
-
         public override void Clear()
         {
             this.TileSets.Clear();
@@ -84,7 +71,7 @@ namespace Shrimp
 
         public override JToken ToJson()
         {
-            return new JObject(
+            return new JArray(
                 from p in this.TileSets
                 orderby p.Key
                 select new JObject(
@@ -95,16 +82,17 @@ namespace Shrimp
         public override void LoadJson(JToken json)
         {
             this.Clear();
-            foreach (JObject j in json)
+            foreach (JObject j in json as JArray)
             {
                 int id = j.Value<int>("Id");
                 TileSet tileSet = new TileSet();
-                tileSet.LoadJson(json["Value"]);
+                tileSet.LoadJson(j["Value"]);
                 this.TileSets.Add(id, tileSet);
             }
             string path = Path.Combine(this.ViewModel.DirectoryPath, "Graphics/Tiles");
-            string[] files = Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly);
-            string[] registeredFiles = this.TileSets.Select(p => p.Value.ImageFileName).ToArray();
+            var files = from f in Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly)
+                        select Path.GetFileName(f);
+            var registeredFiles = this.TileSets.Select(p => p.Value.ImageFileName).ToArray();
             foreach (string file in files.Except(registeredFiles))
             {
                 int id = this.GetNewId();
@@ -121,9 +109,9 @@ namespace Shrimp
             if (0 < ids.Count)
             {
                 int maxId = ids.Max();
-                for (int i = id; id < maxId + 1; i++)
+                for (int i = id; i <= maxId + 1; i++)
                 {
-                    if (!ids.Contains(id))
+                    if (!ids.Contains(i))
                     {
                         id = i;
                         break;

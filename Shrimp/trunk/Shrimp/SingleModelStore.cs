@@ -49,14 +49,18 @@ namespace Shrimp
             if (result = File.Exists(path))
             {
                 string jsonText = File.ReadAllText(path, UTF8N);
-                JObject json;
-                try
+                JToken json;
+                switch (jsonText[0])
                 {
+                case '{':
                     json = JObject.Parse(jsonText);
-                }
-                catch (Exception)
-                {
+                    break;
+                case '[':
+                    json = JArray.Parse(jsonText);
+                    break;
+                default:
                     json = null;
+                    break;
                 }
                 if (json != null)
                 {
