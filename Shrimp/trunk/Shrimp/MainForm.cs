@@ -147,7 +147,7 @@ namespace Shrimp
             this.TilesPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
             this.GameTitleChanged();
-            this.SelectedTileSetIdsChanged();
+            this.SelectedMapIdChanged();
             this.SelectedTileSetIdsChanged();
             this.MapEditorModeChanged();
         }
