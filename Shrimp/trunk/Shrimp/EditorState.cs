@@ -137,7 +137,6 @@ namespace Shrimp
                     this.MapEditorMode = MapEditorModes.Pen;
                 }
             }
-            this.OnLoaded(EventArgs.Empty);
         }
     }
 }

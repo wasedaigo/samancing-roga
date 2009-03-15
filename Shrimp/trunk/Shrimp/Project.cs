@@ -31,7 +31,6 @@ namespace Shrimp
         public override void Clear()
         {
             this.GameTitle = "";
-            this.OnCleared(EventArgs.Empty);
         }
 
         public override JToken ToJson()
@@ -42,8 +41,7 @@ namespace Shrimp
         public override void LoadJson(JToken json)
         {
             this.Clear();
-            this.GameTitle = json["GameTitle"].Value<string>();
-            this.OnLoaded(EventArgs.Empty);
+            this.GameTitle = json.Value<string>("GameTitle");
         }
     }
 }

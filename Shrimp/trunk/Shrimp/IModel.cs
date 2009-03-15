@@ -12,8 +12,6 @@ namespace Shrimp
         void Clear();
 
         event EventHandler<UpdatedEventArgs> Updated;
-        event EventHandler Cleared;
-        event EventHandler Loaded;
 
         JToken ToJson();
         void LoadJson(JToken json);

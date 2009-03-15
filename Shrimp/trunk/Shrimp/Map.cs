@@ -63,7 +63,6 @@ namespace Shrimp
         {
             this.Width = MinWidth;
             this.Height = MinHeight;
-            this.OnCleared(EventArgs.Empty);
         }
 
         public override JToken ToJson()
@@ -78,7 +77,6 @@ namespace Shrimp
         {
             this.Width = json["Width"].Value<int>();
             this.Height = json["Height"].Value<int>();
-            this.OnLoaded(EventArgs.Empty);
         }
     }
 }

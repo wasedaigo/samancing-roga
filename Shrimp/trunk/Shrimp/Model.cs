@@ -17,18 +17,6 @@ namespace Shrimp
             if (this.Updated != null) { this.Updated(this, e); }
         }
 
-        public event EventHandler Cleared;
-        protected virtual void OnCleared(EventArgs e)
-        {
-            if (this.Cleared != null) { this.Cleared(this, e); }
-        }
-
-        public event EventHandler Loaded;
-        protected virtual void OnLoaded(EventArgs e)
-        {
-            if (this.Loaded != null) { this.Loaded(this, e); }
-        }
-
         public abstract JToken ToJson();
 
         public abstract void LoadJson(JToken json);

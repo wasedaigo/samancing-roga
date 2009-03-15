@@ -15,7 +15,6 @@ namespace Shrimp
         public override void Clear()
         {
             this.Models.Clear();
-            this.OnCleared(EventArgs.Empty);
         }
 
         public override JToken ToJson()
@@ -32,7 +31,6 @@ namespace Shrimp
                 model.LoadJson(jObject);
                 this.Models.Add(model);
             }
-            this.OnLoaded(EventArgs.Empty);
         }
     }
 }

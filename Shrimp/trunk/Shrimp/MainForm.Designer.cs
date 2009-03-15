@@ -115,7 +115,6 @@
             // TileSetsToolStripComboBox
             // 
             this.TileSetsToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.TileSetsToolStripComboBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.TileSetsToolStripComboBox.Name = "TileSetsToolStripComboBox";
             this.TileSetsToolStripComboBox.Size = new System.Drawing.Size(121, 25);
             // 

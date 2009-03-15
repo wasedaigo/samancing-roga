@@ -209,7 +209,7 @@ namespace Shrimp
 
         public int GetNewId()
         {
-            IEnumerable<int> ids = this.Nodes.Select(n => n.Id);
+            var ids = this.Nodes.Select(n => n.Id);
             int id = this.Roots.Min();
             int maxId = ids.Max();
             for (int i = id; i <= maxId + 1; i++)
@@ -226,7 +226,7 @@ namespace Shrimp
 
         public int Add(int parentId, string name)
         {
-            IEnumerable<int> ids = this.Nodes.Select(n => n.Id);
+            var ids = this.Nodes.Select(n => n.Id);
             if (!ids.Contains(parentId))
             {
                 throw new ArgumentException("Invalid id", "parentId");
@@ -294,8 +294,8 @@ namespace Shrimp
             this.Clear();
             JObject projectJson = json["Project"] as JObject;
             JObject trashJson = json["Trash"] as JObject;
-            this.ProjectNodeInstance.IsExpanded = projectJson["IsExpanded"].Value<bool>();
-            this.TrashNodeInstance.IsExpanded = projectJson["IsExpanded"].Value<bool>();
+            this.ProjectNodeInstance.IsExpanded = projectJson.Value<bool>("IsExpanded");
+            this.TrashNodeInstance.IsExpanded = projectJson.Value<bool>("IsExpanded");
             foreach (JObject childJson in projectJson["Children"])
             {
                 this.AddNodeFromJson(this.ProjectNodeInstance, childJson);
@@ -304,7 +304,6 @@ namespace Shrimp
             {
                 this.AddNodeFromJson(this.TrashNodeInstance, childJson);
             }
-            this.OnLoaded(EventArgs.Empty);
         }
 
         private void AddNodeFromJson(Node parentNode, JObject json)
@@ -325,7 +324,6 @@ namespace Shrimp
         {
             this.ProjectNodeInstance.Children.Clear();
             this.TrashNodeInstance.Children.Clear();
-            this.OnCleared(EventArgs.Empty);
         }
 
         public event EventHandler<NodeEventArgs> NodeAdded;

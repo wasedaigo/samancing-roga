@@ -144,8 +144,7 @@ namespace Shrimp
                 {
                     if (this.viewModel != null)
                     {
-                        this.viewModel.MapCollection.Loaded -= this.Tree_Loaded;
-                        this.viewModel.MapCollection.Cleared -= this.Tree_Cleared;
+                        this.viewModel.IsOpenedChanged -= this.ViewModel_IsOpenedChanged;
                         this.viewModel.MapCollection.NodeAdded -= this.Tree_NodeAdded;
                         this.viewModel.MapCollection.NodeRemoved -= this.Tree_NodeRemoved;
                         this.viewModel.MapCollection.NodeMoved -= this.Tree_NodeMoved;
@@ -154,8 +153,7 @@ namespace Shrimp
                     this.viewModel = value;
                     if (this.viewModel != null)
                     {
-                        this.viewModel.MapCollection.Loaded += this.Tree_Loaded;
-                        this.viewModel.MapCollection.Cleared += this.Tree_Cleared;
+                        this.viewModel.IsOpenedChanged += this.ViewModel_IsOpenedChanged;
                         this.viewModel.MapCollection.NodeAdded += this.Tree_NodeAdded;
                         this.viewModel.MapCollection.NodeRemoved += this.Tree_NodeRemoved;
                         this.viewModel.MapCollection.NodeMoved += this.Tree_NodeMoved;
@@ -197,12 +195,7 @@ namespace Shrimp
             }
         }
 
-        private void Tree_Loaded(object sender, EventArgs e)
-        {
-            this.Initialize();
-        }
-
-        private void Tree_Cleared(object sender, EventArgs e)
+        private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
         {
             this.Initialize();
         }

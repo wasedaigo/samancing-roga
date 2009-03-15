@@ -127,8 +127,11 @@ namespace Shrimp
 
             // TODO
             this.TileSetsToolStripComboBox.Items.Clear();
-            var x = this.ViewModel.TileSetCollection.Items.Select<TileSet, string>(t => t.ImageFileName);
-            this.TileSetsToolStripComboBox.Items.AddRange(x.ToArray());
+            if (isOpened)
+            {
+                var x = this.ViewModel.TileSetCollection.Items.Select(t => t.ImageFileName);
+                this.TileSetsToolStripComboBox.Items.AddRange(x.ToArray());
+            }
         }
 
         private void IsDirtyChanged()

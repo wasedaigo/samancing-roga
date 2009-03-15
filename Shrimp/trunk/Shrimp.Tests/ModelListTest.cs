@@ -19,7 +19,6 @@ namespace Shrimp.Tests
             public override void Clear()
             {
                 this.Name = "";
-                this.OnCleared(EventArgs.Empty);
             }
 
             public override JToken ToJson()
