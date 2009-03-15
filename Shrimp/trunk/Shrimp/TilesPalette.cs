@@ -85,49 +85,11 @@ namespace Shrimp
                 bitmap.Dispose();
             }
             this.LargeBitmapCache.Clear();
-            /*if (this.ViewModel.IsOpened)
-            {
-                int mapId = this.EditorState.SelectedMapId;
-                int tileSetId = this.EditorState.GetSelectedTileSetId(mapId);
-                if (this.TileSetCollection.ContainsId(tileSetId))
-                {
-                    tileSet = this.TileSetCollection.GetItem(tileSetId);
-                    this.TileSet = tileSet;
-                }
-                else
-                {
-                    this.TileSet = null;
-                }
-                this.TileSet = this.EditorState.SelectedTileSet;
-            }
-            else
-            {
-                this.TileSet = null;
-            }*/
             this.TileSet = this.EditorState.SelectedTileSet;
         }
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
-            /*switch (e.PropertyName)
-            {
-            case "SelectedMapId":
-                break;
-            case "SelectedTileSets":
-                break;
-            default:
-                return;
-            }
-            int tileSetId = this.EditorState.SelectedTileSetId;
-            if (this.TileSetCollection.ContainsId(tileSetId))
-            {
-                //tileSet = this.TileSetCollection.GetItem(tileSetId);
-                this.TileSet = tileSet;
-            }
-            else
-            {
-                this.TileSet = null;
-            }*/
             this.TileSet = this.EditorState.SelectedTileSet;
         }
 
@@ -202,51 +164,6 @@ namespace Shrimp
                 }
             }
         }
-
-        /*public Bitmap TilesBitmap
-        {
-            get
-            {
-                return this.tilesBitmap;
-            }
-            set
-            {
-                if (this.tilesBitmap != value)
-                {
-                    this.tilesBitmap = value;
-                    if (this.DoubleSizedTilesBitmap != null)
-                    {
-                        this.DoubleSizedTilesBitmap.Dispose();
-                        this.DoubleSizedTilesBitmap = null;
-                    }
-                    if (this.tilesBitmap != null)
-                    {
-
-                    }
-                    this.UpdateState();
-                }
-            }
-        }
-        private Bitmap tilesBitmap;
-
-        private Bitmap DoubleSizedTilesBitmap;*/
-
-        /*private void UpdateState()
-        {
-            this.Invalidate();
-            if (this.DoubleSizedTilesBitmap != null)
-            {
-                this.AutoScrollMinSize = new Size
-                {
-                    Width = Util.GridSize * 8,
-                    Height = this.DoubleSizedTilesBitmap.Height,
-                };
-            }
-            else
-            {
-                this.AutoScrollMinSize = new Size(0, 0);
-            }
-        }*/
 
         protected override void OnPaint(PaintEventArgs e)
         {
