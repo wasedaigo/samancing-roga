@@ -265,7 +265,6 @@
             // 
             // MapEditor
             // 
-            this.MapEditor.AutoScroll = true;
             this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapEditor.Location = new System.Drawing.Point(0, 0);
