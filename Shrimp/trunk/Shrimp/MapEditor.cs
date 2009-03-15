@@ -178,18 +178,7 @@ namespace Shrimp
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
                     this.HScrollBar.Maximum = max + this.HScrollBar.LargeChange;
-                    if (max <= -offset.X)
-                    {
-                        this.HScrollBar.Value = max;
-                    }
-                    else if (-offset.X < 0)
-                    {
-                        this.HScrollBar.Value = 0;
-                    }
-                    else
-                    {
-                        this.HScrollBar.Value = -offset.X;
-                    }
+                    this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), max);
                 }
                 else
                 {
@@ -202,18 +191,7 @@ namespace Shrimp
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
                     this.VScrollBar.Maximum = max + this.VScrollBar.LargeChange;
-                    if (max <= -offset.Y)
-                    {
-                        this.VScrollBar.Value = max;
-                    }
-                    else if (-offset.Y < 0)
-                    {
-                        this.VScrollBar.Value = 0;
-                    }
-                    else
-                    {
-                        this.VScrollBar.Value = -offset.Y;
-                    }
+                    this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), max);
                 }
                 else
                 {
