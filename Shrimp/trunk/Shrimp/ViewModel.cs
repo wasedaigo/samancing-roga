@@ -77,8 +77,9 @@ namespace Shrimp
                 modelStore.Clear();
             }
             this.DirectoryPath = directoryPath;
-            this.Project.GameTitle = gameTitle;
             Util.CopyDirectory(ProjectTemplatePath, this.DirectoryPath);
+            this.Project.GameTitle = gameTitle;
+            this.TileSetCollection.AddItemFromFiles();
             this.Save();
             this.IsOpened = true;
         }
@@ -99,6 +100,7 @@ namespace Shrimp
             {
                 modelStore.Load(this.DirectoryPath);
             }
+            this.TileSetCollection.AddItemFromFiles();
             this.IsOpened = true;
         }
 

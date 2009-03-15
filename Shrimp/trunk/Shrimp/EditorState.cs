@@ -75,6 +75,10 @@ namespace Shrimp
 
         public int GetSelectedTileSetId(int mapId)
         {
+            if (this.ViewModel.MapCollection.Roots.Contains(mapId))
+            {
+                return -1;
+            }
             if (!this.SelectedTileSetIds.ContainsKey(mapId))
             {
                 if (0 < this.ViewModel.TileSetCollection.ItemCount)
@@ -91,6 +95,10 @@ namespace Shrimp
         }
         public void SetSelectedTileSetId(int mapId, int tileSetId)
         {
+            if (this.ViewModel.MapCollection.Roots.Contains(mapId))
+            {
+                throw new ArgumentException("Invalid map ID", "mapId");
+            }
             if (this.SelectedTileSetIds[mapId] != tileSetId)
             {
                 this.SelectedTileSetIds[mapId] = tileSetId;

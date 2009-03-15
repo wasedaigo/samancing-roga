@@ -67,7 +67,7 @@ namespace Shrimp
 
         public override void LoadJson(JToken json)
         {
-            this.Clear();
+            this.TileSets.Clear();
             foreach (JObject j in json as JArray)
             {
                 int id = j.Value<int>("Id");
@@ -75,6 +75,10 @@ namespace Shrimp
                 tileSet.LoadJson(j["Value"]);
                 this.TileSets.Add(id, tileSet);
             }
+        }
+
+        public void AddItemFromFiles()
+        {
             string path = Path.Combine(this.ViewModel.DirectoryPath, this.TilesGraphicsDirectory);
             var files = from f in Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly)
                         select Path.GetFileName(f);

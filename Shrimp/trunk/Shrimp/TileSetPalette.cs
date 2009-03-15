@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace Shrimp
 {
-    partial class TilesPalette : UserControl
+    partial class TileSetPalette : UserControl
     {
-        public TilesPalette()
+        public TileSetPalette()
         {
             this.InitializeComponent();
             this.ClientSize = new Size
@@ -85,7 +85,14 @@ namespace Shrimp
                 bitmap.Dispose();
             }
             this.LargeBitmapCache.Clear();
-            this.TileSet = this.EditorState.SelectedTileSet;
+            if (this.ViewModel.IsOpened)
+            {
+                this.TileSet = this.EditorState.SelectedTileSet;
+            }
+            else
+            {
+                this.TileSet = null;
+            }
         }
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)

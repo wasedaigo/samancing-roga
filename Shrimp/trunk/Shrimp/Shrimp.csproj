@@ -132,8 +132,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="TilesPalette.resx">
-      <DependentUpon>TilesPalette.cs</DependentUpon>
+    <EmbeddedResource Include="TileSetPalette.resx">
+      <DependentUpon>TileSetPalette.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -149,21 +149,24 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="TilesPalette.cs">
+    <Compile Include="TileSetPalette.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TilesPalette.Designer.cs">
-      <DependentUpon>TilesPalette.cs</DependentUpon>
+    <Compile Include="TileSetPalette.Designer.cs">
+      <DependentUpon>TileSetPalette.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Newtonsoft.Json.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplate\Graphics\Copyright.txt">
+    <Content Include="ProjectTemplate\Graphics\Tiles\Copyright.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplate\Graphics\Tiles\Sample.png">
+    <Content Include="ProjectTemplate\Graphics\Tiles\SampleA.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ProjectTemplate\Graphics\Tiles\SampleB.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Readme.txt">

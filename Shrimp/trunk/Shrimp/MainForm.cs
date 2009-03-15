@@ -26,11 +26,11 @@ namespace Shrimp
             this.InitializeComponent();
             this.SuspendLayout();
             this.ToolStrip.Renderer = new CustomToolStripSystemRenderer();
-            this.TilesPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
-            this.TilesPalette.Height =
-                this.TilesPalette.Parent.ClientSize.Height - this.TilesPaletteToolStrip.Height;
+            this.TileSetPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
+            this.TileSetPalette.Height =
+                this.TileSetPalette.Parent.ClientSize.Height - this.TileSetPaletteToolStrip.Height;
             this.MainSplitContainer.SplitterDistance -=
-                this.TilesPalette.Parent.ClientSize.Width - this.TilesPalette.Width;
+                this.TileSetPalette.Parent.ClientSize.Width - this.TileSetPalette.Width;
 
             this.PenToolStripButton.Tag = MapEditorModes.Pen;
             foreach (var item in this.MapEditorModeSwitchers)
@@ -86,7 +86,7 @@ namespace Shrimp
             };
             this.MapTreeView.ViewModel = this.ViewModel;
             this.MapEditor.ViewModel = this.ViewModel;
-            this.TilesPalette.ViewModel = this.ViewModel;
+            this.TileSetPalette.ViewModel = this.ViewModel;
 
             this.IsOpenedChanged();
             this.ResumeLayout(false);
@@ -135,7 +135,8 @@ namespace Shrimp
                 item.Enabled = isOpened;
             }
             this.DatabaseToolStripButton.Enabled = isOpened;
-            this.TilesPaletteToolStrip.Enabled = isOpened;
+            this.TileSetPalette.Enabled = isOpened;
+            this.TileSetPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
             this.GameTitleChanged();
             this.SelectedMapIdChanged();
@@ -162,6 +163,8 @@ namespace Shrimp
         private void SelectedMapIdChanged()
         {
             this.AdjustTileSetsToolStripComboBox();
+            this.TileSetsToolStripComboBox.Enabled =
+                this.ViewModel.EditorState.SelectedMap != null;
         }
 
         private void SelectedTileSetIdsChanged()
@@ -276,10 +279,14 @@ namespace Shrimp
             int selectedIndex = this.TileSetsToolStripComboBox.SelectedIndex;
             if (selectedIndex != -1)
             {
-                int mapId = this.ViewModel.EditorState.SelectedMapId;
-                var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
-                int tileSetId = indexToId[selectedIndex];
-                this.ViewModel.EditorState.SetSelectedTileSetId(mapId, tileSetId);
+                Map map = this.ViewModel.EditorState.SelectedMap;
+                if (map != null)
+                {
+                    int mapId = map.Id;
+                    var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
+                    int tileSetId = indexToId[selectedIndex];
+                    this.ViewModel.EditorState.SetSelectedTileSetId(mapId, tileSetId);
+                }
             }
         }
 

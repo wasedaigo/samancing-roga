@@ -1,6 +1,6 @@
 ﻿namespace Shrimp
 {
-    partial class TilesPalette
+    partial class TileSetPalette
     {
         /// <summary> 
         /// 必要なデザイナ変数です。
