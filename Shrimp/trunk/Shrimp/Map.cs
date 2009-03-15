@@ -23,6 +23,17 @@ namespace Shrimp
 
         public MapCollection MapCollection { get; private set; }
 
+        public int Id
+        {
+            get { return this.MapCollection.GetId(this); }
+        }
+
+        public string Name
+        {
+            get { return this.MapCollection.GetName(this.Id); }
+            set { this.MapCollection.SetName(this.Id, value); }
+        }
+
         public int Width
         {
             get { return this.width; }

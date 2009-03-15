@@ -42,7 +42,6 @@ namespace Shrimp
                 };
             }
 
-            this.DatabaseDialog = new DatabaseDialog();
             this.ViewModel = new ViewModel();
             this.ViewModel.IsOpenedChanged += delegate
             {
@@ -95,15 +94,7 @@ namespace Shrimp
 
         private ViewModel ViewModel;
 
-        private DatabaseDialog DatabaseDialog;
-
-        private IEnumerable<ToolStripButton> TilesPaletteSwitchers
-        {
-            get
-            {
-                return this.TilesPaletteToolStrip.Items.OfType<ToolStripButton>();
-            }
-        }
+        private DatabaseDialog DatabaseDialog = new DatabaseDialog();
 
         private IEnumerable<ToolStripButton> MapEditorModeSwitchers
         {
@@ -170,24 +161,19 @@ namespace Shrimp
 
         private void SelectedMapIdChanged()
         {
-            if (this.ViewModel.IsOpened)
-            {
-                int mapId = this.ViewModel.EditorState.SelectedMapId;
-                int tileSetId = this.ViewModel.EditorState.GetSelectedTileSetId(mapId);
-                var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
-                int index = (from p in indexToId
-                             where p.Value == tileSetId
-                             select p.Key).FirstOrDefault();
-                this.TileSetsToolStripComboBox.SelectedIndex = index;
-            }
+            this.AdjustTileSetsToolStripComboBox();
         }
 
         private void SelectedTileSetIdsChanged()
         {
+            this.AdjustTileSetsToolStripComboBox();
+        }
+
+        private void AdjustTileSetsToolStripComboBox()
+        {
             if (this.ViewModel.IsOpened)
             {
-                int mapId = this.ViewModel.EditorState.SelectedMapId;
-                int tileSetId = this.ViewModel.EditorState.GetSelectedTileSetId(mapId);
+                int tileSetId = this.ViewModel.EditorState.SelectedTileSetId;
                 var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
                 int index = (from p in indexToId
                              where p.Value == tileSetId

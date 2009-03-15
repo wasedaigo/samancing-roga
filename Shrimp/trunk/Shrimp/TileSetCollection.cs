@@ -75,7 +75,7 @@ namespace Shrimp
                 tileSet.LoadJson(j["Value"]);
                 this.TileSets.Add(id, tileSet);
             }
-            string path = Path.Combine(this.ViewModel.DirectoryPath, "Graphics/Tiles");
+            string path = Path.Combine(this.ViewModel.DirectoryPath, this.TilesGraphicsDirectory);
             var files = from f in Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly)
                         select Path.GetFileName(f);
             var registeredFiles = this.TileSets.Select(p => p.Value.ImageFileName).ToArray();
@@ -86,6 +86,11 @@ namespace Shrimp
                 tileSet.ImageFileName = Path.GetFileName(file);
                 this.TileSets.Add(id, tileSet);
             }
+        }
+
+        public string TilesGraphicsDirectory
+        {
+            get { return "Graphics/Tiles"; }
         }
     }
 }

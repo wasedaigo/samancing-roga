@@ -185,5 +185,30 @@ namespace Shrimp
                 }
             }
         }
+
+        public TileSet SelectedTileSet
+        {
+            get
+            {
+                int tileSetId = this.SelectedTileSetId;
+                if (this.ViewModel.TileSetCollection.ContainsId(tileSetId))
+                {
+                    return this.ViewModel.TileSetCollection.GetItem(tileSetId);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public int SelectedTileSetId
+        {
+            get
+            {
+                int mapId = this.SelectedMapId;
+                return this.GetSelectedTileSetId(mapId);
+            }
+        }
     }
 }

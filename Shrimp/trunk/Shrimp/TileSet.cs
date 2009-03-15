@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
@@ -35,6 +36,17 @@ namespace Shrimp
             }
         }
         private string imageFileName;
+
+        public string ImageFileFullPath
+        {
+            get
+            {
+                string path = this.TileSetCollection.ViewModel.DirectoryPath;
+                path = Path.Combine(path, this.TileSetCollection.TilesGraphicsDirectory);
+                path = Path.Combine(path, this.ImageFileName);
+                return path;
+            }
+        }
 
         public override void Clear()
         {

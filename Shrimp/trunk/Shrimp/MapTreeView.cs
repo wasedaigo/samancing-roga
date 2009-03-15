@@ -56,7 +56,7 @@ namespace Shrimp
                     {
                         if (dialog.ShowDialog() == DialogResult.OK)
                         {
-                            this.MapCollection.SetName(id, dialog.MapName);
+                            map.Name = dialog.MapName;
                             map.Width = dialog.MapWidth;
                             map.Height = dialog.MapHeight;
                         }

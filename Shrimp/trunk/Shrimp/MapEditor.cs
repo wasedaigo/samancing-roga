@@ -93,7 +93,7 @@ namespace Shrimp
                 this.MapEditorModeChanged();
                 break;
             case "MapOffsets":
-                if (this.Map != null && (int)e.Tag == this.MapId)
+                if (this.Map != null && (int)e.Tag == this.Map.Id)
                 {
                     this.Invalidate();
                 }
@@ -126,11 +126,6 @@ namespace Shrimp
         }
         private Map map;
 
-        private int MapId
-        {
-            get { return this.ViewModel.MapCollection.GetId(this.Map); }
-        }
-
         private EditorState EditorState
         {
             get
@@ -161,6 +156,7 @@ namespace Shrimp
             {
             case "Width":
             case "Height":
+                this.AdjustScrollBars();
                 this.Invalidate();
                 break;
             }
@@ -174,7 +170,7 @@ namespace Shrimp
             this.VScrollBar.LargeChange = Math.Max(this.MainPanelSize.Height, 0);
             if (this.Map != null)
             {
-                Point offset = this.EditorState.GetMapOffset(this.MapId);
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 int max;
                 max = this.Map.Width * 32 - this.MainPanelSize.Width;
                 if (0 < max)
@@ -224,7 +220,7 @@ namespace Shrimp
                     this.VScrollBar.Enabled = false;
                     this.VScrollBar.Value = 0;
                 }
-                this.EditorState.SetMapOffset(this.MapId, new Point
+                this.EditorState.SetMapOffset(this.Map.Id, new Point
                 {
                     X = -this.HScrollBar.Value,
                     Y = -this.VScrollBar.Value,
@@ -255,7 +251,7 @@ namespace Shrimp
                 Map map = this.Map;
                 if (map != null)
                 {
-                    Point position = this.EditorState.GetMapOffset(this.MapId);
+                    Point position = this.EditorState.GetMapOffset(this.Map.Id);
                     int width = map.Width;
                     int height = map.Height;
                     for (int j = 0; j < height; j++)
@@ -296,7 +292,7 @@ namespace Shrimp
 
         private void ScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
-            this.EditorState.SetMapOffset(this.MapId, new Point
+            this.EditorState.SetMapOffset(this.Map.Id, new Point
             {
                 X = -this.HScrollBar.Value,
                 Y = -this.VScrollBar.Value,

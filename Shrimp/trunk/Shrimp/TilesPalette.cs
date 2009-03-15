@@ -80,7 +80,12 @@ namespace Shrimp
 
         private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
         {
-            if (this.ViewModel.IsOpened)
+            foreach (Bitmap bitmap in this.LargeBitmapCache.Values)
+            {
+                bitmap.Dispose();
+            }
+            this.LargeBitmapCache.Clear();
+            /*if (this.ViewModel.IsOpened)
             {
                 int mapId = this.EditorState.SelectedMapId;
                 int tileSetId = this.EditorState.GetSelectedTileSetId(mapId);
@@ -93,60 +98,110 @@ namespace Shrimp
                 {
                     this.TileSet = null;
                 }
+                this.TileSet = this.EditorState.SelectedTileSet;
             }
             else
             {
                 this.TileSet = null;
-            }
+            }*/
+            this.TileSet = this.EditorState.SelectedTileSet;
         }
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
-            TileSet tileSet = null;
-            int mapId;
-            switch (e.PropertyName)
+            /*switch (e.PropertyName)
             {
             case "SelectedMapId":
-                mapId = this.EditorState.SelectedMapId;
                 break;
             case "SelectedTileSets":
-                if ((int)e.Tag == this.EditorState.SelectedMapId)
-                {
-                    mapId = (int)e.Tag;
-                }
-                else
-                {
-                    return;
-                }
                 break;
             default:
                 return;
             }
-            int tileSetId = this.EditorState.GetSelectedTileSetId(mapId);
+            int tileSetId = this.EditorState.SelectedTileSetId;
             if (this.TileSetCollection.ContainsId(tileSetId))
             {
-                tileSet = this.TileSetCollection.GetItem(tileSetId);
+                //tileSet = this.TileSetCollection.GetItem(tileSetId);
                 this.TileSet = tileSet;
             }
             else
             {
                 this.TileSet = null;
-            }
+            }*/
+            this.TileSet = this.EditorState.SelectedTileSet;
         }
 
         private TileSet TileSet
         {
-            get { return this.tileSet; }
+            get { return tileSet; }
             set
             {
                 if (this.tileSet != value)
                 {
+                    if (this.tileSet != null)
+                    {
+                        this.tileSet.Updated -= this.TileSet_Updated;
+                    }
                     this.tileSet = value;
+                    if (this.tileSet != null)
+                    {
+                        this.tileSet.Updated += this.TileSet_Updated;
+                    }
+                    this.AdjustSize();
                     this.Invalidate();
                 }
             }
         }
         private TileSet tileSet;
+
+        private void TileSet_Updated(object sender, EventArgs e)
+        {
+            this.AdjustSize();
+            this.Invalidate();
+        }
+
+        private void AdjustSize()
+        {
+            if (this.TileSet != null)
+            {
+                this.AutoScrollMinSize = new Size
+                {
+                    Width = Util.GridSize * 8,
+                    Height = this.LargeBitmap.Height,
+                };
+            }
+            else
+            {
+                this.AutoScrollMinSize = new Size(0, 0);
+            }
+            
+        }
+
+        private Dictionary<TileSet, Bitmap> LargeBitmapCache =
+            new Dictionary<TileSet, Bitmap>();
+
+        private Bitmap LargeBitmap
+        {
+            get
+            {
+                TileSet tileSet = this.TileSet;
+                if (tileSet != null)
+                {
+                    if (!this.LargeBitmapCache.ContainsKey(tileSet))
+                    {
+                        using (Bitmap bitmap = new Bitmap(tileSet.ImageFileFullPath))
+                        {
+                            this.LargeBitmapCache.Add(tileSet, Util.CreateScaledBitmap(bitmap));
+                        }
+                    }
+                    return this.LargeBitmapCache[tileSet];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         /*public Bitmap TilesBitmap
         {
@@ -196,7 +251,7 @@ namespace Shrimp
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            /*if (this.TilesBitmap == null)
+            if (this.TileSet == null)
             {
                 return;
             }
@@ -212,7 +267,7 @@ namespace Shrimp
                     g.DrawImage(Util.BackgroundBitmap, x, y);
                 }
             }
-            g.DrawImage(this.DoubleSizedTilesBitmap,
+            g.DrawImage(this.LargeBitmap,
                 e.ClipRectangle.X, e.ClipRectangle.Y,
                 new Rectangle
                 {
@@ -221,7 +276,7 @@ namespace Shrimp
                     Width = e.ClipRectangle.Width,
                     Height = e.ClipRectangle.Height,
                 },
-                GraphicsUnit.Pixel);*/
+                GraphicsUnit.Pixel);
         }
     }
 }
