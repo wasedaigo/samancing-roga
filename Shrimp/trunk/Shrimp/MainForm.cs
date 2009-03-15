@@ -287,6 +287,7 @@ namespace Shrimp
                     int tileSetId = indexToId[selectedIndex];
                     this.ViewModel.EditorState.SetSelectedTileSetId(mapId, tileSetId);
                 }
+                this.TileSetPalette.Focus();
             }
         }
 

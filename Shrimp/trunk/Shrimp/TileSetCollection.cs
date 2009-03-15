@@ -77,7 +77,7 @@ namespace Shrimp
             }
         }
 
-        public void AddItemFromFiles()
+        public void AddItemsFromImageFiles()
         {
             string path = Path.Combine(this.ViewModel.DirectoryPath, this.TilesGraphicsDirectory);
             var files = from f in Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly)
