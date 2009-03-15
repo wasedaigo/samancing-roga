@@ -49,6 +49,24 @@ namespace Shrimp
             }
         }
 
+        public static int GetNewId(IEnumerable<int> ids)
+        {
+            int id = 1;
+            if (0 < ids.Count())
+            {
+                int maxId = ids.Max();
+                for (int i = id; i <= maxId + 1; i++)
+                {
+                    if (!ids.Contains(i))
+                    {
+                        id = i;
+                        break;
+                    }
+                }
+            }
+            return id;
+        }
+
         public static Bitmap CreateScaledBitmap(Bitmap srcBitmap)
         {
             int srcWidth = srcBitmap.Width;

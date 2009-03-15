@@ -70,7 +70,7 @@ namespace Shrimp
                     int selectedNodeId = (int)this.SelectedNode.Tag;
                     Debug.Assert(this.MapCollection.GetRoot(selectedNodeId) ==
                         this.MapCollection.ProjectNodeId);
-                    int newId = this.MapCollection.GetNewId();
+                    int newId = Util.GetNewId(this.MapCollection.NodeIds);
                     using (var dialog = new MapDialog(newId, "", null))
                     {
                         if (dialog.ShowDialog() == DialogResult.OK)

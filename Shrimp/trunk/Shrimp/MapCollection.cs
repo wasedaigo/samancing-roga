@@ -207,23 +207,6 @@ namespace Shrimp
             return this.GetNode(id).Children.Select(n => n.Id).ToArray();
         }
 
-        public int GetNewId()
-        {
-            var ids = this.Nodes.Select(n => n.Id);
-            int id = this.Roots.Min();
-            int maxId = ids.Max();
-            for (int i = id; i <= maxId + 1; i++)
-            {
-                if (!ids.Contains(i))
-                {
-                    id = i;
-                    break;
-                }
-            }
-            Debug.Assert(!ids.Contains(id));
-            return id;
-        }
-
         public int Add(int parentId, string name)
         {
             var ids = this.Nodes.Select(n => n.Id);
@@ -231,7 +214,7 @@ namespace Shrimp
             {
                 throw new ArgumentException("Invalid id", "parentId");
             }
-            int id = this.GetNewId();
+            int id = Util.GetNewId(this.Nodes.Select(n => n.Id));
             Node node = new Node(id, name, new Map(this), false);
             node.Parent = this.GetNode(parentId);
             node.Parent.Children.Add(node);

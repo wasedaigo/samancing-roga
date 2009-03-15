@@ -66,30 +66,11 @@ namespace Shrimp
             var registeredFiles = this.TileSets.Select(p => p.Value.ImageFileName).ToArray();
             foreach (string file in files.Except(registeredFiles))
             {
-                int id = this.GetNewId();
+                int id = Util.GetNewId(this.TileSets.Keys);
                 TileSet tileSet = new TileSet(this);
                 tileSet.ImageFileName = Path.GetFileName(file);
                 this.TileSets.Add(id, tileSet);
             }
-        }
-
-        private int GetNewId()
-        {
-            var ids = this.TileSets.Keys;
-            int id = 1;
-            if (0 < ids.Count)
-            {
-                int maxId = ids.Max();
-                for (int i = id; i <= maxId + 1; i++)
-                {
-                    if (!ids.Contains(i))
-                    {
-                        id = i;
-                        break;
-                    }
-                }
-            }
-            return id;
         }
     }
 }
