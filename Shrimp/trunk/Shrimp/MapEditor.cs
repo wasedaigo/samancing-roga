@@ -284,8 +284,15 @@ namespace Shrimp
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
                 X = this.ClientSize.Width - this.VScrollBar.Width,
-                Y = this.ClientSize.Height - this.HScrollBar.Height,
+                Y = 0,
                 Width = this.VScrollBar.Width,
+                Height = this.ClientSize.Height,
+            });
+            g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
+            {
+                X = 0,
+                Y = this.ClientSize.Height - this.HScrollBar.Height,
+                Width = this.ClientSize.Width,
                 Height = this.HScrollBar.Height,
             });
         }
