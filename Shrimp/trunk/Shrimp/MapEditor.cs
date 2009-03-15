@@ -24,7 +24,7 @@ namespace Shrimp
             this.VScrollBar.Height = this.MainPanelSize.Height;
             this.HScrollBar.Location = new Point
             {
-                X = 0,
+                X = 0,  
                 Y = this.MainPanelSize.Height,
             };
             this.HScrollBar.Width = this.MainPanelSize.Width;
@@ -178,7 +178,7 @@ namespace Shrimp
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
                     this.HScrollBar.Maximum = max + this.HScrollBar.LargeChange;
-                    if (max <= this.HScrollBar.Value || max <= -offset.X)
+                    if (max <= -offset.X)
                     {
                         this.HScrollBar.Value = max;
                     }
@@ -202,7 +202,7 @@ namespace Shrimp
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
                     this.VScrollBar.Maximum = max + this.VScrollBar.LargeChange;
-                    if (max <= this.VScrollBar.Value || max <= -offset.Y)
+                    if (max <= -offset.Y)
                     {
                         this.VScrollBar.Value = max;
                     }
@@ -228,10 +228,10 @@ namespace Shrimp
             }
             else
             {
-                this.HScrollBar.Value = 0;
-                this.VScrollBar.Value = 0;
                 this.HScrollBar.Enabled = false;
                 this.VScrollBar.Enabled = false;
+                this.HScrollBar.Value = 0;
+                this.VScrollBar.Value = 0;
             }
         }
 
