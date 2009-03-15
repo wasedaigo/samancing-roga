@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -76,8 +77,15 @@ namespace Shrimp
         {
             if (!this.SelectedTileSetIds.ContainsKey(mapId))
             {
-                int minId = this.ViewModel.TileSetCollection.ItemIds.Min();
-                this.SelectedTileSetIds.Add(mapId, minId);
+                if (0 < this.ViewModel.TileSetCollection.ItemCount)
+                {
+                    int minId = this.ViewModel.TileSetCollection.ItemIds.Min();
+                    this.SelectedTileSetIds.Add(mapId, minId);
+                }
+                else
+                {
+                    this.SelectedTileSetIds.Add(mapId, 0);
+                }
             }
             return this.SelectedTileSetIds[mapId];
         }
@@ -160,7 +168,7 @@ namespace Shrimp
                 {
                     int mapId = j.Value<int>("MapId");
                     int tileSetId = j.Value<int>("TileSetId");
-                    this.SelectedTileSetIds.Add(mapId, tileSetId);
+                    this.SelectedTileSetIds[mapId] = tileSetId;
                 }
             }
             if ((token = json["MapEditorMode"]) != null)

@@ -20,9 +20,24 @@ namespace Shrimp
 
         private Dictionary<int, TileSet> TileSets = new Dictionary<int, TileSet>();
 
+        public TileSet GetItem(int id)
+        {
+            return this.TileSets[id];
+        }
+
         public IEnumerable<TileSet> Items
         {
             get { return this.TileSets.Values; }
+        }
+
+        public int ItemCount
+        {
+            get { return this.TileSets.Count; }
+        }
+
+        public bool ContainsId(int id)
+        {
+            return this.TileSets.ContainsKey(id);
         }
 
         public IEnumerable<int> ItemIds

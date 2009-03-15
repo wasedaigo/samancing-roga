@@ -35,23 +35,118 @@ namespace Shrimp
                     if (this.viewModel != null)
                     {
                         this.viewModel.IsOpenedChanged -= this.ViewModel_IsOpenedChanged;
+                        this.viewModel.EditorState.Updated -= this.EditorState_Updated;
                     }
                     this.viewModel = value;
                     if (this.viewModel != null)
                     {
                         this.viewModel.IsOpenedChanged += this.ViewModel_IsOpenedChanged;
+                        this.viewModel.EditorState.Updated += this.EditorState_Updated;
                     }
                 }
             }
         }
         private ViewModel viewModel;
 
+        private EditorState EditorState
+        {
+            get
+            {
+                if (this.ViewModel != null)
+                {
+                    return this.ViewModel.EditorState;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private TileSetCollection TileSetCollection
+        {
+            get
+            {
+                if (this.ViewModel != null)
+                {
+                    return this.ViewModel.TileSetCollection;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
         {
             if (this.ViewModel.IsOpened)
             {
+                int mapId = this.EditorState.SelectedMapId;
+                int tileSetId = this.EditorState.GetSelectedTileSetId(mapId);
+                if (this.TileSetCollection.ContainsId(tileSetId))
+                {
+                    tileSet = this.TileSetCollection.GetItem(tileSetId);
+                    this.TileSet = tileSet;
+                }
+                else
+                {
+                    this.TileSet = null;
+                }
+            }
+            else
+            {
+                this.TileSet = null;
             }
         }
+
+        private void EditorState_Updated(object sender, UpdatedEventArgs e)
+        {
+            TileSet tileSet = null;
+            int mapId;
+            switch (e.PropertyName)
+            {
+            case "SelectedMapId":
+                mapId = this.EditorState.SelectedMapId;
+                break;
+            case "SelectedTileSets":
+                if ((int)e.Tag == this.EditorState.SelectedMapId)
+                {
+                    mapId = (int)e.Tag;
+                }
+                else
+                {
+                    return;
+                }
+                break;
+            default:
+                return;
+            }
+            int tileSetId = this.EditorState.GetSelectedTileSetId(mapId);
+            if (this.TileSetCollection.ContainsId(tileSetId))
+            {
+                tileSet = this.TileSetCollection.GetItem(tileSetId);
+                this.TileSet = tileSet;
+            }
+            else
+            {
+                this.TileSet = null;
+            }
+        }
+
+        private TileSet TileSet
+        {
+            get { return this.tileSet; }
+            set
+            {
+                if (this.tileSet != value)
+                {
+                    this.tileSet = value;
+                    this.Invalidate();
+                }
+            }
+        }
+        private TileSet tileSet;
 
         /*public Bitmap TilesBitmap
         {

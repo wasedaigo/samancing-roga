@@ -67,12 +67,19 @@ namespace Shrimp
             {
                 switch (e.PropertyName)
                 {
-                case "MapEditorMode":
-                    this.MapEditorModeChanged();
-                    break;
                 case "SelectedMapId":
+                    this.SelectedMapIdChanged();
                     break;
                 case "MapOffsets":
+                    break;
+                case "SelectedTileSetIds":
+                    if ((int)e.Tag == this.ViewModel.EditorState.SelectedMapId)
+                    {
+                        this.SelectedTileSetIdsChanged();
+                    }
+                    break;
+                case "MapEditorMode":
+                    this.MapEditorModeChanged();
                     break;
                 default:
                     throw new ArgumentException("Invalid property name", "e");
@@ -109,6 +116,23 @@ namespace Shrimp
         private void IsOpenedChanged()
         {
             bool isOpened = this.ViewModel.IsOpened;
+
+            this.TileSetsToolStripComboBox.Items.Clear();
+            if (isOpened)
+            {
+                this.TileSetsToolStripComboBox.BeginUpdate();
+                var tileSets = this.ViewModel.TileSetCollection.Items.ToArray();
+                Dictionary<int, int> indexToId = new Dictionary<int, int>();
+                for (int i = 0; i < tileSets.Length; i++)
+                {
+                    TileSet tileSet = tileSets[i];
+                    indexToId.Add(i, tileSet.Id);
+                    this.TileSetsToolStripComboBox.Items.Add(tileSet.ImageFileName);
+                }
+                this.TileSetsToolStripComboBox.Tag = indexToId;
+                this.TileSetsToolStripComboBox.EndUpdate();
+            }
+
             this.MapTreeView.Enabled = isOpened;
             this.MapEditor.Enabled = isOpened;
             this.NewToolStripButton.Enabled = !isOpened;
@@ -123,15 +147,9 @@ namespace Shrimp
             this.TilesPaletteToolStrip.Enabled = isOpened;
             this.IsDirtyChanged();
             this.GameTitleChanged();
+            this.SelectedTileSetIdsChanged();
+            this.SelectedTileSetIdsChanged();
             this.MapEditorModeChanged();
-
-            // TODO
-            this.TileSetsToolStripComboBox.Items.Clear();
-            if (isOpened)
-            {
-                var x = this.ViewModel.TileSetCollection.Items.Select(t => t.ImageFileName);
-                this.TileSetsToolStripComboBox.Items.AddRange(x.ToArray());
-            }
         }
 
         private void IsDirtyChanged()
@@ -147,6 +165,34 @@ namespace Shrimp
             else
             {
                 this.Text = "Shrimp";
+            }
+        }
+
+        private void SelectedMapIdChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                int mapId = this.ViewModel.EditorState.SelectedMapId;
+                int tileSetId = this.ViewModel.EditorState.GetSelectedTileSetId(mapId);
+                var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
+                int index = (from p in indexToId
+                             where p.Value == tileSetId
+                             select p.Key).FirstOrDefault();
+                this.TileSetsToolStripComboBox.SelectedIndex = index;
+            }
+        }
+
+        private void SelectedTileSetIdsChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                int mapId = this.ViewModel.EditorState.SelectedMapId;
+                int tileSetId = this.ViewModel.EditorState.GetSelectedTileSetId(mapId);
+                var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
+                int index = (from p in indexToId
+                             where p.Value == tileSetId
+                             select p.Key).FirstOrDefault();
+                this.TileSetsToolStripComboBox.SelectedIndex = index;
             }
         }
 
@@ -192,7 +238,7 @@ namespace Shrimp
                 string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
                 this.ViewModel.Open(directoryPath);
                 Debug.Assert(this.ViewModel.IsOpened);
-                //Debug.Assert(!this.ViewModel.IsDirty);
+                // Debug.Assert(!this.ViewModel.IsDirty);
             }
         }
 
@@ -237,6 +283,18 @@ namespace Shrimp
             Debug.Assert(this.ViewModel.IsOpened);
             this.DatabaseDialog.ShowDialog();
             Debug.Assert(this.ViewModel.IsOpened);
+        }
+
+        private void TileSetsToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selectedIndex = this.TileSetsToolStripComboBox.SelectedIndex;
+            if (selectedIndex != -1)
+            {
+                int mapId = this.ViewModel.EditorState.SelectedMapId;
+                var indexToId = (Dictionary<int, int>)this.TileSetsToolStripComboBox.Tag;
+                int tileSetId = indexToId[selectedIndex];
+                this.ViewModel.EditorState.SetSelectedTileSetId(mapId, tileSetId);
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
