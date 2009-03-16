@@ -161,7 +161,7 @@ namespace Shrimp
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
                     this.HScrollBar.Maximum = hMax + this.HScrollBar.LargeChange;
-                    this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), hMax - 1);
+                    this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), hMax);
                 }
                 else
                 {
@@ -174,7 +174,7 @@ namespace Shrimp
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
                     this.VScrollBar.Maximum = vMax + this.VScrollBar.LargeChange;
-                    this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), vMax - 1);
+                    this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), vMax);
                 }
                 else
                 {
@@ -195,6 +195,44 @@ namespace Shrimp
                 this.VScrollBar.Value = 0;
             }
         }
+
+        /*protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+            if ((e.KeyCode & Keys.Up) != 0)
+            {
+                this.EditorState.SetMapOffset(this.Map.Id, new Point
+                {
+                    X = offset.X,
+                    Y = offset.Y - Util.DisplayedGridSize,
+                });
+            }
+            else if ((e.KeyCode & Keys.Down) != 0)
+            {
+                this.EditorState.SetMapOffset(this.Map.Id, new Point
+                {
+                    X = offset.X,
+                    Y = offset.Y + Util.DisplayedGridSize,
+                });
+            }
+            else if ((e.KeyCode & Keys.Left) != 0)
+            {
+                this.EditorState.SetMapOffset(this.Map.Id, new Point
+                {
+                    X = offset.X - Util.DisplayedGridSize,
+                    Y = offset.Y,
+                });
+            }
+            else if ((e.KeyCode & Keys.Right) != 0)
+            {
+                this.EditorState.SetMapOffset(this.Map.Id, new Point
+                {
+                    X = offset.X + Util.DisplayedGridSize,
+                    Y = offset.Y,
+                });
+            }
+        }*/
 
         protected override void OnLayout(LayoutEventArgs e)
         {
@@ -241,6 +279,9 @@ namespace Shrimp
                         }
                     }
                 }
+            }
+            if (this.EditorState.DrawingMode == DrawingMode.Pen)
+            {
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
