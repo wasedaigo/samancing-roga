@@ -64,7 +64,6 @@ namespace Shrimp
             if (this.ViewModel.IsOpened)
             {
                 this.SelectedMapIdChanged();
-                this.MapEditorModeChanged();
             }
         }
 
@@ -75,8 +74,10 @@ namespace Shrimp
             case "SelectedMapId":
                 this.SelectedMapIdChanged();
                 break;
+            case "LayerType":
+                this.Invalidate();
+                break;
             case "MapEditorMode":
-                this.MapEditorModeChanged();
                 break;
             case "MapOffsets":
                 if (this.Map != null && (int)e.Tag == this.Map.Id)
@@ -128,10 +129,6 @@ namespace Shrimp
         private void SelectedMapIdChanged()
         {
             this.Map = this.EditorState.SelectedMap;
-        }
-
-        private void MapEditorModeChanged()
-        {
         }
 
         private void Map_Updated(object sender, UpdatedEventArgs e)
@@ -253,6 +250,7 @@ namespace Shrimp
                     Point position = this.EditorState.GetMapOffset(this.Map.Id);
                     int width = map.Width;
                     int height = map.Height;
+                    Pen gridPen = new Pen(Color.FromArgb(0x80, 0x80, 0x80, 0x80), 1);
                     for (int j = 0; j < height; j++)
                     {
                         int y = j * 32 + position.Y;
@@ -276,12 +274,13 @@ namespace Shrimp
                                 break;
                             }
                             g.DrawImage(Util.BackgroundBitmap, x, y);
+                            if (this.EditorState.LayerType == LayerType.Event)
+                            {
+                                g.DrawRectangle(gridPen, x, y, 32 - 1, 32 - 1);
+                            }
                         }
                     }
                 }
-            }
-            if (this.EditorState.DrawingMode == DrawingMode.Pen)
-            {
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
