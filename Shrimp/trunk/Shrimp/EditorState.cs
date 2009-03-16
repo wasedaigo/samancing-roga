@@ -15,6 +15,67 @@ namespace Shrimp
         Pen = 0x01,
     }
 
+    internal enum SelectedTilesType
+    {
+        None,
+        Single,
+        Rectangle,
+        Other,
+    }
+
+    internal class SelectedTiles
+    {
+        public static readonly SelectedTiles Empty = None();
+
+        public static SelectedTiles None()
+        {
+            return new SelectedTiles(SelectedTilesType.None, -1, 0, 0);
+        }
+
+        public static SelectedTiles Single(int tileId)
+        {
+            return new SelectedTiles(SelectedTilesType.Single, tileId, 1, 1);
+        }
+
+        public static SelectedTiles Rectangle(int tileId, int width, int height)
+        {
+            Debug.Assert(0 < width);
+            Debug.Assert(tileId % Util.PaletteHorizontalCount + width <= Util.PaletteHorizontalCount);
+            Debug.Assert(0 < height);
+            var tileIds = Enumerable.Empty<int>();
+            for (int j = 0; j < height; j++)
+            {
+                var line = Enumerable.Range(tileId + j * Util.PaletteHorizontalCount, width);
+                tileIds = tileIds.Concat(line);
+            }
+            return new SelectedTiles(SelectedTilesType.Rectangle, tileIds, width, height);
+        }
+
+        public static SelectedTiles Other(IEnumerable<int> tileIds, int width, int height)
+        {
+            return new SelectedTiles(SelectedTilesType.Other, tileIds, width, height);
+        }
+
+        private SelectedTiles(SelectedTilesType type, int tileId, int width, int height)
+            : this(type, new[] { tileId }, width, height)
+        {
+        }
+
+        private SelectedTiles(SelectedTilesType type, IEnumerable<int> tileIds, int width, int height)
+        {
+            this.SelectedTilesType = type;
+            this.TileIds = tileIds;
+            this.Width = width;
+            this.Height = height;
+        }
+
+        public SelectedTilesType SelectedTilesType { get; private set; }
+        public int TileId { get { return this.TileIds.First(); } }
+        public IEnumerable<int> TileIds { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+    }
+
     internal class EditorState : Model
     {
         public EditorState(ViewModel viewModel)
@@ -146,19 +207,19 @@ namespace Shrimp
             }
         }
 
-        public int SelectedTileId
+        public SelectedTiles SelectedTiles
         {
-            get { return this.selectedTileId; }
+            get { return this.selectedTiles; }
             set
             {
-                if (this.selectedTileId != value)
+                if (this.selectedTiles != value)
                 {
-                    this.selectedTileId = value;
-                    this.OnUpdated(new UpdatedEventArgs("SelectedTileId"));
+                    this.selectedTiles = value;
+                    this.OnUpdated(new UpdatedEventArgs("SelectedTiles"));
                 }
             }
         }
-        private int selectedTileId = -1;
+        private SelectedTiles selectedTiles = SelectedTiles.Empty;
 
         public override void Clear()
         {

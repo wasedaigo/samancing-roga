@@ -13,11 +13,32 @@ namespace Shrimp
 {
     partial class TileSetPalette : UserControl
     {
+        private enum AutoScrollingState { Up, Down, }
+
         public TileSetPalette()
         {
             this.InitializeComponent();
             this.VScroll = true;
             this.VerticalScroll.SmallChange = Util.GridSize;
+            /*this.AutoScrollingTimer.Interval = 250;
+            this.AutoScrollingTimer.Tick += delegate
+            {
+                int dy = 0;
+                switch ((AutoScrollingState)this.AutoScrollingTimer.Tag)
+                {
+                case AutoScrollingState.Up:
+                    dy = -this.VerticalScroll.SmallChange;
+                    break;
+                case AutoScrollingState.Down:
+                    dy = +this.VerticalScroll.SmallChange;
+                    break;
+                }
+                this.AutoScrollPosition = new Point
+                {
+                    X = -this.AutoScrollPosition.X,
+                    Y = -this.AutoScrollPosition.Y + dy,
+                };
+            };*/
         }
 
         public ViewModel ViewModel
@@ -98,7 +119,7 @@ namespace Shrimp
             case "SelectedTileSetIds":
                 this.TileSet = this.EditorState.SelectedTileSet;
                 break;
-            case "SelectedTileId":
+            case "SelectedTiles":
                 this.Invalidate();
                 break;
             }
@@ -139,7 +160,7 @@ namespace Shrimp
             {
                 this.AutoScrollMinSize = new Size
                 {
-                    Width = Util.GridSize * 8,
+                    Width = Util.GridSize * Util.PaletteHorizontalCount,
                     Height = this.LargeBitmap.Height,
                 };
             }
@@ -175,6 +196,10 @@ namespace Shrimp
             }
         }
 
+        private bool IsSelectingTiles = false;
+        private int SelectedTileStartX;
+        private int SelectedTileStartY;
+
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
@@ -183,8 +208,57 @@ namespace Shrimp
                 X = e.X - this.AutoScrollPosition.X,
                 Y = e.Y - this.AutoScrollPosition.Y,
             };
-            this.EditorState.SelectedTileId =
-                (point.Y / Util.GridSize) * 8 + (point.X / Util.GridSize);
+            this.IsSelectingTiles = true;
+            this.SelectedTileStartX =
+                Math.Min(Math.Max(point.X / Util.GridSize, 0), Util.PaletteHorizontalCount - 1);
+            this.SelectedTileStartY =
+                Math.Max(point.Y / Util.GridSize, 0);
+            int tileId = this.SelectedTileStartY * Util.PaletteHorizontalCount
+                + this.SelectedTileStartX;
+            this.EditorState.SelectedTiles = SelectedTiles.Single(tileId);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (this.IsSelectingTiles)
+            {
+                TileSet selectedTileSet = this.EditorState.SelectedTileSet;
+                Point point = new Point
+                {
+                    X = e.X - this.AutoScrollPosition.X,
+                    Y = e.Y - this.AutoScrollPosition.Y,
+                };
+                int selectedTileEndX =
+                    Math.Min(Math.Max(point.X / Util.GridSize, 0), Util.PaletteHorizontalCount - 1);
+                int selectedTileEndY =
+                    Math.Max(point.Y / Util.GridSize, 0);
+                int x = Math.Min(this.SelectedTileStartX, selectedTileEndX);
+                int y = Math.Min(this.SelectedTileStartY, selectedTileEndY);
+                int tileId = y * Util.PaletteHorizontalCount + x;
+                int width = Math.Abs(this.SelectedTileStartX - selectedTileEndX) + 1;
+                int height = Math.Abs(this.SelectedTileStartY - selectedTileEndY) + 1;
+                this.EditorState.SelectedTiles =
+                    SelectedTiles.Rectangle(tileId, width, height);
+                if (e.Y < 0)
+                {
+                    //this.AutoScrollingTimer.Tag = AutoScrollingState.Up;
+                    //this.AutoScrollingTimer.Start();
+                }
+                else
+                {
+                    //this.AutoScrollingTimer.Stop();
+                }
+            }
+        }
+
+        //private Timer AutoScrollingTimer = new Timer();
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            //this.AutoScrollingTimer.Stop();
+            this.IsSelectingTiles = false;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -216,19 +290,23 @@ namespace Shrimp
                     Height = e.ClipRectangle.Height,
                 },
                 GraphicsUnit.Pixel);
-            int selectedTileId = this.EditorState.SelectedTileId;
-            if (0 <= selectedTileId)
+
+            SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+            switch (selectedTiles.SelectedTilesType)
             {
-                Point selectedTilePosition = new Point
-                {
-                    X = selectedTileId % 8 * Util.GridSize + this.AutoScrollPosition.X,
-                    Y = selectedTileId / 8 * Util.GridSize + this.AutoScrollPosition.Y,
-                };
+            case SelectedTilesType.Single:
+            case SelectedTilesType.Rectangle:
+                int tileId = selectedTiles.TileId;
                 Util.DrawFrame(g, new Rectangle
                 {
-                    Location = selectedTilePosition,
-                    Size = new Size(Util.GridSize, Util.GridSize),
+                    X = tileId % Util.PaletteHorizontalCount * Util.GridSize
+                        + this.AutoScrollPosition.X,
+                    Y = tileId / Util.PaletteHorizontalCount * Util.GridSize
+                        + this.AutoScrollPosition.Y,
+                    Width = Util.GridSize * selectedTiles.Width,
+                    Height = Util.GridSize * selectedTiles.Height,
                 });
+                break;
             }
         }
     }
