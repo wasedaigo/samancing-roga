@@ -111,5 +111,33 @@ namespace Shrimp
             srcBitmap.UnlockBits(srcBD);
             return dstBitmap;
         }
+
+        private static Pen FramePen1 = new Pen(Color.Black, 1);
+        private static Pen FramePen2 = new Pen(Color.White, 2);
+
+        public static void DrawFrame(Graphics g, Rectangle rect)
+        {
+            g.DrawRectangle(FramePen1, new Rectangle
+            {
+                X = rect.X,
+                Y = rect.Y,
+                Width = rect.Width - 1,
+                Height = rect.Height - 1,
+            });
+            g.DrawRectangle(FramePen2, new Rectangle
+            {
+                X = rect.X + 2,
+                Y = rect.Y + 2,
+                Width = rect.Width - 4,
+                Height = rect.Height - 4,
+            });
+            g.DrawRectangle(FramePen1, new Rectangle
+            {
+                X = rect.X + 3,
+                Y = rect.Y + 3,
+                Width = rect.Width - 7,
+                Height = rect.Height - 7,
+            });
+        }
     }
 }

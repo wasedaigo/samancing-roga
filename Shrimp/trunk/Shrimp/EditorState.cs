@@ -121,6 +121,45 @@ namespace Shrimp
         }
         private MapEditorModes mapEditorMode = MapEditorModes.Pen;
 
+        public TileSet SelectedTileSet
+        {
+            get
+            {
+                int tileSetId = this.SelectedTileSetId;
+                if (this.ViewModel.TileSetCollection.ContainsId(tileSetId))
+                {
+                    return this.ViewModel.TileSetCollection.GetItem(tileSetId);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public int SelectedTileSetId
+        {
+            get
+            {
+                int mapId = this.SelectedMapId;
+                return this.GetSelectedTileSetId(mapId);
+            }
+        }
+
+        public int SelectedTileId
+        {
+            get { return this.selectedTileId; }
+            set
+            {
+                if (this.selectedTileId != value)
+                {
+                    this.selectedTileId = value;
+                    this.OnUpdated(new UpdatedEventArgs("SelectedTileId"));
+                }
+            }
+        }
+        private int selectedTileId = -1;
+
         public override void Clear()
         {
             this.SelectedMapId = 0;
@@ -191,31 +230,6 @@ namespace Shrimp
                 {
                     this.MapEditorMode = MapEditorModes.Pen;
                 }
-            }
-        }
-
-        public TileSet SelectedTileSet
-        {
-            get
-            {
-                int tileSetId = this.SelectedTileSetId;
-                if (this.ViewModel.TileSetCollection.ContainsId(tileSetId))
-                {
-                    return this.ViewModel.TileSetCollection.GetItem(tileSetId);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        public int SelectedTileSetId
-        {
-            get
-            {
-                int mapId = this.SelectedMapId;
-                return this.GetSelectedTileSetId(mapId);
             }
         }
     }

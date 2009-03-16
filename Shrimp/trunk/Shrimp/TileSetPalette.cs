@@ -92,7 +92,16 @@ namespace Shrimp
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
-            this.TileSet = this.EditorState.SelectedTileSet;
+            switch (e.PropertyName)
+            {
+            case "SelectedMapId":
+            case "SelectedTileSetIds":
+                this.TileSet = this.EditorState.SelectedTileSet;
+                break;
+            case "SelectedTileId":
+                this.Invalidate();
+                break;
+            }
         }
 
         private TileSet TileSet
@@ -138,7 +147,6 @@ namespace Shrimp
             {
                 this.AutoScrollMinSize = new Size(0, 0);
             }
-            
         }
 
         private Dictionary<TileSet, Bitmap> LargeBitmapCache =
@@ -165,6 +173,18 @@ namespace Shrimp
                     return null;
                 }
             }
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            Point point = new Point
+            {
+                X = e.X - this.AutoScrollPosition.X,
+                Y = e.Y - this.AutoScrollPosition.Y,
+            };
+            this.EditorState.SelectedTileId =
+                (point.Y / Util.GridSize) * 8 + (point.X / Util.GridSize);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -196,6 +216,20 @@ namespace Shrimp
                     Height = e.ClipRectangle.Height,
                 },
                 GraphicsUnit.Pixel);
+            int selectedTileId = this.EditorState.SelectedTileId;
+            if (0 <= selectedTileId)
+            {
+                Point selectedTilePosition = new Point
+                {
+                    X = selectedTileId % 8 * Util.GridSize + this.AutoScrollPosition.X,
+                    Y = selectedTileId / 8 * Util.GridSize + this.AutoScrollPosition.Y,
+                };
+                Util.DrawFrame(g, new Rectangle
+                {
+                    Location = selectedTilePosition,
+                    Size = new Size(Util.GridSize, Util.GridSize),
+                });
+            }
         }
     }
 }

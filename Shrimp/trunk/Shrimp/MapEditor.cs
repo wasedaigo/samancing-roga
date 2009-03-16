@@ -75,8 +75,6 @@ namespace Shrimp
             case "SelectedMapId":
                 this.SelectedMapIdChanged();
                 break;
-            case "SelectedTileSetIds":
-                break;
             case "MapEditorMode":
                 this.MapEditorModeChanged();
                 break;
@@ -86,8 +84,6 @@ namespace Shrimp
                     this.Invalidate();
                 }
                 break;
-            default:
-                throw new ArgumentException("Invalid property name", "e");
             }
         }
 

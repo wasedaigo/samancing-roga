@@ -61,8 +61,6 @@ namespace Shrimp
                 case "GameTitle":
                     this.GameTitleChanged();
                     break;
-                default:
-                    throw new ArgumentException("Invalid property name", "e");
                 }
             };
             this.ViewModel.EditorState.Updated += (s, e) =>
@@ -71,8 +69,6 @@ namespace Shrimp
                 {
                 case "SelectedMapId":
                     this.SelectedMapIdChanged();
-                    break;
-                case "MapOffsets":
                     break;
                 case "SelectedTileSetIds":
                     if ((int)e.Tag == this.ViewModel.EditorState.SelectedMapId)
@@ -83,8 +79,6 @@ namespace Shrimp
                 case "MapEditorMode":
                     this.MapEditorModeChanged();
                     break;
-                default:
-                    throw new ArgumentException("Invalid property name", "e");
                 }
             };
             this.MapTreeView.ViewModel = this.ViewModel;
