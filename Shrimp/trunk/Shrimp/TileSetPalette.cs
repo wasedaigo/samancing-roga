@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -20,17 +21,18 @@ namespace Shrimp
             this.InitializeComponent();
             this.VScroll = true;
             this.VerticalScroll.SmallChange = Util.GridSize;
-            /*this.AutoScrollingTimer.Interval = 250;
+            this.AutoScrollingTimer.Interval = 20;
             this.AutoScrollingTimer.Tick += delegate
             {
+                Debug.Assert(this.IsSelectingTiles);
                 int dy = 0;
                 switch ((AutoScrollingState)this.AutoScrollingTimer.Tag)
                 {
                 case AutoScrollingState.Up:
-                    dy = -this.VerticalScroll.SmallChange;
+                    dy = -8;
                     break;
                 case AutoScrollingState.Down:
-                    dy = +this.VerticalScroll.SmallChange;
+                    dy = +8;
                     break;
                 }
                 this.AutoScrollPosition = new Point
@@ -38,7 +40,8 @@ namespace Shrimp
                     X = -this.AutoScrollPosition.X,
                     Y = -this.AutoScrollPosition.Y + dy,
                 };
-            };*/
+                this.SetSelectedTileEnd(this.PointToClient(MousePosition));
+            };
         }
 
         public ViewModel ViewModel
@@ -223,41 +226,60 @@ namespace Shrimp
             base.OnMouseMove(e);
             if (this.IsSelectingTiles)
             {
-                TileSet selectedTileSet = this.EditorState.SelectedTileSet;
-                Point point = new Point
-                {
-                    X = e.X - this.AutoScrollPosition.X,
-                    Y = e.Y - this.AutoScrollPosition.Y,
-                };
-                int selectedTileEndX =
-                    Math.Min(Math.Max(point.X / Util.GridSize, 0), Util.PaletteHorizontalCount - 1);
-                int selectedTileEndY =
-                    Math.Max(point.Y / Util.GridSize, 0);
-                int x = Math.Min(this.SelectedTileStartX, selectedTileEndX);
-                int y = Math.Min(this.SelectedTileStartY, selectedTileEndY);
-                int tileId = y * Util.PaletteHorizontalCount + x;
-                int width = Math.Abs(this.SelectedTileStartX - selectedTileEndX) + 1;
-                int height = Math.Abs(this.SelectedTileStartY - selectedTileEndY) + 1;
-                this.EditorState.SelectedTiles =
-                    SelectedTiles.Rectangle(tileId, width, height);
+                this.SetSelectedTileEnd(e.Location);
                 if (e.Y < 0)
                 {
-                    //this.AutoScrollingTimer.Tag = AutoScrollingState.Up;
-                    //this.AutoScrollingTimer.Start();
+                    this.AutoScrollingTimer.Tag = AutoScrollingState.Up;
+                    if (!this.AutoScrollingTimer.Enabled)
+                    {
+                        this.AutoScrollingTimer.Start();
+                    }
+                }
+                else if (this.ClientSize.Height <= e.Y)
+                {
+                    this.AutoScrollingTimer.Tag = AutoScrollingState.Down;
+                    if (!this.AutoScrollingTimer.Enabled)
+                    {
+                        this.AutoScrollingTimer.Start();
+                    }
                 }
                 else
                 {
-                    //this.AutoScrollingTimer.Stop();
+                    if (this.AutoScrollingTimer.Enabled)
+                    {
+                        this.AutoScrollingTimer.Stop();
+                    }
                 }
             }
         }
 
-        //private Timer AutoScrollingTimer = new Timer();
+        private Timer AutoScrollingTimer = new Timer();
+
+        private void SetSelectedTileEnd(Point mousePoint)
+        {
+            Debug.Assert(this.IsSelectingTiles);
+            Point point = new Point
+            {
+                X = mousePoint.X - this.AutoScrollPosition.X,
+                Y = mousePoint.Y - this.AutoScrollPosition.Y,
+            };
+            int selectedTileEndX =
+                Math.Min(Math.Max(point.X / Util.GridSize, 0), Util.PaletteHorizontalCount - 1);
+            int selectedTileEndY =
+                Math.Max(point.Y / Util.GridSize, 0);
+            int x = Math.Min(this.SelectedTileStartX, selectedTileEndX);
+            int y = Math.Min(this.SelectedTileStartY, selectedTileEndY);
+            int tileId = y * Util.PaletteHorizontalCount + x;
+            int width = Math.Abs(this.SelectedTileStartX - selectedTileEndX) + 1;
+            int height = Math.Abs(this.SelectedTileStartY - selectedTileEndY) + 1;
+            this.EditorState.SelectedTiles =
+                SelectedTiles.Rectangle(tileId, width, height);
+        }
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            //this.AutoScrollingTimer.Stop();
+            this.AutoScrollingTimer.Stop();
             this.IsSelectingTiles = false;
         }
 
