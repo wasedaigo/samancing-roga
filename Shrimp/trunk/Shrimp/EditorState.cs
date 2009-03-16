@@ -27,7 +27,7 @@ namespace Shrimp
     {
         public static readonly SelectedTiles Empty = None();
 
-        public static SelectedTiles None()
+        private static SelectedTiles None()
         {
             return new SelectedTiles(SelectedTilesType.None, -1, 0, 0);
         }
@@ -219,7 +219,7 @@ namespace Shrimp
                 }
             }
         }
-        private SelectedTiles selectedTiles = SelectedTiles.Empty;
+        private SelectedTiles selectedTiles;
 
         public override void Clear()
         {
@@ -227,6 +227,7 @@ namespace Shrimp
             this.MapOffsets.Clear();
             this.SelectedTileSetIds.Clear();
             this.MapEditorMode = MapEditorModes.Pen;
+            this.SelectedTiles = SelectedTiles.Empty;
         }
 
         public override JToken ToJson()

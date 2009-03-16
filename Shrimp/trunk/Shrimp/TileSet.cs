@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,23 @@ namespace Shrimp
                 if (this.imageFileName != value)
                 {
                     this.imageFileName = value;
+                    if (this.imageFileName != null && this.imageFileName != "")
+                    {
+                        using (Image image = Image.FromFile(this.ImageFileFullPath))
+                        {
+                            this.Width = image.Width / Util.GridSize;
+                            if (this.Width != Util.PaletteHorizontalCount)
+                            {
+                                throw new ArgumentException("Invalid size image");
+                            }
+                            this.Height = image.Height / Util.GridSize;
+                        }
+                    }
+                    else
+                    {
+                        this.Width = 0;
+                        this.Height = 0;
+                    }
                     this.OnUpdated(new UpdatedEventArgs("ImageFileName"));
                 }
             }
@@ -48,9 +66,14 @@ namespace Shrimp
             }
         }
 
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
         public override void Clear()
         {
             this.ImageFileName = "";
+            this.Width = 0;
+            this.Height = 0;
         }
 
         public override JToken ToJson()

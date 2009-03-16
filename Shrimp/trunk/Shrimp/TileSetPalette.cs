@@ -20,7 +20,7 @@ namespace Shrimp
         {
             this.InitializeComponent();
             this.VScroll = true;
-            this.VerticalScroll.SmallChange = Util.GridSize;
+            this.VerticalScroll.SmallChange = Util.DisplayedGridSize;
             this.AutoScrollingTimer.Interval = 20;
             this.AutoScrollingTimer.Tick += delegate
             {
@@ -163,7 +163,7 @@ namespace Shrimp
             {
                 this.AutoScrollMinSize = new Size
                 {
-                    Width = Util.GridSize * Util.PaletteHorizontalCount,
+                    Width = Util.DisplayedGridSize * Util.PaletteHorizontalCount,
                     Height = this.LargeBitmap.Height,
                 };
             }
@@ -206,6 +206,10 @@ namespace Shrimp
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
+            if (this.TileSet == null)
+            {
+                return;
+            }
             Point point = new Point
             {
                 X = e.X - this.AutoScrollPosition.X,
@@ -213,9 +217,9 @@ namespace Shrimp
             };
             this.IsSelectingTiles = true;
             this.SelectedTileStartX =
-                Math.Min(Math.Max(point.X / Util.GridSize, 0), Util.PaletteHorizontalCount - 1);
+                Math.Min(Math.Max(point.X / Util.DisplayedGridSize, 0), Util.PaletteHorizontalCount - 1);
             this.SelectedTileStartY =
-                Math.Max(point.Y / Util.GridSize, 0);
+                Math.Min(Math.Max(point.Y / Util.DisplayedGridSize, 0), this.TileSet.Height - 1);
             int tileId = this.SelectedTileStartY * Util.PaletteHorizontalCount
                 + this.SelectedTileStartX;
             this.EditorState.SelectedTiles = SelectedTiles.Single(tileId);
@@ -258,15 +262,16 @@ namespace Shrimp
         private void SetSelectedTileEnd(Point mousePoint)
         {
             Debug.Assert(this.IsSelectingTiles);
+            Debug.Assert(this.TileSet != null);
             Point point = new Point
             {
                 X = mousePoint.X - this.AutoScrollPosition.X,
                 Y = mousePoint.Y - this.AutoScrollPosition.Y,
             };
             int selectedTileEndX =
-                Math.Min(Math.Max(point.X / Util.GridSize, 0), Util.PaletteHorizontalCount - 1);
+                Math.Min(Math.Max(point.X / Util.DisplayedGridSize, 0), Util.PaletteHorizontalCount - 1);
             int selectedTileEndY =
-                Math.Max(point.Y / Util.GridSize, 0);
+                Math.Min(Math.Max(point.Y / Util.DisplayedGridSize, 0), this.TileSet.Height - 1);
             int x = Math.Min(this.SelectedTileStartX, selectedTileEndX);
             int y = Math.Min(this.SelectedTileStartY, selectedTileEndY);
             int tileId = y * Util.PaletteHorizontalCount + x;
@@ -291,14 +296,14 @@ namespace Shrimp
                 return;
             }
             Graphics g = e.Graphics;
-            int baseX = (-this.AutoScrollPosition.X + e.ClipRectangle.X) % Util.GridSize;
-            int baseY = (-this.AutoScrollPosition.Y + e.ClipRectangle.Y) % Util.GridSize;
-            for (int j = 0; j <= (e.ClipRectangle.Height + baseY) / Util.GridSize; j++)
+            int baseX = (-this.AutoScrollPosition.X + e.ClipRectangle.X) % Util.DisplayedGridSize;
+            int baseY = (-this.AutoScrollPosition.Y + e.ClipRectangle.Y) % Util.DisplayedGridSize;
+            for (int j = 0; j <= (e.ClipRectangle.Height + baseY) / Util.DisplayedGridSize; j++)
             {
-                for (int i = 0; i <= (e.ClipRectangle.Width + baseX) / Util.GridSize; i++)
+                for (int i = 0; i <= (e.ClipRectangle.Width + baseX) / Util.DisplayedGridSize; i++)
                 {
-                    int x = e.ClipRectangle.X - baseX + i * Util.GridSize;
-                    int y = e.ClipRectangle.Y - baseY + j * Util.GridSize;
+                    int x = e.ClipRectangle.X - baseX + i * Util.DisplayedGridSize;
+                    int y = e.ClipRectangle.Y - baseY + j * Util.DisplayedGridSize;
                     g.DrawImage(Util.BackgroundBitmap, x, y);
                 }
             }
@@ -321,12 +326,12 @@ namespace Shrimp
                 int tileId = selectedTiles.TileId;
                 Util.DrawFrame(g, new Rectangle
                 {
-                    X = tileId % Util.PaletteHorizontalCount * Util.GridSize
+                    X = tileId % Util.PaletteHorizontalCount * Util.DisplayedGridSize
                         + this.AutoScrollPosition.X,
-                    Y = tileId / Util.PaletteHorizontalCount * Util.GridSize
+                    Y = tileId / Util.PaletteHorizontalCount * Util.DisplayedGridSize
                         + this.AutoScrollPosition.Y,
-                    Width = Util.GridSize * selectedTiles.Width,
-                    Height = Util.GridSize * selectedTiles.Height,
+                    Width = Util.DisplayedGridSize * selectedTiles.Width,
+                    Height = Util.DisplayedGridSize * selectedTiles.Height,
                 });
                 break;
             }
