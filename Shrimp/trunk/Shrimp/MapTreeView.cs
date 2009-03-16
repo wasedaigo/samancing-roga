@@ -16,6 +16,7 @@ namespace Shrimp
         {
             this.InitializeComponent();
             this.ItemHeight = (int)(this.Font.Height * 1.8);
+            this.DoubleBuffered = true;
             this.contextMenuStrip.Opening += (s, e) =>
             {
                 Point location = new Point

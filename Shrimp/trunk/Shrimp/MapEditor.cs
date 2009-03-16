@@ -18,29 +18,17 @@ namespace Shrimp
             this.SuspendLayout();
             this.VScrollBar.Location = new Point
             {
-                X = this.MainPanelSize.Width,
+                X = this.ClientSize.Width - this.VScrollBar.Width,
                 Y = 0,
             };
-            this.VScrollBar.Height = this.MainPanelSize.Height;
+            this.VScrollBar.Height = this.ClientSize.Height - this.HScrollBar.Height;
             this.HScrollBar.Location = new Point
             {
-                X = 0,  
-                Y = this.MainPanelSize.Height,
+                X = 0,
+                Y = this.ClientSize.Height - this.HScrollBar.Height,
             };
-            this.HScrollBar.Width = this.MainPanelSize.Width;
+            this.HScrollBar.Width = this.ClientSize.Width - this.VScrollBar.Width;
             this.ResumeLayout(false);
-        }
-
-        private Size MainPanelSize
-        {
-            get
-            {
-                return new Size
-                {
-                    Width = this.ClientSize.Width - SystemInformation.VerticalScrollBarWidth,
-                    Height = this.ClientSize.Height - SystemInformation.HorizontalScrollBarHeight,
-                };
-            }
         }
 
         public ViewModel ViewModel
@@ -165,33 +153,32 @@ namespace Shrimp
         private void AdjustScrollBars()
         {
             this.HScrollBar.SmallChange = 32;
-            this.HScrollBar.LargeChange = Math.Max(this.MainPanelSize.Width, 0);
+            this.HScrollBar.LargeChange = Math.Max(this.HScrollBar.Width, 0);
             this.VScrollBar.SmallChange = 32;
-            this.VScrollBar.LargeChange = Math.Max(this.MainPanelSize.Height, 0);
+            this.VScrollBar.LargeChange = Math.Max(this.VScrollBar.Height, 0);
             if (this.Map != null)
             {
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                int max;
-                max = this.Map.Width * 32 - this.MainPanelSize.Width;
-                if (0 < max)
+                int hMax = this.Map.Width * 32 - this.HScrollBar.Width;
+                if (0 < hMax)
                 {
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
-                    this.HScrollBar.Maximum = max + this.HScrollBar.LargeChange;
-                    this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), max);
+                    this.HScrollBar.Maximum = hMax + this.HScrollBar.LargeChange;
+                    this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), hMax - 1);
                 }
                 else
                 {
                     this.HScrollBar.Enabled = false;
                     this.HScrollBar.Value = 0;
                 }
-                max = this.Map.Height * 32 - this.MainPanelSize.Height;
-                if (0 < max)
+                int vMax = this.Map.Height * 32 - this.VScrollBar.Height;
+                if (0 < vMax)
                 {
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
-                    this.VScrollBar.Maximum = max + this.VScrollBar.LargeChange;
-                    this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), max);
+                    this.VScrollBar.Maximum = vMax + this.VScrollBar.LargeChange;
+                    this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), vMax - 1);
                 }
                 else
                 {
@@ -239,7 +226,7 @@ namespace Shrimp
                         {
                             continue;
                         }
-                        else if (this.MainPanelSize.Height <= y)
+                        else if (this.VScrollBar.Height <= y)
                         {
                             break;
                         }
@@ -250,7 +237,7 @@ namespace Shrimp
                             {
                                 continue;
                             }
-                            else if (this.MainPanelSize.Width <= x)
+                            else if (this.HScrollBar.Width <= x)
                             {
                                 break;
                             }
@@ -261,16 +248,9 @@ namespace Shrimp
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
-                X = this.ClientSize.Width - this.VScrollBar.Width,
-                Y = 0,
+                X = this.VScrollBar.Location.X,
+                Y = this.HScrollBar.Location.Y,
                 Width = this.VScrollBar.Width,
-                Height = this.ClientSize.Height,
-            });
-            g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
-            {
-                X = 0,
-                Y = this.ClientSize.Height - this.HScrollBar.Height,
-                Width = this.ClientSize.Width,
                 Height = this.HScrollBar.Height,
             });
         }
