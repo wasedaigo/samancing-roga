@@ -37,13 +37,25 @@ namespace Shrimp
             this.MainSplitContainer.SplitterDistance -=
                 this.TileSetPalette.Parent.ClientSize.Width - this.TileSetPalette.Width;
 
-            this.PenToolStripButton.Tag = MapEditorModes.Pen;
-            foreach (var item in this.MapEditorModeSwitchers)
+            this.Layer1ToolStripButton.Tag = LayerType.Layer1;
+            this.Layer2ToolStripButton.Tag = LayerType.Layer2;
+            this.EventToolStripButton.Tag = LayerType.Event;
+            foreach (var item in this.LayerTypeSwitchers)
             {
                 item.Click += (s, e) =>
                 {
-                    this.ViewModel.EditorState.MapEditorMode =
-                        (MapEditorModes)((ToolStripButton)s).Tag;
+                    this.ViewModel.EditorState.LayerType =
+                        (LayerType)((ToolStripButton)s).Tag;
+                };
+            }
+
+            this.PenToolStripButton.Tag = DrawingMode.Pen;
+            foreach (var item in this.DrawingModeSwitchers)
+            {
+                item.Click += (s, e) =>
+                {
+                    this.ViewModel.EditorState.DrawingMode =
+                        (DrawingMode)((ToolStripButton)s).Tag;
                 };
             }
 
@@ -78,8 +90,11 @@ namespace Shrimp
                         this.SelectedTileSetIdsChanged();
                     }
                     break;
-                case "MapEditorMode":
-                    this.MapEditorModeChanged();
+                case "LayerType":
+                    this.LayerTypeChanged();
+                    break;
+                case "DrawingMode":
+                    this.DrawingModeChanged();
                     break;
                 }
             };
@@ -95,7 +110,17 @@ namespace Shrimp
 
         private DatabaseDialog DatabaseDialog = new DatabaseDialog();
 
-        private IEnumerable<ToolStripButton> MapEditorModeSwitchers
+        private IEnumerable<ToolStripButton> LayerTypeSwitchers
+        {
+            get
+            {
+                yield return this.Layer1ToolStripButton;
+                yield return this.Layer2ToolStripButton;
+                yield return this.EventToolStripButton;
+            }
+        }
+
+        private IEnumerable<ToolStripButton> DrawingModeSwitchers
         {
             get
             {
@@ -129,7 +154,11 @@ namespace Shrimp
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened;
-            foreach (var item in this.MapEditorModeSwitchers)
+            foreach (var item in this.LayerTypeSwitchers)
+            {
+                item.Enabled = isOpened;
+            }
+            foreach (var item in this.DrawingModeSwitchers)
             {
                 item.Enabled = isOpened;
             }
@@ -140,7 +169,8 @@ namespace Shrimp
             this.GameTitleChanged();
             this.SelectedMapIdChanged();
             this.SelectedTileSetIdsChanged();
-            this.MapEditorModeChanged();
+            this.LayerTypeChanged();
+            this.DrawingModeChanged();
         }
 
         private void IsDirtyChanged()
@@ -184,19 +214,38 @@ namespace Shrimp
             }
         }
 
-        private void MapEditorModeChanged()
+        private void LayerTypeChanged()
         {
             if (this.ViewModel.IsOpened)
             {
-                foreach (var item in this.MapEditorModeSwitchers)
+                foreach (var item in this.LayerTypeSwitchers)
                 {
                     item.Checked =
-                        ((MapEditorModes)item.Tag == this.ViewModel.EditorState.MapEditorMode);
+                        ((LayerType)item.Tag == this.ViewModel.EditorState.LayerType);
                 }
             }
             else
             {
-                foreach (var item in this.MapEditorModeSwitchers)
+                foreach (var item in this.LayerTypeSwitchers)
+                {
+                    item.Checked = false;
+                }
+            }
+        }
+
+        private void DrawingModeChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                foreach (var item in this.DrawingModeSwitchers)
+                {
+                    item.Checked =
+                        ((DrawingMode)item.Tag == this.ViewModel.EditorState.DrawingMode);
+                }
+            }
+            else
+            {
+                foreach (var item in this.DrawingModeSwitchers)
                 {
                     item.Checked = false;
                 }

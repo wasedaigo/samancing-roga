@@ -59,10 +59,17 @@ namespace Shrimp
         {
             get
             {
-                string path = this.TileSetCollection.ViewModel.DirectoryPath;
-                path = Path.Combine(path, this.TileSetCollection.TilesGraphicsDirectory);
-                path = Path.Combine(path, this.ImageFileName);
-                return path;
+                if (this.ImageFileName != null && this.ImageFileName != "")
+                {
+                    string path = this.TileSetCollection.ViewModel.DirectoryPath;
+                    path = Path.Combine(path, this.TileSetCollection.TilesGraphicsDirectory);
+                    path = Path.Combine(path, this.ImageFileName);
+                    return path;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 

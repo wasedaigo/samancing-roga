@@ -9,10 +9,16 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    [Flags]
-    internal enum MapEditorModes
+    internal enum LayerType
     {
-        Pen = 0x01,
+        Layer1,
+        Layer2,
+        Event,
+    }
+
+    internal enum DrawingMode
+    {
+        Pen,
     }
 
     internal enum SelectedTilesType
@@ -168,19 +174,33 @@ namespace Shrimp
         }
         private Dictionary<int, int> SelectedTileSetIds = new Dictionary<int, int>();
 
-        public MapEditorModes MapEditorMode
+        public LayerType LayerType
         {
-            get { return this.mapEditorMode; }
+            get { return this.layerType; }
             set
             {
-                if (this.mapEditorMode != value)
+                if (this.layerType != value)
                 {
-                    this.mapEditorMode = value;
-                    this.OnUpdated(new UpdatedEventArgs("MapEditorMode"));
+                    this.layerType = value;
+                    this.OnUpdated(new UpdatedEventArgs("LayerType"));
                 }
             }
         }
-        private MapEditorModes mapEditorMode = MapEditorModes.Pen;
+        private LayerType layerType;
+
+        public DrawingMode DrawingMode
+        {
+            get { return this.drawingMode; }
+            set
+            {
+                if (this.drawingMode != value)
+                {
+                    this.drawingMode = value;
+                    this.OnUpdated(new UpdatedEventArgs("DrawingMode"));
+                }
+            }
+        }
+        private DrawingMode drawingMode = DrawingMode.Pen;
 
         public TileSet SelectedTileSet
         {
@@ -226,7 +246,7 @@ namespace Shrimp
             this.SelectedMapId = 0;
             this.MapOffsets.Clear();
             this.SelectedTileSetIds.Clear();
-            this.MapEditorMode = MapEditorModes.Pen;
+            this.DrawingMode = DrawingMode.Pen;
             this.SelectedTiles = SelectedTiles.Empty;
         }
 
@@ -245,8 +265,7 @@ namespace Shrimp
                         from p in this.SelectedTileSetIds
                         select new JObject(
                             new JProperty("MapId", p.Key),
-                            new JProperty("TileSetId", p.Value)))),
-                new JProperty("MapEditorMode", this.MapEditorMode.ToString()));
+                            new JProperty("TileSetId", p.Value)))));
         }
 
         public override void LoadJson(JToken json)
@@ -278,19 +297,6 @@ namespace Shrimp
                     int mapId = j.Value<int>("MapId");
                     int tileSetId = j.Value<int>("TileSetId");
                     this.SelectedTileSetIds[mapId] = tileSetId;
-                }
-            }
-            if ((token = json["MapEditorMode"]) != null)
-            {
-                Type type = typeof(MapEditorModes);
-                string value = token.Value<string>();
-                if (Enum.IsDefined(type, value))
-                {
-                    this.MapEditorMode = (MapEditorModes)Enum.Parse(type, value);
-                }
-                else
-                {
-                    this.MapEditorMode = MapEditorModes.Pen;
                 }
             }
         }

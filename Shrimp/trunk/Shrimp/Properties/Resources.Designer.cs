@@ -60,6 +60,13 @@ namespace Shrimp.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap Balloons {
+            get {
+                object obj = ResourceManager.GetObject("Balloons", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap Bin {
             get {
                 object obj = ResourceManager.GetObject("Bin", resourceCulture);
@@ -112,6 +119,13 @@ namespace Shrimp.Properties {
         internal static System.Drawing.Bitmap Home {
             get {
                 object obj = ResourceManager.GetObject("Home", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Map {
+            get {
+                object obj = ResourceManager.GetObject("Map", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
