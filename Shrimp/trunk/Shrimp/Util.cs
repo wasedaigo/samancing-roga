@@ -236,6 +236,31 @@ namespace Shrimp
             }
         }
 
+        public static void FillBitmap(BitmapData dstBD, Color color)
+        {
+            int width = dstBD.Width;
+            int height = dstBD.Height;
+            int padding = dstBD.Stride - width * 4;
+            byte a = color.A;
+            byte r = color.R;
+            byte g = color.G;
+            byte b = color.B;
+            unsafe
+            {
+                byte* dst = (byte*)dstBD.Scan0;
+                for (int j = 0; j < height; j++, dst += padding)
+                {
+                    for (int i = 0; i < width; i++, dst += 4)
+                    {
+                        dst[0] = b;
+                        dst[1] = g;
+                        dst[2] = r;
+                        dst[3] = a;
+                    }
+                }
+            }
+        }
+
         public static void DarkenBitmap(BitmapData dstBD)
         {
             int width = dstBD.Width;

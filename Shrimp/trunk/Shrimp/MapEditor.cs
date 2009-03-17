@@ -282,6 +282,7 @@ namespace Shrimp
                     {
                         Size = this.OffscreenBitmap.Size,
                     }, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                    Util.FillBitmap(dstBD, this.BackColor);
                     Bitmap backgroundBitmap = Util.BackgroundBitmap;
                     BitmapData backgroundBD = backgroundBitmap.LockBits(new Rectangle
                     {
