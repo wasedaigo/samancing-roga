@@ -117,21 +117,14 @@ namespace Shrimp
             return dstBitmap;
         }
 
-        public static void ClearBitmap(BitmapData dstBD)
+        public static void DrawBitmap(BitmapData dstBD, BitmapData srcBD,
+            int dstX, int dstY, Rectangle srcRect)
         {
-            int size = dstBD.Stride * dstBD.Height;
-            unsafe
-            {
-                byte* dst = (byte*)dstBD.Scan0;
-                for (int i = 0; i < size; i++, dst++)
-                {
-                    *dst = 0;
-                }
-            }
+            DrawBitmap(dstBD, srcBD, dstX, dstY, srcRect, 255);
         }
 
         public static void DrawBitmap(BitmapData dstBD, BitmapData srcBD,
-            int dstX, int dstY, Rectangle srcRect)
+            int dstX, int dstY, Rectangle srcRect, byte alpha)
         {
             int srcX = srcRect.X;
             int srcY = srcRect.Y;
@@ -199,15 +192,65 @@ namespace Shrimp
                 int paddingSrc = srcBD.Stride - width * 4;
                 Debug.Assert(0 <= paddingDst);
                 Debug.Assert(0 <= paddingSrc);
-                for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
+                if (alpha == 255)
                 {
-                    for (int i = 0; i < width; i++, dst += 4, src += 4)
+                    for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
                     {
-                        byte alpha = src[3];
-                        dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * alpha + 255) >> 8);
-                        dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * alpha + 255) >> 8);
-                        dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * alpha + 255) >> 8);
-                        dst[3] = 0xff;
+                        for (int i = 0; i < width; i++, dst += 4, src += 4)
+                        {
+                            byte a = src[3];
+                            dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * a + 255) >> 8);
+                            dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * a + 255) >> 8);
+                            dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * a + 255) >> 8);
+                            dst[3] = 0xff;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
+                    {
+                        for (int i = 0; i < width; i++, dst += 4, src += 4)
+                        {
+                            byte a = (byte)((src[3] * alpha + 255) >> 8);
+                            dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * a + 255) >> 8);
+                            dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * a + 255) >> 8);
+                            dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * a + 255) >> 8);
+                            dst[3] = 0xff;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ClearBitmap(BitmapData dstBD)
+        {
+            int size = dstBD.Stride * dstBD.Height;
+            unsafe
+            {
+                byte* dst = (byte*)dstBD.Scan0;
+                for (int i = 0; i < size; i++, dst++)
+                {
+                    *dst = 0;
+                }
+            }
+        }
+
+        public static void DarkenBitmap(BitmapData dstBD)
+        {
+            int width = dstBD.Width;
+            int height = dstBD.Height;
+            int padding = dstBD.Stride - width * 4;
+            unsafe
+            {
+                byte* dst = (byte*)dstBD.Scan0;
+                for (int j = 0; j < height; j++, dst += padding)
+                {
+                    for (int i = 0; i < width; i++, dst += 4)
+                    {
+                        dst[0] = (byte)(dst[0] >> 1);
+                        dst[1] = (byte)(dst[1] >> 1);
+                        dst[2] = (byte)(dst[2] >> 1);
                     }
                 }
             }

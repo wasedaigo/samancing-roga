@@ -311,42 +311,56 @@ namespace Shrimp
                     {
                         TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
                         Dictionary<int, BitmapData> bitmapDataHash = new Dictionary<int, BitmapData>();
-                        int startI = Math.Max(-offset.X / gridSize, 0);
-                        int endI = Math.Min((this.HScrollBar.Width - offset.X) / gridSize + 1, width);
-                        int startJ = Math.Max(-offset.Y / gridSize, 0);
-                        int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / gridSize + 1, height);
-                        for (int j = startJ; j < endJ; j++)
+                        for (int layer = 0; layer < 2; layer++)
                         {
-                            int y = j * gridSize + offset.Y;
-                            for (int i = startI; i < endI; i++)
+                            byte alpha = 255;
+                            if (this.EditorState.LayerMode == LayerMode.Layer1 && layer == 1)
                             {
-                                int x = i * gridSize + offset.X;
-                                Tile tile = map.GetTile(0, i, j);
-                                if (tileSetCollection.ContainsId(tile.TileSetId))
+                                alpha = 128;
+                            }
+                            int startI = Math.Max(-offset.X / gridSize, 0);
+                            int endI = Math.Min((this.HScrollBar.Width - offset.X) / gridSize + 1, width);
+                            int startJ = Math.Max(-offset.Y / gridSize, 0);
+                            int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / gridSize + 1, height);
+                            for (int j = startJ; j < endJ; j++)
+                            {
+                                int y = j * gridSize + offset.Y;
+                                for (int i = startI; i < endI; i++)
                                 {
-                                    int tileId = tile.TileId;
-                                    BitmapData srcBD;
-                                    if (!bitmapDataHash.ContainsKey(tile.TileSetId))
+                                    int x = i * gridSize + offset.X;
+
+                                    Tile tile = map.GetTile(layer, i, j);
+                                    if (tileSetCollection.ContainsId(tile.TileSetId))
                                     {
-                                        TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
-                                        Bitmap bitmap = tileSet.GetBitmap(BitmapScale.Scale1);
-                                        srcBD = bitmapDataHash[tile.TileSetId] = bitmap.LockBits(new Rectangle
+                                        int tileId = tile.TileId;
+                                        BitmapData srcBD;
+                                        if (!bitmapDataHash.ContainsKey(tile.TileSetId))
                                         {
-                                            Size = bitmap.Size,
-                                        }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                                            TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
+                                            Bitmap bitmap = tileSet.GetBitmap(BitmapScale.Scale1);
+                                            srcBD = bitmapDataHash[tile.TileSetId] = bitmap.LockBits(new Rectangle
+                                            {
+                                                Size = bitmap.Size,
+                                            }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                                        }
+                                        else
+                                        {
+                                            srcBD = bitmapDataHash[tile.TileSetId];
+                                        }
+                                        
+                                        Util.DrawBitmap(dstBD, srcBD, x, y, new Rectangle
+                                        {
+                                            X = (tileId % Util.PaletteHorizontalCount) * gridSize,
+                                            Y = (tileId / Util.PaletteHorizontalCount) * gridSize,
+                                            Width = gridSize,
+                                            Height = gridSize,
+                                        }, alpha);
                                     }
-                                    else
-                                    {
-                                        srcBD = bitmapDataHash[tile.TileSetId];
-                                    }
-                                    Util.DrawBitmap(dstBD, srcBD, x, y, new Rectangle
-                                    {
-                                        X = (tileId % Util.PaletteHorizontalCount) * gridSize,
-                                        Y = (tileId / Util.PaletteHorizontalCount) * gridSize,
-                                        Width = gridSize,
-                                        Height = gridSize,
-                                    });
                                 }
+                            }
+                            if (this.EditorState.LayerMode == LayerMode.Layer2 && layer == 0)
+                            {
+                                Util.DarkenBitmap(dstBD);
                             }
                         }
                         foreach (var pair in bitmapDataHash)
