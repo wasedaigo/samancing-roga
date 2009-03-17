@@ -42,7 +42,7 @@
             this.HScrollBar.Name = "HScrollBar";
             this.HScrollBar.Size = new System.Drawing.Size(80, 16);
             this.HScrollBar.TabIndex = 0;
-            this.HScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ScrollBar_Scroll);
+            this.HScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.HScrollBar_Scroll);
             // 
             // VScrollBar
             // 
@@ -53,7 +53,7 @@
             this.VScrollBar.Name = "VScrollBar";
             this.VScrollBar.Size = new System.Drawing.Size(16, 80);
             this.VScrollBar.TabIndex = 1;
-            this.VScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ScrollBar_Scroll);
+            this.VScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.VScrollBar_Scroll);
             // 
             // MapEditor
             // 

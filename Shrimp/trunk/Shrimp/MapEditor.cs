@@ -390,12 +390,23 @@ namespace Shrimp
             });
         }
 
-        private void ScrollBar_Scroll(object sender, ScrollEventArgs e)
+        private void HScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
+            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
             this.EditorState.SetMapOffset(this.Map.Id, new Point
             {
-                X = -this.HScrollBar.Value,
-                Y = -this.VScrollBar.Value,
+                X = -e.NewValue,
+                Y = offset.Y,
+            });
+        }
+
+        private void VScrollBar_Scroll(object sender, ScrollEventArgs e)
+        {
+            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+            this.EditorState.SetMapOffset(this.Map.Id, new Point
+            {
+                X = offset.X,
+                Y = -e.NewValue,
             });
         }
     }
