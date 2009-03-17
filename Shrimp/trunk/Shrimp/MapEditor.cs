@@ -74,14 +74,13 @@ namespace Shrimp
             case "SelectedMapId":
                 this.SelectedMapIdChanged();
                 break;
-            case "LayerType":
+            case "LayerMode":
                 this.Invalidate();
-                break;
-            case "MapEditorMode":
                 break;
             case "MapOffsets":
                 if (this.Map != null && (int)e.Tag == this.Map.Id)
                 {
+                    this.AdjustScrollBars();
                     this.Invalidate();
                 }
                 break;
@@ -231,6 +230,28 @@ namespace Shrimp
             }
         }*/
 
+        private int CursorTileX = 0;
+        private int CursorTileY = 0;
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (this.EditorState.LayerMode != LayerMode.Event)
+            {
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                Point mousePosition = new Point
+                {
+                    X = e.X - offset.X,
+                    Y = e.Y - offset.Y,
+                };
+                this.CursorTileX =
+                    Math.Min(Math.Max(mousePosition.X / Util.DisplayedGridSize, 0), this.Map.Width - 1);
+                this.CursorTileY =
+                    Math.Min(Math.Max(mousePosition.Y / Util.DisplayedGridSize, 0), this.Map.Height - 1);
+                this.Invalidate();
+            }
+        }
+
         protected override void OnLayout(LayoutEventArgs e)
         {
             base.OnLayout(e);
@@ -247,13 +268,13 @@ namespace Shrimp
                 Map map = this.Map;
                 if (map != null)
                 {
-                    Point position = this.EditorState.GetMapOffset(this.Map.Id);
+                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                     int width = map.Width;
                     int height = map.Height;
                     Pen gridPen = new Pen(Color.FromArgb(0x80, 0x80, 0x80, 0x80), 1);
                     for (int j = 0; j < height; j++)
                     {
-                        int y = j * 32 + position.Y;
+                        int y = j * 32 + offset.Y;
                         if (y + 32 <= 0)
                         {
                             continue;
@@ -264,7 +285,7 @@ namespace Shrimp
                         }
                         for (int i = 0; i < width; i++)
                         {
-                            int x = i * 32 + position.X;
+                            int x = i * 32 + offset.X;
                             if (x + 32 <= 0)
                             {
                                 continue;
@@ -274,12 +295,21 @@ namespace Shrimp
                                 break;
                             }
                             g.DrawImage(Util.BackgroundBitmap, x, y);
-                            if (this.EditorState.LayerType == LayerType.Event)
+                            if (this.EditorState.LayerMode == LayerMode.Event)
                             {
                                 g.DrawRectangle(gridPen, x, y, 32 - 1, 32 - 1);
                             }
+                            
                         }
                     }
+                    SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+                    Util.DrawFrame(g, new Rectangle
+                    {
+                        X = this.CursorTileX * 32 + offset.X,
+                        Y = this.CursorTileY * 32 + offset.Y,
+                        Width = 32 * selectedTiles.Width,
+                        Height = 32 * selectedTiles.Height,
+                    });
                 }
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle

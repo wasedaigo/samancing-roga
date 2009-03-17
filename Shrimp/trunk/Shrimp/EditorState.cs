@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal enum LayerType
+    internal enum LayerMode
     {
         Layer1,
         Layer2,
@@ -23,7 +23,6 @@ namespace Shrimp
 
     internal enum SelectedTilesType
     {
-        None,
         Single,
         Rectangle,
         Other,
@@ -31,13 +30,6 @@ namespace Shrimp
 
     internal class SelectedTiles
     {
-        public static readonly SelectedTiles Empty = None();
-
-        private static SelectedTiles None()
-        {
-            return new SelectedTiles(SelectedTilesType.None, -1, 0, 0);
-        }
-
         public static SelectedTiles Single(int tileId)
         {
             return new SelectedTiles(SelectedTilesType.Single, tileId, 1, 1);
@@ -174,19 +166,19 @@ namespace Shrimp
         }
         private Dictionary<int, int> SelectedTileSetIds = new Dictionary<int, int>();
 
-        public LayerType LayerType
+        public LayerMode LayerMode
         {
-            get { return this.layerType; }
+            get { return this.layerMode; }
             set
             {
-                if (this.layerType != value)
+                if (this.layerMode != value)
                 {
-                    this.layerType = value;
-                    this.OnUpdated(new UpdatedEventArgs("LayerType"));
+                    this.layerMode = value;
+                    this.OnUpdated(new UpdatedEventArgs("LayerMode"));
                 }
             }
         }
-        private LayerType layerType;
+        private LayerMode layerMode;
 
         public DrawingMode DrawingMode
         {
@@ -247,7 +239,7 @@ namespace Shrimp
             this.MapOffsets.Clear();
             this.SelectedTileSetIds.Clear();
             this.DrawingMode = DrawingMode.Pen;
-            this.SelectedTiles = SelectedTiles.Empty;
+            this.SelectedTiles = SelectedTiles.Single(0);
         }
 
         public override JToken ToJson()

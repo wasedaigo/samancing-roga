@@ -37,15 +37,15 @@ namespace Shrimp
             this.MainSplitContainer.SplitterDistance -=
                 this.TileSetPalette.Parent.ClientSize.Width - this.TileSetPalette.Width;
 
-            this.Layer1ToolStripButton.Tag = LayerType.Layer1;
-            this.Layer2ToolStripButton.Tag = LayerType.Layer2;
-            this.EventToolStripButton.Tag = LayerType.Event;
-            foreach (var item in this.LayerTypeSwitchers)
+            this.Layer1ToolStripButton.Tag = LayerMode.Layer1;
+            this.Layer2ToolStripButton.Tag = LayerMode.Layer2;
+            this.EventToolStripButton.Tag = LayerMode.Event;
+            foreach (var item in this.LayerModeSwitchers)
             {
                 item.Click += (s, e) =>
                 {
-                    this.ViewModel.EditorState.LayerType =
-                        (LayerType)((ToolStripButton)s).Tag;
+                    this.ViewModel.EditorState.LayerMode =
+                        (LayerMode)((ToolStripButton)s).Tag;
                 };
             }
 
@@ -90,8 +90,8 @@ namespace Shrimp
                         this.SelectedTileSetIdsChanged();
                     }
                     break;
-                case "LayerType":
-                    this.LayerTypeChanged();
+                case "LayerMode":
+                    this.LayerModeChanged();
                     break;
                 case "DrawingMode":
                     this.DrawingModeChanged();
@@ -110,7 +110,7 @@ namespace Shrimp
 
         private DatabaseDialog DatabaseDialog = new DatabaseDialog();
 
-        private IEnumerable<ToolStripButton> LayerTypeSwitchers
+        private IEnumerable<ToolStripButton> LayerModeSwitchers
         {
             get
             {
@@ -154,7 +154,7 @@ namespace Shrimp
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened;
-            foreach (var item in this.LayerTypeSwitchers)
+            foreach (var item in this.LayerModeSwitchers)
             {
                 item.Enabled = isOpened;
             }
@@ -169,7 +169,7 @@ namespace Shrimp
             this.GameTitleChanged();
             this.SelectedMapIdChanged();
             this.SelectedTileSetIdsChanged();
-            this.LayerTypeChanged();
+            this.LayerModeChanged();
             this.DrawingModeChanged();
         }
 
@@ -214,19 +214,19 @@ namespace Shrimp
             }
         }
 
-        private void LayerTypeChanged()
+        private void LayerModeChanged()
         {
             if (this.ViewModel.IsOpened)
             {
-                foreach (var item in this.LayerTypeSwitchers)
+                foreach (var item in this.LayerModeSwitchers)
                 {
                     item.Checked =
-                        ((LayerType)item.Tag == this.ViewModel.EditorState.LayerType);
+                        ((LayerMode)item.Tag == this.ViewModel.EditorState.LayerMode);
                 }
             }
             else
             {
-                foreach (var item in this.LayerTypeSwitchers)
+                foreach (var item in this.LayerModeSwitchers)
                 {
                     item.Checked = false;
                 }
