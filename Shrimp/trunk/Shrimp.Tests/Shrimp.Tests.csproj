@@ -60,7 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ModelListTest.cs" />
+    <Compile Include="TileTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shrimp\Shrimp.csproj">

@@ -70,6 +70,11 @@ namespace Shrimp
         }
         private int height;
 
+        public Tile GetTile(int x, int y)
+        {
+            return new Tile();
+        }
+
         public override void Clear()
         {
             this.Width = MinWidth;
