@@ -139,6 +139,9 @@ namespace Shrimp
                 this.AdjustScrollBars();
                 this.Invalidate();
                 break;
+            case "Tiles":
+                this.Invalidate();
+                break;
             }
         }
 
@@ -233,6 +236,25 @@ namespace Shrimp
         private int CursorTileX = 0;
         private int CursorTileY = 0;
 
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (this.EditorState.LayerMode != LayerMode.Event)
+            {
+                if ((e.Button & MouseButtons.Left) != 0)
+                {
+                    int layer = 0;
+                    switch (this.EditorState.LayerMode)
+                    {
+                    case LayerMode.Layer1: layer = 0; break;
+                    case LayerMode.Layer2: layer = 1; break;
+                    default: Debug.Fail("Invalid layer"); break;
+                    }
+                    this.Map.SetTiles(layer, this.CursorTileX, this.CursorTileY, this.EditorState.SelectedTiles);
+                }
+            }
+        }
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
@@ -248,7 +270,21 @@ namespace Shrimp
                     Math.Min(Math.Max(mousePosition.X / Util.DisplayedGridSize, 0), this.Map.Width - 1);
                 this.CursorTileY =
                     Math.Min(Math.Max(mousePosition.Y / Util.DisplayedGridSize, 0), this.Map.Height - 1);
-                this.Invalidate();
+                if ((e.Button & MouseButtons.Left) != 0)
+                {
+                    int layer = 0;
+                    switch (this.EditorState.LayerMode)
+                    {
+                    case LayerMode.Layer1: layer = 0; break;
+                    case LayerMode.Layer2: layer = 1; break;
+                    default: Debug.Fail("Invalid layer"); break;
+                    }
+                    this.Map.SetTiles(layer, this.CursorTileX, this.CursorTileY, this.EditorState.SelectedTiles);
+                }
+                else
+                {
+                    this.Invalidate();
+                }
             }
         }
 
@@ -263,6 +299,7 @@ namespace Shrimp
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             if (this.ViewModel != null && this.EditorState != null)
             {
                 Map map = this.Map;
@@ -272,6 +309,8 @@ namespace Shrimp
                     int width = map.Width;
                     int height = map.Height;
                     Pen gridPen = new Pen(Color.FromArgb(0x80, 0x80, 0x80, 0x80), 1);
+                    TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
+                    Dictionary<int, Bitmap> bitmaps = new Dictionary<int, Bitmap>();
                     for (int j = 0; j < height; j++)
                     {
                         int y = j * 32 + offset.Y;
@@ -295,11 +334,28 @@ namespace Shrimp
                                 break;
                             }
                             g.DrawImage(Util.BackgroundBitmap, x, y);
+                            Tile tile = map.GetTile(0, i, j);
+                            int tileId = tile.TileId;
+                            if (tileSetCollection.ContainsId(tile.TileSetId))
+                            {
+                                int scale = 2;
+                                if (!bitmaps.ContainsKey(tile.TileSetId))
+                                {
+                                    TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
+                                    bitmaps[tile.TileSetId]= tileSet.GetBitmap(BitmapScale.Scale1);
+                                }
+                                g.DrawImage(bitmaps[tile.TileSetId], x, y, new Rectangle
+                                {
+                                    X = (tileId % Util.PaletteHorizontalCount) * Util.GridSize * scale,
+                                    Y = (tileId / Util.PaletteHorizontalCount) * Util.GridSize * scale,
+                                    Width = 32,
+                                    Height = 32,
+                                }, GraphicsUnit.Pixel);
+                            }
                             if (this.EditorState.LayerMode == LayerMode.Event)
                             {
                                 g.DrawRectangle(gridPen, x, y, 32 - 1, 32 - 1);
                             }
-                            
                         }
                     }
                     SelectedTiles selectedTiles = this.EditorState.SelectedTiles;

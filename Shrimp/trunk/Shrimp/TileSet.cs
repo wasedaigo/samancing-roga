@@ -9,6 +9,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
+    internal enum BitmapScale
+    {
+        Scale1,
+        Scale2,
+        Scale4,
+        Scale8,
+    }
+
     internal class TileSet : Model
     {
         public TileSet(TileSetCollection tileSetCollection)
@@ -31,23 +39,23 @@ namespace Shrimp
             {
                 if (this.imageFileName != value)
                 {
-                    this.imageFileName = value;
-                    if (this.imageFileName != null && this.imageFileName != "")
+                    if (this.OriginalBitmap != null)
                     {
-                        using (Image image = Image.FromFile(this.ImageFileFullPath))
-                        {
-                            this.Width = image.Width / Util.GridSize;
-                            if (this.Width != Util.PaletteHorizontalCount)
-                            {
-                                throw new ArgumentException("Invalid size image");
-                            }
-                            this.Height = image.Height / Util.GridSize;
-                        }
+                        this.OriginalBitmap.Dispose();
+                    }
+                    foreach (Bitmap bitmap in this.Bitmaps.Values)
+                    {
+                        bitmap.Dispose();
+                    }
+                    this.Bitmaps.Clear();
+                    this.imageFileName = value;
+                    if (this.imageFileName != null)
+                    {
+                        this.OriginalBitmap = new Bitmap(this.ImageFileFullPath);
                     }
                     else
                     {
-                        this.Width = 0;
-                        this.Height = 0;
+                        this.OriginalBitmap = null;
                     }
                     this.OnUpdated(new UpdatedEventArgs("ImageFileName"));
                 }
@@ -59,7 +67,7 @@ namespace Shrimp
         {
             get
             {
-                if (this.ImageFileName != null && this.ImageFileName != "")
+                if (this.ImageFileName != null)
                 {
                     string path = this.TileSetCollection.ViewModel.DirectoryPath;
                     path = Path.Combine(path, this.TileSetCollection.TilesGraphicsDirectory);
@@ -73,14 +81,60 @@ namespace Shrimp
             }
         }
 
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public int Width
+        {
+            get
+            {
+                if (this.OriginalBitmap != null)
+                {
+                    return this.OriginalBitmap.Width / Util.GridSize;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                if (this.OriginalBitmap != null)
+                {
+                    return this.OriginalBitmap.Height / Util.GridSize;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        private Bitmap OriginalBitmap;
+
+        private Dictionary<BitmapScale, Bitmap> Bitmaps =
+            new Dictionary<BitmapScale, Bitmap>();
+
+        public Bitmap GetBitmap(BitmapScale scale)
+        {
+            if (!this.Bitmaps.ContainsKey(scale))
+            {
+                switch (scale)
+                {
+                case BitmapScale.Scale1:
+                    this.Bitmaps.Add(scale, Util.CreateScaledBitmap(this.OriginalBitmap));
+                    break;
+                default:
+                    throw new NotImplementedException();
+                }
+            }
+            return this.Bitmaps[scale];
+        }
 
         public override void Clear()
         {
-            this.ImageFileName = "";
-            this.Width = 0;
-            this.Height = 0;
+            this.ImageFileName = null;
         }
 
         public override JToken ToJson()

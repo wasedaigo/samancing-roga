@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace Shrimp
             this.MapCollection = mapCollection;
             this.Clear();
         }
+
+        private const int LayerCount = 2;
 
         public const int MinWidth = 20;
         public const int MaxWidth = 500;
@@ -45,7 +48,29 @@ namespace Shrimp
                     {
                         throw new ArgumentOutOfRangeException("Invalid width");
                     }
+                    if (this.width < value)
+                    {
+                        foreach (var layer in this.Layers)
+                        {
+                            for (int j = 0; j < this.height; j++)
+                            {
+                                var newTiles = Enumerable.Repeat(new Tile(), value - this.width);
+                                layer.InsertRange(j * value + this.width, newTiles);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var layer in this.Layers)
+                        {
+                            for (int j = 0; j < this.height; j++)
+                            {
+                                layer.RemoveRange(j * value + value, this.width - value);
+                            }
+                        }
+                    }
                     this.width = value;
+                    Debug.Assert(this.Layers.All(l => l.Count == this.Width * this.Height));
                     this.OnUpdated(new UpdatedEventArgs("Width"));
                 }
             }
@@ -63,22 +88,68 @@ namespace Shrimp
                     {
                         throw new ArgumentOutOfRangeException("Invalid height");
                     }
+                    if (this.height < value)
+                    {
+                        foreach (var layer in this.Layers)
+                        {
+                            int size = (value - this.height) * this.Width;
+                            layer.AddRange(Enumerable.Repeat(new Tile(), size));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var layer in this.Layers)
+                        {
+                            int size = (this.height - value) * this.Width;
+                            layer.RemoveRange(layer.Count - size, size);
+                        }
+                    }
                     this.height = value;
+                    Debug.Assert(this.Layers.All(l => l.Count == this.Width * this.Height));
                     this.OnUpdated(new UpdatedEventArgs("Height"));
                 }
             }
         }
         private int height;
 
-        public Tile GetTile(int x, int y)
+        private List<List<Tile>> Layers = new List<List<Tile>>();
+
+        public Tile GetTile(int layerNumber, int x, int y)
         {
-            return new Tile();
+            return this.Layers[layerNumber][y * this.Width + x];
+        }
+
+        public void SetTile(int layerNumber, int x, int y, Tile tile)
+        {
+            this.Layers[layerNumber][y * this.Width + x] = tile;
+            this.OnUpdated(new UpdatedEventArgs("Tiles"));
+        }
+
+        public void SetTiles(int layerNumber, int x, int y, SelectedTiles selectedTiles)
+        {
+            var tiles = selectedTiles.Tiles.ToArray();
+            List<Tile> layer = this.Layers[layerNumber];
+            for (int j = 0; j < selectedTiles.Height; j++)
+            {
+                for (int i = 0; i < selectedTiles.Width; i++)
+                {
+                    Tile tile = tiles[j * selectedTiles.Width + i];
+                    layer[(j + y) * this.Width + (i + x)] = tile;
+                }
+            }
+            this.OnUpdated(new UpdatedEventArgs("Tiles"));
         }
 
         public override void Clear()
         {
             this.Width = MinWidth;
             this.Height = MinHeight;
+            this.Layers.Clear();
+            int size = this.Width * this.Height;
+            for (int i = 0; i < LayerCount; i++)
+            {
+                this.Layers.Add(Enumerable.Repeat(new Tile(), size).ToList());
+            }
         }
 
         public override JToken ToJson()

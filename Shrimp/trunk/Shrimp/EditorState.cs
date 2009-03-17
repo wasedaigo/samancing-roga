@@ -30,46 +30,51 @@ namespace Shrimp
 
     internal class SelectedTiles
     {
-        public static SelectedTiles Single(int tileId)
+        public static SelectedTiles Single(Tile tile)
         {
-            return new SelectedTiles(SelectedTilesType.Single, tileId, 1, 1);
+            return new SelectedTiles(SelectedTilesType.Single, tile, 1, 1);
         }
 
-        public static SelectedTiles Rectangle(int tileId, int width, int height)
+        public static SelectedTiles Rectangle(Tile tile, int width, int height)
         {
             Debug.Assert(0 < width);
-            Debug.Assert(tileId % Util.PaletteHorizontalCount + width <= Util.PaletteHorizontalCount);
+            Debug.Assert(tile.TileId % Util.PaletteHorizontalCount + width <= Util.PaletteHorizontalCount);
             Debug.Assert(0 < height);
-            var tileIds = Enumerable.Empty<int>();
+            var tiles = Enumerable.Empty<Tile>();
             for (int j = 0; j < height; j++)
             {
-                var line = Enumerable.Range(tileId + j * Util.PaletteHorizontalCount, width);
-                tileIds = tileIds.Concat(line);
+                var line = from i in Enumerable.Range(tile.TileId + j * Util.PaletteHorizontalCount, width)
+                           select new Tile
+                           {
+                               TileSetId = tile.TileSetId,
+                               TileId = i,
+                           };
+                tiles = tiles.Concat(line);
             }
-            return new SelectedTiles(SelectedTilesType.Rectangle, tileIds, width, height);
+            return new SelectedTiles(SelectedTilesType.Rectangle, tiles, width, height);
         }
 
-        public static SelectedTiles Other(IEnumerable<int> tileIds, int width, int height)
+        public static SelectedTiles Other(IEnumerable<Tile> tiles, int width, int height)
         {
-            return new SelectedTiles(SelectedTilesType.Other, tileIds, width, height);
+            return new SelectedTiles(SelectedTilesType.Other, tiles, width, height);
         }
 
-        private SelectedTiles(SelectedTilesType type, int tileId, int width, int height)
-            : this(type, new[] { tileId }, width, height)
+        private SelectedTiles(SelectedTilesType type, Tile tile, int width, int height)
+            : this(type, new[] { tile }, width, height)
         {
         }
 
-        private SelectedTiles(SelectedTilesType type, IEnumerable<int> tileIds, int width, int height)
+        private SelectedTiles(SelectedTilesType type, IEnumerable<Tile> tiles, int width, int height)
         {
             this.SelectedTilesType = type;
-            this.TileIds = tileIds;
+            this.Tiles = tiles;
             this.Width = width;
             this.Height = height;
         }
 
         public SelectedTilesType SelectedTilesType { get; private set; }
-        public int TileId { get { return this.TileIds.First(); } }
-        public IEnumerable<int> TileIds { get; private set; }
+        public Tile Tile { get { return this.Tiles.First(); } }
+        public IEnumerable<Tile> Tiles { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
     }
@@ -239,7 +244,11 @@ namespace Shrimp
             this.MapOffsets.Clear();
             this.SelectedTileSetIds.Clear();
             this.DrawingMode = DrawingMode.Pen;
-            this.SelectedTiles = SelectedTiles.Single(0);
+            this.SelectedTiles = SelectedTiles.Single(new Tile
+            {
+                TileSetId = 0,
+                TileId = 0,
+            });
         }
 
         public override JToken ToJson()

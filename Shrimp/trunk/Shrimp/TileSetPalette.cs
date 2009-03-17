@@ -99,11 +99,6 @@ namespace Shrimp
 
         private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
         {
-            foreach (Bitmap bitmap in this.LargeBitmapCache.Values)
-            {
-                bitmap.Dispose();
-            }
-            this.LargeBitmapCache.Clear();
             if (this.ViewModel.IsOpened)
             {
                 this.TileSet = this.EditorState.SelectedTileSet;
@@ -173,9 +168,6 @@ namespace Shrimp
             }
         }
 
-        private Dictionary<TileSet, Bitmap> LargeBitmapCache =
-            new Dictionary<TileSet, Bitmap>();
-
         private Bitmap LargeBitmap
         {
             get
@@ -183,14 +175,7 @@ namespace Shrimp
                 TileSet tileSet = this.TileSet;
                 if (tileSet != null)
                 {
-                    if (!this.LargeBitmapCache.ContainsKey(tileSet))
-                    {
-                        using (Bitmap bitmap = new Bitmap(tileSet.ImageFileFullPath))
-                        {
-                            this.LargeBitmapCache.Add(tileSet, Util.CreateScaledBitmap(bitmap));
-                        }
-                    }
-                    return this.LargeBitmapCache[tileSet];
+                    return tileSet.GetBitmap(BitmapScale.Scale1);
                 }
                 else
                 {
@@ -222,7 +207,11 @@ namespace Shrimp
                 Math.Min(Math.Max(point.Y / Util.DisplayedGridSize, 0), this.TileSet.Height - 1);
             int tileId = this.SelectedTileStartY * Util.PaletteHorizontalCount
                 + this.SelectedTileStartX;
-            this.EditorState.SelectedTiles = SelectedTiles.Single(tileId);
+            this.EditorState.SelectedTiles = SelectedTiles.Single(new Tile
+            {
+                TileSetId = this.EditorState.SelectedTileSetId,
+                TileId = tileId,
+            });
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -278,7 +267,11 @@ namespace Shrimp
             int width = Math.Abs(this.SelectedTileStartX - selectedTileEndX) + 1;
             int height = Math.Abs(this.SelectedTileStartY - selectedTileEndY) + 1;
             this.EditorState.SelectedTiles =
-                SelectedTiles.Rectangle(tileId, width, height);
+                SelectedTiles.Rectangle(new Tile
+                {
+                    TileSetId = this.EditorState.SelectedTileSetId,
+                    TileId = tileId
+                }, width, height);
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -323,16 +316,20 @@ namespace Shrimp
             {
             case SelectedTilesType.Single:
             case SelectedTilesType.Rectangle:
-                int tileId = selectedTiles.TileId;
-                Util.DrawFrame(g, new Rectangle
+                Tile tile = selectedTiles.Tile;
+                if (tile.TileSetId == this.EditorState.SelectedTileSetId)
                 {
-                    X = tileId % Util.PaletteHorizontalCount * Util.DisplayedGridSize
-                        + this.AutoScrollPosition.X,
-                    Y = tileId / Util.PaletteHorizontalCount * Util.DisplayedGridSize
-                        + this.AutoScrollPosition.Y,
-                    Width = Util.DisplayedGridSize * selectedTiles.Width,
-                    Height = Util.DisplayedGridSize * selectedTiles.Height,
-                });
+                    int tileId = tile.TileId;
+                    Util.DrawFrame(g, new Rectangle
+                    {
+                        X = tileId % Util.PaletteHorizontalCount * Util.DisplayedGridSize
+                            + this.AutoScrollPosition.X,
+                        Y = tileId / Util.PaletteHorizontalCount * Util.DisplayedGridSize
+                            + this.AutoScrollPosition.Y,
+                        Width = Util.DisplayedGridSize * selectedTiles.Width,
+                        Height = Util.DisplayedGridSize * selectedTiles.Height,
+                    });
+                }
                 break;
             }
         }
