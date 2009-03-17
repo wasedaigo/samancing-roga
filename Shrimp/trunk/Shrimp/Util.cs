@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -114,6 +115,73 @@ namespace Shrimp
             dstBitmap.UnlockBits(dstBD);
             srcBitmap.UnlockBits(srcBD);
             return dstBitmap;
+        }
+
+        public static void DrawBitmap(BitmapData dstBD, BitmapData srcBD, int x, int y, Rectangle srcRect)
+        {
+            int srcX = srcRect.X;
+            int srcY = srcRect.Y;
+            int width = srcRect.Width;
+            int height = srcRect.Height;
+            if (width <= 0 || height <= 0)
+            {
+                return;
+            }
+            if (x < 0)
+            {
+                srcX -= x;
+                width -= x;
+                x = 0;
+            }
+            if (dstBD.Width <= x + width)
+            {
+                width -= x + width - dstBD.Width;
+            }
+            if (srcBD.Width <= srcX + width)
+            {
+                width -= srcX + width - srcBD.Width;
+            }
+            if (y < 0)
+            {
+                srcY -= y;
+                height -= y;
+                y = 0;
+            }
+            if (dstBD.Height <= y + height)
+            {
+                height -= y + height - dstBD.Height;
+            }
+            if (srcBD.Height <= srcY + height)
+            {
+                height -= srcY + height - srcBD.Height;
+            }
+            if (dstBD.Width <= x || dstBD.Height <= y ||
+                x + width <= 0 || y + height <= 0 ||
+                srcBD.Width <= srcX || srcBD.Height <= srcY ||
+                srcX + width <= 0 || srcY + height <= 0)
+            {
+                return;
+            }
+            unsafe
+            {
+                byte* dst = (byte*)dstBD.Scan0 + (x * 4) + (y * dstBD.Stride);
+                byte* src = (byte*)srcBD.Scan0 + (srcX * 4) + (srcY * srcBD.Stride);
+                int paddingDst = dstBD.Stride - width * 4;
+                int paddingSrc = srcBD.Stride - width * 4;
+                Debug.Assert(0 <= paddingDst);
+                Debug.Assert(0 <= paddingSrc);
+                for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
+                {
+                    for (int i = 0; i < width; i++, dst += 4, src += 4)
+                    {
+                        byte alpha = src[3];
+                        dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * alpha + 255) >> 8);
+                        dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * alpha + 255) >> 8);
+                        dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * alpha + 255) >> 8);
+                        dst[3] = 0xff;
+                    }
+                }
+            }
         }
 
         private static Pen FramePen1 = new Pen(Color.Black, 1);
