@@ -117,7 +117,21 @@ namespace Shrimp
             return dstBitmap;
         }
 
-        public static void DrawBitmap(BitmapData dstBD, BitmapData srcBD, int x, int y, Rectangle srcRect)
+        public static void ClearBitmap(BitmapData dstBD)
+        {
+            int size = dstBD.Stride * dstBD.Height;
+            unsafe
+            {
+                byte* dst = (byte*)dstBD.Scan0;
+                for (int i = 0; i < size; i++, dst++)
+                {
+                    *dst = 0;
+                }
+            }
+        }
+
+        public static void DrawBitmap(BitmapData dstBD, BitmapData srcBD,
+            int dstX, int dstY, Rectangle srcRect)
         {
             int srcX = srcRect.X;
             int srcY = srcRect.Y;
@@ -127,44 +141,59 @@ namespace Shrimp
             {
                 return;
             }
-            if (x < 0)
+            if (dstX < 0)
             {
-                srcX -= x;
-                width -= x;
-                x = 0;
+                width += dstX;
+                srcX -= dstX;
+                dstX = 0;
             }
-            if (dstBD.Width <= x + width)
+            if (srcBD.Width <= srcX)
             {
-                width -= x + width - dstBD.Width;
+                return;
+            }
+            if (dstBD.Width <= dstX + width)
+            {
+                width -= dstX + width - dstBD.Width;
             }
             if (srcBD.Width <= srcX + width)
             {
                 width -= srcX + width - srcBD.Width;
             }
-            if (y < 0)
+            if (dstY < 0)
             {
-                srcY -= y;
-                height -= y;
-                y = 0;
+                height += dstY;
+                srcY -= dstY;
+                dstY = 0;
             }
-            if (dstBD.Height <= y + height)
+            if (srcBD.Height <= srcY)
             {
-                height -= y + height - dstBD.Height;
+                return;
+            }
+            if (dstBD.Height <= dstY + height)
+            {
+                height -= dstY + height - dstBD.Height;
             }
             if (srcBD.Height <= srcY + height)
             {
                 height -= srcY + height - srcBD.Height;
             }
-            if (dstBD.Width <= x || dstBD.Height <= y ||
-                x + width <= 0 || y + height <= 0 ||
-                srcBD.Width <= srcX || srcBD.Height <= srcY ||
+            if (width <= 0 || height <= 0 ||
+                dstX + width <= 0 || dstY + height <= 0 ||
                 srcX + width <= 0 || srcY + height <= 0)
             {
                 return;
             }
+            Debug.Assert(0 <= dstX);
+            Debug.Assert(dstX + width <= dstBD.Width);
+            Debug.Assert(0 <= dstY);
+            Debug.Assert(dstY + height <= dstBD.Height);
+            Debug.Assert(0 <= srcX);
+            Debug.Assert(srcX + width <= srcBD.Width);
+            Debug.Assert(0 <= srcY);
+            Debug.Assert(srcY + height <= srcBD.Height);
             unsafe
             {
-                byte* dst = (byte*)dstBD.Scan0 + (x * 4) + (y * dstBD.Stride);
+                byte* dst = (byte*)dstBD.Scan0 + (dstX * 4) + (dstY * dstBD.Stride);
                 byte* src = (byte*)srcBD.Scan0 + (srcX * 4) + (srcY * srcBD.Stride);
                 int paddingDst = dstBD.Stride - width * 4;
                 int paddingSrc = srcBD.Stride - width * 4;

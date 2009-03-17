@@ -322,9 +322,9 @@ namespace Shrimp
                             {
                                 int x = i * gridSize + offset.X;
                                 Tile tile = map.GetTile(0, i, j);
-                                int tileId = tile.TileId;
                                 if (tileSetCollection.ContainsId(tile.TileSetId))
                                 {
+                                    int tileId = tile.TileId;
                                     BitmapData srcBD;
                                     if (!bitmapDataHash.ContainsKey(tile.TileSetId))
                                     {
