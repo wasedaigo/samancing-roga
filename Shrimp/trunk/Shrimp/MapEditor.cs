@@ -5,11 +5,43 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Shrimp
 {
+    internal class GDI32
+    {
+        public enum TernaryRasterOperations : uint
+        {
+            SRCCOPY = 0x00CC0020, /* dest = source*/
+            SRCPAINT = 0x00EE0086, /* dest = source OR dest*/
+            SRCAND = 0x008800C6, /* dest = source AND dest*/
+            SRCINVERT = 0x00660046, /* dest = source XOR dest*/
+            SRCERASE = 0x00440328, /* dest = source AND (NOT dest )*/
+            NOTSRCCOPY = 0x00330008, /* dest = (NOT source)*/
+            NOTSRCERASE = 0x001100A6, /* dest = (NOT src) AND (NOT dest) */
+            MERGECOPY = 0x00C000CA, /* dest = (source AND pattern)*/
+            MERGEPAINT = 0x00BB0226, /* dest = (NOT source) OR dest*/
+            PATCOPY = 0x00F00021, /* dest = pattern*/
+            PATPAINT = 0x00FB0A09, /* dest = DPSnoo*/
+            PATINVERT = 0x005A0049, /* dest = pattern XOR dest*/
+            DSTINVERT = 0x00550009, /* dest = (NOT dest)*/
+            BLACKNESS = 0x00000042, /* dest = BLACK*/
+            WHITENESS = 0x00FF0062, /* dest = WHITE*/
+        };
+
+        [DllImport("gdi32.dll")]
+        public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, TernaryRasterOperations dwRop);
+
+        [DllImport("gdi32.dll", ExactSpelling = true, PreserveSig = true, SetLastError = true)]
+        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+    }
+
     internal partial class MapEditor : UserControl
     {
         public MapEditor()
@@ -195,44 +227,6 @@ namespace Shrimp
             }
         }
 
-        /*protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-            if ((e.KeyCode & Keys.Up) != 0)
-            {
-                this.EditorState.SetMapOffset(this.Map.Id, new Point
-                {
-                    X = offset.X,
-                    Y = offset.Y - Util.DisplayedGridSize,
-                });
-            }
-            else if ((e.KeyCode & Keys.Down) != 0)
-            {
-                this.EditorState.SetMapOffset(this.Map.Id, new Point
-                {
-                    X = offset.X,
-                    Y = offset.Y + Util.DisplayedGridSize,
-                });
-            }
-            else if ((e.KeyCode & Keys.Left) != 0)
-            {
-                this.EditorState.SetMapOffset(this.Map.Id, new Point
-                {
-                    X = offset.X - Util.DisplayedGridSize,
-                    Y = offset.Y,
-                });
-            }
-            else if ((e.KeyCode & Keys.Right) != 0)
-            {
-                this.EditorState.SetMapOffset(this.Map.Id, new Point
-                {
-                    X = offset.X + Util.DisplayedGridSize,
-                    Y = offset.Y,
-                });
-            }
-        }*/
-
         private int CursorTileX = 0;
         private int CursorTileY = 0;
 
@@ -311,60 +305,75 @@ namespace Shrimp
                     Pen gridPen = new Pen(Color.FromArgb(0x80, 0x80, 0x80, 0x80), 1);
                     TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
                     Dictionary<int, Bitmap> bitmaps = new Dictionary<int, Bitmap>();
-                    for (int j = 0; j < height; j++)
+                    IntPtr hDstDC = g.GetHdc();
+                    IntPtr hBackgroundBitmapDC = Util.BackgroundBitmap.GetHbitmap();
+                    using (Graphics gBackgroundBitmap = Graphics.FromImage(Util.BackgroundBitmap))
                     {
-                        int y = j * 32 + offset.Y;
-                        if (y + 32 <= 0)
+                        IntPtr hSrcDC = gBackgroundBitmap.GetHdc();
+                        IntPtr hBackgroundBitmapDC2 = GDI32.SelectObject(hSrcDC, hBackgroundBitmapDC);
+                        int startI = Math.Max(-offset.X / Util.DisplayedGridSize, 0);
+                        int endI = Math.Min((this.HScrollBar.Width - offset.X) / Util.DisplayedGridSize + 1, width);
+                        int startJ = Math.Max(-offset.Y / Util.DisplayedGridSize, 0);
+                        int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / Util.DisplayedGridSize + 1, height);
+                        for (int j = startJ; j < endJ; j++)
                         {
-                            continue;
-                        }
-                        else if (this.VScrollBar.Height <= y)
-                        {
-                            break;
-                        }
-                        for (int i = 0; i < width; i++)
-                        {
-                            int x = i * 32 + offset.X;
-                            if (x + 32 <= 0)
+                            int y = j * Util.DisplayedGridSize + offset.Y;
+                            for (int i = startI; i < endI; i++)
                             {
-                                continue;
+                                int x = i * Util.DisplayedGridSize + offset.X;
+                                GDI32.BitBlt(
+                                    hDstDC, x, y, Util.DisplayedGridSize, Util.DisplayedGridSize,
+                                    hSrcDC, 0, 0, GDI32.TernaryRasterOperations.SRCCOPY);
                             }
-                            else if (this.HScrollBar.Width <= x)
+                        }
+                        GDI32.SelectObject(hSrcDC, hBackgroundBitmapDC2);
+                        gBackgroundBitmap.ReleaseHdc(hSrcDC);
+                    }
+                    g.ReleaseHdc(hDstDC);
+                    GDI32.DeleteObject(hBackgroundBitmapDC);
+                    int gridSize = Util.GridSize * 2;
+                    {
+                        int startI = Math.Max(-offset.X / gridSize, 0);
+                        int endI = Math.Min((this.HScrollBar.Width - offset.X) / gridSize + 1, width);
+                        int startJ = Math.Max(-offset.Y / gridSize, 0);
+                        int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / gridSize + 1, height);
+                        for (int j = startJ; j < endJ; j++)
+                        {
+                            int y = j * gridSize + offset.Y;
+                            for (int i = startI; i < endI; i++)
                             {
-                                break;
-                            }
-                            g.DrawImage(Util.BackgroundBitmap, x, y);
-                            Tile tile = map.GetTile(0, i, j);
-                            int tileId = tile.TileId;
-                            if (tileSetCollection.ContainsId(tile.TileSetId))
-                            {
-                                int scale = 2;
-                                if (!bitmaps.ContainsKey(tile.TileSetId))
+                                int x = i * gridSize + offset.X;
+                                Tile tile = map.GetTile(0, i, j);
+                                int tileId = tile.TileId;
+                                if (tileSetCollection.ContainsId(tile.TileSetId))
                                 {
-                                    TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
-                                    bitmaps[tile.TileSetId]= tileSet.GetBitmap(BitmapScale.Scale1);
+                                    if (!bitmaps.ContainsKey(tile.TileSetId))
+                                    {
+                                        TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
+                                        bitmaps[tile.TileSetId] = tileSet.GetBitmap(BitmapScale.Scale1);
+                                    }
+                                    g.DrawImage(bitmaps[tile.TileSetId], x, y, new Rectangle
+                                    {
+                                        X = (tileId % Util.PaletteHorizontalCount) * gridSize,
+                                        Y = (tileId / Util.PaletteHorizontalCount) * gridSize,
+                                        Width = gridSize,
+                                        Height = gridSize,
+                                    }, GraphicsUnit.Pixel);
                                 }
-                                g.DrawImage(bitmaps[tile.TileSetId], x, y, new Rectangle
+                                if (this.EditorState.LayerMode == LayerMode.Event)
                                 {
-                                    X = (tileId % Util.PaletteHorizontalCount) * Util.GridSize * scale,
-                                    Y = (tileId / Util.PaletteHorizontalCount) * Util.GridSize * scale,
-                                    Width = 32,
-                                    Height = 32,
-                                }, GraphicsUnit.Pixel);
-                            }
-                            if (this.EditorState.LayerMode == LayerMode.Event)
-                            {
-                                g.DrawRectangle(gridPen, x, y, 32 - 1, 32 - 1);
+                                    g.DrawRectangle(gridPen, x, y, gridSize - 1, gridSize - 1);
+                                }
                             }
                         }
                     }
                     SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                     Util.DrawFrame(g, new Rectangle
                     {
-                        X = this.CursorTileX * 32 + offset.X,
-                        Y = this.CursorTileY * 32 + offset.Y,
-                        Width = 32 * selectedTiles.Width,
-                        Height = 32 * selectedTiles.Height,
+                        X = this.CursorTileX * gridSize + offset.X,
+                        Y = this.CursorTileY * gridSize + offset.Y,
+                        Width = gridSize * selectedTiles.Width,
+                        Height = gridSize * selectedTiles.Height,
                     });
                 }
             }
