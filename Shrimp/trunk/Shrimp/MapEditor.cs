@@ -7,7 +7,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Data;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -374,6 +373,8 @@ namespace Shrimp
         }
 
         private Bitmap OffscreenBitmap;
+        private IntPtr hOffscreen = IntPtr.Zero;
+        private IntPtr hBufferDC = IntPtr.Zero;
 
         protected override void OnLayout(LayoutEventArgs e)
         {
@@ -382,8 +383,21 @@ namespace Shrimp
             if (this.OffscreenBitmap != null)
             {
                 this.OffscreenBitmap.Dispose();
+                //
+                Win32API.DeleteDC(this.hBufferDC);
+                Win32API.DeleteObject(this.hOffscreen);
+                //
             }
-            this.OffscreenBitmap = new Bitmap(this.HScrollBar.Width, this.VScrollBar.Height);
+            int width = this.HScrollBar.Width;
+            int height = this.VScrollBar.Height;
+            this.OffscreenBitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            //
+            IntPtr hDC = Win32API.GetDC(this.Handle);
+            this.hOffscreen = Win32API.CreateCompatibleBitmap(hDC, width, height);
+            this.hBufferDC = Win32API.CreateCompatibleDC(hDC);
+            Win32API.SelectObject(this.hBufferDC, this.hOffscreen);
+            Win32API.ReleaseDC(this.Handle, hDC);
+            //
             this.UpdateOffscreen();
             this.Invalidate();
             this.Update();
@@ -407,14 +421,21 @@ namespace Shrimp
                     BitmapData dstBD = this.OffscreenBitmap.LockBits(new Rectangle
                     {
                         Size = this.OffscreenBitmap.Size,
-                    }, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                    Util.FillBitmap(dstBD, this.BackColor);
-                    Bitmap backgroundBitmap = Util.BackgroundBitmap;
+                    }, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                    // Util.FillBitmap(dstBD, this.BackColor);
+                    Win32API.RECT rect = new Win32API.RECT
+                    {
+                        Left = 0,
+                        Top = 0,
+                        Right = this.HScrollBar.Width,
+                        Bottom = this.VScrollBar.Height,
+                    };
+                    Win32API.FillRect(this.hBufferDC, ref rect, Win32API.GetStockObject(1));
+                    /*Bitmap backgroundBitmap = Util.BackgroundBitmap;
                     BitmapData backgroundBD = backgroundBitmap.LockBits(new Rectangle
                     {
                         Size = backgroundBitmap.Size,
-                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                    unsafe
+                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);*/
                     {
                         int startI = Math.Max(-offset.X / Util.DisplayedGridSize, 0);
                         int endI = Math.Min((this.HScrollBar.Width - offset.X) / Util.DisplayedGridSize + 1, width);
@@ -426,14 +447,17 @@ namespace Shrimp
                             for (int i = startI; i < endI; i++)
                             {
                                 int x = i * Util.DisplayedGridSize + offset.X;
-                                Util.DrawBitmap(dstBD, backgroundBD, x, y, new Rectangle
+                                /*Util.DrawBitmap(dstBD, backgroundBD, x, y, new Rectangle
                                 {
                                     Size = backgroundBitmap.Size,
-                                });
+                                });*/
+                                Win32API.BitBlt(this.hBufferDC, x, y, 32, 32,
+                                    Util.BackgroundHBitmap, 0, 0,
+                                    Win32API.TernaryRasterOperations.SRCCOPY);
                             }
                         }
                     }
-                    Util.BackgroundBitmap.UnlockBits(backgroundBD);
+                    //Util.BackgroundBitmap.UnlockBits(backgroundBD);
                     int gridSize = Util.GridSize * 2;
                     {
                         TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
@@ -505,12 +529,31 @@ namespace Shrimp
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
-            g.InterpolationMode = InterpolationMode.NearestNeighbor;
             if (this.ViewModel != null && this.EditorState != null && this.Map != null)
             {
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 Rectangle rect = e.ClipRectangle;
-                g.DrawImage(this.OffscreenBitmap, rect.X, rect.Y, rect, GraphicsUnit.Pixel);
+                /*using (Graphics gOffscreen = Graphics.FromImage(this.OffscreenBitmap))
+                {
+                    IntPtr hDstDC = g.GetHdc();
+                    IntPtr hOffscreenDC = this.OffscreenBitmap.GetHbitmap();
+                    IntPtr hSrcDC = gOffscreen.GetHdc();
+                    IntPtr hOffscreenDC2 = Win32API.SelectObject(hSrcDC, hOffscreenDC);
+                    Win32API.BitBlt(
+                        hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
+                        hSrcDC, rect.X, rect.Y, Win32API.TernaryRasterOperations.SRCCOPY);
+                    Win32API.SelectObject(hSrcDC, hOffscreenDC2);
+                    gOffscreen.ReleaseHdc(hSrcDC);
+                    Win32API.DeleteObject(hOffscreenDC);
+                    g.ReleaseHdc(hDstDC);
+                }*/
+                IntPtr hDstDC = g.GetHdc();
+                Win32API.BitBlt(
+                    hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
+                    this.hBufferDC, rect.X, rect.Y,
+                    Win32API.TernaryRasterOperations.SRCCOPY);
+                g.ReleaseHdc(hDstDC);
+                //g.DrawImage(this.OffscreenBitmap, rect.X, rect.Y, rect, GraphicsUnit.Pixel);
                 Util.DrawFrame(g, this.FrameRect);
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
@@ -575,36 +618,5 @@ namespace Shrimp
                 Y = -e.NewValue,
             });
         }
-    }
-
-    internal static class GDI32
-    {
-        public enum TernaryRasterOperations : uint
-        {
-            SRCCOPY = 0x00CC0020, /* dest = source*/
-            SRCPAINT = 0x00EE0086, /* dest = source OR dest*/
-            SRCAND = 0x008800C6, /* dest = source AND dest*/
-            SRCINVERT = 0x00660046, /* dest = source XOR dest*/
-            SRCERASE = 0x00440328, /* dest = source AND (NOT dest )*/
-            NOTSRCCOPY = 0x00330008, /* dest = (NOT source)*/
-            NOTSRCERASE = 0x001100A6, /* dest = (NOT src) AND (NOT dest) */
-            MERGECOPY = 0x00C000CA, /* dest = (source AND pattern)*/
-            MERGEPAINT = 0x00BB0226, /* dest = (NOT source) OR dest*/
-            PATCOPY = 0x00F00021, /* dest = pattern*/
-            PATPAINT = 0x00FB0A09, /* dest = DPSnoo*/
-            PATINVERT = 0x005A0049, /* dest = pattern XOR dest*/
-            DSTINVERT = 0x00550009, /* dest = (NOT dest)*/
-            BLACKNESS = 0x00000042, /* dest = BLACK*/
-            WHITENESS = 0x00FF0062, /* dest = WHITE*/
-        };
-
-        [DllImport("gdi32.dll")]
-        public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, TernaryRasterOperations dwRop);
-
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
-        [DllImport("gdi32.dll", ExactSpelling = true, PreserveSig = true, SetLastError = true)]
-        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
     }
 }

@@ -165,6 +165,7 @@
     <Compile Include="TileSetPalette.Designer.cs">
       <DependentUpon>TileSetPalette.cs</DependentUpon>
     </Compile>
+    <Compile Include="Win32API.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Newtonsoft.Json.dll">

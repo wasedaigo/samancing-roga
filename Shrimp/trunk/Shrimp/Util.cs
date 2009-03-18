@@ -14,20 +14,27 @@ namespace Shrimp
         static Util()
         {
             BackgroundBitmap = new Bitmap(DisplayedGridSize, DisplayedGridSize);
-            using (Graphics g = Graphics.FromImage(BackgroundBitmap))
-            {
-                Color color1 = Color.FromArgb(0, 0, 0x80);
-                Brush brush1 = new SolidBrush(color1);
-                Color color2 = Color.FromArgb(0, 0, 0x40);
-                Brush brush2 = new SolidBrush(color2);
-                g.FillRectangle(brush1, 0, 0, 16, 16);
-                g.FillRectangle(brush2, 0, 16, 16, 16);
-                g.FillRectangle(brush2, 16, 0, 16, 16);
-                g.FillRectangle(brush1, 16, 16, 16, 16);
-            }
+            Graphics g = Graphics.FromImage(BackgroundBitmap);
+            Color color1 = Color.FromArgb(0, 0, 0x80);
+            Brush brush1 = new SolidBrush(color1);
+            Color color2 = Color.FromArgb(0, 0, 0x40);
+            Brush brush2 = new SolidBrush(color2);
+            g.FillRectangle(brush1, 0, 0, 16, 16);
+            g.FillRectangle(brush2, 0, 16, 16, 16);
+            g.FillRectangle(brush2, 16, 0, 16, 16);
+            g.FillRectangle(brush1, 16, 16, 16, 16);
+
+            IntPtr hBackgroundBitmap = BackgroundBitmap.GetHbitmap();
+            IntPtr hBackgroundBitmapDC = g.GetHdc();
+            Win32API.SelectObject(hBackgroundBitmapDC, hBackgroundBitmap);
+
+            BackgroundHBitmap = hBackgroundBitmapDC;
+            gBackgroundBitmap = g;
         }
 
         public static readonly Bitmap BackgroundBitmap;
+        public static readonly IntPtr BackgroundHBitmap;
+        private static readonly Graphics gBackgroundBitmap;
 
         public const int DisplayedGridSize = GridSize * GridScale;
         public const int GridSize = 16;
@@ -126,6 +133,8 @@ namespace Shrimp
         public static void DrawBitmap(BitmapData dstBD, BitmapData srcBD,
             int dstX, int dstY, Rectangle srcRect, byte alpha)
         {
+            Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);
+            Debug.Assert(srcBD.PixelFormat == PixelFormat.Format32bppArgb);
             int srcX = srcRect.X;
             int srcY = srcRect.Y;
             int width = srcRect.Width;
@@ -186,9 +195,9 @@ namespace Shrimp
             Debug.Assert(srcY + height <= srcBD.Height);
             unsafe
             {
-                byte* dst = (byte*)dstBD.Scan0 + (dstX * 4) + (dstY * dstBD.Stride);
+                byte* dst = (byte*)dstBD.Scan0 + (dstX * 3) + (dstY * dstBD.Stride);
                 byte* src = (byte*)srcBD.Scan0 + (srcX * 4) + (srcY * srcBD.Stride);
-                int paddingDst = dstBD.Stride - width * 4;
+                int paddingDst = dstBD.Stride - width * 3;
                 int paddingSrc = srcBD.Stride - width * 4;
                 Debug.Assert(0 <= paddingDst);
                 Debug.Assert(0 <= paddingSrc);
@@ -196,13 +205,12 @@ namespace Shrimp
                 {
                     for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
                     {
-                        for (int i = 0; i < width; i++, dst += 4, src += 4)
+                        for (int i = 0; i < width; i++, dst += 3, src += 4)
                         {
                             byte a = src[3];
                             dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * a + 255) >> 8);
                             dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * a + 255) >> 8);
                             dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * a + 255) >> 8);
-                            dst[3] = 0xff;
                         }
                     }
                 }
@@ -210,13 +218,12 @@ namespace Shrimp
                 {
                     for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
                     {
-                        for (int i = 0; i < width; i++, dst += 4, src += 4)
+                        for (int i = 0; i < width; i++, dst += 3, src += 4)
                         {
                             byte a = (byte)((src[3] * alpha + 255) >> 8);
                             dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * a + 255) >> 8);
                             dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * a + 255) >> 8);
                             dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * a + 255) >> 8);
-                            dst[3] = 0xff;
                         }
                     }
                 }
@@ -225,6 +232,7 @@ namespace Shrimp
 
         public static void ClearBitmap(BitmapData dstBD)
         {
+            Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);
             int size = dstBD.Stride * dstBD.Height;
             unsafe
             {
@@ -238,10 +246,10 @@ namespace Shrimp
 
         public static void FillBitmap(BitmapData dstBD, Color color)
         {
+            Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);
             int width = dstBD.Width;
             int height = dstBD.Height;
-            int padding = dstBD.Stride - width * 4;
-            byte a = color.A;
+            int padding = dstBD.Stride - width * 3;
             byte r = color.R;
             byte g = color.G;
             byte b = color.B;
@@ -250,12 +258,11 @@ namespace Shrimp
                 byte* dst = (byte*)dstBD.Scan0;
                 for (int j = 0; j < height; j++, dst += padding)
                 {
-                    for (int i = 0; i < width; i++, dst += 4)
+                    for (int i = 0; i < width; i++, dst += 3)
                     {
                         dst[0] = b;
                         dst[1] = g;
                         dst[2] = r;
-                        dst[3] = a;
                     }
                 }
             }
@@ -263,15 +270,16 @@ namespace Shrimp
 
         public static void DarkenBitmap(BitmapData dstBD)
         {
+            Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);
             int width = dstBD.Width;
             int height = dstBD.Height;
-            int padding = dstBD.Stride - width * 4;
+            int padding = dstBD.Stride - width * 3;
             unsafe
             {
                 byte* dst = (byte*)dstBD.Scan0;
                 for (int j = 0; j < height; j++, dst += padding)
                 {
-                    for (int i = 0; i < width; i++, dst += 4)
+                    for (int i = 0; i < width; i++, dst += 3)
                     {
                         dst[0] = (byte)(dst[0] >> 1);
                         dst[1] = (byte)(dst[1] >> 1);
