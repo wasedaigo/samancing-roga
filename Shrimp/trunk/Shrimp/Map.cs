@@ -129,16 +129,22 @@ namespace Shrimp
             int dx, int dy)
         {
             var tiles = selectedTiles.Tiles.ToArray();
+            int width = selectedTiles.Width;
+            int height = selectedTiles.Height;
             List<Tile> layer = this.Layers[layerNumber];
-            // floor mod
-            dx = (int)(dx - selectedTiles.Width * Math.Floor((double)dx / selectedTiles.Width));
-            dy = (int)(dy - selectedTiles.Height * Math.Floor((double)dy / selectedTiles.Height));
-            for (int j = 0; j < selectedTiles.Height; j++)
+            if (dx < 0)
             {
-                for (int i = 0; i < selectedTiles.Width; i++)
+                dx = width - -dx % width;
+            }
+            if (dy < 0)
+            {
+                dy = height - -dy % height;
+            }
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
                 {
-                    int index = ((j + dy) % selectedTiles.Height) * selectedTiles.Width
-                        + ((i + dx) % selectedTiles.Width);
+                    int index = ((j + dy) % height) * width + ((i + dx) % width);
                     Tile tile = tiles[index];
                     if (0 <= i + x && i + x < this.Width &&
                         0 <= j + y && j + y < this.Height)
