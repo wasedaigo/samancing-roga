@@ -115,6 +115,9 @@ namespace Shrimp
 
         private Dictionary<BitmapScale, Bitmap> Bitmaps =
             new Dictionary<BitmapScale, Bitmap>();
+        private Dictionary<BitmapScale, IntPtr> HBitmapDCs =
+            new Dictionary<BitmapScale, IntPtr>();
+        private List<Graphics> graphicsCollection = new List<Graphics>(); // for GC
 
         public Bitmap GetBitmap(BitmapScale scale)
         {
@@ -123,13 +126,35 @@ namespace Shrimp
                 switch (scale)
                 {
                 case BitmapScale.Scale1:
-                    this.Bitmaps.Add(scale, Util.CreateScaledBitmap(this.OriginalBitmap));
-                    break;
+                    Bitmap bitmap = Util.CreateScaledBitmap(this.OriginalBitmap);
+                    this.Bitmaps.Add(scale, bitmap);
+                    return bitmap;
                 default:
                     throw new NotImplementedException();
                 }
             }
-            return this.Bitmaps[scale];
+            else
+            {
+                return this.Bitmaps[scale];
+            }
+        }
+
+        public IntPtr GetHBitmap(BitmapScale scale)
+        {
+            if (!this.HBitmapDCs.ContainsKey(scale))
+            {
+                Bitmap bitmap = this.GetBitmap(scale);
+                Graphics g = Graphics.FromImage(bitmap);
+                IntPtr hBitmap = bitmap.GetHbitmap();
+                IntPtr hBitmapDC = g.GetHdc();
+                Win32API.SelectObject(hBitmapDC, hBitmap);
+                this.graphicsCollection.Add(g);
+                return this.HBitmapDCs[scale] = hBitmapDC;
+            }
+            else
+            {
+                return this.HBitmapDCs[scale];
+            }
         }
 
         public override void Clear()

@@ -28,13 +28,13 @@ namespace Shrimp
             IntPtr hBackgroundBitmapDC = g.GetHdc();
             Win32API.SelectObject(hBackgroundBitmapDC, hBackgroundBitmap);
 
-            BackgroundHBitmap = hBackgroundBitmapDC;
+            HBackgroundBitmapDC = hBackgroundBitmapDC;
             gBackgroundBitmap = g;
         }
 
         public static readonly Bitmap BackgroundBitmap;
-        public static readonly IntPtr BackgroundHBitmap;
-        private static readonly Graphics gBackgroundBitmap;
+        public static readonly IntPtr HBackgroundBitmapDC;
+        private static readonly Graphics gBackgroundBitmap; // for GC
 
         public const int DisplayedGridSize = GridSize * GridScale;
         public const int GridSize = 16;

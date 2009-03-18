@@ -372,32 +372,27 @@ namespace Shrimp
             this.Update();
         }
 
-        private Bitmap OffscreenBitmap;
-        private IntPtr hOffscreen = IntPtr.Zero;
-        private IntPtr hBufferDC = IntPtr.Zero;
+        private IntPtr HOffscreen = IntPtr.Zero;
+        private IntPtr HOffscreenDC = IntPtr.Zero;
 
         protected override void OnLayout(LayoutEventArgs e)
         {
             base.OnLayout(e);
             this.AdjustScrollBars();
-            if (this.OffscreenBitmap != null)
+            if (this.HOffscreen == IntPtr.Zero)
             {
-                this.OffscreenBitmap.Dispose();
-                //
-                Win32API.DeleteDC(this.hBufferDC);
-                Win32API.DeleteObject(this.hOffscreen);
-                //
+                Win32API.DeleteDC(this.HOffscreenDC);
+                Win32API.DeleteObject(this.HOffscreen);
+                this.HOffscreenDC = IntPtr.Zero;
+                this.HOffscreen = IntPtr.Zero;
             }
             int width = this.HScrollBar.Width;
             int height = this.VScrollBar.Height;
-            this.OffscreenBitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-            //
             IntPtr hDC = Win32API.GetDC(this.Handle);
-            this.hOffscreen = Win32API.CreateCompatibleBitmap(hDC, width, height);
-            this.hBufferDC = Win32API.CreateCompatibleDC(hDC);
-            Win32API.SelectObject(this.hBufferDC, this.hOffscreen);
+            this.HOffscreen = Win32API.CreateCompatibleBitmap(hDC, width, height);
+            this.HOffscreenDC = Win32API.CreateCompatibleDC(hDC);
+            Win32API.SelectObject(this.HOffscreenDC, this.HOffscreen);
             Win32API.ReleaseDC(this.Handle, hDC);
-            //
             this.UpdateOffscreen();
             this.Invalidate();
             this.Update();
@@ -418,109 +413,90 @@ namespace Shrimp
                     Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                     int width = map.Width;
                     int height = map.Height;
-                    BitmapData dstBD = this.OffscreenBitmap.LockBits(new Rectangle
+                    using (Graphics g = Graphics.FromHdc(this.HOffscreenDC))
                     {
-                        Size = this.OffscreenBitmap.Size,
-                    }, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-                    // Util.FillBitmap(dstBD, this.BackColor);
-                    Win32API.RECT rect = new Win32API.RECT
-                    {
-                        Left = 0,
-                        Top = 0,
-                        Right = this.HScrollBar.Width,
-                        Bottom = this.VScrollBar.Height,
-                    };
-                    Win32API.FillRect(this.hBufferDC, ref rect, Win32API.GetStockObject(1));
-                    /*Bitmap backgroundBitmap = Util.BackgroundBitmap;
-                    BitmapData backgroundBD = backgroundBitmap.LockBits(new Rectangle
-                    {
-                        Size = backgroundBitmap.Size,
-                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);*/
-                    {
-                        int startI = Math.Max(-offset.X / Util.DisplayedGridSize, 0);
-                        int endI = Math.Min((this.HScrollBar.Width - offset.X) / Util.DisplayedGridSize + 1, width);
-                        int startJ = Math.Max(-offset.Y / Util.DisplayedGridSize, 0);
-                        int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / Util.DisplayedGridSize + 1, height);
-                        for (int j = startJ; j < endJ; j++)
+                        g.Clear(SystemColors.Control);
                         {
-                            int y = j * Util.DisplayedGridSize + offset.Y;
-                            for (int i = startI; i < endI; i++)
-                            {
-                                int x = i * Util.DisplayedGridSize + offset.X;
-                                /*Util.DrawBitmap(dstBD, backgroundBD, x, y, new Rectangle
-                                {
-                                    Size = backgroundBitmap.Size,
-                                });*/
-                                Win32API.BitBlt(this.hBufferDC, x, y, 32, 32,
-                                    Util.BackgroundHBitmap, 0, 0,
-                                    Win32API.TernaryRasterOperations.SRCCOPY);
-                            }
-                        }
-                    }
-                    //Util.BackgroundBitmap.UnlockBits(backgroundBD);
-                    int gridSize = Util.GridSize * 2;
-                    {
-                        TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
-                        Dictionary<int, BitmapData> bitmapDataHash = new Dictionary<int, BitmapData>();
-                        for (int layer = 0; layer < 2; layer++)
-                        {
-                            byte alpha = 255;
-                            if (this.EditorState.LayerMode == LayerMode.Layer1 && layer == 1)
-                            {
-                                alpha = 128;
-                            }
-                            int startI = Math.Max(-offset.X / gridSize, 0);
-                            int endI = Math.Min((this.HScrollBar.Width - offset.X) / gridSize + 1, width);
-                            int startJ = Math.Max(-offset.Y / gridSize, 0);
-                            int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / gridSize + 1, height);
+                            int startI = Math.Max(-offset.X / Util.DisplayedGridSize, 0);
+                            int endI = Math.Min((this.HScrollBar.Width - offset.X) / Util.DisplayedGridSize + 1, width);
+                            int startJ = Math.Max(-offset.Y / Util.DisplayedGridSize, 0);
+                            int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / Util.DisplayedGridSize + 1, height);
                             for (int j = startJ; j < endJ; j++)
                             {
-                                int y = j * gridSize + offset.Y;
+                                int y = j * Util.DisplayedGridSize + offset.Y;
                                 for (int i = startI; i < endI; i++)
                                 {
-                                    int x = i * gridSize + offset.X;
-
-                                    Tile tile = map.GetTile(layer, i, j);
-                                    if (tileSetCollection.ContainsId(tile.TileSetId))
-                                    {
-                                        int tileId = tile.TileId;
-                                        BitmapData srcBD;
-                                        if (!bitmapDataHash.ContainsKey(tile.TileSetId))
-                                        {
-                                            TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
-                                            Bitmap bitmap = tileSet.GetBitmap(BitmapScale.Scale1);
-                                            srcBD = bitmapDataHash[tile.TileSetId] = bitmap.LockBits(new Rectangle
-                                            {
-                                                Size = bitmap.Size,
-                                            }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                                        }
-                                        else
-                                        {
-                                            srcBD = bitmapDataHash[tile.TileSetId];
-                                        }
-
-                                        Util.DrawBitmap(dstBD, srcBD, x, y, new Rectangle
-                                        {
-                                            X = (tileId % Util.PaletteHorizontalCount) * gridSize,
-                                            Y = (tileId / Util.PaletteHorizontalCount) * gridSize,
-                                            Width = gridSize,
-                                            Height = gridSize,
-                                        }, alpha);
-                                    }
+                                    int x = i * Util.DisplayedGridSize + offset.X;
+                                    Win32API.BitBlt(
+                                        this.HOffscreenDC, x, y, 32, 32,
+                                        Util.HBackgroundBitmapDC, 0, 0,
+                                        Win32API.TernaryRasterOperations.SRCCOPY);
                                 }
                             }
-                            if (this.EditorState.LayerMode == LayerMode.Layer2 && layer == 0)
+                        }
+                        int gridSize = Util.GridSize * 2;
+                        {
+                            TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
+                            Dictionary<int, IntPtr> dcHash = new Dictionary<int, IntPtr>();
+                            for (int layer = 0; layer < 2; layer++)
                             {
-                                Util.DarkenBitmap(dstBD);
+                                byte alpha = 255;
+                                if (this.EditorState.LayerMode == LayerMode.Layer1 && layer == 1)
+                                {
+                                    alpha = 128;
+                                }
+                                Win32API.BLENDFUNCTION blend = new Win32API.BLENDFUNCTION
+                                {
+                                    BlendOp = Win32API.AC_SRC_OVER,
+                                    BlendFlags = 0,
+                                    SourceConstantAlpha = alpha,
+                                    AlphaFormat = Win32API.AC_SRC_ALPHA
+                                };
+                                int startI = Math.Max(-offset.X / gridSize, 0);
+                                int endI = Math.Min((this.HScrollBar.Width - offset.X) / gridSize + 1, width);
+                                int startJ = Math.Max(-offset.Y / gridSize, 0);
+                                int endJ = Math.Min((this.VScrollBar.Height - offset.Y) / gridSize + 1, height);
+                                for (int j = startJ; j < endJ; j++)
+                                {
+                                    int y = j * gridSize + offset.Y;
+                                    for (int i = startI; i < endI; i++)
+                                    {
+                                        int x = i * gridSize + offset.X;
+                                        Tile tile = map.GetTile(layer, i, j);
+                                        if (tileSetCollection.ContainsId(tile.TileSetId))
+                                        {
+                                            int tileId = tile.TileId;
+                                            IntPtr hSrcDC;
+                                            if (!dcHash.ContainsKey(tile.TileSetId))
+                                            {
+                                                TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
+                                                hSrcDC = dcHash[tile.TileSetId] = tileSet.GetHBitmap(BitmapScale.Scale1);
+                                            }
+                                            else
+                                            {
+                                                hSrcDC = dcHash[tile.TileSetId];
+                                            }
+                                            int srcX = (tileId % Util.PaletteHorizontalCount) * gridSize;
+                                            int srcY = (tileId / Util.PaletteHorizontalCount) * gridSize;
+                                            Win32API.AlphaBlend(
+                                                this.HOffscreenDC, x, y, gridSize, gridSize,
+                                                hSrcDC, srcX, srcY, gridSize, gridSize,
+                                                blend);
+                                            /*g.DrawImage(tileSet.GetBitmap(BitmapScale.Scale1),
+                                                x, y,
+                                                new Rectangle(srcX, srcY, gridSize, gridSize),
+                                                GraphicsUnit.Pixel);*/
+                                        }
+                                    }
+                                }
+                                if (this.EditorState.LayerMode == LayerMode.Layer2 && layer == 0)
+                                {
+                                    //Util.DarkenBitmap(dstBD);
+                                }
                             }
                         }
-                        foreach (var pair in bitmapDataHash)
-                        {
-                            Bitmap bitmap = tileSetCollection.GetItem(pair.Key).GetBitmap(BitmapScale.Scale1);
-                            bitmap.UnlockBits(pair.Value);
-                        }
+                        //this.OffscreenBitmap.UnlockBits(dstBD);
                     }
-                    this.OffscreenBitmap.UnlockBits(dstBD);
                 }
             }
         }
@@ -550,10 +526,9 @@ namespace Shrimp
                 IntPtr hDstDC = g.GetHdc();
                 Win32API.BitBlt(
                     hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
-                    this.hBufferDC, rect.X, rect.Y,
+                    this.HOffscreenDC, rect.X, rect.Y,
                     Win32API.TernaryRasterOperations.SRCCOPY);
                 g.ReleaseHdc(hDstDC);
-                //g.DrawImage(this.OffscreenBitmap, rect.X, rect.Y, rect, GraphicsUnit.Pixel);
                 Util.DrawFrame(g, this.FrameRect);
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
