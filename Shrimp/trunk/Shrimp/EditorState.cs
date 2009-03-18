@@ -25,7 +25,7 @@ namespace Shrimp
     {
         Single,
         Rectangle,
-        Other,
+        Picker,
     }
 
     internal class SelectedTiles
@@ -54,9 +54,9 @@ namespace Shrimp
             return new SelectedTiles(SelectedTilesType.Rectangle, tiles, width, height);
         }
 
-        public static SelectedTiles Other(IEnumerable<Tile> tiles, int width, int height)
+        public static SelectedTiles Picker(IEnumerable<Tile> tiles, int width, int height)
         {
-            return new SelectedTiles(SelectedTilesType.Other, tiles, width, height);
+            return new SelectedTiles(SelectedTilesType.Picker, tiles, width, height);
         }
 
         private SelectedTiles(SelectedTilesType type, Tile tile, int width, int height)

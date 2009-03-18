@@ -86,6 +86,13 @@ namespace Shrimp
                     this.Invalidate();
                 }
                 break;
+            case "SelectedTiles":
+                if (this.EditorState.SelectedTiles.SelectedTilesType != SelectedTilesType.Picker)
+                {
+                    this.CursorOffsetX = 0;
+                    this.CursorOffsetY = 0;
+                }
+                break;
             }
         }
 
@@ -199,6 +206,8 @@ namespace Shrimp
 
         private int CursorTileX = 0;
         private int CursorTileY = 0;
+        private int CursorOffsetX = 0;
+        private int CursorOffsetY = 0;
         private bool IsPickingTiles = false;
         private int PickerStartX = 0;
         private int PickerStartY = 0;
@@ -227,10 +236,14 @@ namespace Shrimp
                     case LayerMode.Layer2: layer = 1; break;
                     default: Debug.Fail("Invalid layer"); break;
                     }
-                    this.Map.SetTiles(layer, this.CursorTileX, this.CursorTileY, this.EditorState.SelectedTiles);
+                    int x = this.CursorTileX + this.CursorOffsetX;
+                    int y = this.CursorTileY + this.CursorOffsetY;
+                    this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles);
                 }
                 else if ((e.Button & MouseButtons.Right) != 0)
                 {
+                    this.CursorOffsetX = 0;
+                    this.CursorOffsetY = 0;
                     this.PickerStartX = this.CursorTileX;
                     this.PickerStartY = this.CursorTileY;
                     this.IsPickingTiles = true;
@@ -271,7 +284,9 @@ namespace Shrimp
                         case LayerMode.Layer2: layer = 1; break;
                         default: Debug.Fail("Invalid layer"); break;
                         }
-                        this.Map.SetTiles(layer, this.CursorTileX, this.CursorTileY, this.EditorState.SelectedTiles);
+                        int x = this.CursorTileX + this.CursorOffsetX;
+                        int y = this.CursorTileY + this.CursorOffsetY;
+                        this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles);
                     }
                     else
                     {
@@ -292,6 +307,8 @@ namespace Shrimp
                     int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
                     int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
                     int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
+                    this.CursorOffsetX = pickedRegionX - this.CursorTileX;
+                    this.CursorOffsetY = pickedRegionY - this.CursorTileY;
                     int layer = 0;
                     switch (this.EditorState.LayerMode)
                     {
@@ -301,15 +318,11 @@ namespace Shrimp
                     }
                     Map map = this.Map;
                     List<Tile> tiles = new List<Tile>();
-                    for (int j = pickedRegionY;
-                         j < pickedRegionY + pickedRegionHeight;
-                         j++)
+                    for (int j = 0; j < pickedRegionHeight; j++)
                     {
-                        for (int i = pickedRegionX;
-                             i < pickedRegionX + pickedRegionWidth;
-                             i++)
+                        for (int i = 0; i < pickedRegionWidth; i++)
                         {
-                            tiles.Add(map.GetTile(layer, i, j));
+                            tiles.Add(map.GetTile(layer, i + pickedRegionX, j + pickedRegionY));
                         }
                     }
                     if (tiles.Count == 1)
@@ -319,7 +332,7 @@ namespace Shrimp
                     else
                     {
                         this.EditorState.SelectedTiles =
-                            SelectedTiles.Other(tiles, pickedRegionWidth, pickedRegionHeight);
+                            SelectedTiles.Picker(tiles, pickedRegionWidth, pickedRegionHeight);
                     }
                 }
                 this.IsPickingTiles = false;
@@ -465,8 +478,8 @@ namespace Shrimp
                         SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                         Util.DrawFrame(g, new Rectangle
                         {
-                            X = this.CursorTileX * gridSize + offset.X,
-                            Y = this.CursorTileY * gridSize + offset.Y,
+                            X = (this.CursorTileX + this.CursorOffsetX) * gridSize + offset.X,
+                            Y = (this.CursorTileY + this.CursorOffsetY) * gridSize + offset.Y,
                             Width = gridSize * selectedTiles.Width,
                             Height = gridSize * selectedTiles.Height,
                         });
