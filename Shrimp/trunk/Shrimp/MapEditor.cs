@@ -211,6 +211,8 @@ namespace Shrimp
         private bool IsPickingTiles = false;
         private int PickerStartX = 0;
         private int PickerStartY = 0;
+        private int RenderingStartX = 0;
+        private int RenderingStartY = 0;
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -238,7 +240,9 @@ namespace Shrimp
                     }
                     int x = this.CursorTileX + this.CursorOffsetX;
                     int y = this.CursorTileY + this.CursorOffsetY;
-                    this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles);
+                    this.RenderingStartX = x;
+                    this.RenderingStartY = y;
+                    this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
                 }
                 else if ((e.Button & MouseButtons.Right) != 0)
                 {
@@ -286,7 +290,8 @@ namespace Shrimp
                         }
                         int x = this.CursorTileX + this.CursorOffsetX;
                         int y = this.CursorTileY + this.CursorOffsetY;
-                        this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles);
+                        this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles,
+                            x - this.RenderingStartX, y - this.RenderingStartY);
                     }
                     else
                     {

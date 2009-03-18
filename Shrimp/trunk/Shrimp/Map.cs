@@ -125,15 +125,21 @@ namespace Shrimp
             this.OnUpdated(new UpdatedEventArgs("Tiles"));
         }
 
-        public void SetTiles(int layerNumber, int x, int y, SelectedTiles selectedTiles)
+        public void SetTiles(int layerNumber, int x, int y, SelectedTiles selectedTiles,
+            int dx, int dy)
         {
             var tiles = selectedTiles.Tiles.ToArray();
             List<Tile> layer = this.Layers[layerNumber];
+            // floor mod
+            dx = (int)(dx - selectedTiles.Width * Math.Floor((double)dx / selectedTiles.Width));
+            dy = (int)(dy - selectedTiles.Height * Math.Floor((double)dy / selectedTiles.Height));
             for (int j = 0; j < selectedTiles.Height; j++)
             {
                 for (int i = 0; i < selectedTiles.Width; i++)
                 {
-                    Tile tile = tiles[j * selectedTiles.Width + i];
+                    int index = ((j + dy) % selectedTiles.Height) * selectedTiles.Width
+                        + ((i + dx) % selectedTiles.Width);
+                    Tile tile = tiles[index];
                     if (0 <= i + x && i + x < this.Width &&
                         0 <= j + y && j + y < this.Height)
                     {
