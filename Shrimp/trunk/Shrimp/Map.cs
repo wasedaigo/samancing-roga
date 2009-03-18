@@ -161,7 +161,7 @@ namespace Shrimp
                         0 <= j + y && j + y < this.Height)
                     {
                         int location = (j + y) * this.Width + (i + x);
-                        if (!isChanged && layer[location] != tile)
+                        if (layer[location] != tile)
                         {
                             layer[location] = tile;
                             isChanged = true;

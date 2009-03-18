@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Data;
 using System.Linq;
@@ -233,6 +234,7 @@ namespace Shrimp
                 X = e.X - offset.X,
                 Y = e.Y - offset.Y,
             };
+            Rectangle oldFrameRect = this.FrameRect;
             this.CursorTileX =
                 Math.Min(Math.Max(mousePosition.X / Util.DisplayedGridSize, 0), this.Map.Width - 1);
             this.CursorTileY =
@@ -261,6 +263,8 @@ namespace Shrimp
                     this.PickerStartX = this.CursorTileX;
                     this.PickerStartY = this.CursorTileY;
                     this.IsPickingTiles = true;
+                    this.Invalidate(oldFrameRect);
+                    this.Update();
                 }
             }
         }
@@ -362,6 +366,13 @@ namespace Shrimp
             }
         }
 
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            this.Invalidate(this.FrameRect);
+            this.Update();
+        }
+
         private Bitmap OffscreenBitmap;
 
         protected override void OnLayout(LayoutEventArgs e)
@@ -379,6 +390,11 @@ namespace Shrimp
         }
 
         private void UpdateOffscreen()
+        {
+            this.UpdateOffscreen(Rectangle.Empty);
+        }
+
+        private void UpdateOffscreen(Rectangle rectangle)
         {
             if (this.ViewModel != null && this.EditorState != null)
             {
@@ -489,29 +505,13 @@ namespace Shrimp
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
-            if (this.ViewModel != null && this.EditorState != null)
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+            if (this.ViewModel != null && this.EditorState != null && this.Map != null)
             {
-                Map map = this.Map;
-                if (map != null)
-                {
-                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                    using (Graphics gOffscreen = Graphics.FromImage(this.OffscreenBitmap))
-                    {
-                        IntPtr hDstDC = g.GetHdc();
-                        IntPtr hOffscreenDC = this.OffscreenBitmap.GetHbitmap();
-                        IntPtr hSrcDC = gOffscreen.GetHdc();
-                        IntPtr hOffscreenDC2 = GDI32.SelectObject(hSrcDC, hOffscreenDC);
-                        Rectangle rect = e.ClipRectangle;
-                        GDI32.BitBlt(
-                            hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
-                            hSrcDC, rect.X, rect.Y, GDI32.TernaryRasterOperations.SRCCOPY);
-                        GDI32.SelectObject(hSrcDC, hOffscreenDC2);
-                        gOffscreen.ReleaseHdc(hSrcDC);
-                        GDI32.DeleteObject(hOffscreenDC);
-                        g.ReleaseHdc(hDstDC);
-                    }
-                    Util.DrawFrame(g, this.FrameRect);
-                }
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                Rectangle rect = e.ClipRectangle;
+                g.DrawImage(this.OffscreenBitmap, rect.X, rect.Y, rect, GraphicsUnit.Pixel);
+                Util.DrawFrame(g, this.FrameRect);
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
