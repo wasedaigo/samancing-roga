@@ -134,7 +134,11 @@ namespace Shrimp
                 for (int i = 0; i < selectedTiles.Width; i++)
                 {
                     Tile tile = tiles[j * selectedTiles.Width + i];
-                    layer[(j + y) * this.Width + (i + x)] = tile;
+                    if (0 <= i + x && i + x < this.Width &&
+                        0 <= j + y && j + y < this.Height)
+                    {
+                        layer[(j + y) * this.Width + (i + x)] = tile;
+                    }
                 }
             }
             this.OnUpdated(new UpdatedEventArgs("Tiles"));
