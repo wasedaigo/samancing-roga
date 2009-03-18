@@ -270,6 +270,7 @@ namespace Shrimp
             base.OnMouseMove(e);
             if (this.EditorState.LayerMode != LayerMode.Event)
             {
+                Rectangle oldFrameRect = this.FrameRect;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 Point mousePosition = new Point
                 {
@@ -284,12 +285,13 @@ namespace Shrimp
                 {
                     if ((e.Button & MouseButtons.Right) != 0)
                     {
-                        this.Invalidate();
+                        this.Invalidate(oldFrameRect);
                         this.Update();
                     }
                 }
                 else
                 {
+                    SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                     if ((e.Button & MouseButtons.Left) != 0)
                     {
                         int layer = 0;
@@ -301,12 +303,16 @@ namespace Shrimp
                         }
                         int x = this.CursorTileX + this.CursorOffsetX;
                         int y = this.CursorTileY + this.CursorOffsetY;
-                        this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles,
-                            x - this.RenderingStartX, y - this.RenderingStartY);
+                        if (!this.Map.SetTiles(layer, x, y, selectedTiles,
+                            x - this.RenderingStartX, y - this.RenderingStartY))
+                        {
+                            this.Invalidate(oldFrameRect);
+                            this.Update();
+                        }
                     }
                     else
                     {
-                        this.Invalidate();
+                        this.Invalidate(oldFrameRect);
                         this.Update();
                     }
                 }
@@ -489,7 +495,6 @@ namespace Shrimp
                 if (map != null)
                 {
                     Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                    int gridSize = Util.GridSize * 2;
                     using (Graphics gOffscreen = Graphics.FromImage(this.OffscreenBitmap))
                     {
                         IntPtr hDstDC = g.GetHdc();
@@ -505,31 +510,7 @@ namespace Shrimp
                         GDI32.DeleteObject(hOffscreenDC);
                         g.ReleaseHdc(hDstDC);
                     }
-                    if (!this.IsPickingTiles)
-                    {
-                        SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
-                        Util.DrawFrame(g, new Rectangle
-                        {
-                            X = (this.CursorTileX + this.CursorOffsetX) * gridSize + offset.X,
-                            Y = (this.CursorTileY + this.CursorOffsetY) * gridSize + offset.Y,
-                            Width = gridSize * selectedTiles.Width,
-                            Height = gridSize * selectedTiles.Height,
-                        });
-                    }
-                    else
-                    {
-                        int pickedRegionX = Math.Min(this.CursorTileX, this.PickerStartX);
-                        int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
-                        int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
-                        int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
-                        Util.DrawFrame(g, new Rectangle
-                        {
-                            X = pickedRegionX * gridSize + offset.X,
-                            Y = pickedRegionY * gridSize + offset.Y,
-                            Width = gridSize * pickedRegionWidth,
-                            Height = gridSize * pickedRegionHeight,
-                        });
-                    }
+                    Util.DrawFrame(g, this.FrameRect);
                 }
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
@@ -539,6 +520,40 @@ namespace Shrimp
                 Width = this.VScrollBar.Width,
                 Height = this.HScrollBar.Height,
             });
+        }
+
+        private Rectangle FrameRect
+        {
+            get
+            {
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                int gridSize = Util.GridSize * 2;
+                if (!this.IsPickingTiles)
+                {
+                    SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+                    return new Rectangle
+                    {
+                        X = (this.CursorTileX + this.CursorOffsetX) * gridSize + offset.X,
+                        Y = (this.CursorTileY + this.CursorOffsetY) * gridSize + offset.Y,
+                        Width = gridSize * selectedTiles.Width,
+                        Height = gridSize * selectedTiles.Height,
+                    };
+                }
+                else
+                {
+                    int pickedRegionX = Math.Min(this.CursorTileX, this.PickerStartX);
+                    int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
+                    int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
+                    int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
+                    return new Rectangle
+                    {
+                        X = pickedRegionX * gridSize + offset.X,
+                        Y = pickedRegionY * gridSize + offset.Y,
+                        Width = gridSize * pickedRegionWidth,
+                        Height = gridSize * pickedRegionHeight,
+                    };
+                }
+            }
         }
 
         private void HScrollBar_Scroll(object sender, ScrollEventArgs e)

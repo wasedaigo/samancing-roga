@@ -119,15 +119,26 @@ namespace Shrimp
             return this.Layers[layerNumber][y * this.Width + x];
         }
 
-        public void SetTile(int layerNumber, int x, int y, Tile tile)
+        public bool SetTile(int layerNumber, int x, int y, Tile tile)
         {
-            this.Layers[layerNumber][y * this.Width + x] = tile;
-            this.OnUpdated(new UpdatedEventArgs("Tiles"));
+            List<Tile> layer= this.Layers[layerNumber];
+            int index = y * this.Width + x;
+            if (layer[index] != tile)
+            {
+                layer[index] = tile;
+                this.OnUpdated(new UpdatedEventArgs("Tiles"));
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        public void SetTiles(int layerNumber, int x, int y, SelectedTiles selectedTiles,
+        public bool SetTiles(int layerNumber, int x, int y, SelectedTiles selectedTiles,
             int dx, int dy)
         {
+            bool isChanged = false;
             var tiles = selectedTiles.Tiles.ToArray();
             int width = selectedTiles.Width;
             int height = selectedTiles.Height;
@@ -149,11 +160,20 @@ namespace Shrimp
                     if (0 <= i + x && i + x < this.Width &&
                         0 <= j + y && j + y < this.Height)
                     {
-                        layer[(j + y) * this.Width + (i + x)] = tile;
+                        int location = (j + y) * this.Width + (i + x);
+                        if (!isChanged && layer[location] != tile)
+                        {
+                            layer[location] = tile;
+                            isChanged = true;
+                        }
                     }
                 }
             }
-            this.OnUpdated(new UpdatedEventArgs("Tiles"));
+            if (isChanged)
+            {
+                this.OnUpdated(new UpdatedEventArgs("Tiles"));
+            }
+            return isChanged;
         }
 
         public override void Clear()
