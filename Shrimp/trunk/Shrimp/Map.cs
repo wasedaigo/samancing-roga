@@ -134,11 +134,11 @@ namespace Shrimp
             List<Tile> layer = this.Layers[layerNumber];
             if (dx < 0)
             {
-                dx = width - -dx % width;
+                dx = -(-dx % width) + width;
             }
             if (dy < 0)
             {
-                dy = height - -dy % height;
+                dy = -(-dy % height) + height;
             }
             for (int j = 0; j < height; j++)
             {

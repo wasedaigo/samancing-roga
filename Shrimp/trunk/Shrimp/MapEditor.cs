@@ -77,13 +77,17 @@ namespace Shrimp
                 this.SelectedMapIdChanged();
                 break;
             case "LayerMode":
+                this.UpdateOffscreen();
                 this.Invalidate();
+                this.Update();
                 break;
             case "MapOffsets":
                 if (this.Map != null && (int)e.Tag == this.Map.Id)
                 {
                     this.AdjustScrollBars();
+                    this.UpdateOffscreen();
                     this.Invalidate();
+                    this.Update();
                 }
                 break;
             case "SelectedTiles":
@@ -113,7 +117,9 @@ namespace Shrimp
                         this.map.Updated += this.Map_Updated;
                     }
                     this.AdjustScrollBars();
+                    this.UpdateOffscreen();
                     this.Invalidate();
+                    this.Update();
                 }
             }
         }
@@ -146,10 +152,14 @@ namespace Shrimp
             case "Width":
             case "Height":
                 this.AdjustScrollBars();
+                this.UpdateOffscreen();
                 this.Invalidate();
+                this.Update();
                 break;
             case "Tiles":
+                this.UpdateOffscreen();
                 this.Invalidate();
+                this.Update();
                 break;
             }
         }
@@ -275,6 +285,7 @@ namespace Shrimp
                     if ((e.Button & MouseButtons.Right) != 0)
                     {
                         this.Invalidate();
+                        this.Update();
                     }
                 }
                 else
@@ -296,6 +307,7 @@ namespace Shrimp
                     else
                     {
                         this.Invalidate();
+                        this.Update();
                     }
                 }
             }
@@ -355,13 +367,13 @@ namespace Shrimp
                 this.OffscreenBitmap.Dispose();
             }
             this.OffscreenBitmap = new Bitmap(this.HScrollBar.Width, this.VScrollBar.Height);
+            this.UpdateOffscreen();
             this.Invalidate();
+            this.Update();
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        private void UpdateOffscreen()
         {
-            base.OnPaint(e);
-            Graphics g = e.Graphics;
             if (this.ViewModel != null && this.EditorState != null)
             {
                 Map map = this.Map;
@@ -440,7 +452,7 @@ namespace Shrimp
                                         {
                                             srcBD = bitmapDataHash[tile.TileSetId];
                                         }
-                                        
+
                                         Util.DrawBitmap(dstBD, srcBD, x, y, new Rectangle
                                         {
                                             X = (tileId % Util.PaletteHorizontalCount) * gridSize,
@@ -463,16 +475,31 @@ namespace Shrimp
                         }
                     }
                     this.OffscreenBitmap.UnlockBits(dstBD);
+                }
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            Graphics g = e.Graphics;
+            if (this.ViewModel != null && this.EditorState != null)
+            {
+                Map map = this.Map;
+                if (map != null)
+                {
+                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    int gridSize = Util.GridSize * 2;
                     using (Graphics gOffscreen = Graphics.FromImage(this.OffscreenBitmap))
                     {
                         IntPtr hDstDC = g.GetHdc();
                         IntPtr hOffscreenDC = this.OffscreenBitmap.GetHbitmap();
                         IntPtr hSrcDC = gOffscreen.GetHdc();
                         IntPtr hOffscreenDC2 = GDI32.SelectObject(hSrcDC, hOffscreenDC);
+                        Rectangle rect = e.ClipRectangle;
                         GDI32.BitBlt(
-                            hDstDC, 0, 0,
-                            this.OffscreenBitmap.Width, this.OffscreenBitmap.Height,
-                            hSrcDC, 0, 0, GDI32.TernaryRasterOperations.SRCCOPY);
+                            hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
+                            hSrcDC, rect.X, rect.Y, GDI32.TernaryRasterOperations.SRCCOPY);
                         GDI32.SelectObject(hSrcDC, hOffscreenDC2);
                         gOffscreen.ReleaseHdc(hSrcDC);
                         GDI32.DeleteObject(hOffscreenDC);
