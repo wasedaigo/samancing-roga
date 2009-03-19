@@ -415,7 +415,7 @@ namespace Shrimp
         {
             base.OnLayout(e);
             this.AdjustScrollBars();
-            if (this.HOffscreen == IntPtr.Zero)
+            if (this.HOffscreen != IntPtr.Zero)
             {
                 Win32API.DeleteDC(this.HOffscreenDC);
                 Win32API.DeleteObject(this.HOffscreen);
