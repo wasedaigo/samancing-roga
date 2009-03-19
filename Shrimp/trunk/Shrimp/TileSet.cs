@@ -115,9 +115,6 @@ namespace Shrimp
 
         private Dictionary<BitmapScale, Bitmap> Bitmaps =
             new Dictionary<BitmapScale, Bitmap>();
-        private Dictionary<BitmapScale, IntPtr> HBitmapDCs =
-            new Dictionary<BitmapScale, IntPtr>();
-        private List<Graphics> graphicsCollection = new List<Graphics>(); // for GC
 
         public Bitmap GetBitmap(BitmapScale scale)
         {
@@ -139,7 +136,11 @@ namespace Shrimp
             }
         }
 
-        public IntPtr GetHBitmap(BitmapScale scale)
+        /*private Dictionary<BitmapScale, IntPtr> HBitmapDCs =
+                    new Dictionary<BitmapScale, IntPtr>();
+        private List<Graphics> graphicsCollection = new List<Graphics>(); // for GC
+
+        public IntPtr GetHBitmapDC(BitmapScale scale)
         {
             if (!this.HBitmapDCs.ContainsKey(scale))
             {
@@ -155,7 +156,7 @@ namespace Shrimp
             {
                 return this.HBitmapDCs[scale];
             }
-        }
+        }*/
 
         public override void Clear()
         {

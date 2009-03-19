@@ -9,6 +9,68 @@ namespace Shrimp
 {
     internal static class Win32API
     {
+        //
+        // currently defined blend operation
+        //
+        public const int AC_SRC_OVER = 0x00;
+
+        //
+        // currently defined alpha format
+        //
+        public const int AC_SRC_ALPHA = 0x01;
+
+        public const int BI_RGB = 0x00;
+        public const int DIB_RGB_COLORS = 0x00;
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BLENDFUNCTION
+        {
+            public byte BlendOp;
+            public byte BlendFlags;
+            public byte SourceConstantAlpha;
+            public byte AlphaFormat;
+
+            public BLENDFUNCTION(byte op, byte flags, byte alpha, byte format)
+            {
+                BlendOp = op;
+                BlendFlags = flags;
+                SourceConstantAlpha = alpha;
+                AlphaFormat = format;
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BITMAPINFO
+        {
+            public BITMAPINFOHEADER bmiHeader;
+            public RGBQUAD bmiColors;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BITMAPINFOHEADER
+        {
+            public UInt32 biSize;
+            public Int32 biWidth;
+            public Int32 biHeight;
+            public Int16 biPlanes;
+            public Int16 biBitCount;
+            public UInt32 biCompression;
+            public UInt32 biSizeImage;
+            public Int32 biXPelsPerMeter;
+            public Int32 biYPelsPerMeter;
+            public UInt32 biClrUsed;
+            public UInt32 biClrImportant;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RGBQUAD
+        {
+            public byte rgbBlue;
+            public byte rgbGreen;
+            public byte rgbRed;
+            public byte rgbReserved;
+        }
+
         public enum TernaryRasterOperations : uint
         {
             SRCCOPY = 0x00CC0020, /* dest = source*/
@@ -83,33 +145,6 @@ namespace Shrimp
             #endregion
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct BLENDFUNCTION
-        {
-            public byte BlendOp;
-            public byte BlendFlags;
-            public byte SourceConstantAlpha;
-            public byte AlphaFormat;
-
-            public BLENDFUNCTION(byte op, byte flags, byte alpha, byte format)
-            {
-                BlendOp = op;
-                BlendFlags = flags;
-                SourceConstantAlpha = alpha;
-                AlphaFormat = format;
-            }
-        }
-
-        //
-        // currently defined blend operation
-        //
-        public const int AC_SRC_OVER = 0x00;
-
-        //
-        // currently defined alpha format
-        //
-        public const int AC_SRC_ALPHA = 0x01;
-
         [DllImport("user32.dll")]
         public static extern IntPtr GetDC(IntPtr hWnd);
 
@@ -130,6 +165,10 @@ namespace Shrimp
 
         [DllImport("gdi32.dll", SetLastError = true)]
         public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateDIBSection(IntPtr hdc, [In] ref BITMAPINFO pbmi,
+           uint iUsage, out IntPtr ppvBits, IntPtr hSection, uint dwOffset);
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteDC(IntPtr hdc);
