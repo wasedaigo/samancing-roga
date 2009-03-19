@@ -170,18 +170,19 @@ namespace Shrimp
         private void AdjustScrollBars()
         {
             this.HScrollBar.SmallChange = Util.BackgroundGridSize;
-            this.HScrollBar.LargeChange = Math.Max(this.HScrollBar.Width, 0);
             this.VScrollBar.SmallChange = Util.BackgroundGridSize;
-            this.VScrollBar.LargeChange = Math.Max(this.VScrollBar.Height, 0);
+            int hLargeChange = Math.Max(this.HScrollBar.Width, 0);
+            int vLargeChange = Math.Max(this.VScrollBar.Height, 0);
             if (this.Map != null)
             {
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                int hMax = this.Map.Width * Util.BackgroundGridSize - this.HScrollBar.Width; // TODO
+                int hMax = this.Map.Width * this.GridSize - hLargeChange;
                 if (0 < hMax)
                 {
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
-                    this.HScrollBar.Maximum = hMax + this.HScrollBar.LargeChange;
+                    this.HScrollBar.Maximum = hMax + hLargeChange;
+                    this.HScrollBar.LargeChange = hLargeChange;
                     this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), hMax);
                 }
                 else
@@ -189,12 +190,13 @@ namespace Shrimp
                     this.HScrollBar.Enabled = false;
                     this.HScrollBar.Value = 0;
                 }
-                int vMax = this.Map.Height * Util.BackgroundGridSize - this.VScrollBar.Height; // TODO
+                int vMax = this.Map.Height * this.GridSize - vLargeChange;
                 if (0 < vMax)
                 {
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
-                    this.VScrollBar.Maximum = vMax + this.VScrollBar.LargeChange;
+                    this.VScrollBar.Maximum = vMax + vLargeChange;
+                    this.VScrollBar.LargeChange = vLargeChange;
                     this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), vMax);
                 }
                 else
