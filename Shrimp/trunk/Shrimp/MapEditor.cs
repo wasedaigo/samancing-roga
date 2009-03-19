@@ -494,9 +494,6 @@ namespace Shrimp
                                     this.HOffscreenDC, x, y, 32, 32,
                                     Util.HBackgroundBitmapDC, 0, 0,
                                     Win32API.TernaryRasterOperations.SRCCOPY);
-                                /*Util.DrawBitmap(this.OffscreenPixels,
-                                    new Size(offscreenWidth, offscreenHeight),
-                                    x, y, 32, 32, bd, 0, 0, 255);*/
                             }
                         }
                     }
@@ -567,12 +564,37 @@ namespace Shrimp
                         }
                         if (this.EditorState.LayerMode == LayerMode.Layer2 && layer == 0)
                         {
-                            Util.Darken(this.OffscreenPixels, offscreenSize);
+                            this.DarkenOffscreen(offscreenSize, rect);
                         }
                     }
                     foreach (var pair in bdHash)
                     {
                         pair.Key.UnlockBits(pair.Value);
+                    }
+                }
+            }
+        }
+
+        private void DarkenOffscreen(Size dstSize, Rectangle rect)
+        {
+            Debug.Assert(this.OffscreenPixels != IntPtr.Zero);
+            int width = dstSize.Width;
+            int height = dstSize.Height;
+            int padding = (dstSize.Width * 4 + 3) / 4 * 4 - width * 4;
+            int startI = Math.Max(rect.Left, 0);
+            int startJ = Math.Max(rect.Top, 0);
+            int endI = Math.Min(rect.Right, width);
+            int endJ = Math.Min(rect.Bottom, height);
+            unsafe
+            {
+                byte* dst = (byte*)this.OffscreenPixels;
+                for (int j = startJ; j < endJ; j++, dst += padding)
+                {
+                    for (int i = startI; i < endI; i++, dst += 4)
+                    {
+                        dst[0] = (byte)(dst[0] >> 1);
+                        dst[1] = (byte)(dst[1] >> 1);
+                        dst[2] = (byte)(dst[2] >> 1);
                     }
                 }
             }

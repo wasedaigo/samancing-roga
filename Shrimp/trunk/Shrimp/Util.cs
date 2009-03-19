@@ -259,26 +259,6 @@ namespace Shrimp
             }
         }*/
 
-        public static void Darken(IntPtr dstPixels, Size dstSize)
-        {
-            int width = dstSize.Width;
-            int height = dstSize.Height;
-            int padding = (dstSize.Width * 4 + 3) / 4 * 4 - width * 4;
-            unsafe
-            {
-                byte* dst = (byte*)dstPixels;
-                for (int j = 0; j < height; j++, dst += padding)
-                {
-                    for (int i = 0; i < width; i++, dst += 4)
-                    {
-                        dst[0] = (byte)(dst[0] >> 1);
-                        dst[1] = (byte)(dst[1] >> 1);
-                        dst[2] = (byte)(dst[2] >> 1);
-                    }
-                }
-            }
-        }
-
         private static Pen FramePen1 = new Pen(Color.Black, 1);
         private static Pen FramePen2 = new Pen(Color.White, 2);
 
