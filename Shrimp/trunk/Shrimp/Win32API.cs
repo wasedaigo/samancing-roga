@@ -22,6 +22,39 @@ namespace Shrimp
         public const int BI_RGB = 0x00;
         public const int DIB_RGB_COLORS = 0x00;
 
+        public const int
+            COLOR_SCROLLBAR = 0,
+            COLOR_BACKGROUND = 1,
+            COLOR_DESKTOP = 1,
+            COLOR_ACTIVECAPTION = 2,
+            COLOR_INACTIVECAPTION = 3,
+            COLOR_MENU = 4,
+            COLOR_WINDOW = 5,
+            COLOR_WINDOWFRAME = 6,
+            COLOR_MENUTEXT = 7,
+            COLOR_WINDOWTEXT = 8,
+            COLOR_CAPTIONTEXT = 9,
+            COLOR_ACTIVEBORDER = 10,
+            COLOR_INACTIVEBORDER = 11,
+            COLOR_APPWORKSPACE = 12,
+            COLOR_HIGHLIGHT = 13,
+            COLOR_HIGHLIGHTTEXT = 14,
+            COLOR_BTNFACE = 15,
+            COLOR_3DFACE = 15,
+            COLOR_BTNSHADOW = 16,
+            COLOR_3DSHADOW = 16,
+            COLOR_GRAYTEXT = 17,
+            COLOR_BTNTEXT = 18,
+            COLOR_INACTIVECAPTIONTEXT = 19,
+            COLOR_BTNHIGHLIGHT = 20,
+            COLOR_3DHIGHLIGHT = 20,
+            COLOR_3DHILIGHT = 20,
+            COLOR_BTNHILIGHT = 20,
+            COLOR_3DDKSHADOW = 21,
+            COLOR_3DLIGHT = 22,
+            COLOR_INFOTEXT = 23,
+            COLOR_INFOBK = 24;
+
         [StructLayout(LayoutKind.Sequential)]
         public struct BLENDFUNCTION
         {
@@ -146,7 +179,13 @@ namespace Shrimp
         }
 
         [DllImport("user32.dll")]
+        public static extern int FillRect(IntPtr hDC, [In] ref RECT lprc, IntPtr hbr);
+
+        [DllImport("user32.dll")]
         public static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern uint GetSysColor(int nIndex);
 
         [DllImport("user32.dll")]
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
@@ -175,9 +214,6 @@ namespace Shrimp
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
-
-        [DllImport("user32.dll")]
-        public static extern int FillRect(IntPtr hDC, [In] ref RECT lprc, IntPtr hbr);
 
         [DllImport("gdi32.dll")]
         public static extern IntPtr GetStockObject(int fnObject);

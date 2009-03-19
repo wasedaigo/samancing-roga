@@ -482,13 +482,13 @@ namespace Shrimp
             int offscreenWidth = this.OffscreenSize.Width;
             int offscreenHeight = this.OffscreenSize.Height;
             Size offscreenSize = new Size(offscreenWidth, offscreenHeight);
+
             int bgGridSize = Util.BackgroundGridSize;
             int bgStartI = Math.Max(-offset.X / bgGridSize, 0);
             int bgEndI = Math.Min((offscreenWidth - offset.X) / bgGridSize + 1, map.Width);
             int bgStartJ = Math.Max(-offset.Y / bgGridSize, 0);
             int bgEndJ = Math.Min((offscreenHeight - offset.Y) / bgGridSize + 1, map.Height);
             
-            // adjust
             int tmpBgStartX = bgStartI * bgGridSize + offset.X;
             int tmpBgEndX = bgEndI * bgGridSize + offset.X;
             int tmpBgStartY = bgStartJ * bgGridSize + offset.Y;
@@ -497,6 +497,11 @@ namespace Shrimp
             int paddingI2 = (tmpBgEndX - rect.Right) / bgGridSize;
             int paddingJ1 = (rect.Top - tmpBgStartY) / bgGridSize;
             int paddingJ2 = (tmpBgEndY - rect.Bottom) / bgGridSize;
+            bool drawBlankSpace = false;
+            if (paddingI1 < 0) { paddingI1 = 0; drawBlankSpace = true; }
+            if (paddingI2 < 0) { paddingI2 = 0; drawBlankSpace = true; }
+            if (paddingJ1 < 0) { paddingJ1 = 0; drawBlankSpace = true; }
+            if (paddingJ2 < 0) { paddingJ2 = 0; drawBlankSpace = true; }
             bgStartI += paddingI1;
             bgEndI -= paddingI2;
             bgStartJ += paddingJ1;
@@ -521,7 +526,18 @@ namespace Shrimp
 
             using (Graphics g = Graphics.FromHdc(this.HOffscreenDC))
             {
-                g.FillRectangle(SystemBrushes.Control, rect);
+                if (drawBlankSpace)
+                {
+                    //g.FillRectangle(SystemBrushes.Control, rect);
+                    Win32API.RECT win32Rect = new Win32API.RECT
+                    {
+                        Left = 0,
+                        Right = offscreenWidth,
+                        Top = 0,
+                        Bottom = offscreenHeight,
+                    };
+                    Win32API.FillRect(this.HOffscreenDC, ref win32Rect, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
+                }
                 BitmapData bd = null;
                 try
                 {
@@ -629,16 +645,25 @@ namespace Shrimp
         private void DarkenOffscreen(Size dstSize, Rectangle rect)
         {
             Debug.Assert(this.OffscreenPixels != IntPtr.Zero);
-            int width = dstSize.Width;
-            int height = dstSize.Height;
-            int padding = (dstSize.Width * 4 + 3) / 4 * 4 - width * 4;
-            int startI = Math.Max(rect.Left, 0);
-            int startJ = Math.Max(rect.Top, 0);
-            int endI = Math.Min(rect.Right, width);
-            int endJ = Math.Min(rect.Bottom, height);
+            rect.X = Math.Max(rect.X, 0);
+            rect.Y = Math.Max(rect.Y, 0);
+            if (dstSize.Width < rect.Right)
+            {
+                rect.Width -= rect.Right - dstSize.Width;
+            }
+            if (dstSize.Height < rect.Bottom)
+            {
+                rect.Height -= rect.Bottom - dstSize.Height;
+            }
+            int stride = (dstSize.Width * 4 + 3) / 4 * 4;
+            int padding = stride - rect.Width * 4;
+            int startI = rect.Left;
+            int startJ = rect.Top;
+            int endI = rect.Right;
+            int endJ = rect.Bottom;
             unsafe
             {
-                byte* dst = (byte*)this.OffscreenPixels;
+                byte* dst = (byte*)this.OffscreenPixels + startI * 4 + startJ * stride;
                 for (int j = startJ; j < endJ; j++, dst += padding)
                 {
                     for (int i = startI; i < endI; i++, dst += 4)
