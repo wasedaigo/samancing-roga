@@ -13,7 +13,7 @@ namespace Shrimp
     {
         static Util()
         {
-            BackgroundBitmap = new Bitmap(DisplayedGridSize, DisplayedGridSize);
+            BackgroundBitmap = new Bitmap(BackgroundGridSize, BackgroundGridSize);
             Graphics g = Graphics.FromImage(BackgroundBitmap);
             Color color1 = Color.FromArgb(0, 0, 0x80);
             Brush brush1 = new SolidBrush(color1);
@@ -36,9 +36,9 @@ namespace Shrimp
         public static readonly IntPtr HBackgroundBitmapDC;
         private static readonly Graphics gBackgroundBitmap; // for GC
 
-        public const int DisplayedGridSize = GridSize * GridScale;
-        public const int GridSize = 16;
-        public const int GridScale = 2;
+        public const int PaletteGridSize = 32;
+        public const int BackgroundGridSize = 32;
+        public const int BitmapGridSize = 16;
 
         public const int PaletteHorizontalCount = 8;
 

@@ -29,7 +29,7 @@ namespace Shrimp
             this.TileSetPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TileSetPalette.Size = new Size
             {
-                Width = Util.DisplayedGridSize * Util.PaletteHorizontalCount
+                Width = Util.BackgroundGridSize * Util.PaletteHorizontalCount
                     + SystemInformation.VerticalScrollBarWidth,
                 Height = this.TileSetPalette.Parent.ClientSize.Height
                     - this.TileSetPaletteToolStrip.Height,

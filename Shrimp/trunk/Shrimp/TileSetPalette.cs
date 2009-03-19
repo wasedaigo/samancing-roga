@@ -20,7 +20,7 @@ namespace Shrimp
         {
             this.InitializeComponent();
             this.VScroll = true;
-            this.VerticalScroll.SmallChange = Util.DisplayedGridSize;
+            this.VerticalScroll.SmallChange = Util.BackgroundGridSize;
             this.AutoScrollingTimer.Interval = 20;
             this.AutoScrollingTimer.Tick += delegate
             {
@@ -158,7 +158,7 @@ namespace Shrimp
             {
                 this.AutoScrollMinSize = new Size
                 {
-                    Width = Util.DisplayedGridSize * Util.PaletteHorizontalCount,
+                    Width = Util.BackgroundGridSize * Util.PaletteHorizontalCount,
                     Height = this.LargeBitmap.Height,
                 };
             }
@@ -202,9 +202,9 @@ namespace Shrimp
             };
             this.IsSelectingTiles = true;
             this.SelectedTileStartX =
-                Math.Min(Math.Max(point.X / Util.DisplayedGridSize, 0), Util.PaletteHorizontalCount - 1);
+                Math.Min(Math.Max(point.X / Util.BackgroundGridSize, 0), Util.PaletteHorizontalCount - 1);
             this.SelectedTileStartY =
-                Math.Min(Math.Max(point.Y / Util.DisplayedGridSize, 0), this.TileSet.Height - 1);
+                Math.Min(Math.Max(point.Y / Util.BackgroundGridSize, 0), this.TileSet.Height - 1);
             int tileId = this.SelectedTileStartY * Util.PaletteHorizontalCount
                 + this.SelectedTileStartX;
             this.EditorState.SelectedTiles = SelectedTiles.Single(new Tile
@@ -258,9 +258,9 @@ namespace Shrimp
                 Y = mousePoint.Y - this.AutoScrollPosition.Y,
             };
             int selectedTileEndX =
-                Math.Min(Math.Max(point.X / Util.DisplayedGridSize, 0), Util.PaletteHorizontalCount - 1);
+                Math.Min(Math.Max(point.X / Util.BackgroundGridSize, 0), Util.PaletteHorizontalCount - 1);
             int selectedTileEndY =
-                Math.Min(Math.Max(point.Y / Util.DisplayedGridSize, 0), this.TileSet.Height - 1);
+                Math.Min(Math.Max(point.Y / Util.BackgroundGridSize, 0), this.TileSet.Height - 1);
             int x = Math.Min(this.SelectedTileStartX, selectedTileEndX);
             int y = Math.Min(this.SelectedTileStartY, selectedTileEndY);
             int tileId = y * Util.PaletteHorizontalCount + x;
@@ -289,14 +289,14 @@ namespace Shrimp
                 return;
             }
             Graphics g = e.Graphics;
-            int baseX = (-this.AutoScrollPosition.X + e.ClipRectangle.X) % Util.DisplayedGridSize;
-            int baseY = (-this.AutoScrollPosition.Y + e.ClipRectangle.Y) % Util.DisplayedGridSize;
-            for (int j = 0; j <= (e.ClipRectangle.Height + baseY) / Util.DisplayedGridSize; j++)
+            int baseX = (-this.AutoScrollPosition.X + e.ClipRectangle.X) % Util.BackgroundGridSize;
+            int baseY = (-this.AutoScrollPosition.Y + e.ClipRectangle.Y) % Util.BackgroundGridSize;
+            for (int j = 0; j <= (e.ClipRectangle.Height + baseY) / Util.BackgroundGridSize; j++)
             {
-                for (int i = 0; i <= (e.ClipRectangle.Width + baseX) / Util.DisplayedGridSize; i++)
+                for (int i = 0; i <= (e.ClipRectangle.Width + baseX) / Util.BackgroundGridSize; i++)
                 {
-                    int x = e.ClipRectangle.X - baseX + i * Util.DisplayedGridSize;
-                    int y = e.ClipRectangle.Y - baseY + j * Util.DisplayedGridSize;
+                    int x = e.ClipRectangle.X - baseX + i * Util.BackgroundGridSize;
+                    int y = e.ClipRectangle.Y - baseY + j * Util.BackgroundGridSize;
                     g.DrawImage(Util.BackgroundBitmap, x, y);
                 }
             }
@@ -322,12 +322,12 @@ namespace Shrimp
                     int tileId = tile.TileId;
                     Util.DrawFrame(g, new Rectangle
                     {
-                        X = tileId % Util.PaletteHorizontalCount * Util.DisplayedGridSize
+                        X = tileId % Util.PaletteHorizontalCount * Util.BackgroundGridSize
                             + this.AutoScrollPosition.X,
-                        Y = tileId / Util.PaletteHorizontalCount * Util.DisplayedGridSize
+                        Y = tileId / Util.PaletteHorizontalCount * Util.BackgroundGridSize
                             + this.AutoScrollPosition.Y,
-                        Width = Util.DisplayedGridSize * selectedTiles.Width,
-                        Height = Util.DisplayedGridSize * selectedTiles.Height,
+                        Width = Util.BackgroundGridSize * selectedTiles.Width,
+                        Height = Util.BackgroundGridSize * selectedTiles.Height,
                     });
                 }
                 break;

@@ -87,7 +87,7 @@ namespace Shrimp
             {
                 if (this.OriginalBitmap != null)
                 {
-                    return this.OriginalBitmap.Width / Util.GridSize;
+                    return this.OriginalBitmap.Width / Util.BitmapGridSize;
                 }
                 else
                 {
@@ -102,7 +102,7 @@ namespace Shrimp
             {
                 if (this.OriginalBitmap != null)
                 {
-                    return this.OriginalBitmap.Height / Util.GridSize;
+                    return this.OriginalBitmap.Height / Util.BitmapGridSize;
                 }
                 else
                 {
