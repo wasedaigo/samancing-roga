@@ -221,20 +221,6 @@ namespace Shrimp
             }
         }
 
-        /*public static void ClearBitmap(BitmapData dstBD)
-        {
-            Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);
-            int size = dstBD.Stride * dstBD.Height;
-            unsafe
-            {
-                byte* dst = (byte*)dstBD.Scan0;
-                for (int i = 0; i < size; i++, dst++)
-                {
-                    *dst = 0;
-                }
-            }
-        }*/
-
         /*public static void FillBitmap(BitmapData dstBD, Color color)
         {
             Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);

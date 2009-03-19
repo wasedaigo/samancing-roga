@@ -417,6 +417,7 @@ namespace Shrimp
             this.AdjustScrollBars();
             if (this.HOffscreen != IntPtr.Zero)
             {
+                // TODO: modify to suppress allocation
                 Win32API.DeleteDC(this.HOffscreenDC);
                 Win32API.DeleteObject(this.HOffscreen);
                 this.OffscreenPixels = IntPtr.Zero;
@@ -695,22 +696,22 @@ namespace Shrimp
                 if (!this.IsPickingTiles)
                 {
                     SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
-                    int cursorXCount, cursorYCount;
+                    int cursorHorizontalCount, cursorVerticalCount;
                     bool isEvent = this.EditorState.LayerMode == LayerMode.Event;
                     if (!isEvent)
                     {
-                        cursorXCount = this.CursorTileX + this.CursorOffsetX;
-                        cursorYCount = this.CursorTileY + this.CursorOffsetY;
+                        cursorHorizontalCount = this.CursorTileX + this.CursorOffsetX;
+                        cursorVerticalCount = this.CursorTileY + this.CursorOffsetY;
                     }
                     else
                     {
-                        cursorXCount = this.CursorTileX;
-                        cursorYCount = this.CursorTileY;
+                        cursorHorizontalCount = this.CursorTileX;
+                        cursorVerticalCount = this.CursorTileY;
                     }
                     return new Rectangle
                     {
-                        X = cursorXCount * gridSize + offset.X,
-                        Y = cursorYCount * gridSize + offset.Y,
+                        X = cursorHorizontalCount * gridSize + offset.X,
+                        Y = cursorVerticalCount * gridSize + offset.Y,
                         Width = gridSize * (!isEvent ? selectedTiles.Width : 1),
                         Height = gridSize * (!isEvent ? selectedTiles.Height : 1),
                     };
