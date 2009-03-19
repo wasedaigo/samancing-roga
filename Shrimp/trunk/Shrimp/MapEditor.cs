@@ -695,12 +695,24 @@ namespace Shrimp
                 if (!this.IsPickingTiles)
                 {
                     SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+                    int cursorXCount, cursorYCount;
+                    bool isEvent = this.EditorState.LayerMode == LayerMode.Event;
+                    if (!isEvent)
+                    {
+                        cursorXCount = this.CursorTileX + this.CursorOffsetX;
+                        cursorYCount = this.CursorTileY + this.CursorOffsetY;
+                    }
+                    else
+                    {
+                        cursorXCount = this.CursorTileX;
+                        cursorYCount = this.CursorTileY;
+                    }
                     return new Rectangle
                     {
-                        X = (this.CursorTileX + this.CursorOffsetX) * gridSize + offset.X,
-                        Y = (this.CursorTileY + this.CursorOffsetY) * gridSize + offset.Y,
-                        Width = gridSize * selectedTiles.Width,
-                        Height = gridSize * selectedTiles.Height,
+                        X = cursorXCount * gridSize + offset.X,
+                        Y = cursorYCount * gridSize + offset.Y,
+                        Width = gridSize * (!isEvent ? selectedTiles.Width : 1),
+                        Height = gridSize * (!isEvent ? selectedTiles.Height : 1),
                     };
                 }
                 else
