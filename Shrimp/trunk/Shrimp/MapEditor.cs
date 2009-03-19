@@ -488,14 +488,14 @@ namespace Shrimp
             int bgEndJ = Math.Min((offscreenHeight - offset.Y) / bgGridSize + 1, map.Height);
             
             // adjust
-            int bgStartX = bgStartI * bgGridSize + offset.X;
-            int bgEndX = bgEndI * bgGridSize + offset.X;
-            int bgStartY = bgStartJ * bgGridSize + offset.Y;
-            int bgEndY = bgEndJ * bgGridSize + offset.Y;
-            int paddingI1 = (rect.Left - bgStartX) / bgGridSize;
-            int paddingI2 = (bgEndX - rect.Right) / bgGridSize;
-            int paddingJ1 = (rect.Top - bgStartY) / bgGridSize;
-            int paddingJ2 = (bgEndY - rect.Bottom) / bgGridSize;
+            int tmpBgStartX = bgStartI * bgGridSize + offset.X;
+            int tmpBgEndX = bgEndI * bgGridSize + offset.X;
+            int tmpBgStartY = bgStartJ * bgGridSize + offset.Y;
+            int tmpBgEndY = bgEndJ * bgGridSize + offset.Y;
+            int paddingI1 = (rect.Left - tmpBgStartX) / bgGridSize;
+            int paddingI2 = (tmpBgEndX - rect.Right) / bgGridSize;
+            int paddingJ1 = (rect.Top - tmpBgStartY) / bgGridSize;
+            int paddingJ2 = (tmpBgEndY - rect.Bottom) / bgGridSize;
             bgStartI += paddingI1;
             bgEndI -= paddingI2;
             bgStartJ += paddingJ1;
