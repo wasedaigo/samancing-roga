@@ -396,17 +396,7 @@ namespace Shrimp
             }
         }
 
-        private Size OffscreenSize
-        {
-            get
-            {
-                return new Size
-                {
-                    Width = this.HScrollBar.Width,
-                    Height = this.VScrollBar.Height,
-                };
-            }
-        }
+        private Size OffscreenSize;
         private IntPtr HOffscreen = IntPtr.Zero;
         private IntPtr HOffscreenDC = IntPtr.Zero;
         private unsafe IntPtr OffscreenPixels = IntPtr.Zero;
@@ -423,7 +413,13 @@ namespace Shrimp
                 this.OffscreenPixels = IntPtr.Zero;
                 this.HOffscreenDC = IntPtr.Zero;
                 this.HOffscreen = IntPtr.Zero;
+                this.OffscreenSize = Size.Empty;
             }
+            this.OffscreenSize = new Size
+            {
+                Width = this.HScrollBar.Width,
+                Height = this.VScrollBar.Height,
+            };
             Win32API.BITMAPINFO bitmapInfo = new Win32API.BITMAPINFO
             {
                 bmiHeader = new Win32API.BITMAPINFOHEADER
@@ -493,15 +489,44 @@ namespace Shrimp
             int tmpBgEndX = bgEndI * bgGridSize + offset.X;
             int tmpBgStartY = bgStartJ * bgGridSize + offset.Y;
             int tmpBgEndY = bgEndJ * bgGridSize + offset.Y;
-            int paddingI1 = (rect.Left - tmpBgStartX) / bgGridSize;
-            int paddingI2 = (tmpBgEndX - rect.Right) / bgGridSize;
-            int paddingJ1 = (rect.Top - tmpBgStartY) / bgGridSize;
-            int paddingJ2 = (tmpBgEndY - rect.Bottom) / bgGridSize;
+            int paddingI1, paddingI2, paddingJ1, paddingJ2;
             bool drawBlankSpace = false;
-            if (paddingI1 < 0) { paddingI1 = 0; drawBlankSpace = true; }
-            if (paddingI2 < 0) { paddingI2 = 0; drawBlankSpace = true; }
-            if (paddingJ1 < 0) { paddingJ1 = 0; drawBlankSpace = true; }
-            if (paddingJ2 < 0) { paddingJ2 = 0; drawBlankSpace = true; }
+            if (0 < rect.Left - tmpBgStartX)
+            {
+                paddingI1 = (rect.Left - tmpBgStartX) / bgGridSize;
+            }
+            else
+            {
+                paddingI1 = 0;
+                drawBlankSpace = true;
+            }
+            if (0 < tmpBgEndX - rect.Right)
+            {
+                paddingI2 = (tmpBgEndX - rect.Right) / bgGridSize;
+            }
+            else
+            {
+                paddingI2 = 0;
+                drawBlankSpace = true;
+            }
+            if (0 < rect.Top - tmpBgStartY)
+            {
+                paddingJ1 = (rect.Top - tmpBgStartY) / bgGridSize;
+            }
+            else
+            {
+                paddingJ1 = 0;
+                drawBlankSpace = true;
+            }
+            if (0 < tmpBgEndY - rect.Bottom)
+            {
+                paddingJ2 = (tmpBgEndY - rect.Bottom) / bgGridSize;
+            }
+            else
+            {
+                paddingJ2 = 0;
+                drawBlankSpace = true;
+            }
             bgStartI += paddingI1;
             bgEndI -= paddingI2;
             bgStartJ += paddingJ1;
@@ -528,7 +553,6 @@ namespace Shrimp
             {
                 if (drawBlankSpace)
                 {
-                    //g.FillRectangle(SystemBrushes.Control, rect);
                     Win32API.RECT win32Rect = new Win32API.RECT
                     {
                         Left = 0,
