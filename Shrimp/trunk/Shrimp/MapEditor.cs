@@ -396,7 +396,7 @@ namespace Shrimp
             }
         }
 
-        private Size OffscreenSize;
+        private Size OffscreenSize = Size.Empty;
         private IntPtr HOffscreen = IntPtr.Zero;
         private IntPtr HOffscreenDC = IntPtr.Zero;
         private unsafe IntPtr OffscreenPixels = IntPtr.Zero;
