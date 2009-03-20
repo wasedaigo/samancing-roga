@@ -70,6 +70,8 @@ namespace Shrimp
             }
         }
 
+        private Point PreviousMapOffset = Point.Empty;
+
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
             switch (e.PropertyName)
@@ -83,13 +85,17 @@ namespace Shrimp
                 this.Update();
                 break;
             case "MapOffsets":
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 if (this.Map != null && (int)e.Tag == this.Map.Id)
                 {
                     this.AdjustScrollBars();
+                    offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    // TODO
                     this.UpdateOffscreen();
                     this.Invalidate();
                     this.Update();
                 }
+                this.PreviousMapOffset = offset;
                 break;
             case "SelectedTiles":
                 if (this.EditorState.SelectedTiles.SelectedTilesType != SelectedTilesType.Picker)
@@ -117,6 +123,7 @@ namespace Shrimp
                     {
                         this.map.Updated += this.Map_Updated;
                     }
+                    this.PreviousMapOffset = this.EditorState.GetMapOffset(this.Map.Id);
                     this.AdjustScrollBars();
                     this.UpdateOffscreen();
                     this.Invalidate();
@@ -286,6 +293,7 @@ namespace Shrimp
         }
 
         private Rectangle PreviousFrameRect = Rectangle.Empty;
+        private Point PreviousFrameRectMapOffset = Point.Empty; // TODO: rename!
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
@@ -294,6 +302,8 @@ namespace Shrimp
             {
                 Rectangle previousFrameRect = this.PreviousFrameRect;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                previousFrameRect.X += -this.PreviousFrameRectMapOffset.X + offset.X;
+                previousFrameRect.Y += -this.PreviousFrameRectMapOffset.Y + offset.Y;
                 Point mousePosition = new Point
                 {
                     X = e.X - offset.X,
@@ -359,6 +369,7 @@ namespace Shrimp
                 }
             }
             this.PreviousFrameRect = this.FrameRect;
+            this.PreviousFrameRectMapOffset = this.EditorState.GetMapOffset(this.Map.Id);
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -407,6 +418,10 @@ namespace Shrimp
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
+            if (this.PreviousFrameRect != this.FrameRect)
+            {
+                this.Invalidate(this.PreviousFrameRect);
+            }
             this.Invalidate(this.FrameRect);
             this.Update();
         }
