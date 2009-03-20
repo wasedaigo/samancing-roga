@@ -293,7 +293,7 @@ namespace Shrimp
         }
 
         private Rectangle PreviousFrameRect = Rectangle.Empty;
-        private Point PreviousFrameRectMapOffset = Point.Empty; // TODO: rename!
+        private Point MapOffsetWhenFrameRectSaved = Point.Empty;
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
@@ -302,8 +302,8 @@ namespace Shrimp
             {
                 Rectangle previousFrameRect = this.PreviousFrameRect;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                previousFrameRect.X += -this.PreviousFrameRectMapOffset.X + offset.X;
-                previousFrameRect.Y += -this.PreviousFrameRectMapOffset.Y + offset.Y;
+                previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
+                previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
                 Point mousePosition = new Point
                 {
                     X = e.X - offset.X,
@@ -369,7 +369,7 @@ namespace Shrimp
                 }
             }
             this.PreviousFrameRect = this.FrameRect;
-            this.PreviousFrameRectMapOffset = this.EditorState.GetMapOffset(this.Map.Id);
+            this.MapOffsetWhenFrameRectSaved = this.EditorState.GetMapOffset(this.Map.Id);
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
