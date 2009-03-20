@@ -80,9 +80,8 @@ namespace Shrimp
                 this.SelectedMapIdChanged();
                 break;
             case "LayerMode":
-                this.UpdateOffscreen();
+                this.AddUpdatingOffscreenRequest();
                 this.Invalidate();
-                this.Update();
                 break;
             case "MapOffsets":
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
@@ -90,10 +89,8 @@ namespace Shrimp
                 {
                     this.AdjustScrollBars();
                     offset = this.EditorState.GetMapOffset(this.Map.Id);
-                    // TODO
-                    this.UpdateOffscreen();
+                    this.AddUpdatingOffscreenRequest();
                     this.Invalidate();
-                    this.Update();
                 }
                 this.PreviousMapOffset = offset;
                 break;
@@ -125,9 +122,8 @@ namespace Shrimp
                         this.PreviousMapOffset = this.EditorState.GetMapOffset(this.map.Id);
                     }
                     this.AdjustScrollBars();
-                    this.UpdateOffscreen();
+                    this.AddUpdatingOffscreenRequest();
                     this.Invalidate();
-                    this.Update();
                 }
             }
         }
@@ -160,9 +156,8 @@ namespace Shrimp
             case "Width":
             case "Height":
                 this.AdjustScrollBars();
-                this.UpdateOffscreen();
+                this.AddUpdatingOffscreenRequest();
                 this.Invalidate();
-                this.Update();
                 break;
             case "Tiles":
                 Rectangle updatedTilesRect = (Rectangle)e.Tag;
@@ -174,9 +169,8 @@ namespace Shrimp
                     Width = updatedTilesRect.Width * this.GridSize,
                     Height = updatedTilesRect.Height * this.GridSize,
                 };
-                this.UpdateOffscreen(updatedRect);
+                this.AddUpdatingOffscreenRequest(updatedRect);
                 this.Invalidate(updatedRect);
-                this.Update();
                 break;
             }
         }
@@ -282,13 +276,11 @@ namespace Shrimp
                     this.PickerStartY = this.CursorTileY;
                     this.IsPickingTiles = true;
                     this.Invalidate(oldFrameRect);
-                    this.Update();
                 }
             }
             else
             {
                 this.Invalidate();
-                this.Update();
             }
         }
 
@@ -322,7 +314,6 @@ namespace Shrimp
                             this.Invalidate(previousFrameRect);
                         }
                         this.Invalidate(this.FrameRect);
-                        this.Update();
                     }
                 }
                 else
@@ -348,7 +339,6 @@ namespace Shrimp
                         {
                             this.Invalidate(this.FrameRect);
                         }
-                        this.Update();
                     }
                     else
                     {
@@ -364,7 +354,6 @@ namespace Shrimp
                         {
                             this.Invalidate();
                         }
-                        this.Update();
                     }
                 }
             }
@@ -423,7 +412,6 @@ namespace Shrimp
                 this.Invalidate(this.PreviousFrameRect);
             }
             this.Invalidate(this.FrameRect);
-            this.Update();
         }
 
         private int GridSize
@@ -453,6 +441,7 @@ namespace Shrimp
                 this.HOffscreenDC = IntPtr.Zero;
                 this.HOffscreen = IntPtr.Zero;
                 this.OffscreenSize = Size.Empty;
+                this.UpdatingOffscreenRequests.Clear();
             }
             this.OffscreenSize = new Size
             {
@@ -488,17 +477,26 @@ namespace Shrimp
                     hDC = IntPtr.Zero;
                 }
             }
-            this.UpdateOffscreen();
+            this.AddUpdatingOffscreenRequest();
             this.Invalidate();
-            this.Update();
         }
 
-        private void UpdateOffscreen()
+        List<Rectangle> UpdatingOffscreenRequests = new List<Rectangle>();
+
+        private void AddUpdatingOffscreenRequest()
         {
-            this.UpdateOffscreen(new Rectangle
+            this.AddUpdatingOffscreenRequest(new Rectangle
             {
                 Size = this.OffscreenSize,
             });
+        }
+
+        private void AddUpdatingOffscreenRequest(Rectangle rect)
+        {
+            if (!this.UpdatingOffscreenRequests.Contains(rect))
+            {
+                this.UpdatingOffscreenRequests.Add(rect);
+            }
         }
 
         private void UpdateOffscreen(Rectangle rect)
@@ -750,6 +748,11 @@ namespace Shrimp
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            foreach (Rectangle rect in this.UpdatingOffscreenRequests)
+            {
+                this.UpdateOffscreen(rect);
+            }
+            this.UpdatingOffscreenRequests.Clear();
             Graphics g = e.Graphics;
             if (this.ViewModel != null && this.EditorState != null && this.Map != null)
             {

@@ -183,6 +183,7 @@
     <Content Include="Readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\arrow_return_180_left.png" />
     <None Include="Resources\balloons.png" />
     <None Include="Resources\map.png" />
     <None Include="Resources\pencil.png" />

@@ -33,24 +33,26 @@
             this.LeftSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TileSetPaletteToolStrip = new System.Windows.Forms.ToolStrip();
             this.TileSetsToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
-            this.TileSetPalette = new Shrimp.TileSetPalette();
-            this.MapTreeView = new Shrimp.MapTreeView();
-            this.MapEditor = new Shrimp.MapEditor();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.SaveToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.UndoToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.Layer1ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.Layer2ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.EventToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.PenToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.TileSetPalette = new Shrimp.TileSetPalette();
+            this.MapTreeView = new Shrimp.MapTreeView();
+            this.MapEditor = new Shrimp.MapEditor();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -124,44 +126,6 @@
             this.TileSetsToolStripComboBox.Size = new System.Drawing.Size(121, 25);
             this.TileSetsToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.TileSetsToolStripComboBox_SelectedIndexChanged);
             // 
-            // TileSetPalette
-            // 
-            this.TileSetPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
-            this.TileSetPalette.AutoScroll = true;
-            this.TileSetPalette.Location = new System.Drawing.Point(0, 0);
-            this.TileSetPalette.Name = "TileSetPalette";
-            this.TileSetPalette.Size = new System.Drawing.Size(100, 96);
-            this.TileSetPalette.TabIndex = 0;
-            this.TileSetPalette.ViewModel = null;
-            // 
-            // MapTreeView
-            // 
-            this.MapTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.MapTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
-            this.MapTreeView.FullRowSelect = true;
-            this.MapTreeView.HideSelection = false;
-            this.MapTreeView.ImageKey = "PageWhite";
-            this.MapTreeView.ItemHeight = 21;
-            this.MapTreeView.Location = new System.Drawing.Point(0, 0);
-            this.MapTreeView.Name = "MapTreeView";
-            this.MapTreeView.ShowLines = false;
-            this.MapTreeView.ShowRootLines = false;
-            this.MapTreeView.Size = new System.Drawing.Size(296, 229);
-            this.MapTreeView.TabIndex = 0;
-            this.MapTreeView.ViewModel = null;
-            // 
-            // MapEditor
-            // 
-            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapEditor.Location = new System.Drawing.Point(0, 0);
-            this.MapEditor.Name = "MapEditor";
-            this.MapEditor.Size = new System.Drawing.Size(483, 532);
-            this.MapEditor.TabIndex = 0;
-            this.MapEditor.ViewModel = null;
-            // 
             // ToolStripContainer
             // 
             // 
@@ -195,6 +159,8 @@
             this.CloseToolStripButton,
             this.SaveToolStripButton,
             this.toolStripSeparator1,
+            this.UndoToolStripButton,
+            this.toolStripSeparator4,
             this.Layer1ToolStripButton,
             this.Layer2ToolStripButton,
             this.EventToolStripButton,
@@ -207,6 +173,30 @@
             this.ToolStrip.Size = new System.Drawing.Size(786, 35);
             this.ToolStrip.Stretch = true;
             this.ToolStrip.TabIndex = 0;
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 35);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 35);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 35);
+            // 
+            // OpenFileDialog
+            // 
+            this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 35);
             // 
             // NewToolStripButton
             // 
@@ -248,10 +238,14 @@
             this.SaveToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.SaveToolStripButton.Click += new System.EventHandler(this.SaveToolStripButton_Click);
             // 
-            // toolStripSeparator1
+            // UndoToolStripButton
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 35);
+            this.UndoToolStripButton.Image = global::Shrimp.Properties.Resources.ArrowReturn180Left;
+            this.UndoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.UndoToolStripButton.Name = "UndoToolStripButton";
+            this.UndoToolStripButton.Size = new System.Drawing.Size(35, 32);
+            this.UndoToolStripButton.Text = "Undo";
+            this.UndoToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // Layer1ToolStripButton
             // 
@@ -280,11 +274,6 @@
             this.EventToolStripButton.Text = "Event";
             this.EventToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 35);
-            // 
             // PenToolStripButton
             // 
             this.PenToolStripButton.Image = global::Shrimp.Properties.Resources.Pencil;
@@ -293,11 +282,6 @@
             this.PenToolStripButton.Size = new System.Drawing.Size(28, 32);
             this.PenToolStripButton.Text = "Pen";
             this.PenToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 35);
             // 
             // DatabaseToolStripButton
             // 
@@ -309,9 +293,43 @@
             this.DatabaseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.DatabaseToolStripButton.Click += new System.EventHandler(this.DatabaseToolStripButton_Click);
             // 
-            // OpenFileDialog
+            // TileSetPalette
             // 
-            this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
+            this.TileSetPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.TileSetPalette.AutoScroll = true;
+            this.TileSetPalette.Location = new System.Drawing.Point(0, 0);
+            this.TileSetPalette.Name = "TileSetPalette";
+            this.TileSetPalette.Size = new System.Drawing.Size(100, 96);
+            this.TileSetPalette.TabIndex = 0;
+            this.TileSetPalette.ViewModel = null;
+            // 
+            // MapTreeView
+            // 
+            this.MapTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.MapTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+            this.MapTreeView.FullRowSelect = true;
+            this.MapTreeView.HideSelection = false;
+            this.MapTreeView.ImageKey = "PageWhite";
+            this.MapTreeView.ItemHeight = 21;
+            this.MapTreeView.Location = new System.Drawing.Point(0, 0);
+            this.MapTreeView.Name = "MapTreeView";
+            this.MapTreeView.ShowLines = false;
+            this.MapTreeView.ShowRootLines = false;
+            this.MapTreeView.Size = new System.Drawing.Size(296, 229);
+            this.MapTreeView.TabIndex = 0;
+            this.MapTreeView.ViewModel = null;
+            // 
+            // MapEditor
+            // 
+            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapEditor.Location = new System.Drawing.Point(0, 0);
+            this.MapEditor.Name = "MapEditor";
+            this.MapEditor.Size = new System.Drawing.Size(483, 532);
+            this.MapEditor.TabIndex = 0;
+            this.MapEditor.ViewModel = null;
             // 
             // MainForm
             // 
@@ -366,6 +384,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton Layer2ToolStripButton;
         private System.Windows.Forms.ToolStripButton EventToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripButton UndoToolStripButton;
     }
 }
 

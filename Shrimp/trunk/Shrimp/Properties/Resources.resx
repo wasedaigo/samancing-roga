@@ -118,6 +118,25 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="ArrowReturn180Left" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAApRJREFUOE+lk21I
+        U2EUx09NpdSWL2DaNFYrDTQwsdLAwD4JZVhEYd3C7MNMLEOhVtokC4nZm9GLo1KUUkMN3GaaWro0lusu
+        uViJqVistPKD2JoO3Dyde+cWpvWlCz/OeZ7n/H/3uR/uopjLfSDy9ASPWUQiEQMACYgopwpTVitf5jwz
+        Dgc47HawT08D8IJNJYMQf/sTJNwdYQh2Foi79RE23xiaR+y1D7Cx+D1sKOLmCBiSsOoviHzdcnN4wTAv
+        nC+4PsDQLYRwcZ8D+X4BjLSnIZQkkLpvQE0SwZZ+Rsx5/hPzDJN4occmUPjGyXmTk7MGqy1dNzYaV9Kv
+        j1a9SxQ+IepiTxLBFryewgzdOOa2W1BpnMRz3ZOY/8oJL1V0WTG7dQKzmifweNu4Jba4V085KUQWmmB9
+        gZGJUHazeQYrDVuR7/8kusjE7SzrN6dWDzlSyvtxV8XgCM0oBQE1IFO8YNac1rO5z74jX9fmvYR1+QY3
+        MkWnhPZV2++8NW8rG8AdVcM2WmvcAlpA2MlWJjS7hZ0FZGe63ILVp4RziUzRwcXXfcWt9d+Q5owQeuIp
+        rMxqguBMHYRkNlJtZAh1kFwD/kfqQHyoRiDw6GMIytBKQnNaufAGC0YQK47pjOB74KHAMqZaGPRLqxVw
+        BV3VP61WEpBerwq70mv21dgxpG7CRmvNb8HBKjVJ2L/hJ2/gglScWayddnhoEQOv9o3QrBKW7qtwwaaY
+        EGM6EaP0iOHtiKvaEINbEAOaEcVNiF46RBGFxZVjFu/DNXrv/ZVS8Nx9zwUb2eEc9ieWU4AP+T5B9CG8
+        dTPo8+iHzecSN+qV+kDvted+4pK95QCi5FIX6sXJpew/MNKZhlBSRsq/WBDQb/tf/AKzjwtLHRIyowAA
+        AABJRU5ErkJggg==
+</value>
+    <comment>arrow_return_180_left.png</comment>
+  </data>
   <data name="Balloons" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -270,17 +289,6 @@
 </value>
     <comment>map.png</comment>
   </data>
-  <data name="Minus" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAMJJREFUOE9j/P//
-        PwNFAGQAJZgizWDXI9ue3Po6OKXtzT0g/o8F3wPJo7sWxYCwijv3zt/8BlSDCUDiIHm8BjilnPj/58+f
-        /79//8bAIHGQPF4DDIK2YtUMMxAkj9cAFbfVYBeAaHQME8drgLLr+v9fvnzBiUHyeA3Q8tn3/82bN/+f
-        PHmCgUHiIHm8BpiGX7q38/Dz/y9fvvz/4sULOAbxQeIgebwG2CU8DrZPfHoPiP9jwfdA8ngNICdJUzcp
-        D4gLAHcJ3XQ1kO/zAAAAAElFTkSuQmCC
-</value>
-    <comment>toggle_small_collapse.png</comment>
-  </data>
   <data name="Pencil" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -295,7 +303,7 @@
 </value>
     <comment>pencil.png</comment>
   </data>
-  <data name="Plus" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="ToggleSmall" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAONJREFUOE/Fkr0K
@@ -305,5 +313,16 @@
         dV14nocwDFWlZ86+EdAcna3W+CIy4YME+0bAN1/6t1/5Lxs8APci1+eqyft6AAAAAElFTkSuQmCC
 </value>
     <comment>toggle_small.png</comment>
+  </data>
+  <data name="ToggleSmallCollapse" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAMJJREFUOE9j/P//
+        PwNFAGQAJZgizWDXI9ue3Po6OKXtzT0g/o8F3wPJo7sWxYCwijv3zt/8BlSDCUDiIHm8BjilnPj/58+f
+        /79//8bAIHGQPF4DDIK2YtUMMxAkj9cAFbfVYBeAaHQME8drgLLr+v9fvnzBiUHyeA3Q8tn3/82bN/+f
+        PHmCgUHiIHm8BpiGX7q38/Dz/y9fvvz/4sULOAbxQeIgebwG2CU8DrZPfHoPiP9jwfdA8ngNICdJUzcp
+        D4gLAHcJ3XQ1kO/zAAAAAElFTkSuQmCC
+</value>
+    <comment>toggle_small_collapse.png</comment>
   </data>
 </root>

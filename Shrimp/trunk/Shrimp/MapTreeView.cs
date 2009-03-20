@@ -330,7 +330,7 @@ namespace Shrimp
             }
             if (0 < node.Level && 0 < node.GetNodeCount(false))
             {
-                Image toggleImage = node.IsExpanded ? Resources.Minus : Resources.Plus;
+                Image toggleImage = node.IsExpanded ? Resources.ToggleSmallCollapse : Resources.ToggleSmall;
                 g.DrawImage(toggleImage,
                     bounds.X + this.Indent * (node.Level - 1) + 1,
                     bounds.Y + 2);

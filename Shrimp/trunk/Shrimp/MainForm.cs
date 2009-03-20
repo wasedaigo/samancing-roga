@@ -154,6 +154,7 @@ namespace Shrimp
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
             this.SaveToolStripButton.Enabled = isOpened;
+            this.UndoToolStripButton.Enabled = isOpened;
             foreach (var item in this.LayerModeSwitchers)
             {
                 item.Enabled = isOpened;
@@ -361,6 +362,22 @@ namespace Shrimp
                     e.Cancel = true;
                     return;
                 }
+            }
+        }
+    }
+
+    internal class ToolStripTrackBar : ToolStripControlHost
+    {
+        public ToolStripTrackBar()
+            : base(new TrackBar())
+        {
+        }
+
+        public TrackBar TrackBar
+        {
+            get
+            {
+                return (TrackBar)this.Control;
             }
         }
     }
