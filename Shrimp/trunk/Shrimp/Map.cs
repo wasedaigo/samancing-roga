@@ -126,7 +126,7 @@ namespace Shrimp
             if (layer[index] != tile)
             {
                 layer[index] = tile;
-                this.OnUpdated(new UpdatedEventArgs("Tiles"));
+                this.OnUpdated(new UpdatedEventArgs("Tiles", new Rectangle(x, y, 1, 1)));
                 return true;
             }
             else
@@ -171,7 +171,7 @@ namespace Shrimp
             }
             if (isChanged)
             {
-                this.OnUpdated(new UpdatedEventArgs("Tiles"));
+                this.OnUpdated(new UpdatedEventArgs("Tiles", new Rectangle(x, y, width, height)));
             }
             return isChanged;
         }

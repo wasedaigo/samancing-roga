@@ -158,10 +158,17 @@ namespace Shrimp
                 this.Update();
                 break;
             case "Tiles":
-                /*this.UpdateOffscreen(this.FrameRect);
-                this.Invalidate(this.FrameRect);*/
-                this.UpdateOffscreen();
-                this.Invalidate();
+                Rectangle updatedTilesRect = (Rectangle)e.Tag;
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                Rectangle updatedRect = new Rectangle
+                {
+                    X = updatedTilesRect.X * this.GridSize + offset.X,
+                    Y = updatedTilesRect.Y * this.GridSize + offset.Y,
+                    Width = updatedTilesRect.Width * this.GridSize,
+                    Height = updatedTilesRect.Height * this.GridSize,
+                };
+                this.UpdateOffscreen(updatedRect);
+                this.Invalidate(updatedRect);
                 this.Update();
                 break;
             }
@@ -226,8 +233,8 @@ namespace Shrimp
         private bool IsPickingTiles = false;
         private int PickerStartX = 0;
         private int PickerStartY = 0;
-        private int RenderingStartX = 0;
-        private int RenderingStartY = 0;
+        private int RenderingTileStartX = 0;
+        private int RenderingTileStartY = 0;
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -256,8 +263,8 @@ namespace Shrimp
                     }
                     int x = this.CursorTileX + this.CursorOffsetX;
                     int y = this.CursorTileY + this.CursorOffsetY;
-                    this.RenderingStartX = x;
-                    this.RenderingStartY = y;
+                    this.RenderingTileStartX = x;
+                    this.RenderingTileStartY = y;
                     this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
                 }
                 else if ((e.Button & MouseButtons.Right) != 0)
@@ -278,12 +285,14 @@ namespace Shrimp
             }
         }
 
+        private Rectangle PreviousFrameRect = Rectangle.Empty;
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
             if (this.EditorState.LayerMode != LayerMode.Event)
             {
-                Rectangle oldFrameRect = this.FrameRect;
+                Rectangle previousFrameRect = this.PreviousFrameRect;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 Point mousePosition = new Point
                 {
@@ -291,14 +300,18 @@ namespace Shrimp
                     Y = e.Y - offset.Y,
                 };
                 this.CursorTileX =
-                    Math.Min(Math.Max(mousePosition.X / Util.BackgroundGridSize, 0), this.Map.Width - 1);
+                    Math.Min(Math.Max(mousePosition.X / this.GridSize, 0), this.Map.Width - 1);
                 this.CursorTileY =
-                    Math.Min(Math.Max(mousePosition.Y / Util.BackgroundGridSize, 0), this.Map.Height - 1);
+                    Math.Min(Math.Max(mousePosition.Y / this.GridSize, 0), this.Map.Height - 1);
                 if (this.IsPickingTiles)
                 {
                     if ((e.Button & MouseButtons.Right) != 0)
                     {
-                        this.Invalidate(oldFrameRect);
+                        if (previousFrameRect != this.FrameRect)
+                        {
+                            this.Invalidate(previousFrameRect);
+                        }
+                        this.Invalidate(this.FrameRect);
                         this.Update();
                     }
                 }
@@ -316,18 +329,26 @@ namespace Shrimp
                         }
                         int x = this.CursorTileX + this.CursorOffsetX;
                         int y = this.CursorTileY + this.CursorOffsetY;
-                        if (!this.Map.SetTiles(layer, x, y, selectedTiles,
-                            x - this.RenderingStartX, y - this.RenderingStartY))
+                        if (previousFrameRect != this.FrameRect)
                         {
-                            this.Invalidate(oldFrameRect);
-                            this.Update();
+                            this.Invalidate(previousFrameRect);
                         }
+                        if (!this.Map.SetTiles(layer, x, y, selectedTiles,
+                            x - this.RenderingTileStartX, y - this.RenderingTileStartY))
+                        {
+                            this.Invalidate(this.FrameRect);
+                        }
+                        this.Update();
                     }
                     else
                     {
                         if (this.EditorState.LayerMode != LayerMode.Event)
                         {
-                            this.Invalidate(oldFrameRect);
+                            if (previousFrameRect != this.FrameRect)
+                            {
+                                this.Invalidate(previousFrameRect);
+                            }
+                            this.Invalidate(this.FrameRect);
                         }
                         else
                         {
@@ -337,6 +358,7 @@ namespace Shrimp
                     }
                 }
             }
+            this.PreviousFrameRect = this.FrameRect;
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -493,7 +515,7 @@ namespace Shrimp
             int tmpBgEndY = bgEndJ * bgGridSize + offset.Y;
             int paddingI1, paddingI2, paddingJ1, paddingJ2;
             bool fillBlankSpace = false;
-            if (0 < rect.Left - tmpBgStartX)
+            if (0 <= rect.Left - tmpBgStartX)
             {
                 paddingI1 = (rect.Left - tmpBgStartX) / bgGridSize;
             }
@@ -502,7 +524,7 @@ namespace Shrimp
                 paddingI1 = 0;
                 fillBlankSpace = true;
             }
-            if (0 < tmpBgEndX - rect.Right)
+            if (0 <= tmpBgEndX - rect.Right)
             {
                 paddingI2 = (tmpBgEndX - rect.Right) / bgGridSize;
             }
@@ -511,7 +533,7 @@ namespace Shrimp
                 paddingI2 = 0;
                 fillBlankSpace = true;
             }
-            if (0 < rect.Top - tmpBgStartY)
+            if (0 <= rect.Top - tmpBgStartY)
             {
                 paddingJ1 = (rect.Top - tmpBgStartY) / bgGridSize;
             }
@@ -520,7 +542,7 @@ namespace Shrimp
                 paddingJ1 = 0;
                 fillBlankSpace = true;
             }
-            if (0 < tmpBgEndY - rect.Bottom)
+            if (0 <= tmpBgEndY - rect.Bottom)
             {
                 paddingJ2 = (tmpBgEndY - rect.Bottom) / bgGridSize;
             }
@@ -542,7 +564,7 @@ namespace Shrimp
             Debug.Assert(tileGridSize <= bgGridSize);
             Debug.Assert(bgGridSize % tileGridSize == 0);
             tileStartI += paddingI1 * bgGridSize / tileGridSize;
-            tileEndJ -= paddingI2 * bgGridSize / tileGridSize;
+            tileEndI -= paddingI2 * bgGridSize / tileGridSize;
             tileStartJ += paddingJ1 * bgGridSize / tileGridSize;
             tileEndJ -= paddingJ2 * bgGridSize / tileGridSize;
 
@@ -559,16 +581,16 @@ namespace Shrimp
                     {
                         Left = 0,
                         Right = offscreenWidth,
-                        Top = offscreenHeight - map.Height * this.GridSize,
+                        Top = map.Height * this.GridSize,
                         Bottom = offscreenHeight,
                     };
                     Win32API.FillRect(this.HOffscreenDC, ref win32Rect1, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
                     Win32API.RECT win32Rect2 = new Win32API.RECT
                     {
-                        Left = offscreenWidth - map.Width * this.GridSize,
+                        Left = map.Width * this.GridSize,
                         Right = offscreenWidth,
                         Top = 0,
-                        Bottom = offscreenHeight,
+                        Bottom = win32Rect1.Top,
                     };
                     Win32API.FillRect(this.HOffscreenDC, ref win32Rect2, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
                 }
