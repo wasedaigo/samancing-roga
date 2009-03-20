@@ -492,7 +492,7 @@ namespace Shrimp
             int tmpBgStartY = bgStartJ * bgGridSize + offset.Y;
             int tmpBgEndY = bgEndJ * bgGridSize + offset.Y;
             int paddingI1, paddingI2, paddingJ1, paddingJ2;
-            bool drawBlankSpace = false;
+            bool fillBlankSpace = false;
             if (0 < rect.Left - tmpBgStartX)
             {
                 paddingI1 = (rect.Left - tmpBgStartX) / bgGridSize;
@@ -500,7 +500,7 @@ namespace Shrimp
             else
             {
                 paddingI1 = 0;
-                drawBlankSpace = true;
+                fillBlankSpace = true;
             }
             if (0 < tmpBgEndX - rect.Right)
             {
@@ -509,7 +509,7 @@ namespace Shrimp
             else
             {
                 paddingI2 = 0;
-                drawBlankSpace = true;
+                fillBlankSpace = true;
             }
             if (0 < rect.Top - tmpBgStartY)
             {
@@ -518,7 +518,7 @@ namespace Shrimp
             else
             {
                 paddingJ1 = 0;
-                drawBlankSpace = true;
+                fillBlankSpace = true;
             }
             if (0 < tmpBgEndY - rect.Bottom)
             {
@@ -527,7 +527,7 @@ namespace Shrimp
             else
             {
                 paddingJ2 = 0;
-                drawBlankSpace = true;
+                fillBlankSpace = true;
             }
             bgStartI += paddingI1;
             bgEndI -= paddingI2;
@@ -553,16 +553,24 @@ namespace Shrimp
 
             using (Graphics g = Graphics.FromHdc(this.HOffscreenDC))
             {
-                if (drawBlankSpace)
+                if (fillBlankSpace)
                 {
-                    Win32API.RECT win32Rect = new Win32API.RECT
+                    Win32API.RECT win32Rect1 = new Win32API.RECT
                     {
                         Left = 0,
+                        Right = offscreenWidth,
+                        Top = offscreenHeight - map.Height * this.GridSize,
+                        Bottom = offscreenHeight,
+                    };
+                    Win32API.FillRect(this.HOffscreenDC, ref win32Rect1, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
+                    Win32API.RECT win32Rect2 = new Win32API.RECT
+                    {
+                        Left = offscreenWidth - map.Width * this.GridSize,
                         Right = offscreenWidth,
                         Top = 0,
                         Bottom = offscreenHeight,
                     };
-                    Win32API.FillRect(this.HOffscreenDC, ref win32Rect, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
+                    Win32API.FillRect(this.HOffscreenDC, ref win32Rect2, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
                 }
                 BitmapData bd = null;
                 try
