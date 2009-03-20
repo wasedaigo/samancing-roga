@@ -122,8 +122,8 @@ namespace Shrimp
                     if (this.map != null)
                     {
                         this.map.Updated += this.Map_Updated;
+                        this.PreviousMapOffset = this.EditorState.GetMapOffset(this.map.Id);
                     }
-                    this.PreviousMapOffset = this.EditorState.GetMapOffset(this.Map.Id);
                     this.AdjustScrollBars();
                     this.UpdateOffscreen();
                     this.Invalidate();
