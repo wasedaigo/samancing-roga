@@ -654,7 +654,7 @@ namespace Shrimp
                     TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
                     bdHash = new Dictionary<Bitmap, BitmapData>();
                     LayerMode layerMode = this.EditorState.LayerMode;
-                    Pen eventGridPen = new Pen(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
+                    Pen eventGridPen = new Pen(Color.FromArgb(0x20, 0x00, 0x00, 0x00));
                     for (int layer = 0; layer < 2; layer++)
                     {
                         byte alpha = 255;
