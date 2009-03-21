@@ -34,7 +34,6 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.ApplyButton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
-            this.TileSetTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -101,10 +100,9 @@
             this.MinimizeBox = false;
             this.Name = "DatabaseDialog";
             this.Padding = new System.Windows.Forms.Padding(0, 0, 5, 5);
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Database";
             this.tabControl1.ResumeLayout(false);
-            this.TileSetTabPage.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

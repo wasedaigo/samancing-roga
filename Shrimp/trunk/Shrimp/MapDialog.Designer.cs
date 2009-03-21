@@ -141,6 +141,7 @@
             this.MinimizeBox = false;
             this.Name = "MapDialog";
             this.Padding = new System.Windows.Forms.Padding(0, 0, 5, 5);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Map";
             ((System.ComponentModel.ISupportInitialize)(this.WidthNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.HeightNumericUpDown)).EndInit();

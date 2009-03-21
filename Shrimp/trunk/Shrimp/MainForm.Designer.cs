@@ -35,21 +35,21 @@
             this.TileSetsToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.CloseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.SaveToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.UndoToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.Layer1ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.Layer2ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.EventToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.PenToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.TileSetPalette = new Shrimp.TileSetPalette();
             this.MapTreeView = new Shrimp.MapTreeView();
             this.MapEditor = new Shrimp.MapEditor();
@@ -174,30 +174,6 @@
             this.ToolStrip.Stretch = true;
             this.ToolStrip.TabIndex = 0;
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 35);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 35);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 35);
-            // 
-            // OpenFileDialog
-            // 
-            this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 35);
-            // 
             // NewToolStripButton
             // 
             this.NewToolStripButton.Image = global::Shrimp.Properties.Resources.Document;
@@ -238,6 +214,11 @@
             this.SaveToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.SaveToolStripButton.Click += new System.EventHandler(this.SaveToolStripButton_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 35);
+            // 
             // UndoToolStripButton
             // 
             this.UndoToolStripButton.Image = global::Shrimp.Properties.Resources.ArrowReturn180Left;
@@ -246,6 +227,11 @@
             this.UndoToolStripButton.Size = new System.Drawing.Size(35, 32);
             this.UndoToolStripButton.Text = "Undo";
             this.UndoToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 35);
             // 
             // Layer1ToolStripButton
             // 
@@ -274,6 +260,11 @@
             this.EventToolStripButton.Text = "Event";
             this.EventToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 35);
+            // 
             // PenToolStripButton
             // 
             this.PenToolStripButton.Image = global::Shrimp.Properties.Resources.Pencil;
@@ -282,6 +273,11 @@
             this.PenToolStripButton.Size = new System.Drawing.Size(28, 32);
             this.PenToolStripButton.Text = "Pen";
             this.PenToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 35);
             // 
             // DatabaseToolStripButton
             // 
@@ -292,6 +288,10 @@
             this.DatabaseToolStripButton.Text = "Database";
             this.DatabaseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.DatabaseToolStripButton.Click += new System.EventHandler(this.DatabaseToolStripButton_Click);
+            // 
+            // OpenFileDialog
+            // 
+            this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
             // 
             // TileSetPalette
             // 
@@ -338,6 +338,7 @@
             this.ClientSize = new System.Drawing.Size(786, 567);
             this.Controls.Add(this.ToolStripContainer);
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Shrimp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.MainSplitContainer.Panel1.ResumeLayout(false);
