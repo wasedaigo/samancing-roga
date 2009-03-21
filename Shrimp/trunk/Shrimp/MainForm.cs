@@ -150,7 +150,6 @@ namespace Shrimp
             }
 
             this.MapTreeView.Enabled = isOpened;
-            this.MapEditor.Enabled = isOpened;
             this.NewToolStripButton.Enabled = !isOpened;
             this.OpenToolStripButton.Enabled = !isOpened;
             this.CloseToolStripButton.Enabled = isOpened;
@@ -167,12 +166,17 @@ namespace Shrimp
             this.DatabaseToolStripButton.Enabled = isOpened;
             this.TileSetPalette.Enabled = isOpened;
             this.TileSetPaletteToolStrip.Enabled = isOpened;
+
             this.IsDirtyChanged();
             this.GameTitleChanged();
             this.SelectedMapIdChanged();
             this.SelectedTileSetIdsChanged();
             this.LayerModeChanged();
             this.DrawingModeChanged();
+
+            // To prevent the map editor from being edited wrongly
+            Application.DoEvents();
+            this.MapEditor.Enabled = isOpened;
         }
 
         private void IsDirtyChanged()
