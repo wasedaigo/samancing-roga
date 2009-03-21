@@ -121,7 +121,7 @@ namespace Shrimp
 
         public bool SetTile(int layerNumber, int x, int y, Tile tile)
         {
-            List<Tile> layer= this.Layers[layerNumber];
+            List<Tile> layer = this.Layers[layerNumber];
             int index = y * this.Width + x;
             if (layer[index] != tile)
             {
@@ -190,16 +190,57 @@ namespace Shrimp
 
         public override JToken ToJson()
         {
+            List<string> layerStrings = new List<string>();
+            foreach (var layer in this.Layers)
+            {
+                int length = layer.Count;
+                byte[] layerBytes = new byte[length * 4];
+                for (int i = 0; i < length; i++)
+                {
+                    Tile tile = layer[i];
+                    byte[] bytes = tile.ToBytes();
+                    layerBytes[i * 4] = bytes[0];
+                    layerBytes[i * 4 + 1] = bytes[1];
+                    layerBytes[i * 4 + 2] = bytes[2];
+                    layerBytes[i * 4 + 3] = bytes[3];
+                }
+                layerStrings.Add(Convert.ToBase64String(layerBytes));
+            }
             return new JObject(
                 new JProperty("Width", this.Width),
                 new JProperty("Height", this.Height),
-                new JProperty("Tiles", null));
+                new JProperty("Tiles",
+                    new JArray(layerStrings)));
         }
 
         public override void LoadJson(JToken json)
         {
-            this.Width = json["Width"].Value<int>();
-            this.Height = json["Height"].Value<int>();
+            this.Clear();
+            JToken token;
+            if ((token = json["Width"] as JValue) != null)
+            {
+                this.Width = token.Value<int>();
+            }
+            if ((token = json["Height"] as JValue) != null)
+            {
+                this.Height = token.Value<int>();
+            }
+            if ((token = json["Tiles"] as JArray) != null)
+            {
+                for (int i = 0; i < LayerCount; i++)
+                {
+                    JValue token2 = token[i] as JValue;
+                    byte[] bytes = Convert.FromBase64String(token2.Value<string>());
+                    int length = this.Width * this.Height;
+                    List<Tile> layer = this.Layers[i];
+                    for (int j = 0; j < length; j++)
+                    {
+                        Tile tile = new Tile();
+                        tile.FromBytes(bytes, j * 4);
+                        layer[j] = tile;
+                    }
+                }
+            }
         }
     }
 }

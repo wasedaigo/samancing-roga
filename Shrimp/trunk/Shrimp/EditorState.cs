@@ -47,7 +47,7 @@ namespace Shrimp
                            select new Tile
                            {
                                TileSetId = tile.TileSetId,
-                               TileId = i,
+                               TileId = (short)i,
                            };
                 tiles = tiles.Concat(line);
             }

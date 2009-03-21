@@ -41,5 +41,17 @@ namespace Shrimp.Tests
             Assert.IsFalse(tile1 == null);
             Assert.IsTrue(tile1 != null);
         }
+
+        [Test]
+        public void TestFromBytes()
+        {
+            Tile tile = new Tile();
+            tile.FromBytes(new byte[] { 1, 2, 3, 4 }, 0);
+            Assert.AreEqual((2 << 8) | 1, tile.TileSetId);
+            Assert.AreEqual((4 << 8) | 3, tile.TileId);
+            tile.FromBytes(new byte[] { 1, 2, 3, 4, 5 }, 1);
+            Assert.AreEqual((3 << 8) | 2, tile.TileSetId);
+            Assert.AreEqual((5 << 8) | 4, tile.TileId);
+        }
     }
 }

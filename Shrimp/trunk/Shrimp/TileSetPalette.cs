@@ -209,8 +209,8 @@ namespace Shrimp
                 + this.SelectedTileStartX;
             this.EditorState.SelectedTiles = SelectedTiles.Single(new Tile
             {
-                TileSetId = this.EditorState.SelectedTileSetId,
-                TileId = tileId,
+                TileSetId = (short)this.EditorState.SelectedTileSetId,
+                TileId = (short)tileId,
             });
         }
 
@@ -269,8 +269,8 @@ namespace Shrimp
             this.EditorState.SelectedTiles =
                 SelectedTiles.Rectangle(new Tile
                 {
-                    TileSetId = this.EditorState.SelectedTileSetId,
-                    TileId = tileId
+                    TileSetId = (short)this.EditorState.SelectedTileSetId,
+                    TileId = (short)tileId
                 }, width, height);
         }
 

@@ -64,7 +64,10 @@ namespace Shrimp
             this.MapCollectionSingleStore.Save(directory);
             foreach (var mapStore in this.MapStores.Values)
             {
-                mapStore.Save(directory);
+                if (mapStore.IsDirty)
+                {
+                    mapStore.Save(directory);
+                }
             }
         }
 

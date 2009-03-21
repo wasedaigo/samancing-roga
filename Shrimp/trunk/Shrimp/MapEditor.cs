@@ -293,56 +293,23 @@ namespace Shrimp
             if (this.EditorState.LayerMode != LayerMode.Event)
             {
                 Rectangle previousFrameRect = this.PreviousFrameRect;
-                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
-                previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
-                Point mousePosition = new Point
+                if (this.Map != null)
                 {
-                    X = e.X - offset.X,
-                    Y = e.Y - offset.Y,
-                };
-                this.CursorTileX =
-                    Math.Min(Math.Max(mousePosition.X / this.GridSize, 0), this.Map.Width - 1);
-                this.CursorTileY =
-                    Math.Min(Math.Max(mousePosition.Y / this.GridSize, 0), this.Map.Height - 1);
-                if (this.IsPickingTiles)
-                {
-                    if ((e.Button & MouseButtons.Right) != 0)
+                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
+                    previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
+                    Point mousePosition = new Point
                     {
-                        if (previousFrameRect != this.FrameRect)
-                        {
-                            this.Invalidate(previousFrameRect);
-                        }
-                        this.Invalidate(this.FrameRect);
-                    }
-                }
-                else
-                {
-                    SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
-                    if ((e.Button & MouseButtons.Left) != 0)
+                        X = e.X - offset.X,
+                        Y = e.Y - offset.Y,
+                    };
+                    this.CursorTileX =
+                        Math.Min(Math.Max(mousePosition.X / this.GridSize, 0), this.Map.Width - 1);
+                    this.CursorTileY =
+                        Math.Min(Math.Max(mousePosition.Y / this.GridSize, 0), this.Map.Height - 1);
+                    if (this.IsPickingTiles)
                     {
-                        int layer = 0;
-                        switch (this.EditorState.LayerMode)
-                        {
-                        case LayerMode.Layer1: layer = 0; break;
-                        case LayerMode.Layer2: layer = 1; break;
-                        default: Debug.Fail("Invalid layer"); break;
-                        }
-                        int x = this.CursorTileX + this.CursorOffsetX;
-                        int y = this.CursorTileY + this.CursorOffsetY;
-                        if (previousFrameRect != this.FrameRect)
-                        {
-                            this.Invalidate(previousFrameRect);
-                        }
-                        if (!this.Map.SetTiles(layer, x, y, selectedTiles,
-                            x - this.RenderingTileStartX, y - this.RenderingTileStartY))
-                        {
-                            this.Invalidate(this.FrameRect);
-                        }
-                    }
-                    else
-                    {
-                        if (this.EditorState.LayerMode != LayerMode.Event)
+                        if ((e.Button & MouseButtons.Right) != 0)
                         {
                             if (previousFrameRect != this.FrameRect)
                             {
@@ -350,15 +317,58 @@ namespace Shrimp
                             }
                             this.Invalidate(this.FrameRect);
                         }
+                    }
+                    else
+                    {
+                        SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+                        if ((e.Button & MouseButtons.Left) != 0)
+                        {
+                            int layer = 0;
+                            switch (this.EditorState.LayerMode)
+                            {
+                            case LayerMode.Layer1: layer = 0; break;
+                            case LayerMode.Layer2: layer = 1; break;
+                            default: Debug.Fail("Invalid layer"); break;
+                            }
+                            int x = this.CursorTileX + this.CursorOffsetX;
+                            int y = this.CursorTileY + this.CursorOffsetY;
+                            if (previousFrameRect != this.FrameRect)
+                            {
+                                this.Invalidate(previousFrameRect);
+                            }
+                            if (!this.Map.SetTiles(layer, x, y, selectedTiles,
+                                x - this.RenderingTileStartX, y - this.RenderingTileStartY))
+                            {
+                                this.Invalidate(this.FrameRect);
+                            }
+                        }
                         else
                         {
-                            this.Invalidate();
+                            if (this.EditorState.LayerMode != LayerMode.Event)
+                            {
+                                if (previousFrameRect != this.FrameRect)
+                                {
+                                    this.Invalidate(previousFrameRect);
+                                }
+                                this.Invalidate(this.FrameRect);
+                            }
+                            else
+                            {
+                                this.Invalidate();
+                            }
                         }
                     }
                 }
             }
             this.PreviousFrameRect = this.FrameRect;
-            this.MapOffsetWhenFrameRectSaved = this.EditorState.GetMapOffset(this.Map.Id);
+            if (this.Map != null)
+            {
+                this.MapOffsetWhenFrameRectSaved = this.EditorState.GetMapOffset(this.Map.Id);
+            }
+            else
+            {
+                this.MapOffsetWhenFrameRectSaved = Point.Empty;
+            }
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -434,7 +444,6 @@ namespace Shrimp
             this.AdjustScrollBars();
             if (this.HOffscreen != IntPtr.Zero)
             {
-                // TODO: modify to suppress allocation
                 Win32API.DeleteDC(this.HOffscreenDC);
                 Win32API.DeleteObject(this.HOffscreen);
                 this.OffscreenPixels = IntPtr.Zero;
@@ -790,44 +799,51 @@ namespace Shrimp
         {
             get
             {
-                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                int gridSize = this.GridSize;
-                if (!this.IsPickingTiles)
+                if (this.Map != null)
                 {
-                    SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
-                    int cursorHorizontalCount, cursorVerticalCount;
-                    bool isEvent = this.EditorState.LayerMode == LayerMode.Event;
-                    if (!isEvent)
+                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    int gridSize = this.GridSize;
+                    if (!this.IsPickingTiles)
                     {
-                        cursorHorizontalCount = this.CursorTileX + this.CursorOffsetX;
-                        cursorVerticalCount = this.CursorTileY + this.CursorOffsetY;
+                        SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+                        int cursorHorizontalCount, cursorVerticalCount;
+                        bool isEvent = this.EditorState.LayerMode == LayerMode.Event;
+                        if (!isEvent)
+                        {
+                            cursorHorizontalCount = this.CursorTileX + this.CursorOffsetX;
+                            cursorVerticalCount = this.CursorTileY + this.CursorOffsetY;
+                        }
+                        else
+                        {
+                            cursorHorizontalCount = this.CursorTileX;
+                            cursorVerticalCount = this.CursorTileY;
+                        }
+                        return new Rectangle
+                        {
+                            X = cursorHorizontalCount * gridSize + offset.X,
+                            Y = cursorVerticalCount * gridSize + offset.Y,
+                            Width = gridSize * (!isEvent ? selectedTiles.Width : 1),
+                            Height = gridSize * (!isEvent ? selectedTiles.Height : 1),
+                        };
                     }
                     else
                     {
-                        cursorHorizontalCount = this.CursorTileX;
-                        cursorVerticalCount = this.CursorTileY;
+                        int pickedRegionX = Math.Min(this.CursorTileX, this.PickerStartX);
+                        int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
+                        int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
+                        int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
+                        return new Rectangle
+                        {
+                            X = pickedRegionX * gridSize + offset.X,
+                            Y = pickedRegionY * gridSize + offset.Y,
+                            Width = gridSize * pickedRegionWidth,
+                            Height = gridSize * pickedRegionHeight,
+                        };
                     }
-                    return new Rectangle
-                    {
-                        X = cursorHorizontalCount * gridSize + offset.X,
-                        Y = cursorVerticalCount * gridSize + offset.Y,
-                        Width = gridSize * (!isEvent ? selectedTiles.Width : 1),
-                        Height = gridSize * (!isEvent ? selectedTiles.Height : 1),
-                    };
                 }
                 else
                 {
-                    int pickedRegionX = Math.Min(this.CursorTileX, this.PickerStartX);
-                    int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
-                    int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
-                    int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
-                    return new Rectangle
-                    {
-                        X = pickedRegionX * gridSize + offset.X,
-                        Y = pickedRegionY * gridSize + offset.Y,
-                        Width = gridSize * pickedRegionWidth,
-                        Height = gridSize * pickedRegionHeight,
-                    };
+                    return Rectangle.Empty;
                 }
             }
         }
