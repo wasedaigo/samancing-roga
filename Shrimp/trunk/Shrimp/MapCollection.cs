@@ -255,14 +255,22 @@ namespace Shrimp
 
         public void ExpandNode(int id)
         {
-            this.GetNode(id).IsExpanded = true;
-            this.OnUpdated(new UpdatedEventArgs(null));
+            Node node = this.GetNode(id);
+            if (node.IsExpanded != true)
+            {
+                node.IsExpanded = true;
+                this.OnUpdated(new UpdatedEventArgs(null));
+            }
         }
 
         public void CollapseNode(int id)
         {
-            this.GetNode(id).IsExpanded = false;
-            this.OnUpdated(new UpdatedEventArgs(null));
+            Node node = this.GetNode(id);
+            if (node.IsExpanded != false)
+            {
+                node.IsExpanded = false;
+                this.OnUpdated(new UpdatedEventArgs(null));
+            }
         }
 
         public override JToken ToJson()

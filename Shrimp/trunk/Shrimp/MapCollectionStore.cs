@@ -82,7 +82,7 @@ namespace Shrimp
                 if (map != null)
                 {
                     this.AddMap(id);
-                    this.MapStores[id].Load(directory);
+                    result &= this.MapStores[id].Load(directory);
                 }
             }
             return result;

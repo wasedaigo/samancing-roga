@@ -131,6 +131,7 @@ namespace Shrimp
         private void IsOpenedChanged()
         {
             bool isOpened = this.ViewModel.IsOpened;
+            Debug.Assert((isOpened == true && !this.ViewModel.IsDirty) || isOpened == false);
 
             this.TileSetsToolStripComboBox.Items.Clear();
             if (isOpened)
