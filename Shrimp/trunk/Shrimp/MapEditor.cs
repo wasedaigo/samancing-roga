@@ -177,20 +177,18 @@ namespace Shrimp
 
         private void AdjustScrollBars()
         {
-            this.HScrollBar.SmallChange = Util.BackgroundGridSize;
-            this.VScrollBar.SmallChange = Util.BackgroundGridSize;
-            int hLargeChange = Math.Max(this.HScrollBar.Width, 0);
-            int vLargeChange = Math.Max(this.VScrollBar.Height, 0);
             if (this.Map != null)
             {
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                int hMax = this.Map.Width * this.GridSize - hLargeChange;
+                int hMax = this.Map.Width * this.GridSize - this.HScrollBar.Width;
                 if (0 < hMax)
                 {
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
-                    this.HScrollBar.Maximum = hMax + hLargeChange;
-                    this.HScrollBar.LargeChange = hLargeChange;
+                    this.HScrollBar.Maximum = hMax + this.HScrollBar.Width - 1;
+                    this.HScrollBar.SmallChange = Util.BackgroundGridSize;
+                    this.HScrollBar.LargeChange = this.HScrollBar.Width;
+                    Debug.Assert(this.HScrollBar.LargeChange == this.HScrollBar.Width);
                     this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), hMax);
                 }
                 else
@@ -198,13 +196,15 @@ namespace Shrimp
                     this.HScrollBar.Enabled = false;
                     this.HScrollBar.Value = 0;
                 }
-                int vMax = this.Map.Height * this.GridSize - vLargeChange;
+                int vMax = this.Map.Height * this.GridSize - this.VScrollBar.Height;
                 if (0 < vMax)
                 {
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
-                    this.VScrollBar.Maximum = vMax + vLargeChange;
-                    this.VScrollBar.LargeChange = vLargeChange;
+                    this.VScrollBar.Maximum = vMax + this.VScrollBar.Height - 1;
+                    this.VScrollBar.SmallChange = Util.BackgroundGridSize;
+                    this.VScrollBar.LargeChange = this.VScrollBar.Height;
+                    Debug.Assert(this.VScrollBar.LargeChange == this.VScrollBar.Height);
                     this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), vMax);
                 }
                 else
