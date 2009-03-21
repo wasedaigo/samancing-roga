@@ -417,9 +417,13 @@ namespace Shrimp
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
-            if (this.PreviousFrameRect != this.FrameRect)
+            Rectangle previousFrameRect = this.PreviousFrameRect;
+            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+            previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
+            previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
+            if (previousFrameRect != this.FrameRect)
             {
-                this.Invalidate(this.PreviousFrameRect);
+                this.Invalidate(previousFrameRect);
             }
             this.Invalidate(this.FrameRect);
         }
@@ -784,7 +788,19 @@ namespace Shrimp
                         hDstDC = IntPtr.Zero;
                     }
                 }
-                Util.DrawFrame(g, this.FrameRect);
+                Point mouse = this.PointToClient(Control.MousePosition);
+                Rectangle clientRect = new Rectangle
+                {
+                    X = 0,
+                    Y = 0,
+                    Width = Math.Min(this.OffscreenSize.Width, this.Map.Width * this.GridSize),
+                    Height = Math.Min(this.OffscreenSize.Height, this.Map.Height * this.GridSize),
+                };
+                if (clientRect.Left <= mouse.X && mouse.X < clientRect.Right &&
+                    clientRect.Top <= mouse.Y && mouse.Y < clientRect.Bottom)
+                {
+                    Util.DrawFrame(g, this.FrameRect);
+                }
             }
             g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
             {
