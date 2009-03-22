@@ -18,20 +18,22 @@ namespace Shrimp
         public MapEditor()
         {
             this.InitializeComponent();
-            this.SuspendLayout();
+            /*this.SuspendLayout();
             this.VScrollBar.Location = new Point
             {
                 X = this.ClientSize.Width - this.VScrollBar.Width,
                 Y = 0,
             };
+            Console.WriteLine(this.VScrollBar.Height);
             this.VScrollBar.Height = this.ClientSize.Height - this.HScrollBar.Height;
+            Console.WriteLine(this.VScrollBar.Height);
             this.HScrollBar.Location = new Point
             {
                 X = 0,
                 Y = this.ClientSize.Height - this.HScrollBar.Height,
             };
             this.HScrollBar.Width = this.ClientSize.Width - this.VScrollBar.Width;
-            this.ResumeLayout(false);
+            this.ResumeLayout(false);*/
         }
 
         public ViewModel ViewModel
