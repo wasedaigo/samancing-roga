@@ -18,22 +18,6 @@ namespace Shrimp
         public MapEditor()
         {
             this.InitializeComponent();
-            /*this.SuspendLayout();
-            this.VScrollBar.Location = new Point
-            {
-                X = this.ClientSize.Width - this.VScrollBar.Width,
-                Y = 0,
-            };
-            Console.WriteLine(this.VScrollBar.Height);
-            this.VScrollBar.Height = this.ClientSize.Height - this.HScrollBar.Height;
-            Console.WriteLine(this.VScrollBar.Height);
-            this.HScrollBar.Location = new Point
-            {
-                X = 0,
-                Y = this.ClientSize.Height - this.HScrollBar.Height,
-            };
-            this.HScrollBar.Width = this.ClientSize.Width - this.VScrollBar.Width;
-            this.ResumeLayout(false);*/
         }
 
         public ViewModel ViewModel
@@ -242,47 +226,50 @@ namespace Shrimp
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-            Point mousePosition = new Point
+            if (this.Map != null)
             {
-                X = e.X - offset.X,
-                Y = e.Y - offset.Y,
-            };
-            Rectangle oldFrameRect = this.FrameRect;
-            this.CursorTileX =
-                Math.Min(Math.Max(mousePosition.X / Util.BackgroundGridSize, 0), this.Map.Width - 1);
-            this.CursorTileY =
-                Math.Min(Math.Max(mousePosition.Y / Util.BackgroundGridSize, 0), this.Map.Height - 1);
-            if (this.EditorState.LayerMode != LayerMode.Event)
-            {
-                if ((e.Button & MouseButtons.Left) != 0)
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                Point mousePosition = new Point
                 {
-                    int layer = 0;
-                    switch (this.EditorState.LayerMode)
+                    X = e.X - offset.X,
+                    Y = e.Y - offset.Y,
+                };
+                Rectangle oldFrameRect = this.FrameRect;
+                this.CursorTileX =
+                    Math.Min(Math.Max(mousePosition.X / Util.BackgroundGridSize, 0), this.Map.Width - 1);
+                this.CursorTileY =
+                    Math.Min(Math.Max(mousePosition.Y / Util.BackgroundGridSize, 0), this.Map.Height - 1);
+                if (this.EditorState.LayerMode != LayerMode.Event)
+                {
+                    if ((e.Button & MouseButtons.Left) != 0)
                     {
-                    case LayerMode.Layer1: layer = 0; break;
-                    case LayerMode.Layer2: layer = 1; break;
-                    default: Debug.Fail("Invalid layer"); break;
+                        int layer = 0;
+                        switch (this.EditorState.LayerMode)
+                        {
+                        case LayerMode.Layer1: layer = 0; break;
+                        case LayerMode.Layer2: layer = 1; break;
+                        default: Debug.Fail("Invalid layer"); break;
+                        }
+                        int x = this.CursorTileX + this.CursorOffsetX;
+                        int y = this.CursorTileY + this.CursorOffsetY;
+                        this.RenderingTileStartX = x;
+                        this.RenderingTileStartY = y;
+                        this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
                     }
-                    int x = this.CursorTileX + this.CursorOffsetX;
-                    int y = this.CursorTileY + this.CursorOffsetY;
-                    this.RenderingTileStartX = x;
-                    this.RenderingTileStartY = y;
-                    this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
+                    else if ((e.Button & MouseButtons.Right) != 0)
+                    {
+                        this.CursorOffsetX = 0;
+                        this.CursorOffsetY = 0;
+                        this.PickerStartX = this.CursorTileX;
+                        this.PickerStartY = this.CursorTileY;
+                        this.IsPickingTiles = true;
+                        this.Invalidate(oldFrameRect);
+                    }
                 }
-                else if ((e.Button & MouseButtons.Right) != 0)
+                else
                 {
-                    this.CursorOffsetX = 0;
-                    this.CursorOffsetY = 0;
-                    this.PickerStartX = this.CursorTileX;
-                    this.PickerStartY = this.CursorTileY;
-                    this.IsPickingTiles = true;
-                    this.Invalidate(oldFrameRect);
+                    this.Invalidate();
                 }
-            }
-            else
-            {
-                this.Invalidate();
             }
         }
 
@@ -376,7 +363,7 @@ namespace Shrimp
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            if (this.IsPickingTiles)
+            if (this.Map != null && this.IsPickingTiles)
             {
                 if ((e.Button & MouseButtons.Right) != 0)
                 {
@@ -419,15 +406,18 @@ namespace Shrimp
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
-            Rectangle previousFrameRect = this.PreviousFrameRect;
-            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-            previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
-            previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
-            if (previousFrameRect != this.FrameRect)
+            if (this.Map != null)
             {
-                this.Invalidate(previousFrameRect);
+                Rectangle previousFrameRect = this.PreviousFrameRect;
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
+                previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
+                if (previousFrameRect != this.FrameRect)
+                {
+                    this.Invalidate(previousFrameRect);
+                }
+                this.Invalidate(this.FrameRect);
             }
-            this.Invalidate(this.FrameRect);
         }
 
         private int GridSize

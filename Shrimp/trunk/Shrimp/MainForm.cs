@@ -25,6 +25,22 @@ namespace Shrimp
         {
             this.InitializeComponent();
             this.SuspendLayout();
+
+            ToolStripTrackBar tsTrackBar = new ToolStripTrackBar();
+            tsTrackBar.Name = "ScaleToolStripTrackBar";
+            int index = this.ToolStrip.Items.IndexOf(this.toolStripSeparator5);
+            this.ToolStrip.Items.Insert(index, tsTrackBar);
+            Debug.Assert(this.ScaleTrackBar == tsTrackBar.TrackBar);
+
+            this.ScaleTrackBar.AutoSize = false;
+            this.ScaleTrackBar.Width = 100;
+            this.ScaleTrackBar.Height = 20;
+            this.ScaleTrackBar.Maximum = 3;
+            this.ScaleTrackBar.SmallChange = 1;
+            this.ScaleTrackBar.LargeChange = 1;
+            tsTrackBar.Text = "Scale";
+            tsTrackBar.ToolTipText = "Scale";
+
             this.ToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TileSetPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TileSetPalette.Size = new Size
@@ -110,6 +126,22 @@ namespace Shrimp
 
         private DatabaseDialog DatabaseDialog = new DatabaseDialog();
 
+        private ToolStripTrackBar ScaleToolStripTrackBar
+        {
+            get
+            {
+                return (ToolStripTrackBar)this.ToolStrip.Items.Find("ScaleToolStripTrackBar", false)[0];
+            }
+        }
+
+        private TrackBar ScaleTrackBar
+        {
+            get
+            {
+                return this.ScaleToolStripTrackBar.TrackBar;
+            }
+        }
+
         private IEnumerable<ToolStripButton> LayerModeSwitchers
         {
             get
@@ -163,6 +195,7 @@ namespace Shrimp
             {
                 item.Enabled = isOpened;
             }
+            this.ScaleToolStripTrackBar.Enabled = isOpened;
             this.DatabaseToolStripButton.Enabled = isOpened;
             this.TileSetPalette.Enabled = isOpened;
             this.TileSetPaletteToolStrip.Enabled = isOpened;
