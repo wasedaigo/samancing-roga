@@ -57,8 +57,7 @@
             // 
             // MapEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.VScrollBar);
             this.Controls.Add(this.HScrollBar);
             this.DoubleBuffered = true;

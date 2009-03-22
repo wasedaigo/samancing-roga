@@ -35,7 +35,6 @@
             this.TileSetsToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.TileSetPalette = new Shrimp.TileSetPalette();
             this.MapTreeView = new Shrimp.MapTreeView();
-            this.MapEditor = new Shrimp.MapEditor();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -55,7 +54,6 @@
             this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.MainSplitContainer.Panel1.SuspendLayout();
-            this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
             this.LeftSplitContainer.Panel1.SuspendLayout();
             this.LeftSplitContainer.Panel2.SuspendLayout();
@@ -78,10 +76,6 @@
             // MainSplitContainer.Panel1
             // 
             this.MainSplitContainer.Panel1.Controls.Add(this.LeftSplitContainer);
-            // 
-            // MainSplitContainer.Panel2
-            // 
-            this.MainSplitContainer.Panel2.Controls.Add(this.MapEditor);
             this.MainSplitContainer.Size = new System.Drawing.Size(792, 531);
             this.MainSplitContainer.SplitterDistance = 300;
             this.MainSplitContainer.SplitterWidth = 3;
@@ -154,16 +148,6 @@
             this.MapTreeView.Size = new System.Drawing.Size(296, 229);
             this.MapTreeView.TabIndex = 0;
             this.MapTreeView.ViewModel = null;
-            // 
-            // MapEditor
-            // 
-            this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapEditor.Location = new System.Drawing.Point(0, 0);
-            this.MapEditor.Name = "MapEditor";
-            this.MapEditor.Size = new System.Drawing.Size(489, 531);
-            this.MapEditor.TabIndex = 0;
-            this.MapEditor.ViewModel = null;
             // 
             // ToolStripContainer
             // 
@@ -349,7 +333,6 @@
             this.Text = "Shrimp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.MainSplitContainer.Panel1.ResumeLayout(false);
-            this.MainSplitContainer.Panel2.ResumeLayout(false);
             this.MainSplitContainer.ResumeLayout(false);
             this.LeftSplitContainer.Panel1.ResumeLayout(false);
             this.LeftSplitContainer.Panel1.PerformLayout();
@@ -374,7 +357,6 @@
         private System.Windows.Forms.ToolStripContainer ToolStripContainer;
         private System.Windows.Forms.ToolStrip ToolStrip;
         private System.Windows.Forms.ToolStripButton NewToolStripButton;
-        private MapEditor MapEditor;
         private System.Windows.Forms.SplitContainer LeftSplitContainer;
         private System.Windows.Forms.ToolStripButton OpenToolStripButton;
         private System.Windows.Forms.OpenFileDialog OpenFileDialog;

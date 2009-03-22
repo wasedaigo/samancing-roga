@@ -26,6 +26,11 @@ namespace Shrimp
             this.InitializeComponent();
             this.SuspendLayout();
 
+            this.MapEditor = new MapEditor();
+            this.MapEditor.BorderStyle = BorderStyle.Fixed3D;
+            this.MapEditor.Dock = DockStyle.Fill;
+            this.MainSplitContainer.Panel2.Controls.Add(this.MapEditor);
+
             ToolStripTrackBar tsTrackBar = new ToolStripTrackBar();
             tsTrackBar.Name = "ScaleToolStripTrackBar";
             int index = this.ToolStrip.Items.IndexOf(this.toolStripSeparator5);
@@ -125,6 +130,8 @@ namespace Shrimp
         private ViewModel ViewModel;
 
         private DatabaseDialog DatabaseDialog = new DatabaseDialog();
+
+        private MapEditor MapEditor;
 
         private ToolStripTrackBar ScaleToolStripTrackBar
         {
