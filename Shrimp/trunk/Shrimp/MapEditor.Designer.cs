@@ -40,7 +40,7 @@
             this.HScrollBar.Location = new System.Drawing.Point(0, 144);
             this.HScrollBar.Maximum = 500;
             this.HScrollBar.Name = "HScrollBar";
-            this.HScrollBar.Size = new System.Drawing.Size(144, 16);
+            this.HScrollBar.Size = new System.Drawing.Size(32, 16);
             this.HScrollBar.TabIndex = 0;
             this.HScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.HScrollBar_Scroll);
             // 
@@ -51,7 +51,7 @@
             this.VScrollBar.Enabled = false;
             this.VScrollBar.Location = new System.Drawing.Point(144, 0);
             this.VScrollBar.Name = "VScrollBar";
-            this.VScrollBar.Size = new System.Drawing.Size(16, 144);
+            this.VScrollBar.Size = new System.Drawing.Size(16, 32);
             this.VScrollBar.TabIndex = 1;
             this.VScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.VScrollBar_Scroll);
             // 

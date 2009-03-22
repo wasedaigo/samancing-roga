@@ -18,6 +18,14 @@ namespace Shrimp
         public MapEditor()
         {
             this.InitializeComponent();
+            this.HScrollBar.Width = this.ClientSize.Width - SystemInformation.VerticalScrollBarWidth;
+            this.HScrollBar.Height = SystemInformation.HorizontalScrollBarHeight;
+            this.HScrollBar.Left = 0;
+            this.HScrollBar.Top = this.ClientSize.Height - SystemInformation.HorizontalScrollBarHeight;
+            this.VScrollBar.Width = SystemInformation.VerticalScrollBarWidth;
+            this.VScrollBar.Height = this.ClientSize.Height - SystemInformation.HorizontalScrollBarHeight;
+            this.VScrollBar.Left = this.ClientSize.Width - SystemInformation.VerticalScrollBarWidth;
+            this.VScrollBar.Top = 0;
         }
 
         public ViewModel ViewModel
