@@ -82,7 +82,7 @@
             // MainSplitContainer.Panel2
             // 
             this.MainSplitContainer.Panel2.Controls.Add(this.MapEditor);
-            this.MainSplitContainer.Size = new System.Drawing.Size(786, 532);
+            this.MainSplitContainer.Size = new System.Drawing.Size(792, 531);
             this.MainSplitContainer.SplitterDistance = 300;
             this.MainSplitContainer.SplitterWidth = 3;
             this.MainSplitContainer.TabIndex = 0;
@@ -103,8 +103,8 @@
             // LeftSplitContainer.Panel2
             // 
             this.LeftSplitContainer.Panel2.Controls.Add(this.MapTreeView);
-            this.LeftSplitContainer.Size = new System.Drawing.Size(300, 532);
-            this.LeftSplitContainer.SplitterDistance = 296;
+            this.LeftSplitContainer.Size = new System.Drawing.Size(300, 531);
+            this.LeftSplitContainer.SplitterDistance = 295;
             this.LeftSplitContainer.SplitterWidth = 3;
             this.LeftSplitContainer.TabIndex = 0;
             // 
@@ -114,7 +114,7 @@
             this.TileSetPaletteToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TileSetPaletteToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.TileSetsToolStripComboBox});
-            this.TileSetPaletteToolStrip.Location = new System.Drawing.Point(0, 267);
+            this.TileSetPaletteToolStrip.Location = new System.Drawing.Point(0, 266);
             this.TileSetPaletteToolStrip.Name = "TileSetPaletteToolStrip";
             this.TileSetPaletteToolStrip.Size = new System.Drawing.Size(296, 25);
             this.TileSetPaletteToolStrip.TabIndex = 1;
@@ -134,7 +134,7 @@
             this.TileSetPalette.AutoScroll = true;
             this.TileSetPalette.Location = new System.Drawing.Point(0, 0);
             this.TileSetPalette.Name = "TileSetPalette";
-            this.TileSetPalette.Size = new System.Drawing.Size(100, 96);
+            this.TileSetPalette.Size = new System.Drawing.Size(100, 95);
             this.TileSetPalette.TabIndex = 0;
             this.TileSetPalette.ViewModel = null;
             // 
@@ -157,12 +157,11 @@
             // 
             // MapEditor
             // 
-            this.MapEditor.AutoSize = true;
             this.MapEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.MapEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapEditor.Location = new System.Drawing.Point(0, 0);
             this.MapEditor.Name = "MapEditor";
-            this.MapEditor.Size = new System.Drawing.Size(483, 532);
+            this.MapEditor.Size = new System.Drawing.Size(489, 531);
             this.MapEditor.TabIndex = 0;
             this.MapEditor.ViewModel = null;
             // 
@@ -176,11 +175,11 @@
             // ToolStripContainer.ContentPanel
             // 
             this.ToolStripContainer.ContentPanel.Controls.Add(this.MainSplitContainer);
-            this.ToolStripContainer.ContentPanel.Size = new System.Drawing.Size(786, 532);
+            this.ToolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 531);
             this.ToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ToolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.ToolStripContainer.Name = "ToolStripContainer";
-            this.ToolStripContainer.Size = new System.Drawing.Size(786, 567);
+            this.ToolStripContainer.Size = new System.Drawing.Size(792, 566);
             this.ToolStripContainer.TabIndex = 1;
             this.ToolStripContainer.Text = "toolStripContainer1";
             // 
@@ -211,7 +210,7 @@
             this.DatabaseToolStripButton});
             this.ToolStrip.Location = new System.Drawing.Point(0, 0);
             this.ToolStrip.Name = "ToolStrip";
-            this.ToolStrip.Size = new System.Drawing.Size(786, 35);
+            this.ToolStrip.Size = new System.Drawing.Size(792, 35);
             this.ToolStrip.Stretch = true;
             this.ToolStrip.TabIndex = 0;
             // 
@@ -343,7 +342,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(786, 567);
+            this.ClientSize = new System.Drawing.Size(792, 566);
             this.Controls.Add(this.ToolStripContainer);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -351,7 +350,6 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.MainSplitContainer.Panel1.ResumeLayout(false);
             this.MainSplitContainer.Panel2.ResumeLayout(false);
-            this.MainSplitContainer.Panel2.PerformLayout();
             this.MainSplitContainer.ResumeLayout(false);
             this.LeftSplitContainer.Panel1.ResumeLayout(false);
             this.LeftSplitContainer.Panel1.PerformLayout();
