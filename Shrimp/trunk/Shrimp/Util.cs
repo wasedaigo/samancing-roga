@@ -26,7 +26,7 @@ namespace Shrimp
 
             IntPtr hBackgroundBitmap = BackgroundBitmap.GetHbitmap();
             IntPtr hBackgroundBitmapDC = g.GetHdc();
-            Win32API.SelectObject(hBackgroundBitmapDC, hBackgroundBitmap);
+            NativeMethods.SelectObject(hBackgroundBitmapDC, hBackgroundBitmap);
 
             HBackgroundBitmapDC = hBackgroundBitmapDC;
             gBackgroundBitmap = g;

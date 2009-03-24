@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Shrimp
 {
-    internal static class Win32API
+    internal static class NativeMethods
     {
         //
         // currently defined blend operation

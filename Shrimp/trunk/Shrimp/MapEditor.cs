@@ -428,6 +428,24 @@ namespace Shrimp
             }
         }
 
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            base.OnMouseWheel(e);
+            if (this.Map != null)
+            {
+                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                if ((Control.ModifierKeys & Keys.Shift) != 0)
+                {
+                    offset.X += (e.Delta / 120) * this.HScrollBar.SmallChange;
+                }
+                else
+                {
+                    offset.Y += (e.Delta / 120) * this.VScrollBar.SmallChange;
+                }
+                this.EditorState.SetMapOffset(this.Map.Id, offset);
+            }
+        }
+
         private int GridSize
         {
             get
@@ -448,8 +466,8 @@ namespace Shrimp
             this.AdjustScrollBars();
             if (this.HOffscreen != IntPtr.Zero)
             {
-                Win32API.DeleteDC(this.HOffscreenDC);
-                Win32API.DeleteObject(this.HOffscreen);
+                NativeMethods.DeleteDC(this.HOffscreenDC);
+                NativeMethods.DeleteObject(this.HOffscreen);
                 this.OffscreenPixels = IntPtr.Zero;
                 this.HOffscreenDC = IntPtr.Zero;
                 this.HOffscreen = IntPtr.Zero;
@@ -461,32 +479,32 @@ namespace Shrimp
                 Width = this.HScrollBar.Width,
                 Height = this.VScrollBar.Height,
             };
-            Win32API.BITMAPINFO bitmapInfo = new Win32API.BITMAPINFO
+            NativeMethods.BITMAPINFO bitmapInfo = new NativeMethods.BITMAPINFO
             {
-                bmiHeader = new Win32API.BITMAPINFOHEADER
+                bmiHeader = new NativeMethods.BITMAPINFOHEADER
                 {
-                    biSize = (uint)Marshal.SizeOf(typeof(Win32API.BITMAPINFOHEADER)),
+                    biSize = (uint)Marshal.SizeOf(typeof(NativeMethods.BITMAPINFOHEADER)),
                     biWidth = this.OffscreenSize.Width,
                     biHeight = -this.OffscreenSize.Height,
                     biPlanes = 1,
                     biBitCount = 32,
-                    biCompression = Win32API.BI_RGB,
+                    biCompression = NativeMethods.BI_RGB,
                 },
             };
             IntPtr hDC = IntPtr.Zero;
             try
             {
-                hDC = Win32API.GetDC(this.Handle);
-                this.HOffscreen = Win32API.CreateDIBSection(hDC, ref bitmapInfo,
-                    Win32API.DIB_RGB_COLORS, out this.OffscreenPixels, IntPtr.Zero, 0);
-                this.HOffscreenDC = Win32API.CreateCompatibleDC(hDC);
-                Win32API.SelectObject(this.HOffscreenDC, this.HOffscreen);
+                hDC = NativeMethods.GetDC(this.Handle);
+                this.HOffscreen = NativeMethods.CreateDIBSection(hDC, ref bitmapInfo,
+                    NativeMethods.DIB_RGB_COLORS, out this.OffscreenPixels, IntPtr.Zero, 0);
+                this.HOffscreenDC = NativeMethods.CreateCompatibleDC(hDC);
+                NativeMethods.SelectObject(this.HOffscreenDC, this.HOffscreen);
             }
             finally
             {
                 if (hDC != IntPtr.Zero)
                 {
-                    Win32API.ReleaseDC(this.Handle, hDC);
+                    NativeMethods.ReleaseDC(this.Handle, hDC);
                     hDC = IntPtr.Zero;
                 }
             }
@@ -603,22 +621,22 @@ namespace Shrimp
             {
                 if (fillBlankSpace)
                 {
-                    Win32API.RECT win32Rect1 = new Win32API.RECT
+                    NativeMethods.RECT win32Rect1 = new NativeMethods.RECT
                     {
                         Left = 0,
                         Right = offscreenWidth,
                         Top = map.Height * this.GridSize,
                         Bottom = offscreenHeight,
                     };
-                    Win32API.FillRect(this.HOffscreenDC, ref win32Rect1, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
-                    Win32API.RECT win32Rect2 = new Win32API.RECT
+                    NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect1, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
+                    NativeMethods.RECT win32Rect2 = new NativeMethods.RECT
                     {
                         Left = map.Width * this.GridSize,
                         Right = offscreenWidth,
                         Top = 0,
                         Bottom = win32Rect1.Top,
                     };
-                    Win32API.FillRect(this.HOffscreenDC, ref win32Rect2, (IntPtr)(Win32API.COLOR_BTNFACE + 1));
+                    NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect2, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
                 }
                 BitmapData bd = null;
                 try
@@ -633,10 +651,10 @@ namespace Shrimp
                         for (int i = bgStartI; i < bgEndI; i++)
                         {
                             int x = i * bgGridSize + offset.X;
-                            Win32API.BitBlt(
+                            NativeMethods.BitBlt(
                                 this.HOffscreenDC, x, y, bgGridSize, bgGridSize,
                                 Util.HBackgroundBitmapDC, 0, 0,
-                                Win32API.TernaryRasterOperations.SRCCOPY);
+                                NativeMethods.TernaryRasterOperations.SRCCOPY);
                         }
                     }
                 }
@@ -775,10 +793,10 @@ namespace Shrimp
                 try
                 {
                     hDstDC = g.GetHdc();
-                    Win32API.BitBlt(
+                    NativeMethods.BitBlt(
                         hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
                         this.HOffscreenDC, rect.X, rect.Y,
-                        Win32API.TernaryRasterOperations.SRCCOPY);
+                        NativeMethods.TernaryRasterOperations.SRCCOPY);
                 }
                 finally
                 {
