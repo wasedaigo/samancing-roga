@@ -60,7 +60,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.VScrollBar);
             this.Controls.Add(this.HScrollBar);
-            this.DoubleBuffered = true;
             this.Name = "MapEditor";
             this.Size = new System.Drawing.Size(160, 160);
             this.ResumeLayout(false);

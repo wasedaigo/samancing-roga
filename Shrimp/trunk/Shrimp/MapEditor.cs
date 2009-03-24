@@ -18,6 +18,9 @@ namespace Shrimp
         public MapEditor()
         {
             this.InitializeComponent();
+            this.SuspendLayout();
+            this.SetStyle(ControlStyles.UserPaint, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             this.HScrollBar.Width = this.ClientSize.Width - SystemInformation.VerticalScrollBarWidth;
             this.HScrollBar.Height = SystemInformation.HorizontalScrollBarHeight;
             this.HScrollBar.Left = 0;
@@ -26,6 +29,7 @@ namespace Shrimp
             this.VScrollBar.Height = this.ClientSize.Height - SystemInformation.HorizontalScrollBarHeight;
             this.VScrollBar.Left = this.ClientSize.Width - SystemInformation.VerticalScrollBarWidth;
             this.VScrollBar.Top = 0;
+            this.ResumeLayout(false);
         }
 
         public ViewModel ViewModel
@@ -776,57 +780,69 @@ namespace Shrimp
             }
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        protected override void WndProc(ref Message m)
         {
-            base.OnPaint(e);
-            foreach (Rectangle rect in this.UpdatingOffscreenRequests)
+            switch (m.Msg)
             {
-                this.UpdateOffscreen(rect);
-            }
-            this.UpdatingOffscreenRequests.Clear();
-            Graphics g = e.Graphics;
-            if (this.ViewModel != null && this.EditorState != null && this.Map != null)
-            {
-                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                Rectangle rect = e.ClipRectangle;
-                IntPtr hDstDC = IntPtr.Zero;
-                try
+            case NativeMethods.WM_PAINT:
+                foreach (Rectangle r in this.UpdatingOffscreenRequests)
                 {
-                    hDstDC = g.GetHdc();
-                    NativeMethods.BitBlt(
-                        hDstDC, rect.X, rect.Y, rect.Width, rect.Height,
-                        this.HOffscreenDC, rect.X, rect.Y,
-                        NativeMethods.TernaryRasterOperations.SRCCOPY);
+                    this.UpdateOffscreen(r);
                 }
-                finally
+                this.UpdatingOffscreenRequests.Clear();
+                NativeMethods.PAINTSTRUCT ps;
+                IntPtr hDstDC = NativeMethods.BeginPaint(m.HWnd, out ps);
+                NativeMethods.RECT rect;
+                Size offscreenSize = this.OffscreenSize;
+                bool renderCorner = false;
+                if (NativeMethods.GetUpdateRect(m.HWnd, out rect, false))
                 {
-                    if (hDstDC != IntPtr.Zero)
+                    if (offscreenSize.Width < rect.Right)
                     {
-                        g.ReleaseHdc(hDstDC);
-                        hDstDC = IntPtr.Zero;
+                        rect.Right = offscreenSize.Width;
+                        renderCorner = true;
+                    }
+                    if (offscreenSize.Height < rect.Bottom)
+                    {
+                        rect.Bottom = offscreenSize.Height;
+                        renderCorner = true;
                     }
                 }
-                Point mouse = this.PointToClient(Control.MousePosition);
-                Rectangle clientRect = new Rectangle
+                else
                 {
-                    X = 0,
-                    Y = 0,
-                    Width = Math.Min(this.OffscreenSize.Width, this.Map.Width * this.GridSize),
-                    Height = Math.Min(this.OffscreenSize.Height, this.Map.Height * this.GridSize),
-                };
-                if (clientRect.Left <= mouse.X && mouse.X < clientRect.Right &&
-                    clientRect.Top <= mouse.Y && mouse.Y < clientRect.Bottom)
-                {
-                    Util.DrawFrame(g, this.FrameRect);
+                    rect.Left = 0;
+                    rect.Top = 0;
+                    rect.Right = offscreenSize.Width;
+                    rect.Bottom = offscreenSize.Height;
+                    renderCorner = true;
                 }
+                if (this.ViewModel != null && this.EditorState != null && this.Map != null)
+                {
+                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    NativeMethods.BitBlt(
+                        hDstDC, rect.Left, rect.Top, rect.Width, rect.Height,
+                        this.HOffscreenDC, rect.Left, rect.Top,
+                        NativeMethods.TernaryRasterOperations.SRCCOPY);
+                }
+                else
+                {
+                    NativeMethods.FillRect(hDstDC, ref rect, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
+                }
+                if (renderCorner)
+                {
+                    NativeMethods.RECT cornerRect = new NativeMethods.RECT
+                    {
+                        Left = offscreenSize.Width,
+                        Top = offscreenSize.Height,
+                        Right = offscreenSize.Width + this.HScrollBar.Width,
+                        Bottom = offscreenSize.Height + this.VScrollBar.Height,
+                    };
+                    NativeMethods.FillRect(hDstDC, ref cornerRect, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
+                }
+                NativeMethods.EndPaint(m.HWnd, ref ps);
+                break;
             }
-            g.FillRectangle(new SolidBrush(this.BackColor), new Rectangle
-            {
-                X = this.VScrollBar.Location.X,
-                Y = this.HScrollBar.Location.Y,
-                Width = this.VScrollBar.Width,
-                Height = this.HScrollBar.Height,
-            });
+            base.WndProc(ref m);
         }
 
         private Rectangle FrameRect
