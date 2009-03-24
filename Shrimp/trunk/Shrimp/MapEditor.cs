@@ -797,15 +797,15 @@ namespace Shrimp
                 bool renderCorner = false;
                 if (NativeMethods.GetUpdateRect(m.HWnd, out rect, false))
                 {
+                    renderCorner = (offscreenSize.Width < rect.Right) &&
+                        (offscreenSize.Height < rect.Bottom);
                     if (offscreenSize.Width < rect.Right)
                     {
                         rect.Right = offscreenSize.Width;
-                        renderCorner = true;
                     }
                     if (offscreenSize.Height < rect.Bottom)
                     {
                         rect.Bottom = offscreenSize.Height;
-                        renderCorner = true;
                     }
                 }
                 else
