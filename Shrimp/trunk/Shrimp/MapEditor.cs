@@ -828,6 +828,10 @@ namespace Shrimp
                 {
                     NativeMethods.FillRect(hDstDC, ref rect, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
                 }
+                using (Graphics g = Graphics.FromHdc(hDstDC))
+                {
+                    Util.DrawFrame(g, this.FrameRect);
+                }
                 if (renderCorner)
                 {
                     NativeMethods.RECT cornerRect = new NativeMethods.RECT
