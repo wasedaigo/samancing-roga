@@ -82,15 +82,16 @@ namespace Shrimp
                 this.Invalidate();
                 break;
             case "MapOffsets":
-                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                if (this.Map != null && (int)e.Tag == this.Map.Id)
+                if (this.Map != null && e.ItemId == this.Map.Id)
                 {
                     this.AdjustScrollBars();
-                    offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+                    // test
+                    Point previousOffset = (Point)e.PreviousValue;
                     this.AddUpdatingOffscreenRequest();
                     this.Invalidate();
+                    this.PreviousMapOffset = offset;
                 }
-                this.PreviousMapOffset = offset;
                 break;
             case "SelectedTiles":
                 if (this.EditorState.SelectedTiles.SelectedTilesType != SelectedTilesType.Picker)
@@ -158,7 +159,7 @@ namespace Shrimp
                 this.Invalidate();
                 break;
             case "Tiles":
-                Rectangle updatedTilesRect = (Rectangle)e.Tag;
+                Rectangle updatedTilesRect = (Rectangle)e.Bounds;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 Rectangle updatedRect = new Rectangle
                 {
@@ -785,13 +786,7 @@ namespace Shrimp
             switch (m.Msg)
             {
             case NativeMethods.WM_PAINT:
-                foreach (Rectangle r in this.UpdatingOffscreenRequests)
-                {
-                    this.UpdateOffscreen(r);
-                }
-                this.UpdatingOffscreenRequests.Clear();
                 NativeMethods.PAINTSTRUCT ps;
-                IntPtr hDstDC = NativeMethods.BeginPaint(m.HWnd, out ps);
                 NativeMethods.RECT rect;
                 Size offscreenSize = this.OffscreenSize;
                 bool renderCorner = false;
@@ -816,6 +811,12 @@ namespace Shrimp
                     rect.Bottom = offscreenSize.Height;
                     renderCorner = true;
                 }
+                foreach (Rectangle r in this.UpdatingOffscreenRequests)
+                {
+                    this.UpdateOffscreen(r);
+                }
+                this.UpdatingOffscreenRequests.Clear();
+                IntPtr hDstDC = NativeMethods.BeginPaint(m.HWnd, out ps);
                 if (this.ViewModel != null && this.EditorState != null && this.Map != null)
                 {
                     Point offset = this.EditorState.GetMapOffset(this.Map.Id);
@@ -828,9 +829,15 @@ namespace Shrimp
                 {
                     NativeMethods.FillRect(hDstDC, ref rect, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
                 }
-                using (Graphics g = Graphics.FromHdc(hDstDC))
+                Rectangle frameRect = this.FrameRect;
+                Point mousePosition = this.PointToClient(Control.MousePosition);
+                if (0 <= mousePosition.X && mousePosition.X < offscreenSize.Width &&
+                    0 <= mousePosition.Y && mousePosition.Y < offscreenSize.Height)
                 {
-                    Util.DrawFrame(g, this.FrameRect);
+                    using (Graphics g = Graphics.FromHdc(hDstDC))
+                    {
+                        Util.DrawFrame(g, frameRect);
+                    }
                 }
                 if (renderCorner)
                 {

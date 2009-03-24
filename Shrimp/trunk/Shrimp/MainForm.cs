@@ -106,7 +106,7 @@ namespace Shrimp
                     this.SelectedMapIdChanged();
                     break;
                 case "SelectedTileSetIds":
-                    if ((int)e.Tag == this.ViewModel.EditorState.SelectedMapId)
+                    if (e.ItemId == this.ViewModel.EditorState.SelectedMapId)
                     {
                         this.SelectedTileSetIdsChanged();
                     }

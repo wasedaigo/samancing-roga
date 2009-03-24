@@ -131,8 +131,9 @@ namespace Shrimp
         {
             if (this.MapOffsets[id] != point)
             {
+                Point previousValue = this.MapOffsets[id];
                 this.MapOffsets[id] = point;
-                this.OnUpdated(new UpdatedEventArgs("MapOffsets", id));
+                this.OnUpdated(new UpdatedEventArgs("MapOffsets", id, previousValue, null));
             }
         }
         private Dictionary<int, Point> MapOffsets = new Dictionary<int, Point>();
@@ -165,8 +166,9 @@ namespace Shrimp
             }
             if (this.SelectedTileSetIds[mapId] != tileSetId)
             {
+                int previousValue = this.SelectedTileSetIds[mapId];
                 this.SelectedTileSetIds[mapId] = tileSetId;
-                this.OnUpdated(new UpdatedEventArgs("SelectedTileSetIds", mapId));
+                this.OnUpdated(new UpdatedEventArgs("SelectedTileSetIds", mapId, previousValue, null));
             }
         }
         private Dictionary<int, int> SelectedTileSetIds = new Dictionary<int, int>();

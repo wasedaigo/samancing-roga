@@ -213,11 +213,9 @@ namespace Shrimp
         [DllImport("user32.dll")]
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
-        [DllImport("gdi32.dll", EntryPoint = "GdiAlphaBlend")]
-        public static extern bool AlphaBlend(IntPtr hdcDest, int nXOriginDest, int nYOriginDest,
-            int nWidthDest, int nHeightDest,
-            IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-            BLENDFUNCTION blendFunction);
+        [DllImport("user32.dll")]
+        static extern int ScrollWindowEx(IntPtr hWnd, int dx, int dy, IntPtr prcScroll,
+           IntPtr prcClip, IntPtr hrgnUpdate, IntPtr prcUpdate, uint flags);
 
         [DllImport("gdi32.dll")]
         public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, TernaryRasterOperations dwRop);
