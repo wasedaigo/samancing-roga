@@ -9,14 +9,8 @@ namespace Shrimp
 {
     internal static class NativeMethods
     {
-        //
-        // currently defined blend operation
-        //
         public const int AC_SRC_OVER = 0x00;
 
-        //
-        // currently defined alpha format
-        //
         public const int AC_SRC_ALPHA = 0x01;
 
         public const int BI_RGB = 0x00;
@@ -54,6 +48,11 @@ namespace Shrimp
             COLOR_3DLIGHT = 22,
             COLOR_INFOTEXT = 23,
             COLOR_INFOBK = 24;
+
+        public const uint SW_SCROLLCHILDREN = 0x0001;
+        public const uint SW_INVALIDATE = 0x0002;
+        public const uint SW_ERASE = 0x0004;
+        public const uint SW_SMOOTHSCROLL = 0x0010;
 
         public const int WM_PAINT = 0x000F;
 

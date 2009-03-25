@@ -88,40 +88,8 @@ namespace Shrimp
                     int dx = offset.X - previousOffset.X;
                     int dy = offset.Y - previousOffset.Y;
                     NativeMethods.ScrollWindowEx(this.Handle, dx, dy,
-                        IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 0);
-                    Rectangle rect = new Rectangle();
-                    if (0 < dx)
-                    {
-                        rect.X = 0;
-                        rect.Y = 0;
-                        rect.Width = dx;
-                        rect.Height = this.OffscreenSize.Height;
-                        this.Invalidate(rect);
-                    }
-                    else if (dx < 0)
-                    {
-                        rect.X = this.OffscreenSize.Width + dx;
-                        rect.Y = 0;
-                        rect.Width = -dx;
-                        rect.Height = this.OffscreenSize.Height;
-                        this.Invalidate(rect);
-                    }
-                    if (0 < dy)
-                    {
-                        rect.X = 0;
-                        rect.Y = 0;
-                        rect.Width = this.OffscreenSize.Width;
-                        rect.Height = dy;
-                        this.Invalidate(rect);
-                    }
-                    else if (dy < 0)
-                    {
-                        rect.X = 0;
-                        rect.Y = this.OffscreenSize.Height + dy;
-                        rect.Width = this.OffscreenSize.Width;
-                        rect.Height = -dy;
-                        this.Invalidate(rect);
-                    }
+                        IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero,
+                        NativeMethods.SW_INVALIDATE);
                     this.Update();
                 }
                 break;
