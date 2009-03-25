@@ -68,8 +68,6 @@ namespace Shrimp
             }
         }
 
-        private Point PreviousMapOffset = Point.Empty;
-
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
             switch (e.PropertyName)
@@ -79,6 +77,7 @@ namespace Shrimp
                 break;
             case "LayerMode":
                 this.Invalidate();
+                this.Update();
                 break;
             case "MapOffsets":
                 if (this.Map != null && e.ItemId == this.Map.Id)
@@ -123,8 +122,7 @@ namespace Shrimp
                         rect.Height = -dy;
                         this.Invalidate(rect);
                     }
-                    this.Invalidate();
-                    this.PreviousMapOffset = offset;
+                    this.Update();
                 }
                 break;
             case "SelectedTiles":
@@ -152,10 +150,10 @@ namespace Shrimp
                     if (this.map != null)
                     {
                         this.map.Updated += this.Map_Updated;
-                        this.PreviousMapOffset = this.EditorState.GetMapOffset(this.map.Id);
                     }
                     this.AdjustScrollBars();
                     this.Invalidate();
+                    this.Update();
                 }
             }
         }
@@ -189,6 +187,7 @@ namespace Shrimp
             case "Height":
                 this.AdjustScrollBars();
                 this.Invalidate();
+                this.Update();
                 break;
             case "Tiles":
                 Rectangle updatedTilesRect = (Rectangle)e.Bounds;
@@ -201,6 +200,7 @@ namespace Shrimp
                     Height = updatedTilesRect.Height * this.GridSize,
                 };
                 this.Invalidate(updatedRect);
+                this.Update();
                 break;
             }
         }
@@ -308,11 +308,14 @@ namespace Shrimp
                         this.PickerStartY = this.CursorTileY;
                         this.IsPickingTiles = true;
                         this.Invalidate(oldFrameRect);
+                        this.Update();
                     }
                 }
                 else
                 {
-                    this.Invalidate();
+                    this.Invalidate(oldFrameRect);
+                    this.Invalidate(this.FrameRect);
+                    this.Update();
                 }
             }
         }
@@ -347,8 +350,9 @@ namespace Shrimp
                             if (previousFrameRect != this.FrameRect)
                             {
                                 this.Invalidate(previousFrameRect);
+                                this.Invalidate(this.FrameRect);
+                                this.Update();
                             }
-                            this.Invalidate(this.FrameRect);
                         }
                     }
                     else
@@ -372,7 +376,11 @@ namespace Shrimp
                             if (!this.Map.SetTiles(layer, x, y, selectedTiles,
                                 x - this.RenderingTileStartX, y - this.RenderingTileStartY))
                             {
-                                this.Invalidate(this.FrameRect);
+                                if (previousFrameRect != this.FrameRect)
+                                {
+                                    this.Invalidate(this.FrameRect);
+                                    this.Update();
+                                }
                             }
                         }
                         else
@@ -382,12 +390,9 @@ namespace Shrimp
                                 if (previousFrameRect != this.FrameRect)
                                 {
                                     this.Invalidate(previousFrameRect);
+                                    this.Invalidate(this.FrameRect);
+                                    this.Update();
                                 }
-                                this.Invalidate(this.FrameRect);
-                            }
-                            else
-                            {
-                                this.Invalidate();
                             }
                         }
                     }
@@ -461,6 +466,8 @@ namespace Shrimp
                     this.Invalidate(previousFrameRect);
                 }
                 this.Invalidate(this.FrameRect);
+                this.Update();
+                this.PreviousFrameRect = Rectangle.Empty;
             }
         }
 
@@ -544,6 +551,7 @@ namespace Shrimp
                 }
             }
             this.Invalidate();
+            this.Update();
         }
 
         private void UpdateOffscreen(Rectangle rect)
@@ -561,7 +569,7 @@ namespace Shrimp
             Point offset = this.EditorState.GetMapOffset(this.Map.Id);
             int offscreenWidth = this.OffscreenSize.Width;
             int offscreenHeight = this.OffscreenSize.Height;
-            Size offscreenSize = new Size(offscreenWidth, offscreenHeight);
+            Size offscreenSize = this.OffscreenSize;
 
             int bgGridSize = Util.BackgroundGridSize;
             int bgStartI = Math.Max(-offset.X / bgGridSize, 0);
@@ -627,11 +635,6 @@ namespace Shrimp
             tileEndI -= paddingI2 * bgGridSize / tileGridSize;
             tileStartJ += paddingJ1 * bgGridSize / tileGridSize;
             tileEndJ -= paddingJ2 * bgGridSize / tileGridSize;
-
-            rect.X = bgStartI * bgGridSize + offset.X;
-            rect.Width = (bgEndI - bgStartI) * bgGridSize;
-            rect.Y = bgStartJ * bgGridSize + offset.Y;
-            rect.Height = (bgEndJ - bgStartJ) * bgGridSize;
 
             using (Graphics g = Graphics.FromHdc(this.HOffscreenDC))
             {
@@ -739,7 +742,13 @@ namespace Shrimp
                         }
                         if (this.EditorState.LayerMode == LayerMode.Layer2 && layer == 0)
                         {
-                            this.DarkenOffscreen(offscreenSize, rect);
+                            this.DarkenOffscreen(offscreenSize, new Rectangle
+                            {
+                                X = bgStartI * bgGridSize + offset.X,
+                                Y = bgStartJ * bgGridSize + offset.Y,
+                                Width = (bgEndI - bgStartI) * bgGridSize,
+                                Height = (bgEndJ - bgStartJ) * bgGridSize,
+                            });
                         }
                     }
                 }
@@ -801,7 +810,8 @@ namespace Shrimp
                 NativeMethods.RECT rect;
                 Size offscreenSize = this.OffscreenSize;
                 bool renderCorner = false;
-                if (NativeMethods.GetUpdateRect(m.HWnd, out rect, false))
+                bool test;
+                if (test = NativeMethods.GetUpdateRect(m.HWnd, out rect, false))
                 {
                     renderCorner = (offscreenSize.Width < rect.Right) &&
                         (offscreenSize.Height < rect.Bottom);
@@ -826,7 +836,6 @@ namespace Shrimp
                 IntPtr hDstDC = NativeMethods.BeginPaint(m.HWnd, out ps);
                 if (this.ViewModel != null && this.EditorState != null && this.Map != null)
                 {
-                    Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                     NativeMethods.BitBlt(
                         hDstDC, rect.Left, rect.Top, rect.Width, rect.Height,
                         this.HOffscreenDC, rect.Left, rect.Top,
@@ -838,8 +847,9 @@ namespace Shrimp
                 }
                 Rectangle frameRect = this.FrameRect;
                 Point mousePosition = this.PointToClient(Control.MousePosition);
-                if (0 <= mousePosition.X && mousePosition.X < offscreenSize.Width &&
-                    0 <= mousePosition.Y && mousePosition.Y < offscreenSize.Height)
+                if ((this.EditorState.LayerMode == LayerMode.Event) ||
+                    (0 <= mousePosition.X && mousePosition.X < offscreenSize.Width &&
+                     0 <= mousePosition.Y && mousePosition.Y < offscreenSize.Height))
                 {
                     using (Graphics g = Graphics.FromHdc(hDstDC))
                     {
