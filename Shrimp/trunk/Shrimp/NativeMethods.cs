@@ -214,7 +214,7 @@ namespace Shrimp
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
         [DllImport("user32.dll")]
-        static extern int ScrollWindowEx(IntPtr hWnd, int dx, int dy, IntPtr prcScroll,
+        public static extern int ScrollWindowEx(IntPtr hWnd, int dx, int dy, IntPtr prcScroll,
            IntPtr prcClip, IntPtr hrgnUpdate, IntPtr prcUpdate, uint flags);
 
         [DllImport("gdi32.dll")]
