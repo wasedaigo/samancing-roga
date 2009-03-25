@@ -131,6 +131,8 @@ namespace Shrimp
         {
             if (this.MapOffsets[id] != point)
             {
+                point.X = Math.Min(point.X, 0);
+                point.Y = Math.Min(point.Y, 0);
                 Point previousValue = this.MapOffsets[id];
                 this.MapOffsets[id] = point;
                 this.OnUpdated(new UpdatedEventArgs("MapOffsets", id, previousValue, null));

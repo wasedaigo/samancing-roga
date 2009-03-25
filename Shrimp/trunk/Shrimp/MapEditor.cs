@@ -379,9 +379,9 @@ namespace Shrimp
                                 if (previousFrameRect != this.FrameRect)
                                 {
                                     this.Invalidate(this.FrameRect);
-                                    this.Update();
                                 }
                             }
+                            this.Update();
                         }
                         else
                         {
@@ -552,6 +552,11 @@ namespace Shrimp
             }
             this.Invalidate();
             this.Update();
+        }
+
+        private void UpdateOffscreen()
+        {
+            this.UpdateOffscreen(new Rectangle(new Point(0, 0), this.OffscreenSize));
         }
 
         private void UpdateOffscreen(Rectangle rect)
