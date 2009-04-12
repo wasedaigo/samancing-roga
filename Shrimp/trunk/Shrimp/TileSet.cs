@@ -9,14 +9,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal enum BitmapScale
-    {
-        Scale1,
-        Scale2,
-        Scale4,
-        Scale8,
-    }
-
     internal class TileSet : Model
     {
         public TileSet(TileSetCollection tileSetCollection)
@@ -113,16 +105,15 @@ namespace Shrimp
 
         private Bitmap OriginalBitmap;
 
-        private Dictionary<BitmapScale, Bitmap> Bitmaps =
-            new Dictionary<BitmapScale, Bitmap>();
+        private Dictionary<ScaleMode, Bitmap> Bitmaps = new Dictionary<ScaleMode, Bitmap>();
 
-        public Bitmap GetBitmap(BitmapScale scale)
+        public Bitmap GetBitmap(ScaleMode scale)
         {
             if (!this.Bitmaps.ContainsKey(scale))
             {
                 switch (scale)
                 {
-                case BitmapScale.Scale1:
+                case ScaleMode.Scale1:
                     Bitmap bitmap = Util.CreateScaledBitmap(this.OriginalBitmap);
                     this.Bitmaps.Add(scale, bitmap);
                     return bitmap;

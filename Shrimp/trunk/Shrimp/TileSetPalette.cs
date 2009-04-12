@@ -175,7 +175,7 @@ namespace Shrimp
                 TileSet tileSet = this.TileSet;
                 if (tileSet != null)
                 {
-                    return tileSet.GetBitmap(BitmapScale.Scale1);
+                    return tileSet.GetBitmap(ScaleMode.Scale1);
                 }
                 else
                 {

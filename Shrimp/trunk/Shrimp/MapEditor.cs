@@ -79,6 +79,11 @@ namespace Shrimp
                 this.Invalidate();
                 this.Update();
                 break;
+            case "ScaleMode":
+                this.AdjustScrollBars();
+                this.Invalidate();
+                this.Update();               
+                break;
             case "MapOffsets":
                 if (this.Map != null && e.ItemId == this.Map.Id)
                 {
@@ -238,53 +243,54 @@ namespace Shrimp
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (this.Map != null)
+            if (this.Map == null)
             {
-                Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                Point mousePosition = new Point
+                return;
+            }
+            Point offset = this.EditorState.GetMapOffset(this.Map.Id);
+            Point mousePosition = new Point
+            {
+                X = e.X - offset.X,
+                Y = e.Y - offset.Y,
+            };
+            Rectangle oldFrameRect = this.FrameRect;
+            this.CursorTileX =
+                Math.Min(Math.Max(mousePosition.X / Util.BackgroundGridSize, 0), this.Map.Width - 1);
+            this.CursorTileY =
+                Math.Min(Math.Max(mousePosition.Y / Util.BackgroundGridSize, 0), this.Map.Height - 1);
+            if (this.EditorState.LayerMode != LayerMode.Event)
+            {
+                if ((e.Button & MouseButtons.Left) != 0)
                 {
-                    X = e.X - offset.X,
-                    Y = e.Y - offset.Y,
-                };
-                Rectangle oldFrameRect = this.FrameRect;
-                this.CursorTileX =
-                    Math.Min(Math.Max(mousePosition.X / Util.BackgroundGridSize, 0), this.Map.Width - 1);
-                this.CursorTileY =
-                    Math.Min(Math.Max(mousePosition.Y / Util.BackgroundGridSize, 0), this.Map.Height - 1);
-                if (this.EditorState.LayerMode != LayerMode.Event)
-                {
-                    if ((e.Button & MouseButtons.Left) != 0)
+                    int layer = 0;
+                    switch (this.EditorState.LayerMode)
                     {
-                        int layer = 0;
-                        switch (this.EditorState.LayerMode)
-                        {
-                        case LayerMode.Layer1: layer = 0; break;
-                        case LayerMode.Layer2: layer = 1; break;
-                        default: Debug.Fail("Invalid layer"); break;
-                        }
-                        int x = this.CursorTileX + this.CursorOffsetX;
-                        int y = this.CursorTileY + this.CursorOffsetY;
-                        this.RenderingTileStartX = x;
-                        this.RenderingTileStartY = y;
-                        this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
+                    case LayerMode.Layer1: layer = 0; break;
+                    case LayerMode.Layer2: layer = 1; break;
+                    default: Debug.Fail("Invalid layer"); break;
                     }
-                    else if ((e.Button & MouseButtons.Right) != 0)
-                    {
-                        this.CursorOffsetX = 0;
-                        this.CursorOffsetY = 0;
-                        this.PickerStartX = this.CursorTileX;
-                        this.PickerStartY = this.CursorTileY;
-                        this.IsPickingTiles = true;
-                        this.Invalidate(oldFrameRect);
-                        this.Update();
-                    }
+                    int x = this.CursorTileX + this.CursorOffsetX;
+                    int y = this.CursorTileY + this.CursorOffsetY;
+                    this.RenderingTileStartX = x;
+                    this.RenderingTileStartY = y;
+                    this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
                 }
-                else
+                else if ((e.Button & MouseButtons.Right) != 0)
                 {
+                    this.CursorOffsetX = 0;
+                    this.CursorOffsetY = 0;
+                    this.PickerStartX = this.CursorTileX;
+                    this.PickerStartY = this.CursorTileY;
+                    this.IsPickingTiles = true;
                     this.Invalidate(oldFrameRect);
-                    this.Invalidate(this.FrameRect);
                     this.Update();
                 }
+            }
+            else
+            {
+                this.Invalidate(oldFrameRect);
+                this.Invalidate(this.FrameRect);
+                this.Update();
             }
         }
 
@@ -461,8 +467,20 @@ namespace Shrimp
         {
             get
             {
-                // TODO
-                return Util.BackgroundGridSize;
+                switch (this.EditorState.ScaleMode)
+                {
+                case ScaleMode.Scale1:
+                    return 32;
+                case ScaleMode.Scale2:
+                    return 16;
+                case ScaleMode.Scale4:
+                    return 8;
+                case ScaleMode.Scale8:
+                    return 4;
+                default:
+                    Debug.Fail("Invalid scale");
+                    return 0;
+                }
             }
         }
 
@@ -664,6 +682,7 @@ namespace Shrimp
                     TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
                     bdHash = new Dictionary<Bitmap, BitmapData>();
                     LayerMode layerMode = this.EditorState.LayerMode;
+                    ScaleMode scaleMode = this.EditorState.ScaleMode;
                     Pen eventGridPen = new Pen(Color.FromArgb(0x20, 0x00, 0x00, 0x00));
                     for (int layer = 0; layer < 2; layer++)
                     {
@@ -683,7 +702,7 @@ namespace Shrimp
                                 {
                                     int tileId = tile.TileId;
                                     TileSet tileSet = tileSetCollection.GetItem(tile.TileSetId);
-                                    Bitmap bitmap = tileSet.GetBitmap(BitmapScale.Scale1);
+                                    Bitmap bitmap = tileSet.GetBitmap(scaleMode);
                                     BitmapData srcBD;
                                     if (!bdHash.ContainsKey(bitmap))
                                     {
@@ -766,9 +785,9 @@ namespace Shrimp
                 {
                     for (int i = startI; i < endI; i++, dst += 4)
                     {
-                        dst[0] = (byte)(dst[0] >> 1);
-                        dst[1] = (byte)(dst[1] >> 1);
-                        dst[2] = (byte)(dst[2] >> 1);
+                        dst[0] >>= 1;
+                        dst[1] >>= 1;
+                        dst[2] >>= 1;
                     }
                 }
             }

@@ -79,6 +79,24 @@ namespace Shrimp
                         (DrawingMode)((ToolStripButton)s).Tag;
                 };
             }
+            this.ScaleTrackBar.ValueChanged += (s, e) =>
+            {
+                switch (this.ScaleTrackBar.Value)
+                {
+                case 0:
+                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale1;
+                    break;
+                case 1:
+                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale2;
+                    break;
+                case 2:
+                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale4;
+                    break;
+                case 3:
+                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale8;
+                    break;
+                }
+            };
 
             this.ViewModel = new ViewModel();
             this.ViewModel.IsOpenedChanged += delegate
@@ -116,6 +134,9 @@ namespace Shrimp
                     break;
                 case "DrawingMode":
                     this.DrawingModeChanged();
+                    break;
+                case "ScaleMode":
+                    this.ScaleModeChanged();
                     break;
                 }
             };
@@ -213,6 +234,7 @@ namespace Shrimp
             this.SelectedTileSetIdsChanged();
             this.LayerModeChanged();
             this.DrawingModeChanged();
+            this.ScaleModeChanged();
 
             // To prevent the map editor from being edited wrongly
             Application.DoEvents();
@@ -294,6 +316,28 @@ namespace Shrimp
                 foreach (var item in this.DrawingModeSwitchers)
                 {
                     item.Checked = false;
+                }
+            }
+        }
+
+        private void ScaleModeChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                switch (this.ViewModel.EditorState.ScaleMode)
+                {
+                case ScaleMode.Scale1:
+                    this.ScaleTrackBar.Value = 0;
+                    break;
+                case ScaleMode.Scale2:
+                    this.ScaleTrackBar.Value = 1;
+                    break;
+                case ScaleMode.Scale4:
+                    this.ScaleTrackBar.Value = 2;
+                    break;
+                case ScaleMode.Scale8:
+                    this.ScaleTrackBar.Value = 3;
+                    break;
                 }
             }
         }

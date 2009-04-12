@@ -21,6 +21,14 @@ namespace Shrimp
         Pen,
     }
 
+    internal enum ScaleMode
+    {
+        Scale1,
+        Scale2,
+        Scale4,
+        Scale8,
+    }
+
     internal enum SelectedTilesType
     {
         Single,
@@ -202,6 +210,20 @@ namespace Shrimp
             }
         }
         private DrawingMode drawingMode = DrawingMode.Pen;
+
+        public ScaleMode ScaleMode
+        {
+            get { return this.scaleMode; }
+            set
+            {
+                if (this.scaleMode != value)
+                {
+                    this.scaleMode = value;
+                    this.OnUpdated(new UpdatedEventArgs("ScaleMode"));
+                }
+            }
+        }
+        private ScaleMode scaleMode;
 
         public TileSet SelectedTileSet
         {
