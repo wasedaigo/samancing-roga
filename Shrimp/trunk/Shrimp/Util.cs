@@ -79,49 +79,99 @@ namespace Shrimp
             return id;
         }
 
-        public static Bitmap CreateScaledBitmap(Bitmap srcBitmap)
+        public static Bitmap CreateScaledBitmap(Bitmap srcBitmap, ScaleMode scaleMode)
         {
             int srcWidth = srcBitmap.Width;
             int srcHeight = srcBitmap.Height;
-            int dstWidth = srcWidth * 2;
-            int dstHeight = srcHeight * 2;
-            Bitmap dstBitmap = new Bitmap(dstWidth, dstHeight);
-            BitmapData srcBD = srcBitmap.LockBits(new Rectangle
+            Bitmap dstBitmap;
+            switch (scaleMode)
             {
-                Width = srcWidth,
-                Height = srcHeight,
-            }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            BitmapData dstBD = dstBitmap.LockBits(new Rectangle
-            {
-                Width = dstWidth,
-                Height = dstHeight,
-            }, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            int srcPadding = srcBD.Stride - srcWidth * 4;
-            int dstPadding = dstBD.Stride - dstWidth * 4;
-            unsafe
-            {
-                byte* src = (byte*)srcBD.Scan0;
-                byte* dst = (byte*)dstBD.Scan0;
-                int dstPadding2 = dstWidth * 4 + dstPadding * 2;
-                int dWidthX4 = dstWidth * 4;
-                for (int j = 0; j < srcHeight;
-                    j++, src += srcPadding, dst += dstPadding2)
+            case ScaleMode.Scale1:
                 {
-                    for (int i = 0; i < srcWidth; i++, dst += 4)
+                    int dstWidth = srcWidth * 2;
+                    int dstHeight = srcHeight * 2;
+                    dstBitmap = new Bitmap(dstWidth, dstHeight);
+                    BitmapData srcBD = srcBitmap.LockBits(new Rectangle
                     {
-                        for (int k = 0; k < 4; k++, src++, dst++)
+                        Width = srcWidth,
+                        Height = srcHeight,
+                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    BitmapData dstBD = dstBitmap.LockBits(new Rectangle
+                    {
+                        Width = dstWidth,
+                        Height = dstHeight,
+                    }, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    int srcPadding = srcBD.Stride - srcWidth * 4;
+                    int dstPadding = dstBD.Stride - dstWidth * 4;
+                    unsafe
+                    {
+                        byte* src = (byte*)srcBD.Scan0;
+                        byte* dst = (byte*)dstBD.Scan0;
+                        int dstPadding2 = dstWidth * 4 + dstPadding * 2;
+                        int dWidthX4 = dstWidth * 4;
+                        for (int j = 0; j < srcHeight;
+                            j++, src += srcPadding, dst += dstPadding2)
                         {
-                            dst[0] = *src;
-                            dst[4] = *src;
-                            dst[dWidthX4] = *src;
-                            dst[dWidthX4 + 4] = *src;
+                            for (int i = 0; i < srcWidth; i++, dst += 4)
+                            {
+                                for (int k = 0; k < 4; k++, src++, dst++)
+                                {
+                                    dst[0] = *src;
+                                    dst[4] = *src;
+                                    dst[dWidthX4] = *src;
+                                    dst[dWidthX4 + 4] = *src;
+                                }
+                            }
                         }
                     }
+                    dstBitmap.UnlockBits(dstBD);
+                    srcBitmap.UnlockBits(srcBD);
                 }
+                return dstBitmap;
+            case ScaleMode.Scale2:
+                {
+                    int dstWidth = srcWidth;
+                    int dstHeight = srcHeight;
+                    dstBitmap = new Bitmap(dstWidth, dstHeight);
+                    BitmapData srcBD = srcBitmap.LockBits(new Rectangle
+                    {
+                        Width = srcWidth,
+                        Height = srcHeight,
+                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    BitmapData dstBD = dstBitmap.LockBits(new Rectangle
+                    {
+                        Width = dstWidth,
+                        Height = dstHeight,
+                    }, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    int srcPadding = srcBD.Stride - srcWidth * 4;
+                    int dstPadding = dstBD.Stride - dstWidth * 4;
+                    unsafe
+                    {
+                        byte* src = (byte*)srcBD.Scan0;
+                        byte* dst = (byte*)dstBD.Scan0;
+                        for (int j = 0; j < srcHeight;
+                            j++, src += srcPadding, dst += dstPadding)
+                        {
+                            for (int i = 0; i < srcWidth; i++, src += 4, dst += 4)
+                            {
+                                dst[0] = src[0];
+                                dst[1] = src[1];
+                                dst[2] = src[2];
+                                dst[3] = src[3];
+                            }
+                        }
+                    }
+                    dstBitmap.UnlockBits(dstBD);
+                    srcBitmap.UnlockBits(srcBD);
+                }
+                return dstBitmap;
+            case ScaleMode.Scale4:
+            case ScaleMode.Scale8:
+                throw new NotImplementedException();
+            default:
+                Debug.Fail("Invalid scale mode");
+                return null;
             }
-            dstBitmap.UnlockBits(dstBD);
-            srcBitmap.UnlockBits(srcBD);
-            return dstBitmap;
         }
 
         public static void DrawBitmap(IntPtr dstPixels, Size dstSize,
@@ -264,13 +314,17 @@ namespace Shrimp
                 Width = rect.Width - 4,
                 Height = rect.Height - 4,
             });
-            g.DrawRectangle(FramePen1, new Rectangle
+            Rectangle rect2 = new Rectangle
             {
                 X = rect.X + 3,
                 Y = rect.Y + 3,
                 Width = rect.Width - 7,
                 Height = rect.Height - 7,
-            });
+            };
+            if (0 < rect2.Width)
+            {
+                g.DrawRectangle(FramePen1, rect2);
+            }
         }
     }
 }

@@ -31,21 +31,6 @@ namespace Shrimp
             this.MapEditor.Dock = DockStyle.Fill;
             this.MainSplitContainer.Panel2.Controls.Add(this.MapEditor);
 
-            ToolStripTrackBar tsTrackBar = new ToolStripTrackBar();
-            tsTrackBar.Name = "ScaleToolStripTrackBar";
-            int index = this.ToolStrip.Items.IndexOf(this.toolStripSeparator5);
-            this.ToolStrip.Items.Insert(index, tsTrackBar);
-            Debug.Assert(this.ScaleTrackBar == tsTrackBar.TrackBar);
-
-            this.ScaleTrackBar.AutoSize = false;
-            this.ScaleTrackBar.Width = 100;
-            this.ScaleTrackBar.Height = 20;
-            this.ScaleTrackBar.Maximum = 3;
-            this.ScaleTrackBar.SmallChange = 1;
-            this.ScaleTrackBar.LargeChange = 1;
-            tsTrackBar.Text = "Scale";
-            tsTrackBar.ToolTipText = "Scale";
-
             this.ToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TileSetPaletteToolStrip.Renderer = new CustomToolStripSystemRenderer();
             this.TileSetPalette.Size = new Size
@@ -79,24 +64,19 @@ namespace Shrimp
                         (DrawingMode)((ToolStripButton)s).Tag;
                 };
             }
-            this.ScaleTrackBar.ValueChanged += (s, e) =>
+
+            this.Scale1ToolStripButton.Tag = ScaleMode.Scale1;
+            this.Scale2ToolStripButton.Tag = ScaleMode.Scale2;
+            this.Scale4ToolStripButton.Tag = ScaleMode.Scale4;
+            this.Scale8ToolStripButton.Tag = ScaleMode.Scale8;
+            foreach (var item in this.ScaleModeSwitchers)
             {
-                switch (this.ScaleTrackBar.Value)
+                item.Click += (s, e) =>
                 {
-                case 0:
-                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale1;
-                    break;
-                case 1:
-                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale2;
-                    break;
-                case 2:
-                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale4;
-                    break;
-                case 3:
-                    this.ViewModel.EditorState.ScaleMode = ScaleMode.Scale8;
-                    break;
-                }
-            };
+                    this.ViewModel.EditorState.ScaleMode =
+                        (ScaleMode)((ToolStripButton)s).Tag;
+                };
+            }
 
             this.ViewModel = new ViewModel();
             this.ViewModel.IsOpenedChanged += delegate
@@ -154,22 +134,6 @@ namespace Shrimp
 
         private MapEditor MapEditor;
 
-        private ToolStripTrackBar ScaleToolStripTrackBar
-        {
-            get
-            {
-                return (ToolStripTrackBar)this.ToolStrip.Items.Find("ScaleToolStripTrackBar", false)[0];
-            }
-        }
-
-        private TrackBar ScaleTrackBar
-        {
-            get
-            {
-                return this.ScaleToolStripTrackBar.TrackBar;
-            }
-        }
-
         private IEnumerable<ToolStripButton> LayerModeSwitchers
         {
             get
@@ -185,6 +149,17 @@ namespace Shrimp
             get
             {
                 yield return this.PenToolStripButton;
+            }
+        }
+
+        private IEnumerable<ToolStripButton> ScaleModeSwitchers
+        {
+            get
+            {
+                yield return this.Scale1ToolStripButton;
+                yield return this.Scale2ToolStripButton;
+                yield return this.Scale4ToolStripButton;
+                yield return this.Scale8ToolStripButton;
             }
         }
 
@@ -223,7 +198,10 @@ namespace Shrimp
             {
                 item.Enabled = isOpened;
             }
-            this.ScaleToolStripTrackBar.Enabled = isOpened;
+            foreach (var item in this.ScaleModeSwitchers)
+            {
+                item.Enabled = isOpened;
+            }
             this.DatabaseToolStripButton.Enabled = isOpened;
             this.TileSetPalette.Enabled = isOpened;
             this.TileSetPaletteToolStrip.Enabled = isOpened;
@@ -324,20 +302,17 @@ namespace Shrimp
         {
             if (this.ViewModel.IsOpened)
             {
-                switch (this.ViewModel.EditorState.ScaleMode)
+                foreach (var item in this.ScaleModeSwitchers)
                 {
-                case ScaleMode.Scale1:
-                    this.ScaleTrackBar.Value = 0;
-                    break;
-                case ScaleMode.Scale2:
-                    this.ScaleTrackBar.Value = 1;
-                    break;
-                case ScaleMode.Scale4:
-                    this.ScaleTrackBar.Value = 2;
-                    break;
-                case ScaleMode.Scale8:
-                    this.ScaleTrackBar.Value = 3;
-                    break;
+                    item.Checked =
+                        ((ScaleMode)item.Tag == this.ViewModel.EditorState.ScaleMode);
+                }
+            }
+            else
+            {
+                foreach (var item in this.ScaleModeSwitchers)
+                {
+                    item.Checked = false;
                 }
             }
         }

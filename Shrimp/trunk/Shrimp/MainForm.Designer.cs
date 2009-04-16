@@ -29,12 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.LeftSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TileSetPaletteToolStrip = new System.Windows.Forms.ToolStrip();
             this.TileSetsToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
-            this.TileSetPalette = new Shrimp.TileSetPalette();
-            this.MapTreeView = new Shrimp.MapTreeView();
             this.ToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.ToolStrip = new System.Windows.Forms.ToolStrip();
             this.NewToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -53,6 +52,12 @@
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.TileSetPalette = new Shrimp.TileSetPalette();
+            this.MapTreeView = new Shrimp.MapTreeView();
+            this.Scale1ToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.Scale2ToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.Scale4ToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.Scale8ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
             this.LeftSplitContainer.Panel1.SuspendLayout();
@@ -121,34 +126,6 @@
             this.TileSetsToolStripComboBox.Size = new System.Drawing.Size(121, 25);
             this.TileSetsToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.TileSetsToolStripComboBox_SelectedIndexChanged);
             // 
-            // TileSetPalette
-            // 
-            this.TileSetPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
-            this.TileSetPalette.AutoScroll = true;
-            this.TileSetPalette.Location = new System.Drawing.Point(0, 0);
-            this.TileSetPalette.Name = "TileSetPalette";
-            this.TileSetPalette.Size = new System.Drawing.Size(100, 109);
-            this.TileSetPalette.TabIndex = 0;
-            this.TileSetPalette.ViewModel = null;
-            // 
-            // MapTreeView
-            // 
-            this.MapTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.MapTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MapTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
-            this.MapTreeView.FullRowSelect = true;
-            this.MapTreeView.HideSelection = false;
-            this.MapTreeView.ImageKey = "PageWhite";
-            this.MapTreeView.ItemHeight = 21;
-            this.MapTreeView.Location = new System.Drawing.Point(0, 0);
-            this.MapTreeView.Name = "MapTreeView";
-            this.MapTreeView.ShowLines = false;
-            this.MapTreeView.ShowRootLines = false;
-            this.MapTreeView.Size = new System.Drawing.Size(296, 230);
-            this.MapTreeView.TabIndex = 0;
-            this.MapTreeView.ViewModel = null;
-            // 
             // ToolStripContainer
             // 
             // 
@@ -190,6 +167,10 @@
             this.toolStripSeparator2,
             this.PenToolStripButton,
             this.toolStripSeparator3,
+            this.Scale1ToolStripButton,
+            this.Scale2ToolStripButton,
+            this.Scale4ToolStripButton,
+            this.Scale8ToolStripButton,
             this.toolStripSeparator5,
             this.DatabaseToolStripButton});
             this.ToolStrip.Location = new System.Drawing.Point(0, 0);
@@ -322,6 +303,70 @@
             // 
             this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
             // 
+            // TileSetPalette
+            // 
+            this.TileSetPalette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.TileSetPalette.AutoScroll = true;
+            this.TileSetPalette.Location = new System.Drawing.Point(0, 0);
+            this.TileSetPalette.Name = "TileSetPalette";
+            this.TileSetPalette.Size = new System.Drawing.Size(100, 109);
+            this.TileSetPalette.TabIndex = 0;
+            this.TileSetPalette.ViewModel = null;
+            // 
+            // MapTreeView
+            // 
+            this.MapTreeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.MapTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+            this.MapTreeView.FullRowSelect = true;
+            this.MapTreeView.HideSelection = false;
+            this.MapTreeView.ImageKey = "PageWhite";
+            this.MapTreeView.ItemHeight = 21;
+            this.MapTreeView.Location = new System.Drawing.Point(0, 0);
+            this.MapTreeView.Name = "MapTreeView";
+            this.MapTreeView.ShowLines = false;
+            this.MapTreeView.ShowRootLines = false;
+            this.MapTreeView.Size = new System.Drawing.Size(296, 230);
+            this.MapTreeView.TabIndex = 0;
+            this.MapTreeView.ViewModel = null;
+            // 
+            // Scale1ToolStripButton
+            // 
+            this.Scale1ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale1ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale1ToolStripButton.Image")));
+            this.Scale1ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale1ToolStripButton.Name = "Scale1ToolStripButton";
+            this.Scale1ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale1ToolStripButton.Text = "1/1";
+            // 
+            // Scale2ToolStripButton
+            // 
+            this.Scale2ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale2ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale2ToolStripButton.Image")));
+            this.Scale2ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale2ToolStripButton.Name = "Scale2ToolStripButton";
+            this.Scale2ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale2ToolStripButton.Text = "1/2";
+            // 
+            // Scale4ToolStripButton
+            // 
+            this.Scale4ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale4ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale4ToolStripButton.Image")));
+            this.Scale4ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale4ToolStripButton.Name = "Scale4ToolStripButton";
+            this.Scale4ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale4ToolStripButton.Text = "1/4";
+            // 
+            // Scale8ToolStripButton
+            // 
+            this.Scale8ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale8ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale8ToolStripButton.Image")));
+            this.Scale8ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale8ToolStripButton.Name = "Scale8ToolStripButton";
+            this.Scale8ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale8ToolStripButton.Text = "1/8";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -377,6 +422,10 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripButton UndoToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripButton Scale1ToolStripButton;
+        private System.Windows.Forms.ToolStripButton Scale2ToolStripButton;
+        private System.Windows.Forms.ToolStripButton Scale4ToolStripButton;
+        private System.Windows.Forms.ToolStripButton Scale8ToolStripButton;
     }
 }
 

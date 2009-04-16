@@ -111,15 +111,9 @@ namespace Shrimp
         {
             if (!this.Bitmaps.ContainsKey(scale))
             {
-                switch (scale)
-                {
-                case ScaleMode.Scale1:
-                    Bitmap bitmap = Util.CreateScaledBitmap(this.OriginalBitmap);
-                    this.Bitmaps.Add(scale, bitmap);
-                    return bitmap;
-                default:
-                    throw new NotImplementedException();
-                }
+                Bitmap bitmap = Util.CreateScaledBitmap(this.OriginalBitmap, scale);
+                this.Bitmaps.Add(scale, bitmap);
+                return bitmap;
             }
             else
             {
