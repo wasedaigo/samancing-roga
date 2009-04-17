@@ -596,25 +596,27 @@ namespace Shrimp
 
             using (Graphics g = Graphics.FromHdc(this.HOffscreenDC))
             {
-                if (0 < offscreenHeight - map.Height * this.GridSize ||
-                    0 < offscreenWidth - map.Width * this.GridSize)
+                if (0 < offscreenHeight - map.Height * this.GridSize)
                 {
-                    NativeMethods.RECT win32Rect1 = new NativeMethods.RECT
+                    NativeMethods.RECT win32Rect = new NativeMethods.RECT
                     {
                         Left = 0,
                         Right = offscreenWidth,
                         Top = map.Height * this.GridSize,
                         Bottom = offscreenHeight,
                     };
-                    NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect1, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
-                    NativeMethods.RECT win32Rect2 = new NativeMethods.RECT
+                    NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
+                }
+                if (0 < offscreenWidth - map.Width * this.GridSize)
+                {
+                    NativeMethods.RECT win32Rect = new NativeMethods.RECT
                     {
                         Left = map.Width * this.GridSize,
                         Right = offscreenWidth,
                         Top = 0,
-                        Bottom = win32Rect1.Top,
+                        Bottom = map.Height * this.GridSize,
                     };
-                    NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect2, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
+                    NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
                 }
                 Dictionary<Bitmap, BitmapData> bdHash = null;
                 try

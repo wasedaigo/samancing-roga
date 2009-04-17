@@ -292,7 +292,8 @@ namespace Shrimp
                         from p in this.SelectedTileSetIds
                         select new JObject(
                             new JProperty("MapId", p.Key),
-                            new JProperty("TileSetId", p.Value)))));
+                            new JProperty("TileSetId", p.Value)))),
+                new JProperty("ScaleMode", this.ScaleMode.ToString()));
         }
 
         public override void LoadJson(JToken json)
@@ -325,6 +326,10 @@ namespace Shrimp
                     int tileSetId = j.Value<int>("TileSetId");
                     this.SelectedTileSetIds[mapId] = tileSetId;
                 }
+            }
+            if ((token = json["ScaleMode"]) != null)
+            {
+                this.ScaleMode = (ScaleMode)Enum.Parse(typeof(ScaleMode), token.Value<string>());
             }
         }
     }
