@@ -149,10 +149,10 @@ namespace Shrimp
                     {
                         byte* src = (byte*)srcBD.Scan0;
                         byte* dst = (byte*)dstBD.Scan0;
-                        for (int j = 0; j < srcHeight;
+                        for (int j = 0; j < dstHeight;
                             j++, src += srcPadding, dst += dstPadding)
                         {
-                            for (int i = 0; i < srcWidth; i++, src += 4, dst += 4)
+                            for (int i = 0; i < dstWidth; i++, src += 4, dst += 4)
                             {
                                 dst[0] = src[0];
                                 dst[1] = src[1];
@@ -166,8 +166,79 @@ namespace Shrimp
                 }
                 return dstBitmap;
             case ScaleMode.Scale4:
+                {
+                    int dstWidth = srcWidth / 2;
+                    int dstHeight = srcHeight / 2;
+                    dstBitmap = new Bitmap(dstWidth, dstHeight);
+                    BitmapData srcBD = srcBitmap.LockBits(new Rectangle
+                    {
+                        Width = srcWidth,
+                        Height = srcHeight,
+                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    BitmapData dstBD = dstBitmap.LockBits(new Rectangle
+                    {
+                        Width = dstWidth,
+                        Height = dstHeight,
+                    }, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    int srcPadding = (srcBD.Stride - srcWidth * 4) + srcBD.Stride;
+                    int dstPadding = dstBD.Stride - dstWidth * 4;
+                    unsafe
+                    {
+                        byte* src = (byte*)srcBD.Scan0;
+                        byte* dst = (byte*)dstBD.Scan0;
+                        for (int j = 0; j < dstHeight;
+                            j++, src += srcPadding, dst += dstPadding)
+                        {
+                            for (int i = 0; i < dstWidth; i++, src += 4 * 2, dst += 4)
+                            {
+                                dst[0] = src[0];
+                                dst[1] = src[1];
+                                dst[2] = src[2];
+                                dst[3] = src[3];
+                            }
+                        }
+                    }
+                    dstBitmap.UnlockBits(dstBD);
+                    srcBitmap.UnlockBits(srcBD);
+                }
+                return dstBitmap;
             case ScaleMode.Scale8:
-                throw new NotImplementedException();
+                {
+                    int dstWidth = srcWidth / 4;
+                    int dstHeight = srcHeight / 4;
+                    dstBitmap = new Bitmap(dstWidth, dstHeight);
+                    BitmapData srcBD = srcBitmap.LockBits(new Rectangle
+                    {
+                        Width = srcWidth,
+                        Height = srcHeight,
+                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    BitmapData dstBD = dstBitmap.LockBits(new Rectangle
+                    {
+                        Width = dstWidth,
+                        Height = dstHeight,
+                    }, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    int srcPadding = (srcBD.Stride - srcWidth * 4) + srcBD.Stride * 3;
+                    int dstPadding = dstBD.Stride - dstWidth * 4;
+                    unsafe
+                    {
+                        byte* src = (byte*)srcBD.Scan0;
+                        byte* dst = (byte*)dstBD.Scan0;
+                        for (int j = 0; j < dstHeight;
+                            j++, src += srcPadding, dst += dstPadding)
+                        {
+                            for (int i = 0; i < dstWidth; i++, src += 4 * 4, dst += 4)
+                            {
+                                dst[0] = src[0];
+                                dst[1] = src[1];
+                                dst[2] = src[2];
+                                dst[3] = src[3];
+                            }
+                        }
+                    }
+                    dstBitmap.UnlockBits(dstBD);
+                    srcBitmap.UnlockBits(srcBD);
+                }
+                return dstBitmap;
             default:
                 Debug.Fail("Invalid scale mode");
                 return null;
