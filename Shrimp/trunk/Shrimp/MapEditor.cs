@@ -596,7 +596,8 @@ namespace Shrimp
 
             using (Graphics g = Graphics.FromHdc(this.HOffscreenDC))
             {
-                /*if (fillBlankSpace)
+                if (0 < offscreenHeight - map.Height * this.GridSize ||
+                    0 < offscreenWidth - map.Width * this.GridSize)
                 {
                     NativeMethods.RECT win32Rect1 = new NativeMethods.RECT
                     {
@@ -614,7 +615,7 @@ namespace Shrimp
                         Bottom = win32Rect1.Top,
                     };
                     NativeMethods.FillRect(this.HOffscreenDC, ref win32Rect2, (IntPtr)(NativeMethods.COLOR_BTNFACE + 1));
-                }*/
+                }
                 Dictionary<Bitmap, BitmapData> bdHash = null;
                 try
                 {
