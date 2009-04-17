@@ -342,59 +342,42 @@ namespace Shrimp
             }
         }
 
-        /*public static void FillBitmap(BitmapData dstBD, Color color)
-        {
-            Debug.Assert(dstBD.PixelFormat == PixelFormat.Format24bppRgb);
-            int width = dstBD.Width;
-            int height = dstBD.Height;
-            int padding = dstBD.Stride - width * 3;
-            byte r = color.R;
-            byte g = color.G;
-            byte b = color.B;
-            unsafe
-            {
-                byte* dst = (byte*)dstBD.Scan0;
-                for (int j = 0; j < height; j++, dst += padding)
-                {
-                    for (int i = 0; i < width; i++, dst += 3)
-                    {
-                        dst[0] = b;
-                        dst[1] = g;
-                        dst[2] = r;
-                    }
-                }
-            }
-        }*/
-
-        private static Pen FramePen1 = new Pen(Color.Black, 1);
-        private static Pen FramePen2 = new Pen(Color.White, 2);
-
         public static void DrawFrame(Graphics g, Rectangle rect)
         {
-            g.DrawRectangle(FramePen1, new Rectangle
+            Pen framePen1 = new Pen(Color.Black, 1);
+            g.DrawRectangle(framePen1, new Rectangle
             {
                 X = rect.X,
                 Y = rect.Y,
                 Width = rect.Width - 1,
                 Height = rect.Height - 1,
             });
-            g.DrawRectangle(FramePen2, new Rectangle
+            if (4 < rect.Width)
             {
-                X = rect.X + 2,
-                Y = rect.Y + 2,
-                Width = rect.Width - 4,
-                Height = rect.Height - 4,
-            });
-            Rectangle rect2 = new Rectangle
+                g.DrawRectangle(new Pen(Color.White, 2), new Rectangle
+                {
+                    X = rect.X + 2,
+                    Y = rect.Y + 2,
+                    Width = rect.Width - 4,
+                    Height = rect.Height - 4,
+                });
+                g.DrawRectangle(framePen1, new Rectangle
+                {
+                    X = rect.X + 3,
+                    Y = rect.Y + 3,
+                    Width = rect.Width - 7,
+                    Height = rect.Height - 7,
+                });
+            }
+            else
             {
-                X = rect.X + 3,
-                Y = rect.Y + 3,
-                Width = rect.Width - 7,
-                Height = rect.Height - 7,
-            };
-            if (0 < rect2.Width)
-            {
-                g.DrawRectangle(FramePen1, rect2);
+                g.DrawRectangle(new Pen(Color.White, 1), new Rectangle
+                {
+                    X = rect.X + 1,
+                    Y = rect.Y + 1,
+                    Width = rect.Width - 3,
+                    Height = rect.Height - 3,
+                });
             }
         }
     }
