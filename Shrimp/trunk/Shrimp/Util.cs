@@ -312,20 +312,19 @@ namespace Shrimp
             unsafe
             {
                 int dstStride = (dstSize.Width * 4 + 3) / 4 * 4;
-                byte* dst = (byte*)dstPixels + (dstX * 4) + (dstY * dstStride);
-                byte* src = (byte*)srcBD.Scan0 + (srcX * 4) + (srcY * srcBD.Stride);
-                int paddingDst = dstStride - width * 4;
-                int paddingSrc = srcBD.Stride - width * 4;
+                Debug.Assert(dstStride % 4 == 0);
+                Debug.Assert(srcBD.Stride % 4 == 0);
+                int* dst = (int*)dstPixels + dstX + (dstY * dstStride / 4);
+                int* src = (int*)srcBD.Scan0 + srcX + (srcY * srcBD.Stride / 4);
+                int paddingDst = dstStride / 4 - width;
+                int paddingSrc = srcBD.Stride / 4 - width;
                 Debug.Assert(0 <= paddingDst);
                 Debug.Assert(0 <= paddingSrc);
                 for (int j = 0; j < height; j++, dst += paddingDst, src += paddingSrc)
                 {
-                    for (int i = 0; i < width; i++, dst += 4, src += 4)
+                    for (int i = 0; i < width; i++, dst++, src++)
                     {
-                        dst[0] = src[0];
-                        dst[1] = src[1];
-                        dst[2] = src[2];
-                        dst[3] = src[3];
+                        *dst = *src;
                     }
                 }
             }
@@ -357,9 +356,12 @@ namespace Shrimp
                         for (int i = 0; i < width; i++, dst += 4, src += 4)
                         {
                             byte a = src[3];
-                            dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * a + 255) >> 8);
-                            dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * a + 255) >> 8);
-                            dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * a + 255) >> 8);
+                            byte dst0 = dst[0];
+                            byte dst1 = dst[1];
+                            byte dst2 = dst[2];
+                            dst[0] = (byte)(((dst0 << 8) - dst0 + (src[0] - dst0) * a + 255) >> 8);
+                            dst[1] = (byte)(((dst1 << 8) - dst1 + (src[1] - dst1) * a + 255) >> 8);
+                            dst[2] = (byte)(((dst2 << 8) - dst2 + (src[2] - dst2) * a + 255) >> 8);
                         }
                     }
                 }
@@ -370,9 +372,12 @@ namespace Shrimp
                         for (int i = 0; i < width; i++, dst += 4, src += 4)
                         {
                             byte a = (byte)((src[3] * alpha + 255) >> 8);
-                            dst[0] = (byte)(((dst[0] << 8) - dst[0] + (src[0] - dst[0]) * a + 255) >> 8);
-                            dst[1] = (byte)(((dst[1] << 8) - dst[1] + (src[1] - dst[1]) * a + 255) >> 8);
-                            dst[2] = (byte)(((dst[2] << 8) - dst[2] + (src[2] - dst[2]) * a + 255) >> 8);
+                            byte dst0 = dst[0];
+                            byte dst1 = dst[1];
+                            byte dst2 = dst[2];
+                            dst[0] = (byte)(((dst0 << 8) - dst0 + (src[0] - dst0) * a + 255) >> 8);
+                            dst[1] = (byte)(((dst1 << 8) - dst1 + (src[1] - dst1) * a + 255) >> 8);
+                            dst[2] = (byte)(((dst2 << 8) - dst2 + (src[2] - dst2) * a + 255) >> 8);
                         }
                     }
                 }
