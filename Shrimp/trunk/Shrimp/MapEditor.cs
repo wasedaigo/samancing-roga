@@ -682,12 +682,11 @@ namespace Shrimp
                                 }
                                 else
                                 {
-                                    Util.DrawBitmap(this.OffscreenPixels, offscreenSize,
+                                    Util.BltBitmap(this.OffscreenPixels, offscreenSize,
                                         x, y, tileGridSize, tileGridSize,
                                         backgroundBD,
                                         (i * tileGridSize) % Util.BackgroundGridSize,
-                                        (j * tileGridSize) % Util.BackgroundGridSize,
-                                        255);
+                                        (j * tileGridSize) % Util.BackgroundGridSize);
                                 }
                             }
                         }
