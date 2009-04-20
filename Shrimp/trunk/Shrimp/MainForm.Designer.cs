@@ -49,15 +49,15 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.PenToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.Scale1ToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.Scale2ToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.Scale4ToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.Scale8ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.TileSetPalette = new Shrimp.TileSetPalette();
             this.MapTreeView = new Shrimp.MapTreeView();
-            this.Scale1ToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.Scale2ToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.Scale4ToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.Scale8ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
             this.LeftSplitContainer.Panel1.SuspendLayout();
@@ -232,6 +232,7 @@
             this.UndoToolStripButton.Size = new System.Drawing.Size(35, 32);
             this.UndoToolStripButton.Text = "Undo";
             this.UndoToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.UndoToolStripButton.Click += new System.EventHandler(this.UndoToolStripButton_Click);
             // 
             // toolStripSeparator4
             // 
@@ -284,6 +285,42 @@
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(6, 35);
             // 
+            // Scale1ToolStripButton
+            // 
+            this.Scale1ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale1ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale1ToolStripButton.Image")));
+            this.Scale1ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale1ToolStripButton.Name = "Scale1ToolStripButton";
+            this.Scale1ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale1ToolStripButton.Text = "1/1";
+            // 
+            // Scale2ToolStripButton
+            // 
+            this.Scale2ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale2ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale2ToolStripButton.Image")));
+            this.Scale2ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale2ToolStripButton.Name = "Scale2ToolStripButton";
+            this.Scale2ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale2ToolStripButton.Text = "1/2";
+            // 
+            // Scale4ToolStripButton
+            // 
+            this.Scale4ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale4ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale4ToolStripButton.Image")));
+            this.Scale4ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale4ToolStripButton.Name = "Scale4ToolStripButton";
+            this.Scale4ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale4ToolStripButton.Text = "1/4";
+            // 
+            // Scale8ToolStripButton
+            // 
+            this.Scale8ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Scale8ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale8ToolStripButton.Image")));
+            this.Scale8ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Scale8ToolStripButton.Name = "Scale8ToolStripButton";
+            this.Scale8ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale8ToolStripButton.Text = "1/8";
+            // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
@@ -330,42 +367,6 @@
             this.MapTreeView.Size = new System.Drawing.Size(296, 230);
             this.MapTreeView.TabIndex = 0;
             this.MapTreeView.ViewModel = null;
-            // 
-            // Scale1ToolStripButton
-            // 
-            this.Scale1ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.Scale1ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale1ToolStripButton.Image")));
-            this.Scale1ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Scale1ToolStripButton.Name = "Scale1ToolStripButton";
-            this.Scale1ToolStripButton.Size = new System.Drawing.Size(27, 32);
-            this.Scale1ToolStripButton.Text = "1/1";
-            // 
-            // Scale2ToolStripButton
-            // 
-            this.Scale2ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.Scale2ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale2ToolStripButton.Image")));
-            this.Scale2ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Scale2ToolStripButton.Name = "Scale2ToolStripButton";
-            this.Scale2ToolStripButton.Size = new System.Drawing.Size(27, 32);
-            this.Scale2ToolStripButton.Text = "1/2";
-            // 
-            // Scale4ToolStripButton
-            // 
-            this.Scale4ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.Scale4ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale4ToolStripButton.Image")));
-            this.Scale4ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Scale4ToolStripButton.Name = "Scale4ToolStripButton";
-            this.Scale4ToolStripButton.Size = new System.Drawing.Size(27, 32);
-            this.Scale4ToolStripButton.Text = "1/4";
-            // 
-            // Scale8ToolStripButton
-            // 
-            this.Scale8ToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.Scale8ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale8ToolStripButton.Image")));
-            this.Scale8ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Scale8ToolStripButton.Name = "Scale8ToolStripButton";
-            this.Scale8ToolStripButton.Size = new System.Drawing.Size(27, 32);
-            this.Scale8ToolStripButton.Text = "1/8";
             // 
             // MainForm
             // 

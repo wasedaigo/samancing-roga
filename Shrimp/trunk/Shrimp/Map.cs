@@ -26,6 +26,11 @@ namespace Shrimp
 
         public MapCollection MapCollection { get; private set; }
 
+        public ViewModel ViewModel
+        {
+            get { return this.MapCollection.ViewModel; }
+        }
+
         public int Id
         {
             get { return this.MapCollection.GetId(this); }
@@ -114,36 +119,30 @@ namespace Shrimp
 
         private List<List<Tile>> Layers = new List<List<Tile>>();
 
+        
+
         public Tile GetTile(int layerNumber, int x, int y)
         {
             return this.Layers[layerNumber][y * this.Width + x];
         }
 
-        public bool SetTile(int layerNumber, int x, int y, Tile tile)
+        /*public Command CreateSettingTileCommand(int layerNumber, int x, int y, Tile tile)
         {
-            List<Tile> layer = this.Layers[layerNumber];
-            int index = y * this.Width + x;
-            if (layer[index] != tile)
-            {
-                Tile previousValue = layer[index];
-                layer[index] = tile;
-                this.OnUpdated(new UpdatedEventArgs("Tiles", 0, previousValue, new Rectangle(x, y, 1, 1)));
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+            return this.CreateSettingTilesCommand(layerNumber, x, y, SelectedTiles.Single(tile), 0, 0);
+        }*/
 
-        public bool SetTiles(int layerNumber, int x, int y, SelectedTiles selectedTiles,
+        public Command CreateSettingTilesCommand(int layerNumber, int x, int y, SelectedTiles selectedTiles,
             int dx, int dy)
         {
-            bool isChanged = false;
-            var tiles = selectedTiles.Tiles.ToArray();
-            int width = selectedTiles.Width;
-            int height = selectedTiles.Height;
-            List<Tile> layer = this.Layers[layerNumber];
+            Rectangle region = new Rectangle
+            {
+                X = x,
+                Y = y,
+                Width = selectedTiles.Width,
+                Height = selectedTiles.Height,
+            };
+            int width = region.Width;
+            int height = region.Height;
             if (dx < 0)
             {
                 dx = -(-dx % width) + width;
@@ -152,29 +151,75 @@ namespace Shrimp
             {
                 dy = -(-dy % height) + height;
             }
+            Tile[] oldTiles = new Tile[region.Width * region.Height];
+            int index = 0;
             for (int j = 0; j < height; j++)
             {
                 for (int i = 0; i < width; i++)
                 {
-                    int index = ((j + dy) % height) * width + ((i + dx) % width);
-                    Tile tile = tiles[index];
                     if (0 <= i + x && i + x < this.Width &&
                         0 <= j + y && j + y < this.Height)
                     {
-                        int location = (j + y) * this.Width + (i + x);
-                        if (layer[location] != tile)
+                        oldTiles[index] = this.Layers[layerNumber][j * this.Width + i];
+                    }
+                    index++;
+                }
+            }
+            Command command = new Command();
+            command.Done += delegate
+            {
+                bool isChanged = false;
+                List<Tile> layer = this.Layers[layerNumber];
+                Tile[] newTiles = selectedTiles.Tiles.ToArray();
+                for (int j = 0; j < height; j++)
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        if (0 <= i + x && i + x < this.Width &&
+                            0 <= j + y && j + y < this.Height)
                         {
-                            layer[location] = tile;
-                            isChanged = true;
+                            Tile tile = newTiles[((j + dy) % height) * width + ((i + dx) % width)];
+                            int location = (j + y) * this.Width + (i + x);
+                            if (layer[location] != tile)
+                            {
+                                layer[location] = tile;
+                                isChanged = true;
+                            }
                         }
                     }
                 }
-            }
-            if (isChanged)
+                if (isChanged)
+                {
+                    this.OnUpdated(new UpdatedEventArgs("Tiles", 0, null, region));
+                }
+            };
+            command.Undone += delegate
             {
-                this.OnUpdated(new UpdatedEventArgs("Tiles", 0, null, new Rectangle(x, y, width, height)));
-            }
-            return isChanged;
+                bool isChanged = false;
+                List<Tile> layer = this.Layers[layerNumber];
+                for (int j = 0; j < height; j++)
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        if (0 <= i + x && i + x < this.Width &&
+                            0 <= j + y && j + y < this.Height)
+                        {
+                            Tile tile = oldTiles[j * width + i];
+                            int location = (j + y) * this.Width + (i + x);
+                            if (layer[location] != tile)
+                            {
+                                layer[location] = tile;
+                                isChanged = true;
+                            }
+                        }
+                    }
+                }
+                if (isChanged)
+                {
+                    this.OnUpdated(new UpdatedEventArgs("Tiles", 0, null, region));
+                }
+            };
+            return command;
         }
 
         public override void Clear()

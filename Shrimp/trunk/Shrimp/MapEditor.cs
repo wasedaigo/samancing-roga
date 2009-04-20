@@ -298,7 +298,9 @@ namespace Shrimp
                     int y = this.CursorTileY + this.CursorOffsetY;
                     this.RenderingTileStartX = x;
                     this.RenderingTileStartY = y;
-                    this.Map.SetTiles(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
+                    Command command =
+                        this.Map.CreateSettingTilesCommand(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
+                    command.Do();
                 }
                 else if ((e.Button & MouseButtons.Right) != 0)
                 {
@@ -372,13 +374,13 @@ namespace Shrimp
                             {
                                 this.Invalidate(previousFrameRect);
                             }
-                            if (!this.Map.SetTiles(layer, x, y, selectedTiles,
-                                x - this.RenderingTileStartX, y - this.RenderingTileStartY))
+                            Command command = this.Map.CreateSettingTilesCommand(
+                                layer, x, y, selectedTiles,
+                                x - this.RenderingTileStartX, y - this.RenderingTileStartY);
+                            command.Do();
+                            if (previousFrameRect != this.FrameRect)
                             {
-                                if (previousFrameRect != this.FrameRect)
-                                {
-                                    this.Invalidate(this.FrameRect);
-                                }
+                                this.Invalidate(this.FrameRect);
                             }
                             this.Update();
                         }

@@ -380,6 +380,14 @@ namespace Shrimp
             Debug.Assert(!this.ViewModel.IsDirty);
         }
 
+        private void UndoToolStripButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.ViewModel.IsOpened);
+            Debug.Assert(this.ViewModel.EditorState.SelectedMap != null);
+            //this.ViewModel.EditorState.SelectedMap.Undo();
+            Debug.Assert(this.ViewModel.IsOpened);
+        }
+
         private void DatabaseToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(this.ViewModel.IsOpened);

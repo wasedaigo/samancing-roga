@@ -20,8 +20,10 @@ namespace Shrimp.Tests
             Map map1 = new Map(mapCollection);
             map1.Width = 100;
             map1.Height = 200;
-            map1.SetTile(0, 1, 2, new Tile { TileSetId = 3, TileId = 4 });
-            map1.SetTile(1, 5, 6, new Tile { TileSetId = 7, TileId = 8 });
+            map1.CreateSettingTilesCommand(0, 1, 2,
+                SelectedTiles.Single(new Tile { TileSetId = 3, TileId = 4 }), 0, 0).Do();
+            map1.CreateSettingTilesCommand(1, 5, 6,
+                SelectedTiles.Single(new Tile { TileSetId = 7, TileId = 8 }), 0, 0).Do();
             JToken token = map1.ToJson();
             Assert.AreEqual(map1.Width, token["Width"].Value<int>());
             Assert.AreEqual(map1.Height, token["Height"].Value<int>());

@@ -102,7 +102,7 @@ namespace Shrimp
             get
             {
                 Map map;
-                if (this.ViewModel.MapCollection.TryGetMap(this.selectedMapId, out map))
+                if (this.ViewModel.MapCollection.TryGetMap(this.SelectedMapId, out map))
                 {
                     return map;
                 }
@@ -122,6 +122,10 @@ namespace Shrimp
                 {
                     this.selectedMapId = value;
                     this.OnUpdated(new UpdatedEventArgs("SelectedMapId"));
+                    if (this.SelectedMap != null)
+                    {
+                        // TODO
+                    }
                 }
             }
         }
@@ -275,6 +279,21 @@ namespace Shrimp
                 TileSetId = 0,
                 TileId = 0,
             });
+        }
+
+        public void Undo()
+        {
+            Debug.Assert(this.IsUndoable);
+            //this.SelectedMap.Undo();
+        }
+
+        public bool IsUndoable
+        {
+            get
+            {
+                Map map = this.SelectedMap;
+                return map != null;
+            }
         }
 
         public override JToken ToJson()
