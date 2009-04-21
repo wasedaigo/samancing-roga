@@ -126,11 +126,6 @@ namespace Shrimp
             return this.Layers[layerNumber][y * this.Width + x];
         }
 
-        /*public Command CreateSettingTileCommand(int layerNumber, int x, int y, Tile tile)
-        {
-            return this.CreateSettingTilesCommand(layerNumber, x, y, SelectedTiles.Single(tile), 0, 0);
-        }*/
-
         public Command CreateSettingTilesCommand(int layerNumber, int x, int y, SelectedTiles selectedTiles,
             int dx, int dy)
         {
