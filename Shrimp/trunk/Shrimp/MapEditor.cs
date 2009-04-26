@@ -481,10 +481,14 @@ namespace Shrimp
                 if ((Control.ModifierKeys & Keys.Shift) != 0)
                 {
                     offset.X += (e.Delta / 120) * this.HScrollBar.SmallChange;
+                    offset.X = Math.Max(Math.Min(0, offset.X),
+                        -(this.Map.Width * this.GridSize - this.HScrollBar.Width));
                 }
                 else
                 {
                     offset.Y += (e.Delta / 120) * this.VScrollBar.SmallChange;
+                    offset.Y = Math.Max(Math.Min(0, offset.Y),
+                        -(this.Map.Height * this.GridSize - this.VScrollBar.Height));
                 }
                 this.EditorState.SetMapOffset(this.Map.Id, offset);
             }
@@ -896,5 +900,6 @@ namespace Shrimp
                 Y = -e.NewValue,
             });
         }
+
     }
 }
