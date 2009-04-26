@@ -87,6 +87,10 @@ namespace Shrimp
             {
                 this.IsDirtyChanged();
             };
+            this.ViewModel.IsUndoableChanged += delegate
+            {
+                this.IsUndoableChanged();
+            };
             this.ViewModel.Project.Updated += (s, e) =>
             {
                 switch (e.PropertyName)
@@ -207,6 +211,7 @@ namespace Shrimp
             this.TileSetPaletteToolStrip.Enabled = isOpened;
 
             this.IsDirtyChanged();
+            this.IsUndoableChanged();
             this.GameTitleChanged();
             this.SelectedMapIdChanged();
             this.SelectedTileSetIdsChanged();
@@ -221,6 +226,11 @@ namespace Shrimp
 
         private void IsDirtyChanged()
         {
+        }
+
+        private void IsUndoableChanged()
+        {
+            this.UndoToolStripButton.Enabled = this.ViewModel.IsOpened && this.ViewModel.IsUndoable;
         }
 
         private void GameTitleChanged()
@@ -383,8 +393,9 @@ namespace Shrimp
         private void UndoToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(this.ViewModel.IsOpened);
+            Debug.Assert(this.ViewModel.IsUndoable);
             Debug.Assert(this.ViewModel.EditorState.SelectedMap != null);
-            //this.ViewModel.EditorState.SelectedMap.Undo();
+            this.ViewModel.Undo();
             Debug.Assert(this.ViewModel.IsOpened);
         }
 

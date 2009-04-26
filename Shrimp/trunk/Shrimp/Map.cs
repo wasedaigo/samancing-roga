@@ -155,7 +155,7 @@ namespace Shrimp
                     if (0 <= i + x && i + x < this.Width &&
                         0 <= j + y && j + y < this.Height)
                     {
-                        oldTiles[index] = this.Layers[layerNumber][j * this.Width + i];
+                        oldTiles[index] = this.Layers[layerNumber][(y + j) * this.Width + (x + i)];
                     }
                     index++;
                 }

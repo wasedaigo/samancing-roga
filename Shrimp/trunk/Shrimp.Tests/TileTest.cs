@@ -43,6 +43,19 @@ namespace Shrimp.Tests
         }
 
         [Test]
+        public void TestAssign()
+        {
+            Tile tile1 = new Tile
+            {
+                TileSetId = 1,
+                TileId = 2,
+            };
+            Tile tile2 = tile1;
+            Assert.AreEqual(1, tile2.TileSetId);
+            Assert.AreEqual(2, tile2.TileId);
+        }
+
+        [Test]
         public void TestFromBytes()
         {
             Tile tile = new Tile();

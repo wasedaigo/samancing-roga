@@ -265,6 +265,8 @@ namespace Shrimp
         private int RenderingTileStartX = 0;
         private int RenderingTileStartY = 0;
 
+        private List<ICommand> TempCommands;
+
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
@@ -301,6 +303,8 @@ namespace Shrimp
                     Command command =
                         this.Map.CreateSettingTilesCommand(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
                     command.Do();
+                    this.TempCommands = new List<ICommand>();
+                    this.TempCommands.Add(command);
                 }
                 else if ((e.Button & MouseButtons.Right) != 0)
                 {
@@ -378,6 +382,7 @@ namespace Shrimp
                                 layer, x, y, selectedTiles,
                                 x - this.RenderingTileStartX, y - this.RenderingTileStartY);
                             command.Do();
+                            this.TempCommands.Add(command);
                             if (previousFrameRect != this.FrameRect)
                             {
                                 this.Invalidate(this.FrameRect);
@@ -413,43 +418,61 @@ namespace Shrimp
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            if (this.Map != null && this.IsPickingTiles)
+            if (this.Map != null)
             {
-                if ((e.Button & MouseButtons.Right) != 0)
+                if (this.IsPickingTiles)
                 {
-                    int pickedRegionX = Math.Min(this.CursorTileX, this.PickerStartX);
-                    int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
-                    int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
-                    int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
-                    this.CursorOffsetX = pickedRegionX - this.CursorTileX;
-                    this.CursorOffsetY = pickedRegionY - this.CursorTileY;
-                    int layer = 0;
-                    switch (this.EditorState.LayerMode)
+                    if ((e.Button & MouseButtons.Right) != 0)
                     {
-                    case LayerMode.Layer1: layer = 0; break;
-                    case LayerMode.Layer2: layer = 1; break;
-                    default: Debug.Fail("Invalid layer"); break;
-                    }
-                    Map map = this.Map;
-                    List<Tile> tiles = new List<Tile>();
-                    for (int j = 0; j < pickedRegionHeight; j++)
-                    {
-                        for (int i = 0; i < pickedRegionWidth; i++)
+                        int pickedRegionX = Math.Min(this.CursorTileX, this.PickerStartX);
+                        int pickedRegionY = Math.Min(this.CursorTileY, this.PickerStartY);
+                        int pickedRegionWidth = Math.Abs(this.CursorTileX - this.PickerStartX) + 1;
+                        int pickedRegionHeight = Math.Abs(this.CursorTileY - this.PickerStartY) + 1;
+                        this.CursorOffsetX = pickedRegionX - this.CursorTileX;
+                        this.CursorOffsetY = pickedRegionY - this.CursorTileY;
+                        int layer = 0;
+                        switch (this.EditorState.LayerMode)
                         {
-                            tiles.Add(map.GetTile(layer, i + pickedRegionX, j + pickedRegionY));
+                        case LayerMode.Layer1: layer = 0; break;
+                        case LayerMode.Layer2: layer = 1; break;
+                        default: Debug.Fail("Invalid layer"); break;
+                        }
+                        Map map = this.Map;
+                        List<Tile> tiles = new List<Tile>();
+                        for (int j = 0; j < pickedRegionHeight; j++)
+                        {
+                            for (int i = 0; i < pickedRegionWidth; i++)
+                            {
+                                tiles.Add(map.GetTile(layer, i + pickedRegionX, j + pickedRegionY));
+                            }
+                        }
+                        if (tiles.Count == 1)
+                        {
+                            this.EditorState.SelectedTiles = SelectedTiles.Single(tiles[0]);
+                        }
+                        else
+                        {
+                            this.EditorState.SelectedTiles =
+                                SelectedTiles.Picker(tiles, pickedRegionWidth, pickedRegionHeight);
                         }
                     }
-                    if (tiles.Count == 1)
-                    {
-                        this.EditorState.SelectedTiles = SelectedTiles.Single(tiles[0]);
-                    }
-                    else
-                    {
-                        this.EditorState.SelectedTiles =
-                            SelectedTiles.Picker(tiles, pickedRegionWidth, pickedRegionHeight);
-                    }
+                    this.IsPickingTiles = false;
                 }
-                this.IsPickingTiles = false;
+                if (this.TempCommands != null)
+                {
+                    IEnumerable<ICommand> commands = this.TempCommands;
+                    var command = new Command();
+                    command.Done += delegate
+                    {
+                        foreach (var c in commands) { c.Do(); }
+                    };
+                    command.Undone += delegate
+                    {
+                        foreach (var c in commands.Reverse()) { c.Undo(); }
+                    };
+                    this.EditorState.AddCommand(command);
+                    this.TempCommands = null;
+                }
             }
         }
 

@@ -31,6 +31,10 @@ namespace Shrimp
                     this.OnIsDirtyChanged(EventArgs.Empty);
                 };
             }
+            this.EditorState.IsUndoableChanged += delegate
+            {
+                this.OnIsUndoableChanged(EventArgs.Empty);
+            };
         }
 
         public Project Project
@@ -122,6 +126,12 @@ namespace Shrimp
             }
         }
 
+        public void Undo()
+        {
+            Debug.Assert(this.IsUndoable);
+            this.EditorState.Undo();
+        }
+
         public bool IsOpened
         {
             get { return this.isOpened; }
@@ -152,6 +162,19 @@ namespace Shrimp
         protected virtual void OnIsDirtyChanged(EventArgs e)
         {
             if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
+        }
+
+        public bool IsUndoable
+        {
+            get
+            {
+                return this.EditorState.IsUndoable;
+            }
+        }
+        public event EventHandler IsUndoableChanged;
+        protected virtual void OnIsUndoableChanged(EventArgs e)
+        {
+            if (this.IsUndoableChanged != null) { this.IsUndoableChanged(this, e); }
         }
 
         public Bitmap GetTilesBitmap()

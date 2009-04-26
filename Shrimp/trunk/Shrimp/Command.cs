@@ -5,7 +5,13 @@ using System.Text;
 
 namespace Shrimp
 {
-    internal class Command
+    internal interface ICommand
+    {
+        void Do();
+        void Undo();
+    }
+
+    internal class Command : ICommand
     {
         public void Do()
         {

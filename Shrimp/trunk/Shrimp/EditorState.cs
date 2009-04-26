@@ -122,10 +122,8 @@ namespace Shrimp
                 {
                     this.selectedMapId = value;
                     this.OnUpdated(new UpdatedEventArgs("SelectedMapId"));
-                    if (this.SelectedMap != null)
-                    {
-                        // TODO
-                    }
+                    this.Commands.Clear();
+                    this.OnIsUndoableChanged(EventArgs.Empty);
                 }
             }
         }
@@ -281,19 +279,32 @@ namespace Shrimp
             });
         }
 
+        private Stack<ICommand> Commands = new Stack<ICommand>();
+
+        internal void AddCommand(ICommand command)
+        {
+            this.Commands.Push(command);
+            this.OnIsUndoableChanged(EventArgs.Empty);
+        }
+
         public void Undo()
         {
             Debug.Assert(this.IsUndoable);
-            //this.SelectedMap.Undo();
+            this.Commands.Pop().Undo();
+            this.OnIsUndoableChanged(EventArgs.Empty);
         }
 
         public bool IsUndoable
         {
             get
             {
-                Map map = this.SelectedMap;
-                return map != null;
+                return 0 < this.Commands.Count;
             }
+        }
+        public event EventHandler IsUndoableChanged;
+        protected virtual void OnIsUndoableChanged(EventArgs e)
+        {
+            if (this.IsUndoableChanged != null) { this.IsUndoableChanged(this, e); }
         }
 
         public override JToken ToJson()
