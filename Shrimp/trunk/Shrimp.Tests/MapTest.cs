@@ -74,56 +74,6 @@ namespace Shrimp.Tests
                 new Tile { TileSetId = 105, TileId = 106 },
                 new Tile { TileSetId = 107, TileId = 108 },
             };
-            Command command1 = map1.CreateSettingTilesCommand(0, 0, 0, SelectedTiles.Picker(tiles1, 2, 2), 0, 0);
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 0, 0));
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 1, 0));
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 0, 1));
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 1, 1));
-            command1.Do();
-            Assert.AreEqual(tiles1[0], map1.GetTile(0, 0, 0));
-            Assert.AreEqual(tiles1[1], map1.GetTile(0, 1, 0));
-            Assert.AreEqual(tiles1[2], map1.GetTile(0, 0, 1));
-            Assert.AreEqual(tiles1[3], map1.GetTile(0, 1, 1));
-            Command command2 = map1.CreateSettingTilesCommand(0, 0, 0, SelectedTiles.Picker(tiles2, 2, 2), 0, 0);
-            command2.Do();
-            Assert.AreEqual(tiles2[0], map1.GetTile(0, 0, 0));
-            Assert.AreEqual(tiles2[1], map1.GetTile(0, 1, 0));
-            Assert.AreEqual(tiles2[2], map1.GetTile(0, 0, 1));
-            Assert.AreEqual(tiles2[3], map1.GetTile(0, 1, 1));
-            command2.Undo();
-            Assert.AreEqual(tiles1[0], map1.GetTile(0, 0, 0));
-            Assert.AreEqual(tiles1[1], map1.GetTile(0, 1, 0));
-            Assert.AreEqual(tiles1[2], map1.GetTile(0, 0, 1));
-            Assert.AreEqual(tiles1[3], map1.GetTile(0, 1, 1));
-            command1.Undo();
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 0, 0));
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 1, 0));
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 0, 1));
-            Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 1, 1));
-        }
-
-        [Test]
-        public void TestUndo2()
-        {
-            ViewModel viewModel = new ViewModel();
-            MapCollection mapCollection = new MapCollection(viewModel);
-            Map map1 = new Map(mapCollection);
-            map1.Width = 100;
-            map1.Height = 100;
-            Tile[] tiles1 = new[]
-            {
-                new Tile { TileSetId = 1, TileId = 2 },
-                new Tile { TileSetId = 3, TileId = 4 },
-                new Tile { TileSetId = 5, TileId = 6 },
-                new Tile { TileSetId = 7, TileId = 8 },
-            };
-            Tile[] tiles2 = new[]
-            {
-                new Tile { TileSetId = 101, TileId = 102 },
-                new Tile { TileSetId = 103, TileId = 104 },
-                new Tile { TileSetId = 105, TileId = 106 },
-                new Tile { TileSetId = 107, TileId = 108 },
-            };
             Command command1 = map1.CreateSettingTilesCommand(1, 2, 3, SelectedTiles.Picker(tiles1, 2, 2), 0, 1);
             Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 0, 0));
             Assert.AreEqual(new Tile { TileSetId = 0, TileId = 0 }, map1.GetTile(0, 1, 0));

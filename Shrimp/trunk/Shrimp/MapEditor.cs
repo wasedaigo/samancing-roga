@@ -659,7 +659,6 @@ namespace Shrimp
                     bdHash.Add(Util.BackgroundBitmap, backgroundBD);
                     LayerMode layerMode = this.EditorState.LayerMode;
                     ScaleMode scaleMode = this.EditorState.ScaleMode;
-                    Pen eventGridPen = new Pen(Color.FromArgb(0x20, 0x00, 0x00, 0x00));
                     for (int layer = -1; layer < 2; layer++)
                     {
                         byte alpha = 255;
@@ -698,16 +697,6 @@ namespace Shrimp
                                         Util.DrawBitmap(this.OffscreenPixels, offscreenSize,
                                             x, y, tileGridSize, tileGridSize, srcBD, srcX, srcY, alpha);
                                     }
-                                    if (layerMode == LayerMode.Event)
-                                    {
-                                        g.DrawRectangle(eventGridPen, new Rectangle
-                                        {
-                                            X = x,
-                                            Y = y,
-                                            Width = tileGridSize - 1,
-                                            Height = tileGridSize - 1
-                                        });
-                                    }
                                 }
                                 else
                                 {
@@ -719,9 +708,30 @@ namespace Shrimp
                                 }
                             }
                         }
+                        if (layerMode == LayerMode.Event)
+                        {
+                            int yMin = tileStartJ * tileGridSize + offset.Y;
+                            int yMax = tileEndJ * tileGridSize + offset.Y;
+                            for (int i = tileStartI; i < tileEndI; i++)
+                            {
+                                int x1 = i * tileGridSize + offset.X;
+                                int x2 = i * tileGridSize + offset.X + tileGridSize - 1;
+                                this.DrawGrayLineOnOffscreen(x1, x1, yMin, yMax);
+                                this.DrawGrayLineOnOffscreen(x2, x2, yMin, yMax);
+                            }
+                            int xMin = tileStartI * tileGridSize + offset.X;
+                            int xMax = tileEndI * tileGridSize + offset.X;
+                            for (int j = tileStartJ; j < tileEndJ; j++)
+                            {
+                                int y1 = j * tileGridSize + offset.Y;
+                                int y2 = j * tileGridSize + offset.Y + tileGridSize - 1;
+                                this.DrawGrayLineOnOffscreen(xMin, xMax, y1, y1);
+                                this.DrawGrayLineOnOffscreen(xMin, xMax, y2, y2);
+                            }
+                        }
                         if (this.EditorState.LayerMode == LayerMode.Layer2 && layer == 0)
                         {
-                            this.DarkenOffscreen(offscreenSize, new Rectangle
+                            this.DarkenOffscreen(new Rectangle
                             {
                                 X = tileStartI * tileGridSize + offset.X,
                                 Y = tileStartJ * tileGridSize + offset.Y,
@@ -746,9 +756,10 @@ namespace Shrimp
             }
         }
 
-        private void DarkenOffscreen(Size dstSize, Rectangle rect)
+        private void DarkenOffscreen(Rectangle rect)
         {
             Debug.Assert(this.OffscreenPixels != IntPtr.Zero);
+            Size dstSize = this.OffscreenSize;
             rect.X = Math.Max(rect.X, 0);
             rect.Y = Math.Max(rect.Y, 0);
             if (dstSize.Width < rect.Right)
@@ -775,6 +786,46 @@ namespace Shrimp
                         dst[0] >>= 1;
                         dst[1] >>= 1;
                         dst[2] >>= 1;
+                    }
+                }
+            }
+        }
+
+        private void DrawGrayLineOnOffscreen(int x1, int x2, int y1, int y2)
+        {
+            Debug.Assert(x1 == x2 || y1 == y2);
+            Size dstSize = this.OffscreenSize;
+            x1 = Math.Min(Math.Max(x1, 0), dstSize.Width);
+            x2 = Math.Min(Math.Max(x2, 0), dstSize.Width);
+            y1 = Math.Min(Math.Max(y1, 0), dstSize.Height);
+            y2 = Math.Min(Math.Max(y2, 0), dstSize.Height);
+            Debug.Assert(x1 <= x2);
+            Debug.Assert(y1 <= y2);
+            int stride = (dstSize.Width * 4 + 3) / 4 * 4;
+            unsafe
+            {
+                byte* dst = (byte*)this.OffscreenPixels + x1 * 4 + y1 * stride;
+                if (x1 == x2)
+                {
+                    for (int j = y1; j < y2; j++, dst += stride)
+                    {
+                        dst[0] = (byte)(dst[0] - (dst[0] >> 3));
+                        dst[1] = (byte)(dst[1] - (dst[1] >> 3));
+                        dst[2] = (byte)(dst[2] - (dst[2] >> 3));
+
+                    }
+                }
+                else
+                {
+                    Debug.Assert(y1 == y2);
+                    if (y1 < dstSize.Height)
+                    {
+                        for (int i = x1; i < x2; i++, dst += 4)
+                        {
+                            dst[0] = (byte)(dst[0] - (dst[0] >> 3));
+                            dst[1] = (byte)(dst[1] - (dst[1] >> 3));
+                            dst[2] = (byte)(dst[2] - (dst[2] >> 3));
+                        }
                     }
                 }
             }
