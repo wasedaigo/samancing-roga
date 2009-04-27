@@ -815,9 +815,9 @@ namespace Shrimp
                 {
                     for (int j = y1; j < y2; j++, dst += stride)
                     {
-                        dst[0] = (byte)(dst[0] - (dst[0] >> 3));
-                        dst[1] = (byte)(dst[1] - (dst[1] >> 3));
-                        dst[2] = (byte)(dst[2] - (dst[2] >> 3));
+                        dst[0] -= (byte)(dst[0] >> 3);
+                        dst[1] -= (byte)(dst[1] >> 3);
+                        dst[2] -= (byte)(dst[2] >> 3);
 
                     }
                 }
@@ -828,9 +828,9 @@ namespace Shrimp
                     {
                         for (int i = x1; i < x2; i++, dst += 4)
                         {
-                            dst[0] = (byte)(dst[0] - (dst[0] >> 3));
-                            dst[1] = (byte)(dst[1] - (dst[1] >> 3));
-                            dst[2] = (byte)(dst[2] - (dst[2] >> 3));
+                            dst[0] -= (byte)(dst[0] >> 3);
+                            dst[1] -= (byte)(dst[1] >> 3);
+                            dst[2] -= (byte)(dst[2] >> 3);
                         }
                     }
                 }
