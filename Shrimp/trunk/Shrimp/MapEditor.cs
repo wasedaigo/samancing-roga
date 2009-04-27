@@ -795,6 +795,12 @@ namespace Shrimp
         {
             Debug.Assert(x1 == x2 || y1 == y2);
             Size dstSize = this.OffscreenSize;
+            Debug.Assert(x1 <= x2);
+            Debug.Assert(y1 <= y2);
+            if (dstSize.Width <= x1 || dstSize.Height <= y1 || x2 <= 0 || y2 <= 0)
+            {
+                return;
+            }
             x1 = Math.Min(Math.Max(x1, 0), dstSize.Width);
             x2 = Math.Min(Math.Max(x2, 0), dstSize.Width);
             y1 = Math.Min(Math.Max(y1, 0), dstSize.Height);
