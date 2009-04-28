@@ -811,22 +811,20 @@ namespace Shrimp
                 rect.Height -= rect.Bottom - dstSize.Height;
             }
             int stride = (dstSize.Width * 4 + 3) / 4 * 4;
-            int padding = stride - rect.Width * 4;
+            int padding = stride / 4 - rect.Width;
             int startI = rect.Left;
             int startJ = rect.Top;
             int endI = rect.Right;
             int endJ = rect.Bottom;
             unsafe
             {
-                byte* dst = (byte*)this.OffscreenPixels + startI * 4 + startJ * stride;
+                int color = (0xff << 24) | (r << 16) | (g << 8) | b;
+                int* dst = (int*)this.OffscreenPixels + startI + startJ * stride / 4;
                 for (int j = startJ; j < endJ; j++, dst += padding)
                 {
-                    for (int i = startI; i < endI; i++, dst += 4)
+                    for (int i = startI; i < endI; i++, dst++)
                     {
-                        dst[0] = b;
-                        dst[1] = g;
-                        dst[2] = r;
-                        dst[3] = 255;
+                        *dst = color;
                     }
                 }
             }

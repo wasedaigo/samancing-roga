@@ -284,7 +284,6 @@ namespace Shrimp
             unsafe
             {
                 int dstStride = (dstSize.Width * 4 + 3) / 4 * 4;
-                Debug.Assert(dstStride % 4 == 0);
                 Debug.Assert(srcBD.Stride % 4 == 0);
                 int* dst = (int*)dstPixels + dstX + (dstY * dstStride / 4);
                 int* src = (int*)srcBD.Scan0 + srcX + (srcY * srcBD.Stride / 4);
