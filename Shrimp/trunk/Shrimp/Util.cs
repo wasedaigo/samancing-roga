@@ -11,35 +11,7 @@ namespace Shrimp
 {
     internal static class Util
     {
-        static Util()
-        {
-            BackgroundBitmap = new Bitmap(BackgroundGridSize, BackgroundGridSize);
-            Graphics g = Graphics.FromImage(BackgroundBitmap);
-            Color color1 = Color.FromArgb(0, 0, 0x80);
-            Brush brush1 = new SolidBrush(color1);
-            Color color2 = Color.FromArgb(0, 0, 0x40);
-            Brush brush2 = new SolidBrush(color2);
-            g.FillRectangle(brush1, 0, 0, 16, 16);
-            g.FillRectangle(brush2, 0, 16, 16, 16);
-            g.FillRectangle(brush2, 16, 0, 16, 16);
-            g.FillRectangle(brush1, 16, 16, 16, 16);
-
-            IntPtr hBackgroundBitmap = BackgroundBitmap.GetHbitmap();
-            IntPtr hBackgroundBitmapDC = g.GetHdc();
-            NativeMethods.SelectObject(hBackgroundBitmapDC, hBackgroundBitmap);
-
-            HBackgroundBitmapDC = hBackgroundBitmapDC;
-            gBackgroundBitmap = g;
-        }
-
-        public static readonly Bitmap BackgroundBitmap;
-        public static readonly IntPtr HBackgroundBitmapDC;
-        private static readonly Graphics gBackgroundBitmap; // for GC
-
         public const int PaletteGridSize = 32;
-        public const int BackgroundGridSize = 32;
-        public const int BitmapGridSize = 16;
-
         public const int PaletteHorizontalCount = 8;
 
         public static void CopyDirectory(string src, string dst)

@@ -214,7 +214,7 @@ namespace Shrimp
                     this.HScrollBar.Enabled = true;
                     this.HScrollBar.Minimum = 0;
                     this.HScrollBar.Maximum = hMax + this.HScrollBar.Width - 1;
-                    this.HScrollBar.SmallChange = Util.BackgroundGridSize;
+                    this.HScrollBar.SmallChange = 32; // TODO
                     this.HScrollBar.LargeChange = this.HScrollBar.Width;
                     Debug.Assert(this.HScrollBar.LargeChange == this.HScrollBar.Width);
                     this.HScrollBar.Value = Math.Min(Math.Max(0, -offset.X), hMax);
@@ -230,7 +230,7 @@ namespace Shrimp
                     this.VScrollBar.Enabled = true;
                     this.VScrollBar.Minimum = 0;
                     this.VScrollBar.Maximum = vMax + this.VScrollBar.Height - 1;
-                    this.VScrollBar.SmallChange = Util.BackgroundGridSize;
+                    this.VScrollBar.SmallChange = 32; // TODO
                     this.VScrollBar.LargeChange = this.VScrollBar.Height;
                     Debug.Assert(this.VScrollBar.LargeChange == this.VScrollBar.Height);
                     this.VScrollBar.Value = Math.Min(Math.Max(0, -offset.Y), vMax);
@@ -652,13 +652,16 @@ namespace Shrimp
                 {
                     TileSetCollection tileSetCollection = this.ViewModel.TileSetCollection;
                     bdHash = new Dictionary<Bitmap, BitmapData>();
-                    BitmapData backgroundBD = Util.BackgroundBitmap.LockBits(new Rectangle
-                    {
-                        Size = Util.BackgroundBitmap.Size,
-                    }, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                    bdHash.Add(Util.BackgroundBitmap, backgroundBD);
                     LayerMode layerMode = this.EditorState.LayerMode;
                     ScaleMode scaleMode = this.EditorState.ScaleMode;
+                    int reductionRatio = 0;
+                    switch (scaleMode)
+                    {
+                    case ScaleMode.Scale2: reductionRatio = 1; break;
+                    case ScaleMode.Scale4: reductionRatio = 2; break;
+                    case ScaleMode.Scale8: reductionRatio = 4; break;
+                    }
+                    int halfTileGridSize = tileGridSize >> 1;
                     for (int layer = -1; layer < 2; layer++)
                     {
                         byte alpha = 255;
@@ -700,11 +703,48 @@ namespace Shrimp
                                 }
                                 else
                                 {
-                                    Util.BltBitmap(this.OffscreenPixels, offscreenSize,
-                                        x, y, tileGridSize, tileGridSize,
-                                        backgroundBD,
-                                        (i * tileGridSize) % Util.BackgroundGridSize,
-                                        (j * tileGridSize) % Util.BackgroundGridSize);
+                                    if (scaleMode == ScaleMode.Scale1)
+                                    {
+                                        this.DrawRectOffscreen(new Rectangle
+                                        {
+                                            X = x,
+                                            Y = y,
+                                            Width = halfTileGridSize,
+                                            Height = halfTileGridSize,
+                                        }, 0x00, 0x00, 0x80);
+                                        this.DrawRectOffscreen(new Rectangle
+                                        {
+                                            X = x + halfTileGridSize,
+                                            Y = y,
+                                            Width = halfTileGridSize,
+                                            Height = halfTileGridSize,
+                                        }, 0x00, 0x00, 0x40);
+                                        this.DrawRectOffscreen(new Rectangle
+                                        {
+                                            X = x,
+                                            Y = y + halfTileGridSize,
+                                            Width = halfTileGridSize,
+                                            Height = halfTileGridSize,
+                                        }, 0x00, 0x00, 0x40);
+                                        this.DrawRectOffscreen(new Rectangle
+                                        {
+                                            X = x + halfTileGridSize,
+                                            Y = y + halfTileGridSize,
+                                            Width = halfTileGridSize,
+                                            Height = halfTileGridSize,
+                                        }, 0x00, 0x00, 0x80);
+                                    }
+                                    else
+                                    {
+                                        byte blue = (byte)(((i / reductionRatio + j / reductionRatio) % 2) == 0 ? 0x80 : 0x40);
+                                        this.DrawRectOffscreen(new Rectangle
+                                        {
+                                            X = x,
+                                            Y = y,
+                                            Width = tileGridSize,
+                                            Height = tileGridSize,
+                                        }, 0x00, 0x00, blue);
+                                    }
                                 }
                             }
                         }
@@ -751,6 +791,42 @@ namespace Shrimp
                         }
                         bdHash.Clear();
                         bdHash = null;
+                    }
+                }
+            }
+        }
+
+        private void DrawRectOffscreen(Rectangle rect, byte r, byte g, byte b)
+        {
+            Debug.Assert(this.OffscreenPixels != IntPtr.Zero);
+            Size dstSize = this.OffscreenSize;
+            rect.X = Math.Max(rect.X, 0);
+            rect.Y = Math.Max(rect.Y, 0);
+            if (dstSize.Width < rect.Right)
+            {
+                rect.Width -= rect.Right - dstSize.Width;
+            }
+            if (dstSize.Height < rect.Bottom)
+            {
+                rect.Height -= rect.Bottom - dstSize.Height;
+            }
+            int stride = (dstSize.Width * 4 + 3) / 4 * 4;
+            int padding = stride - rect.Width * 4;
+            int startI = rect.Left;
+            int startJ = rect.Top;
+            int endI = rect.Right;
+            int endJ = rect.Bottom;
+            unsafe
+            {
+                byte* dst = (byte*)this.OffscreenPixels + startI * 4 + startJ * stride;
+                for (int j = startJ; j < endJ; j++, dst += padding)
+                {
+                    for (int i = startI; i < endI; i++, dst += 4)
+                    {
+                        dst[0] = b;
+                        dst[1] = g;
+                        dst[2] = r;
+                        dst[3] = 255;
                     }
                 }
             }

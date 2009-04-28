@@ -20,7 +20,7 @@ namespace Shrimp
         {
             this.InitializeComponent();
             this.VScroll = true;
-            this.VerticalScroll.SmallChange = Util.BackgroundGridSize;
+            this.VerticalScroll.SmallChange = Util.PaletteGridSize;
             this.AutoScrollingTimer.Interval = 20;
             this.AutoScrollingTimer.Tick += delegate
             {
@@ -158,7 +158,7 @@ namespace Shrimp
             {
                 this.AutoScrollMinSize = new Size
                 {
-                    Width = Util.BackgroundGridSize * Util.PaletteHorizontalCount,
+                    Width = Util.PaletteGridSize * Util.PaletteHorizontalCount,
                     Height = this.LargeBitmap.Height,
                 };
             }
@@ -202,9 +202,9 @@ namespace Shrimp
             };
             this.IsSelectingTiles = true;
             this.SelectedTileStartX =
-                Math.Min(Math.Max(point.X / Util.BackgroundGridSize, 0), Util.PaletteHorizontalCount - 1);
+                Math.Min(Math.Max(point.X / Util.PaletteGridSize, 0), Util.PaletteHorizontalCount - 1);
             this.SelectedTileStartY =
-                Math.Min(Math.Max(point.Y / Util.BackgroundGridSize, 0), this.TileSet.Height - 1);
+                Math.Min(Math.Max(point.Y / Util.PaletteGridSize, 0), this.TileSet.Height - 1);
             int tileId = this.SelectedTileStartY * Util.PaletteHorizontalCount
                 + this.SelectedTileStartX;
             this.EditorState.SelectedTiles = SelectedTiles.Single(new Tile
@@ -258,9 +258,9 @@ namespace Shrimp
                 Y = mousePoint.Y - this.AutoScrollPosition.Y,
             };
             int selectedTileEndX =
-                Math.Min(Math.Max(point.X / Util.BackgroundGridSize, 0), Util.PaletteHorizontalCount - 1);
+                Math.Min(Math.Max(point.X / Util.PaletteGridSize, 0), Util.PaletteHorizontalCount - 1);
             int selectedTileEndY =
-                Math.Min(Math.Max(point.Y / Util.BackgroundGridSize, 0), this.TileSet.Height - 1);
+                Math.Min(Math.Max(point.Y / Util.PaletteGridSize, 0), this.TileSet.Height - 1);
             int x = Math.Min(this.SelectedTileStartX, selectedTileEndX);
             int y = Math.Min(this.SelectedTileStartY, selectedTileEndY);
             int tileId = y * Util.PaletteHorizontalCount + x;
@@ -289,15 +289,45 @@ namespace Shrimp
                 return;
             }
             Graphics g = e.Graphics;
-            int baseX = (-this.AutoScrollPosition.X + e.ClipRectangle.X) % Util.BackgroundGridSize;
-            int baseY = (-this.AutoScrollPosition.Y + e.ClipRectangle.Y) % Util.BackgroundGridSize;
-            for (int j = 0; j <= (e.ClipRectangle.Height + baseY) / Util.BackgroundGridSize; j++)
+            int baseX = (-this.AutoScrollPosition.X + e.ClipRectangle.X) % Util.PaletteGridSize;
+            int baseY = (-this.AutoScrollPosition.Y + e.ClipRectangle.Y) % Util.PaletteGridSize;
+            Brush lightBlueBrush = new SolidBrush(Color.FromArgb(0x00, 0x00, 0x80));
+            Brush darkBlueBrush = new SolidBrush(Color.FromArgb(0x00, 0x00, 0x40));
+            int halfGridSize = Util.PaletteGridSize >> 1;
+            for (int j = 0; j <= (e.ClipRectangle.Height + baseY) / Util.PaletteGridSize; j++)
             {
-                for (int i = 0; i <= (e.ClipRectangle.Width + baseX) / Util.BackgroundGridSize; i++)
+                for (int i = 0; i <= (e.ClipRectangle.Width + baseX) / Util.PaletteGridSize; i++)
                 {
-                    int x = e.ClipRectangle.X - baseX + i * Util.BackgroundGridSize;
-                    int y = e.ClipRectangle.Y - baseY + j * Util.BackgroundGridSize;
-                    g.DrawImage(Util.BackgroundBitmap, x, y);
+                    int x = e.ClipRectangle.X - baseX + i * Util.PaletteGridSize;
+                    int y = e.ClipRectangle.Y - baseY + j * Util.PaletteGridSize;
+                    g.FillRectangle(lightBlueBrush, new Rectangle
+                    {
+                        X = x,
+                        Y = y,
+                        Width = halfGridSize,
+                        Height = halfGridSize,
+                    });
+                    g.FillRectangle(darkBlueBrush, new Rectangle
+                    {
+                        X = x + halfGridSize,
+                        Y = y,
+                        Width = halfGridSize,
+                        Height = halfGridSize,
+                    });
+                    g.FillRectangle(darkBlueBrush, new Rectangle
+                    {
+                        X = x,
+                        Y = y + halfGridSize,
+                        Width = halfGridSize,
+                        Height = halfGridSize,
+                    });
+                    g.FillRectangle(lightBlueBrush, new Rectangle
+                    {
+                        X = x + halfGridSize,
+                        Y = y + halfGridSize,
+                        Width = halfGridSize,
+                        Height = halfGridSize,
+                    });
                 }
             }
             g.DrawImage(this.LargeBitmap,
@@ -322,12 +352,12 @@ namespace Shrimp
                     int tileId = tile.TileId;
                     Util.DrawFrame(g, new Rectangle
                     {
-                        X = tileId % Util.PaletteHorizontalCount * Util.BackgroundGridSize
+                        X = tileId % Util.PaletteHorizontalCount * Util.PaletteGridSize
                             + this.AutoScrollPosition.X,
-                        Y = tileId / Util.PaletteHorizontalCount * Util.BackgroundGridSize
+                        Y = tileId / Util.PaletteHorizontalCount * Util.PaletteGridSize
                             + this.AutoScrollPosition.Y,
-                        Width = Util.BackgroundGridSize * selectedTiles.Width,
-                        Height = Util.BackgroundGridSize * selectedTiles.Height,
+                        Width = Util.PaletteGridSize * selectedTiles.Width,
+                        Height = Util.PaletteGridSize * selectedTiles.Height,
                     });
                 }
                 break;

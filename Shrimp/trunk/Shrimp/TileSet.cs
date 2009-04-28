@@ -79,7 +79,8 @@ namespace Shrimp
             {
                 if (this.OriginalBitmap != null)
                 {
-                    return this.OriginalBitmap.Width / Util.BitmapGridSize;
+                    // TODO
+                    return this.OriginalBitmap.Width / 16;
                 }
                 else
                 {
@@ -94,7 +95,8 @@ namespace Shrimp
             {
                 if (this.OriginalBitmap != null)
                 {
-                    return this.OriginalBitmap.Height / Util.BitmapGridSize;
+                    // TODO
+                    return this.OriginalBitmap.Height / 16;
                 }
                 else
                 {
@@ -120,28 +122,6 @@ namespace Shrimp
                 return this.Bitmaps[scale];
             }
         }
-
-        /*private Dictionary<BitmapScale, IntPtr> HBitmapDCs =
-                    new Dictionary<BitmapScale, IntPtr>();
-        private List<Graphics> graphicsCollection = new List<Graphics>(); // for GC
-
-        public IntPtr GetHBitmapDC(BitmapScale scale)
-        {
-            if (!this.HBitmapDCs.ContainsKey(scale))
-            {
-                Bitmap bitmap = this.GetBitmap(scale);
-                Graphics g = Graphics.FromImage(bitmap);
-                IntPtr hBitmap = bitmap.GetHbitmap();
-                IntPtr hBitmapDC = g.GetHdc();
-                Win32API.SelectObject(hBitmapDC, hBitmap);
-                this.graphicsCollection.Add(g);
-                return this.HBitmapDCs[scale] = hBitmapDC;
-            }
-            else
-            {
-                return this.HBitmapDCs[scale];
-            }
-        }*/
 
         public override void Clear()
         {
