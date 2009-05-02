@@ -382,6 +382,10 @@ namespace Shrimp
                                 layer, x, y, selectedTiles,
                                 x - this.RenderingTileStartX, y - this.RenderingTileStartY);
                             command.Do();
+                            if (this.TempCommands == null)
+                            {
+                                this.TempCommands = new List<ICommand>();
+                            }
                             this.TempCommands.Add(command);
                             if (previousFrameRect != this.FrameRect)
                             {
