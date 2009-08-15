@@ -67,6 +67,37 @@ void AnimationModel::calculateAnimationDuration()
     }
 }
 
+void AnimationModel::resetTweenCelHash()
+{
+    for (int i = 0; i < mKeyFrameList.count(); i++)
+    {
+        mTweenCelHash.clear();
+        QHash<int, CelModel::CelData>& celHash = mKeyFrameList[i].mCelHash;
+        for (int j = 0; j < celHash.count(); j++)
+        {
+            CelModel::CelData& celData = celHash[j];
+            if(CelModel::hasTween(celData))
+            {
+                TweenCelData tweenCelData;
+                tweenCelData = celData;
+                tweenCelData.mStartFrameNo = getFrameNoByKeyFrameNo(i);
+                tweenCelData.mEndFrameNo = -1;
+                //int tweenCelIndex = mTweenCelHash.count();
+                // Look for next cel of the same cel no
+                for (int j = i; j < mKeyFrameList.count(); j++)
+                {
+                    CelModel::CelData* endCelData = getCelDataRef(j, celData.mCelNo);
+                    if (endCelData)
+                    {
+                        tweenCelData.mEndFrameNo = getFrameNoByKeyFrameNo(j);
+                    }
+                }
+                mTweenCelHash.push_back(tweenCelData);
+            }
+        }
+    }
+}
+
 //Celdata control
 
 // Add passed celdata to the list, it will set unique celNo.
@@ -77,12 +108,12 @@ void AnimationModel::addCelData(int keyFrameNo, const GLSprite::Point2& position
     celData.mSpriteDescriptor.mTextureSrcRect = mSelectedPaletTextureSrcRect;
     celData.mTextureID = mSelectedPaletNo;
 
-    QList<CelModel::CelData> celList = getSelectedSortedCelList(keyFrameNo);
-    QList<CelModel::CelData>::Iterator iter = celList.begin();
+    QHash<int, CelModel::CelData> celHash = getSelectedSortedCelHash(keyFrameNo);
+    QHash<int, CelModel::CelData>::Iterator iter = celHash.begin();
 
     // Get new celNo
     int celNo = 0;
-    while (iter != celList.end())
+    while (iter != celHash.end())
     {
         CelModel::CelData celData = (CelModel::CelData)*iter;
         if (celData.mCelNo != celNo) { break; }
@@ -92,7 +123,7 @@ void AnimationModel::addCelData(int keyFrameNo, const GLSprite::Point2& position
 
     // Add new cel data to the list
     celData.mCelNo = celNo;
-    getCurrentKeyFrame().mCelList.insert(0, celData);
+    getCurrentKeyFrame().mCelHash.insert(0, celData);
 
     emit celAdded(celData);
 }
@@ -101,31 +132,25 @@ void AnimationModel::addCelData(int keyFrameNo, const GLSprite::Point2& position
 // Set new celData
 void AnimationModel::setCelDataInCurrentKeyFrame(int celNo, const CelModel::CelData& celData)
 {
-    QList<CelModel::CelData>& celList = mKeyFrameList[getCurrentKeyFrameNo()].mCelList;
+    QHash<int, CelModel::CelData>& celHash = mKeyFrameList[getCurrentKeyFrameNo()].mCelHash;
 
-    int celIndex = getCelIndex(getCurrentKeyFrameNo(), celNo);
-
-    if (celIndex >= 0)
-    {
-        celList[celIndex] = celData;
-    }
+    celHash[celNo] = celData;
 }
 
 // Remove cel data
 void AnimationModel::removeCelData(int keyFrameNo, int celNo)
 {
-
-    // Get CelList inside keyframe...
-    QList<CelModel::CelData>& celList = getCurrentKeyFrame().mCelList;
+    // Get CelHash inside keyframe...
+    QHash<int, CelModel::CelData>& celHash = getCurrentKeyFrame().mCelHash;
 
     // Remove a Celdata of passed celNo
-    QList<CelModel::CelData>::Iterator iter = celList.begin();
-    while (iter != celList.end())
+    QHash<int, CelModel::CelData>::Iterator iter = celHash.begin();
+    while (iter != celHash.end())
     {
         const CelModel::CelData& celData = (CelModel::CelData)*iter;
         if (celData.mCelNo == celNo)
         {
-            celList.erase(iter);
+            celHash.erase(iter);
             emit celRemoved(celData);
             break;
         }
@@ -334,34 +359,34 @@ int AnimationModel::getSelectedPaletNo() const
     return mSelectedPaletNo;
 }
 
-QList<CelModel::CelData> AnimationModel::getSelectedSortedCelList(int keyFrameNo) const
+QHash<int, CelModel::CelData> AnimationModel::getSelectedSortedCelHash(int keyFrameNo) const
 {
-    QList<CelModel::CelData> celList;
+    QHash<int, CelModel::CelData> celHash;
 
     if (keyFrameNo >= 0)
     {
-        celList = mKeyFrameList[keyFrameNo].mCelList;
-        qSort(celList.begin(), celList.end(), CelModel::celNoLessThan);
+        celHash = mKeyFrameList[keyFrameNo].mCelHash;
+        //qSort(celHash.begin(), celHash.end(), CelModel::celNoLessThan);
     }
 
-    return celList;
+    return celHash;
 }
 
 // Get list of cels from current keyframe
-QList<CelModel::CelData> AnimationModel::getCurrentSortedCelList() const
+QHash<int, CelModel::CelData> AnimationModel::getCurrentSortedCelHash() const
 {
-    return getSelectedSortedCelList(mCurrentKeyFrameNo);
+    return getSelectedSortedCelHash(mCurrentKeyFrameNo);
 }
 
 // Return true if it find a cel to tween, if not return false;
-bool AnimationModel::tweenFrame(QList<CelModel::CelData>& returnCelList, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo)
+bool AnimationModel::tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo)
 {
     int endFrameNo = getFrameNoByKeyFrameNo(endKeyFrameNo);
     bool match = false;
-    QList<CelModel::CelData>& endCelList = mKeyFrameList[endKeyFrameNo].mCelList;
-    for (int j = 0; j < endCelList.count(); j++)
+    QHash<int, CelModel::CelData>& endCelHash = mKeyFrameList[endKeyFrameNo].mCelHash;
+    for (int j = 0; j < endCelHash.count(); j++)
     {
-        CelModel::CelData& endCelData = endCelList[j];
+        CelModel::CelData& endCelData = endCelHash[j];
         if (startCelData.mCelNo == endCelData.mCelNo)
         {
             CelModel::CelData celData;
@@ -381,7 +406,7 @@ bool AnimationModel::tweenFrame(QList<CelModel::CelData>& returnCelList, CelMode
             Tween(ScaleTweenType, startCelData, endCelData, SpriteDescriptor.mScale.mY, frameNo, startFrameNo, endFrameNo);
 
             celData.mSpriteDescriptor.mBlendType = startCelData.mSpriteDescriptor.mBlendType;
-            returnCelList.push_front(celData);
+            returnCelHash[celData.mCelNo] = celData;
             match = true;
         }
     }
@@ -390,7 +415,7 @@ bool AnimationModel::tweenFrame(QList<CelModel::CelData>& returnCelList, CelMode
 }
 
 // Get list of cels from current keyframe
-QList<CelModel::CelData> AnimationModel::getCelListAt(int frameNo)
+QHash<int, CelModel::CelData> AnimationModel::getCelHashAt(int frameNo)
 {
     int currentKeyFrameNo = getKeyFrameNoByFrameNo(frameNo);
     int nextKeyFrameNo = currentKeyFrameNo + 1;
@@ -398,14 +423,14 @@ QList<CelModel::CelData> AnimationModel::getCelListAt(int frameNo)
     {
         int startFrameNo = getFrameNoByKeyFrameNo(currentKeyFrameNo);
 
-        QList<CelModel::CelData> &startCelList = mKeyFrameList[currentKeyFrameNo].mCelList;
-        QList<CelModel::CelData> returnCelList;
-        for (int i = 0; i < startCelList.count(); i++)
+        QHash<int, CelModel::CelData> &startCelHash = mKeyFrameList[currentKeyFrameNo].mCelHash;
+        QHash<int, CelModel::CelData> returnCelHash;
+        for (int i = 0; i < startCelHash.count(); i++)
         {
             bool match = false;
             for (int j = nextKeyFrameNo; j < mKeyFrameList.count(); j++)
             {
-                if (tweenFrame(returnCelList, startCelList[i], startFrameNo, frameNo, j))
+                if (tweenFrame(returnCelHash, startCelHash[i], startFrameNo, frameNo, j))
                 {
                     match = true;
                     break;
@@ -413,31 +438,16 @@ QList<CelModel::CelData> AnimationModel::getCelListAt(int frameNo)
             }
             if (!match)
             {
-                CelModel::CelData celData = startCelList[i];
-                returnCelList.push_front(celData);
+                CelModel::CelData celData = startCelHash[i];
+                returnCelHash[celData.mCelNo] = celData;
             }
         }
 
-        return returnCelList;
+        return returnCelHash;
     }
 
     // Just return current cellist
-    return getCurrentSortedCelList();
-}
-
-int AnimationModel::getCelIndex(int keyFrameNo, int celNo)
-{
-    const QList<CelModel::CelData>& celList = mKeyFrameList[keyFrameNo].mCelList;
-
-    for (int i = 0; i < celList.count(); i++)
-    {
-        if(celList[i].mCelNo== celNo)
-        {
-            return i;
-        }
-    }
-
-    return -1;
+    return getCurrentSortedCelHash();
 }
 
 CelModel::CelData* AnimationModel::getCelDataRefInCurrentKeyFrame(int celNo)
@@ -447,13 +457,5 @@ CelModel::CelData* AnimationModel::getCelDataRefInCurrentKeyFrame(int celNo)
 
 CelModel::CelData* AnimationModel::getCelDataRef(int keyFrameNo, int celNo)
 {
-    int index = getCelIndex(keyFrameNo, celNo);
-    if (index < 0 || index >= mKeyFrameList[keyFrameNo].mCelList.count())
-    {
-       return NULL;
-    }
-    else
-    {
-      return &getCurrentKeyFrame().mCelList[index];
-    }
+    return &mKeyFrameList[keyFrameNo].mCelHash[celNo];
 }

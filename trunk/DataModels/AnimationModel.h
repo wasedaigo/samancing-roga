@@ -1,6 +1,7 @@
 #ifndef ANIMATIONMODEL_H
 #define ANIMATIONMODEL_H
 
+#include <QHash>
 #include <QList>
 #include <QObject>
 #include <QPixmap>
@@ -49,7 +50,7 @@ public:
     {
         int mDuration;
         QString mComment;
-        QList<CelModel::CelData> mCelList;
+        QHash<int, CelModel::CelData> mCelHash;
         QList<int> mTweenCelIndexList;
     };
 
@@ -60,6 +61,7 @@ public:
 
     int getAnimationDuration();
     void calculateAnimationDuration();
+    void resetTweenCelHash();
 
     // Cel data control
     void addCelData(int keyFrameNo, const GLSprite::Point2& position);
@@ -93,11 +95,10 @@ public:
     void setSelectedPaletNo(int paletNo);
     int getSelectedPaletNo() const;
 
-    QList<CelModel::CelData> getCurrentSortedCelList() const;
-    bool tweenFrame(QList<CelModel::CelData>& returnCelList, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo);
-    QList<CelModel::CelData> getCelListAt(int frameNo);
+    QHash<int, CelModel::CelData> getCurrentSortedCelHash() const;
+    bool tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo);
+    QHash<int, CelModel::CelData> getCelHashAt(int frameNo);
 
-    int getCelIndex(int keyFrameNo, int celNo);
     CelModel::CelData* getCelDataRefInCurrentKeyFrame(int celNo);
     CelModel::CelData* getCelDataRef(int keyFrameNo, int celNo);
 
@@ -107,14 +108,14 @@ public:
 
 
 private:
-    QList<CelModel::CelData> getSelectedSortedCelList(int keyFrameNo) const;
+    QHash<int, CelModel::CelData> getSelectedSortedCelHash(int keyFrameNo) const;
 
     // Key Frames
     QList<KeyFrame> mKeyFrameList;
 
     // Animation Events
     QList<Event> mAnimationEventList;
-    QList<TweenCelData> mTweenCelList;
+    QList<TweenCelData> mTweenCelHash;
 
     QString mImagePalets[ImagePaletCount];
     QPixmap* mpPixmaps[ImagePaletCount];
