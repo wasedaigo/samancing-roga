@@ -122,6 +122,21 @@ void AnimationViewer::clearCels()
     }
 }
 
+int AnimationViewer::selectCelIndexOfCelList(int celNo) const
+{
+    for (int i = 0; i < m_ui->celListTableWidget->rowCount(); i++)
+    {
+        QTableWidgetItem* pItem = m_ui->celListTableWidget->item(i, 0);
+        int no = pItem->data(Qt::DisplayRole ).toInt();
+        if (celNo == no)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 void AnimationViewer::addCel(int celNo, QString comment)
 {
     // Insert blank row to the bottom
@@ -136,15 +151,10 @@ void AnimationViewer::addCel(int celNo, QString comment)
 
 void AnimationViewer::removeCel(int celNo)
 {
-    for (int i = 0; i < m_ui->celListTableWidget->rowCount(); i++)
+    int index = selectCelIndexOfCelList(celNo);
+    if (index >= 0)
     {
-        QTableWidgetItem* pItem = m_ui->celListTableWidget->item(i, 0);
-        int no = pItem->data(Qt::DisplayRole ).toInt();
-        if (celNo == no)
-        {
-            m_ui->celListTableWidget->removeRow(i);
-            break;
-        }
+         m_ui->celListTableWidget->removeRow(index);
     }
 }
 
@@ -205,7 +215,12 @@ void AnimationViewer::onCelSelected(CelModel::CelData* pCelData)
         m_ui->lookAtTargetCheckBox->setChecked(pCelData->mLookAtTarget);
         m_ui->blendTypeComboBox->setCurrentIndex(pCelData->mSpriteDescriptor.mBlendType);
 
-        m_ui->celListTableWidget->selectRow(pCelData->mCelNo);
+        // Select an item from celList
+        int index = selectCelIndexOfCelList(pCelData->mCelNo);
+        if (index >= 0)
+        {
+            m_ui->celListTableWidget->selectRow(index);
+        }
     }
 }
 

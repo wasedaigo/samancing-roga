@@ -42,6 +42,7 @@ public:
         }
     };
 
+    static inline bool hasTween(CelData& celData);
     static inline bool celNoLessThan(CelData& item1, CelData& item2);
     CelData* getCelDataRef() const;
     void setCelDataRef(CelData* pCelData);
@@ -113,6 +114,15 @@ private:
     CelData* mpCelData;
 };
 
+inline bool CelModel::hasTween(CelData& celData)
+{
+    return !(
+            celData.mAlphaTweenType == eTT_Fix &&
+            celData.mPositionTweenType == eTT_Fix &&
+            celData.mRotationTweenType == eTT_Fix &&
+            celData.mScaleTweenType == eTT_Fix
+            );
+}
 
 static inline CelModel::CelData makeDefaultCelData()
 {

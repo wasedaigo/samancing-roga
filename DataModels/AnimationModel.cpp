@@ -103,7 +103,7 @@ void AnimationModel::setCelDataInCurrentKeyFrame(int celNo, const CelModel::CelD
 {
     QList<CelModel::CelData>& celList = mKeyFrameList[getCurrentKeyFrameNo()].mCelList;
 
-    int celIndex = getCelDataIndexInCurrentKeyFrame(celNo);
+    int celIndex = getCelIndex(getCurrentKeyFrameNo(), celNo);
 
     if (celIndex >= 0)
     {
@@ -425,9 +425,9 @@ QList<CelModel::CelData> AnimationModel::getCelListAt(int frameNo)
     return getCurrentSortedCelList();
 }
 
-int AnimationModel::getCelDataIndexInCurrentKeyFrame(int celNo)
+int AnimationModel::getCelIndex(int keyFrameNo, int celNo)
 {
-    const QList<CelModel::CelData>& celList = getCurrentKeyFrame().mCelList;
+    const QList<CelModel::CelData>& celList = mKeyFrameList[keyFrameNo].mCelList;
 
     for (int i = 0; i < celList.count(); i++)
     {
@@ -442,8 +442,13 @@ int AnimationModel::getCelDataIndexInCurrentKeyFrame(int celNo)
 
 CelModel::CelData* AnimationModel::getCelDataRefInCurrentKeyFrame(int celNo)
 {
-    int index = getCelDataIndexInCurrentKeyFrame(celNo);
-    if (index < 0 || index >= getCurrentKeyFrame().mCelList.count())
+    return getCelDataRef(getCurrentKeyFrameNo(), celNo);
+}
+
+CelModel::CelData* AnimationModel::getCelDataRef(int keyFrameNo, int celNo)
+{
+    int index = getCelIndex(keyFrameNo, celNo);
+    if (index < 0 || index >= mKeyFrameList[keyFrameNo].mCelList.count())
     {
        return NULL;
     }
