@@ -1,0 +1,17 @@
+INPUT(
+./debug\ImagePaletDialog.o
+./debug\AnimationImagePaletPanel.o
+./debug\CelModel.o
+./debug\AnimationModel.o
+./debug\AnimationViewer.o
+./debug\AnimationViewerPanel.o
+./debug\main.o
+./debug\mainwindow.o
+./debug\GLSprite.o
+./debug\moc_ImagePaletDialog.o
+./debug\moc_CelModel.o
+./debug\moc_AnimationModel.o
+./debug\moc_AnimationViewer.o
+./debug\moc_AnimationViewerPanel.o
+./debug\moc_mainwindow.o
+);

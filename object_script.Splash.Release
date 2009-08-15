@@ -1,0 +1,17 @@
+INPUT(
+./release\ImagePaletDialog.o
+./release\AnimationImagePaletPanel.o
+./release\CelModel.o
+./release\AnimationModel.o
+./release\AnimationViewer.o
+./release\AnimationViewerPanel.o
+./release\main.o
+./release\mainwindow.o
+./release\GLSprite.o
+./release\moc_ImagePaletDialog.o
+./release\moc_CelModel.o
+./release\moc_AnimationModel.o
+./release\moc_AnimationViewer.o
+./release\moc_AnimationViewerPanel.o
+./release\moc_mainwindow.o
+);
