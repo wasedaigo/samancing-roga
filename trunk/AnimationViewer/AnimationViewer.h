@@ -43,6 +43,7 @@ protected:
 
 private:
     void clearCels();
+    int selectCelIndexOfCelList(int celNo) const;
     void addCel(int celNo, QString comment);
     void removeCel(int celNo);
     

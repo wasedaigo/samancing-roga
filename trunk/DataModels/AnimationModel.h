@@ -24,11 +24,33 @@ public:
         QString mValue;
     };
 
+    struct TweenCelData
+    {
+        int mStartFrameNo;
+        int mEndFrameNo;
+        int mCelNo;
+
+        CelModel::TweenType mPositionTweenType;
+        CelModel::TweenType mRotationTweenType;
+        CelModel::TweenType mScaleTweenType;
+        CelModel::TweenType mAlphaTweenType;
+
+        void operator=(const CelModel::CelData& item)
+        {
+            mCelNo = item.mCelNo;
+            mPositionTweenType = item.mPositionTweenType;
+            mRotationTweenType = item.mRotationTweenType;
+            mScaleTweenType = item.mScaleTweenType;
+            mAlphaTweenType = item.mAlphaTweenType;
+        }
+    };
+
     struct KeyFrame
     {
         int mDuration;
         QString mComment;
         QList<CelModel::CelData> mCelList;
+        QList<int> mTweenCelIndexList;
     };
 
     static inline KeyFrame makeEmptyKeyFrame();
@@ -75,8 +97,9 @@ public:
     bool tweenFrame(QList<CelModel::CelData>& returnCelList, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo);
     QList<CelModel::CelData> getCelListAt(int frameNo);
 
-    int getCelDataIndexInCurrentKeyFrame(int celNo);
+    int getCelIndex(int keyFrameNo, int celNo);
     CelModel::CelData* getCelDataRefInCurrentKeyFrame(int celNo);
+    CelModel::CelData* getCelDataRef(int keyFrameNo, int celNo);
 
     // public member variables
     QString mAnimationName;
@@ -91,6 +114,7 @@ private:
 
     // Animation Events
     QList<Event> mAnimationEventList;
+    QList<TweenCelData> mTweenCelList;
 
     QString mImagePalets[ImagePaletCount];
     QPixmap* mpPixmaps[ImagePaletCount];
