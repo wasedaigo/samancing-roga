@@ -24,7 +24,7 @@ private slots:
     void onCelRemoved(CelModel::CelData celData);
     void onCelSelected(CelModel::CelData* pCelData);
     void onCelUnselected();
-    void onCelListCelClicked(int row, int col);
+    void onCelHashCelClicked(int row, int col);
     void onCurrentFrameNoChanged(int keyFrameNo);
 
     void onSaveAnimationButtonClicked();
@@ -43,7 +43,7 @@ protected:
 
 private:
     void clearCels();
-    int selectCelIndexOfCelList(int celNo) const;
+    int selectCelIndexOfCelHash(int celNo) const;
     void addCel(int celNo, QString comment);
     void removeCel(int celNo);
     

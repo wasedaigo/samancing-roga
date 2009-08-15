@@ -78,7 +78,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     // Cel selection
     connect(mpAnimationViewerPanel, SIGNAL(celSelected(CelModel::CelData*)), this, SLOT(onCelSelected(CelModel::CelData*)));
     connect(mpAnimationViewerPanel, SIGNAL(celUnselected()), this, SLOT(onCelUnselected()));
-    connect(m_ui->celListTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(onCelListCelClicked(int, int)));
+    connect(m_ui->celListTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(onCelHashCelClicked(int, int)));
 
     // connect switch texture button
     connect(m_ui->switchTextureButton, SIGNAL(clicked()), this, SLOT(onSwitchTextureButtonClicked()));
@@ -122,7 +122,7 @@ void AnimationViewer::clearCels()
     }
 }
 
-int AnimationViewer::selectCelIndexOfCelList(int celNo) const
+int AnimationViewer::selectCelIndexOfCelHash(int celNo) const
 {
     for (int i = 0; i < m_ui->celListTableWidget->rowCount(); i++)
     {
@@ -151,7 +151,7 @@ void AnimationViewer::addCel(int celNo, QString comment)
 
 void AnimationViewer::removeCel(int celNo)
 {
-    int index = selectCelIndexOfCelList(celNo);
+    int index = selectCelIndexOfCelHash(celNo);
     if (index >= 0)
     {
          m_ui->celListTableWidget->removeRow(index);
@@ -182,7 +182,7 @@ void AnimationViewer::onCelRemoved(CelModel::CelData celData)
 }
 
 //Cel list Change
-void AnimationViewer::onCelListCelClicked(int row, int col)
+void AnimationViewer::onCelHashCelClicked(int row, int col)
 {
     QTableWidgetItem* pItem = m_ui->celListTableWidget->item(row, 0);
     int celNo = pItem->data(Qt::EditRole ).toInt();
@@ -216,7 +216,7 @@ void AnimationViewer::onCelSelected(CelModel::CelData* pCelData)
         m_ui->blendTypeComboBox->setCurrentIndex(pCelData->mSpriteDescriptor.mBlendType);
 
         // Select an item from celList
-        int index = selectCelIndexOfCelList(pCelData->mCelNo);
+        int index = selectCelIndexOfCelHash(pCelData->mCelNo);
         if (index >= 0)
         {
             m_ui->celListTableWidget->selectRow(index);
@@ -255,8 +255,8 @@ void AnimationViewer::onCurrentFrameNoChanged(int frameNo)
             // Load cels
             if (mpAnimationModel->getCurrentKeyFrameNo() >= 0)
             {
-                QList<CelModel::CelData> celList = mpAnimationModel->getCurrentSortedCelList();
-                QList<CelModel::CelData>::Iterator iter = celList.begin();
+                QHash<int, CelModel::CelData> celList = mpAnimationModel->getCurrentSortedCelHash();
+                QHash<int, CelModel::CelData>::Iterator iter = celList.begin();
                 while (iter != celList.end())
                 {
                     CelModel::CelData celData = (CelModel::CelData)*iter;
