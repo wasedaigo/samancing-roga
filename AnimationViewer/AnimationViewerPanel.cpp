@@ -221,11 +221,11 @@ void AnimationViewerPanel::removeCelSprite(const CelModel::CelData& celData)
 void AnimationViewerPanel::refresh()
 {
     clearSprites();
-    QHash<int, CelModel::CelData> celList = mpAnimationModel->getCelHashAt(mpAnimationModel->getCurrentFrameNo());
-    QHash<int, CelModel::CelData>::Iterator iter = celList.begin();
-    while (iter != celList.end())
+    QHash<int, CelModel::CelData> celHash = mpAnimationModel->getCelHashAt(mpAnimationModel->getCurrentFrameNo());
+    QHash<int, CelModel::CelData>::Iterator iter = celHash.begin();
+    while (iter != celHash.end())
     {
-        CelModel::CelData celData = (CelModel::CelData)*iter;
+        CelModel::CelData& celData = iter.value();
         addCelSprite(celData);
         iter++;
     }

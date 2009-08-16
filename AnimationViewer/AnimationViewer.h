@@ -22,6 +22,7 @@ public:
 private slots:
     void onCelAdded(CelModel::CelData celData);
     void onCelRemoved(CelModel::CelData celData);
+    void onCelNoChanged(int celNo);
     void onCelSelected(CelModel::CelData* pCelData);
     void onCelUnselected();
     void onCelHashCelClicked(int row, int col);

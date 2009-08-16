@@ -83,7 +83,6 @@ public slots:
     void setTextureID(int value);
     void setTextureSrcRect(GLSprite::Rect value);
 
-    void setCelNo(int value);
     void setBlendType(int index);
     void setRelativeToTarget(bool value);
     void setLookAtTarget(bool value);
@@ -113,7 +112,7 @@ public slots:
 signals:
     void textureIDChanged(int value);
     void textureSrcRectChanged(GLSprite::Rect value);
-    void celNoChanged(int value);
+
     void blendTypeChanged(int value);
     void relativeToTargetChanged(bool value);
     void lookAtTargetChanged(bool value);

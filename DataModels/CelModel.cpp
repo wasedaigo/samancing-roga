@@ -41,7 +41,6 @@ void CelModel::set##name1(type1 value)\
 
 // Define all slots
 SETSLOT(TextureID, textureID, int, int);
-SETSLOT(CelNo, celNo, int, int);
 
 SETSLOT(RelativeToTarget, relativeToTarget, bool, bool);
 SETSLOT(LookAtTarget, lookAtTarget, bool, bool);
