@@ -250,7 +250,7 @@ void AnimationViewerPanel::addNewCel(QPoint& relativePressedPosition)
 
 void AnimationViewerPanel::selectCel(int celNo)
 {
-    mpSelectedCelModel->setCelDataRef(mpAnimationModel->getCelDataRefInCurrentKeyFrame(celNo));
+    mpSelectedCelModel->setCelDataRef(mpAnimationModel->getCelDataRef(mpAnimationModel->getCurrentKeyFrameNo(), celNo));
     if (mpSelectedCelModel->getCelDataRef())
     {
         emit celSelected(mpSelectedCelModel->getCelDataRef());

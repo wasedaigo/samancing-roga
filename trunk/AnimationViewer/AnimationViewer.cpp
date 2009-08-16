@@ -255,7 +255,7 @@ void AnimationViewer::onCurrentFrameNoChanged(int frameNo)
             // Load cels
             if (mpAnimationModel->getCurrentKeyFrameNo() >= 0)
             {
-                QHash<int, CelModel::CelData> celList = mpAnimationModel->getCurrentSortedCelHash();
+                QHash<int, CelModel::CelData> celList = mpAnimationModel->getCelHash(mpAnimationModel->getCurrentKeyFrameNo());
                 QHash<int, CelModel::CelData>::Iterator iter = celList.begin();
                 while (iter != celList.end())
                 {
