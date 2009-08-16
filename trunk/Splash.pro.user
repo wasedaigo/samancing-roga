@@ -210,7 +210,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString" >C:/Qt/2009.03/mingw/bin/mingw32-make.exe</value>
    <value key="abstractProcess.enabled" type="bool" >true</value>
-   <value key="abstractProcess.workingDirectory" type="QString" >C:/Documents and Settings/WASEDAIGO/My Documents/Qt/Splash</value>
+   <value key="abstractProcess.workingDirectory" type="QString" >C:/Documents and Settings/WASEDAIGO/My Documents/SVN/Splash</value>
   </valuemap>
  </data>
  <data>

@@ -25,7 +25,7 @@ public:
         QString mValue;
     };
 
-    struct TweenCelData
+    struct TweenData
     {
         int mStartFrameNo;
         int mEndFrameNo;
@@ -51,7 +51,7 @@ public:
         int mDuration;
         QString mComment;
         QHash<int, CelModel::CelData> mCelHash;
-        QList<int> mTweenCelIndexList;
+        QList<int> mTweenCelIDList;
     };
 
     static inline KeyFrame makeEmptyKeyFrame();
@@ -61,7 +61,9 @@ public:
 
     int getAnimationDuration();
     void calculateAnimationDuration();
-    void resetTweenCelHash();
+
+    void clearTweenHash();
+    void resetTweenHash();
 
     // Cel data control
     void addCelData(int keyFrameNo, const GLSprite::Point2& position);
@@ -113,7 +115,7 @@ private:
 
     // Animation Events
     QList<Event> mAnimationEventList;
-    QList<TweenCelData> mTweenCelList;
+    QHash<int, TweenData> mTweenHash;
 
     QString mImagePalets[ImagePaletCount];
     QPixmap* mpPixmaps[ImagePaletCount];
