@@ -100,7 +100,7 @@ public:
 private:
     void tweenElement(CelModel::CelData& celData, CelModel::TweenAttribute tweenAttribute, CelModel::CelData& startCelData, CelModel::CelData& endCelData, int frameNo, int startFrameNo, int endFrameNo);
     void tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::TweenAttribute tweenAttribute, int celNo, int startFrameNo, int frameNo, int startKeyFrameNo, int endKeyFrameNo);
-    inline void addTweenData(int keyFrameNo, int celNo, CelModel::TweenAttribute tweenAttribute);
+    inline void addTweenData(int keyFrameNo, const CelModel::CelData& celData, CelModel::TweenAttribute tweenAttribute);
 
     // Key Frames
     QList<KeyFrame> mKeyFrameList;
