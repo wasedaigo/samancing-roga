@@ -67,6 +67,7 @@ void AnimationModel::calculateAnimationDuration()
     }
 }
 
+// Clear all Tween data
 void AnimationModel::clearTweenHash()
 {
     for (int i = 0; i < mKeyFrameList.count(); i++)
@@ -80,38 +81,51 @@ void AnimationModel::clearTweenHash()
 void AnimationModel::resetTweenHash()
 {
     clearTweenHash();
+    // Iterate through keyframes
     for (int i = 0; i < mKeyFrameList.count(); i++)
     {
         QHash<int, CelModel::CelData>& celHash = mKeyFrameList[i].mCelHash;
-        for (int j = 0; j < celHash.count(); j++)
+        QHash<int, CelModel::CelData>::Iterator iter = celHash.begin();
+        // Iterate through cels
+        while (iter != celHash.end())
         {
-            CelModel::CelData& celData = celHash[j];
+            CelModel::CelData& celData = iter.value();
+            // If it has no tween data, don't do anything
             if(CelModel::hasTween(celData))
             {
                 TweenData tweenData;
                 tweenData = celData;
-                tweenData.mStartFrameNo = getFrameNoByKeyFrameNo(i);
-                tweenData.mEndFrameNo = -1;
+                tweenData.mStartKeyFrameNo = i;
+                tweenData.mEndKeyFrameNo = -1;
 
+                // Get next available unique tweenCelID
                 int tweenCelID = 0;
                 while (mTweenHash.contains(tweenCelID))
                 {
                     tweenCelID++;
                 }
-                mTweenHash.insert(tweenCelID, tweenData);
 
-                //int tweenCelIndex = mTweenHash.count();
-                // Look for next cel of the same cel no
+                // Iterate through keyframes till it finds a cel of the same cel no
+                // Add reference to previous tween data
                 for (int j = i; j < mKeyFrameList.count(); j++)
                 {
                     CelModel::CelData* endCelData = getCelDataRef(j, celData.mCelNo);
                     if (endCelData)
                     {
-                        tweenData.mEndFrameNo = getFrameNoByKeyFrameNo(j);
+                        // OK, we found the same cel
+                        tweenData.mEndKeyFrameNo = j;
                     }
-                    mKeyFrameList[j].mTweenCelIDList.push_front(tweenCelID);
+                    else
+                    {
+                        // Add reference to previous tween data
+                        mKeyFrameList[j].mTweenCelIDList.push_front(tweenCelID);
+                    }
                 }
+
+                // Register Tween Data
+                mTweenHash.insert(tweenCelID, tweenData);
             }
+            iter++;
         }
     }
 }
@@ -121,6 +135,7 @@ void AnimationModel::resetTweenHash()
 // Add passed celdata to the list, it will set unique celNo.
 void AnimationModel::addCelData(int keyFrameNo, const GLSprite::Point2& position)
 {
+    resetTweenHash();
     CelModel::CelData celData = makeDefaultCelData();
     celData.mSpriteDescriptor.mPosition = position;
     celData.mSpriteDescriptor.mTextureSrcRect = mSelectedPaletTextureSrcRect;

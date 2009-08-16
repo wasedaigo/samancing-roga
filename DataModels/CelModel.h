@@ -10,6 +10,7 @@ Q_OBJECT
 public:
     enum TweenType
     {
+        eTT_None,
         eTT_Fix,
         eTT_Linear,
         eTT_Spline,
