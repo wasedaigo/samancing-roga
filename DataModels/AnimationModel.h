@@ -65,7 +65,7 @@ public:
 
     // Cel data control
     void addCelData(int keyFrameNo, const GLSprite::Point2& position);
-    void setCelDataInCurrentKeyFrame(int celNo, const CelModel::CelData& celData);
+    void setCelData(int keyFrameNo, int celNo, const CelModel::CelData& celData);
     void removeCelData(int keyFrameNo, int celDataID);
     // Key frame control
     void addEmptyKeyFrame();
@@ -88,18 +88,18 @@ public:
     bool isKeyFrameSelected();
     void setKeyFrameDuration(int index, int duration);
     void setKeyFrameComment(int index, QString comment);
-    KeyFrame& getCurrentKeyFrame();
+
     void setCurrentKeyFrameNo(int keyFrameNo);    
     int getCurrentKeyFrameNo() const;
 
     void setSelectedPaletNo(int paletNo);
     int getSelectedPaletNo() const;
 
-    QHash<int, CelModel::CelData> getCurrentSortedCelHash() const;
+    QHash<int, CelModel::CelData> getCelHash(int keyFrameNo) const;
+
     bool tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo);
     QHash<int, CelModel::CelData> getCelHashAt(int frameNo);
 
-    CelModel::CelData* getCelDataRefInCurrentKeyFrame(int celNo);
     CelModel::CelData* getCelDataRef(int keyFrameNo, int celNo);
 
     // public member variables
@@ -108,14 +108,12 @@ public:
 
 
 private:
-    QHash<int, CelModel::CelData> getSelectedSortedCelHash(int keyFrameNo) const;
-
     // Key Frames
     QList<KeyFrame> mKeyFrameList;
 
     // Animation Events
     QList<Event> mAnimationEventList;
-    QList<TweenCelData> mTweenCelHash;
+    QList<TweenCelData> mTweenCelList;
 
     QString mImagePalets[ImagePaletCount];
     QPixmap* mpPixmaps[ImagePaletCount];
