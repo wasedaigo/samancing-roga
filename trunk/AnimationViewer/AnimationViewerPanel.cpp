@@ -139,7 +139,7 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
     while (iter != mGlSpriteList.end())
     {
         GLSprite* glSprite = (GLSprite*)*iter;
-        if (mpAnimationModel->isKeyFrame(mpAnimationModel->getCurrentFrameNo()) && !glSprite->isSelectable())
+        if (!mIsAnimationPlaying && mpAnimationModel->isKeyFrame(mpAnimationModel->getCurrentFrameNo()) && !glSprite->isSelectable())
         {
             painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha * 0.5);
         }
@@ -150,38 +150,42 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
         // render sprite
         glSprite->render(centerPoint, painter);
 
-        if (!glSprite->isSelectable())
+        // Don't render when playing the animation
+        if (!mIsAnimationPlaying)
         {
-            painter.setPen(QColor(100, 100, 200));
-            painter.setOpacity(0.5);
-        }
-        else if (mpSelectedCelModel->getCelDataRef() && glSprite->mID == mpSelectedCelModel->getCelDataRef()->mCelNo)
-        {
-            painter.setPen(Qt::yellow);
-            painter.setOpacity(1.0);
-        }
-        else
-        {
-            painter.setPen(Qt::white);
-            painter.setOpacity(0.5);
-        }
+            if (!glSprite->isSelectable())
+            {
+                painter.setPen(QColor(100, 100, 200));
+                painter.setOpacity(0.5);
+            }
+            else if (mpSelectedCelModel->getCelDataRef() && glSprite->mID == mpSelectedCelModel->getCelDataRef()->mCelNo)
+            {
+                painter.setPen(Qt::yellow);
+                painter.setOpacity(1.0);
+            }
+            else
+            {
+                painter.setPen(Qt::white);
+                painter.setOpacity(0.5);
+            }
 
-        // Draw image border rectanble
-        // Calculate draw position and draw
-        if(mpAnimationModel->isKeyFrameSelected())
-        {
-            QRect rect = glSprite->getRect();
-            rect.translate(centerPoint);
-            painter.drawRect(rect);
+            // Draw image border rectanble
+            // Calculate draw position and draw
+            if(mpAnimationModel->isKeyFrameSelected())
+            {
+                QRect rect = glSprite->getRect();
+                rect.translate(centerPoint);
+                painter.drawRect(rect);
 
-            // Draw Text
-            painter.drawText(QRect(
-                                    (int)glSprite->mSpriteDescriptor.mPosition.mX + centerPoint.x(),
-                                    (int)glSprite->mSpriteDescriptor.mPosition.mY + centerPoint.y(),
-                                    16,
-                                    16
-                                   ),
-                             Qt::AlignCenter, QString("%0").arg(glSprite->mID));
+                // Draw Text
+                painter.drawText(QRect(
+                                        (int)glSprite->mSpriteDescriptor.mPosition.mX + centerPoint.x(),
+                                        (int)glSprite->mSpriteDescriptor.mPosition.mY + centerPoint.y(),
+                                        16,
+                                        16
+                                       ),
+                                 Qt::AlignCenter, QString("%0").arg(glSprite->mID));
+            }
         }
 
         iter++;
