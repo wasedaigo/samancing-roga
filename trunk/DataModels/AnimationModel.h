@@ -55,6 +55,7 @@ public:
 
     // Cel data control
     void addCelData(int keyFrameNo, const GLSprite::Point2& position);
+    int changeCelNo(int keyFrameNo, int prevCelNo, int newCelNo);
     void setCelData(int keyFrameNo, int celNo, const CelModel::CelData& celData);
     void removeCelData(int keyFrameNo, int celDataID);
     // Key frame control

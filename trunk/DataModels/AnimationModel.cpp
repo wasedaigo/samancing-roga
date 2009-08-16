@@ -168,7 +168,46 @@ void AnimationModel::addCelData(int keyFrameNo, const GLSprite::Point2& position
     emit celAdded(celData);
 }
 
-// Set new celData
+int AnimationModel::changeCelNo(int keyFrameNo, int prevCelNo, int newCelNo)
+{
+    // nothing has changed
+    if (newCelNo == prevCelNo) { return prevCelNo; }
+
+    // reference to selected celNo
+    CelModel::CelData* pCelData = getCelDataRef(keyFrameNo, prevCelNo);
+    QHash<int, CelModel::CelData>& celHash = mKeyFrameList[keyFrameNo].mCelHash;
+
+    // increment or decrement?
+    int d = 0;
+    if (newCelNo > prevCelNo)
+    {
+        d = 1;
+    }
+    else
+    {
+        d = -1;
+    }
+
+    // Search for unique celNo in this keyFrame
+    int celNo = newCelNo;
+    while (celNo >= -1 && celHash.contains(celNo))
+    {
+        celNo += d;
+    }
+
+    // nothing has changed
+    if (celNo == -1 || prevCelNo == celNo){ return prevCelNo; }
+
+    // change celNo
+    pCelData->mCelNo = celNo;
+
+    // Change the key of celHash
+    celHash.remove(prevCelNo);
+    celHash.insert(celNo, *pCelData);
+
+    return celNo;
+}
+
 void AnimationModel::setCelData(int keyFrameNo, int celNo, const CelModel::CelData& celData)
 {
     if (keyFrameNo >= 0 && keyFrameNo < mKeyFrameList.count())
@@ -528,3 +567,9 @@ CelModel::CelData* AnimationModel::getCelDataRef(int keyFrameNo, int celNo)
     }
     return celData;
 }
+
+void AnimationModel::write(QString path)
+{
+
+}
+

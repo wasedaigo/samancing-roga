@@ -60,7 +60,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setRotationTweenType(int)));
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
-    connect(m_ui->celNoSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCelNo(int)));
+    connect(m_ui->celNoSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onCelNoChanged(int)));
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->lookAtTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setLookAtTarget(bool)));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
@@ -186,6 +186,31 @@ void AnimationViewer::onCelAdded(CelModel::CelData celData)
 void AnimationViewer::onCelRemoved(CelModel::CelData celData)
 {
     removeCel(celData.mCelNo);
+}
+
+
+void AnimationViewer::onCelNoChanged(int celNo)
+{
+    if (mpSelectedCelModel->getCelDataRef())
+    {
+        int currentCelNo = mpSelectedCelModel->getCelDataRef()->mCelNo;
+        if (celNo != currentCelNo)
+        {
+            int newCelNo = mpAnimationModel->changeCelNo(mpAnimationModel->getCurrentKeyFrameNo(), currentCelNo, celNo);
+            if (currentCelNo != newCelNo)
+            {
+                // Refresh celListbox
+                QTableWidgetItem* item = new QTableWidgetItem(QString("%0").arg(newCelNo));
+                item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                m_ui->celListTableWidget->setItem(m_ui->celListTableWidget->currentRow(), 0, item);
+
+                // Refresh Animation Viewer panel
+                mpAnimationModel->resetTweenHash();
+                mpAnimationViewerPanel->refresh();
+            }
+            m_ui->celNoSpinBox->setValue(newCelNo);
+        }
+    }
 }
 
 //Cel list Change
