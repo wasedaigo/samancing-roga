@@ -238,7 +238,7 @@ void AnimationViewer::onSwitchTextureButtonClicked()
 //Change Keyframe no
 void AnimationViewer::onCurrentFrameNoChanged(int frameNo)
 {
-    m_ui->frameLcdNumber->display(frameNo);
+    m_ui->frameLcdNumber->display(frameNo + 1);
     if (this->isEnabled())
     {
         // remove all cels from cellist

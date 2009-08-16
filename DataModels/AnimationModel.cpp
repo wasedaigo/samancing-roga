@@ -2,9 +2,10 @@
 #include <QPixmap>
 #include "Macros.h"
 
+// Macros
+// Tween fields
 #define TweenValue(startCelData, endCelData, field, frameNo, startFrameNo, endFrameNo)\
 celData.m##field = LERP(startCelData.m##field, endCelData.m##field, frameNo, startFrameNo, endFrameNo)
-
 
 #define Tween(tweenType, startCelData, endCelData, field, frameNo, startFrameNo, endFrameNo)\
 {\
@@ -17,8 +18,7 @@ celData.m##field = LERP(startCelData.m##field, endCelData.m##field, frameNo, sta
         celData.m##field = startCelData.m##field;\
     }\
 }
-
-
+////
 AnimationModel::AnimationModel()
     : mAnimationName(QString("")),
       mCurrentKeyFrameNo(-1),
@@ -67,33 +67,50 @@ void AnimationModel::calculateAnimationDuration()
     }
 }
 
-// Reset all Tween data
-void AnimationModel::resetTweenCelHash()
+void AnimationModel::clearTweenHash()
 {
     for (int i = 0; i < mKeyFrameList.count(); i++)
     {
-        mTweenCelList.clear();
+        mKeyFrameList[i].mTweenCelIDList.clear();
+    }
+    mTweenHash.clear();
+}
+
+// Reset all Tween data
+void AnimationModel::resetTweenHash()
+{
+    clearTweenHash();
+    for (int i = 0; i < mKeyFrameList.count(); i++)
+    {
         QHash<int, CelModel::CelData>& celHash = mKeyFrameList[i].mCelHash;
         for (int j = 0; j < celHash.count(); j++)
         {
             CelModel::CelData& celData = celHash[j];
             if(CelModel::hasTween(celData))
             {
-                TweenCelData tweenCelData;
-                tweenCelData = celData;
-                tweenCelData.mStartFrameNo = getFrameNoByKeyFrameNo(i);
-                tweenCelData.mEndFrameNo = -1;
-                //int tweenCelIndex = mTweenCelList.count();
+                TweenData tweenData;
+                tweenData = celData;
+                tweenData.mStartFrameNo = getFrameNoByKeyFrameNo(i);
+                tweenData.mEndFrameNo = -1;
+
+                int tweenCelID = 0;
+                while (mTweenHash.contains(tweenCelID))
+                {
+                    tweenCelID++;
+                }
+                mTweenHash.insert(tweenCelID, tweenData);
+
+                //int tweenCelIndex = mTweenHash.count();
                 // Look for next cel of the same cel no
                 for (int j = i; j < mKeyFrameList.count(); j++)
                 {
                     CelModel::CelData* endCelData = getCelDataRef(j, celData.mCelNo);
                     if (endCelData)
                     {
-                        tweenCelData.mEndFrameNo = getFrameNoByKeyFrameNo(j);
+                        tweenData.mEndFrameNo = getFrameNoByKeyFrameNo(j);
                     }
+                    mKeyFrameList[j].mTweenCelIDList.push_front(tweenCelID);
                 }
-                mTweenCelList.push_back(tweenCelData);
             }
         }
     }
@@ -109,15 +126,15 @@ void AnimationModel::addCelData(int keyFrameNo, const GLSprite::Point2& position
     celData.mSpriteDescriptor.mTextureSrcRect = mSelectedPaletTextureSrcRect;
     celData.mTextureID = mSelectedPaletNo;
 
-    QHash<int, CelModel::CelData> celHash = mKeyFrameList[keyFrameNo].mCelHash;
-
+    QHash<int, CelModel::CelData>& celHash = mKeyFrameList[keyFrameNo].mCelHash;
     int celNo = 0;
     while (celHash.contains(celNo))
     {
         celNo++;
     }
-    celHash[celNo] = celData;
+    celData.mCelNo = celNo;
 
+    celHash.insert(celNo, celData);
     emit celAdded(celData);
 }
 
@@ -126,7 +143,7 @@ void AnimationModel::setCelData(int keyFrameNo, int celNo, const CelModel::CelDa
 {
     if (keyFrameNo >= 0 && keyFrameNo < mKeyFrameList.count())
     {
-        mKeyFrameList[getCurrentKeyFrameNo()].mCelHash[celNo] = celData;
+        mKeyFrameList[getCurrentKeyFrameNo()].mCelHash.insert(celNo, celData);
     }
 }
 
@@ -348,9 +365,11 @@ bool AnimationModel::tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, Ce
     int endFrameNo = getFrameNoByKeyFrameNo(endKeyFrameNo);
     bool match = false;
     QHash<int, CelModel::CelData>& endCelHash = mKeyFrameList[endKeyFrameNo].mCelHash;
-    for (int j = 0; j < endCelHash.count(); j++)
+    QHash<int, CelModel::CelData>::Iterator iter = endCelHash.begin();
+
+    while (iter != endCelHash.end())
     {
-        CelModel::CelData& endCelData = endCelHash[j];
+        CelModel::CelData& endCelData = iter.value();
         if (startCelData.mCelNo == endCelData.mCelNo)
         {
             CelModel::CelData celData;
@@ -370,9 +389,10 @@ bool AnimationModel::tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, Ce
             Tween(ScaleTweenType, startCelData, endCelData, SpriteDescriptor.mScale.mY, frameNo, startFrameNo, endFrameNo);
 
             celData.mSpriteDescriptor.mBlendType = startCelData.mSpriteDescriptor.mBlendType;
-            returnCelHash[celData.mCelNo] = celData;
+            returnCelHash.insert(celData.mCelNo, celData);
             match = true;
         }
+        iter++;
     }
     
     return match;
@@ -403,7 +423,7 @@ QHash<int, CelModel::CelData> AnimationModel::getCelHashAt(int frameNo)
             if (!match)
             {
                 CelModel::CelData celData = startCelHash[i];
-                returnCelHash[celData.mCelNo] = celData;
+                returnCelHash.insert(celData.mCelNo, celData);
             }
         }
 
