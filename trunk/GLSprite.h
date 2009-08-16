@@ -96,8 +96,8 @@ public:
         }
     };
 
-    GLSprite(const int& id,  QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor);
-
+    GLSprite(const int& id,  QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor, bool selectable);
+    bool isSelectable() const;
     void render(QPoint renderCenterPoint, QPainter& painter);
     QRect getRect() const;
     bool contains(QPoint point) const;
@@ -107,6 +107,7 @@ public:
 
 private:
     QPixmap* mpPixmap;
+    bool mIsSelectable;
 };
 
 

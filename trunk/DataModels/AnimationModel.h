@@ -30,20 +30,8 @@ public:
         int mStartKeyFrameNo;
         int mEndKeyFrameNo;
         int mCelNo;
-
-        CelModel::TweenType mPositionTweenType;
-        CelModel::TweenType mRotationTweenType;
-        CelModel::TweenType mScaleTweenType;
-        CelModel::TweenType mAlphaTweenType;
-
-        void operator=(const CelModel::CelData& item)
-        {
-            mCelNo = item.mCelNo;
-            mPositionTweenType = item.mPositionTweenType;
-            mRotationTweenType = item.mRotationTweenType;
-            mScaleTweenType = item.mScaleTweenType;
-            mAlphaTweenType = item.mAlphaTweenType;
-        }
+        //TweenType mTweenTypes[TweenAttribute_COUNT];
+        CelModel::TweenAttribute mTweenAttribute;
     };
 
     struct KeyFrame
@@ -51,7 +39,7 @@ public:
         int mDuration;
         QString mComment;
         QHash<int, CelModel::CelData> mCelHash;
-        QList<int> mTweenCelIDList;
+        QList<int> mTweenIDList;
     };
 
     static inline KeyFrame makeEmptyKeyFrame();
@@ -99,7 +87,7 @@ public:
 
     QHash<int, CelModel::CelData> getCelHash(int keyFrameNo) const;
 
-    bool tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::CelData& startCelData, int startFrameNo, int frameNo, int endKeyFrameNo);
+
     QHash<int, CelModel::CelData> getCelHashAt(int frameNo);
 
     CelModel::CelData* getCelDataRef(int keyFrameNo, int celNo);
@@ -110,6 +98,10 @@ public:
 
 
 private:
+    void tweenElement(CelModel::CelData& celData, CelModel::TweenAttribute tweenAttribute, CelModel::CelData& startCelData, CelModel::CelData& endCelData, int frameNo, int startFrameNo, int endFrameNo);
+    void tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::TweenAttribute tweenAttribute, int celNo, int startFrameNo, int frameNo, int startKeyFrameNo, int endKeyFrameNo);
+    inline void addTweenData(int keyFrameNo, int celNo, CelModel::TweenAttribute tweenAttribute);
+
     // Key Frames
     QList<KeyFrame> mKeyFrameList;
 

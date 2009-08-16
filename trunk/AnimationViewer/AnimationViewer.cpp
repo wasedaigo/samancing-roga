@@ -203,18 +203,18 @@ void AnimationViewer::onCelSelected(CelModel::CelData* pCelData)
     if (pCelData)
     {
         m_ui->alphaSpinBox->setValue(pCelData->mSpriteDescriptor.mAlpha);
-        m_ui->alphaTweenTypeComboBox->setCurrentIndex(pCelData->mAlphaTweenType);
+        m_ui->alphaTweenTypeComboBox->setCurrentIndex(pCelData->mTweenTypes[CelModel::TweenAttribute_alpha]);
 
         m_ui->positionXSpinBox->setValue((int)pCelData->mSpriteDescriptor.mPosition.mX);
         m_ui->positionYSpinBox->setValue((int)pCelData->mSpriteDescriptor.mPosition.mY);
-        m_ui->positionTweenTypeComboBox->setCurrentIndex(pCelData->mPositionTweenType);
+        m_ui->positionTweenTypeComboBox->setCurrentIndex(pCelData->mTweenTypes[CelModel::TweenAttribute_position]);
 
         m_ui->scaleXSpinBox->setValue((double)pCelData->mSpriteDescriptor.mScale.mX);
         m_ui->scaleYSpinBox->setValue((double)pCelData->mSpriteDescriptor.mScale.mY);
-        m_ui->scaleTweenTypeComboBox->setCurrentIndex(pCelData->mScaleTweenType);
+        m_ui->scaleTweenTypeComboBox->setCurrentIndex(pCelData->mTweenTypes[CelModel::TweenAttribute_scale]);
 
         m_ui->rotationXSpinBox->setValue((int)pCelData->mSpriteDescriptor.mRotation.mX);
-        m_ui->rotationTweenTypeComboBox->setCurrentIndex(pCelData->mRotationTweenType);
+        m_ui->rotationTweenTypeComboBox->setCurrentIndex(pCelData->mTweenTypes[CelModel::TweenAttribute_rotation]);
 
         m_ui->celNoSpinBox->setValue(pCelData->mCelNo);
         m_ui->blurTargetCheckBox->setChecked(pCelData->mBlur);
@@ -297,7 +297,8 @@ void AnimationViewer::onTweenTypeChanged(int tweenType)
     bool rotationTweenEnabled = (m_ui->rotationTweenTypeComboBox->currentIndex() != 0);
     m_ui->rotationXSpinBox->setEnabled(rotationTweenEnabled);
 
-
+    mpAnimationModel->resetTweenHash();
+    mpAnimationViewerPanel->refresh();
 }
 
 void AnimationViewer::onSliderValueChanged(int value)

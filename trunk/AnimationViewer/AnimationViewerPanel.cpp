@@ -139,13 +139,23 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
     while (iter != mGlSpriteList.end())
     {
         GLSprite* glSprite = (GLSprite*)*iter;
-
-        painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha);
+        if (mpAnimationModel->isKeyFrame(mpAnimationModel->getCurrentFrameNo()) && !glSprite->isSelectable())
+        {
+            painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha * 0.5);
+        }
+        else
+        {
+            painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha);
+        }
         // render sprite
         glSprite->render(centerPoint, painter);
 
-        // Selected cel will change its color
-        if (mpSelectedCelModel->getCelDataRef() && glSprite->mID == mpSelectedCelModel->getCelDataRef()->mCelNo)
+        if (!glSprite->isSelectable())
+        {
+            painter.setPen(QColor(100, 100, 200));
+            painter.setOpacity(0.5);
+        }
+        else if (mpSelectedCelModel->getCelDataRef() && glSprite->mID == mpSelectedCelModel->getCelDataRef()->mCelNo)
         {
             painter.setPen(Qt::yellow);
             painter.setOpacity(1.0);
@@ -193,7 +203,8 @@ void AnimationViewerPanel::addCelSprite(const CelModel::CelData& celData)
             new GLSprite(
                     celData.mCelNo,
                     mpAnimationModel->getPixmap(celData.mTextureID),
-                    celData.mSpriteDescriptor
+                    celData.mSpriteDescriptor,
+                    !celData.mIsTweenCel
             )
     );
 }
@@ -265,7 +276,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
     while (iter != mGlSpriteList.end())
     {
         GLSprite* glSprite = (GLSprite*)*iter;
-        if (glSprite->contains(relativePressedPosition))
+        if (glSprite->isSelectable() && glSprite->contains(relativePressedPosition))
         {
             mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
             selectCel(glSprite->mID);

@@ -22,6 +22,16 @@ public:
         eTT_COUNT
     };
 
+    enum TweenAttribute
+    {
+      TweenAttribute_position,
+      TweenAttribute_rotation,
+      TweenAttribute_scale,
+      TweenAttribute_alpha,
+
+      TweenAttribute_COUNT
+    };
+    
     struct CelData
     {
         int mTextureID;
@@ -29,17 +39,36 @@ public:
         bool mRelativeToTarget;
         bool mLookAtTarget;
         bool mBlur;
+        bool mIsTweenCel;
 
         GLSprite::SpriteDescriptor mSpriteDescriptor;
 
-        TweenType mPositionTweenType;
-        TweenType mRotationTweenType;
-        TweenType mScaleTweenType;
-        TweenType mAlphaTweenType;
+        TweenType mTweenTypes[TweenAttribute_COUNT];
 
         bool operator==(const CelData& item)
         {
             return mCelNo == item.mCelNo;
+        }
+
+        void copyAttribute(TweenAttribute tweenAttribute, const CelData& item)
+        {
+            switch(tweenAttribute)
+            {
+                case TweenAttribute_position:
+                    mSpriteDescriptor.mPosition = item.mSpriteDescriptor.mPosition;
+                break;
+                case TweenAttribute_rotation:
+                    mSpriteDescriptor.mRotation = item.mSpriteDescriptor.mRotation;
+                break;
+                case TweenAttribute_scale:
+                    mSpriteDescriptor.mScale = item.mSpriteDescriptor.mScale;
+                break;
+                case TweenAttribute_alpha:
+                    mSpriteDescriptor.mAlpha = item.mSpriteDescriptor.mAlpha;
+                break;
+                default:
+                break;
+            }
         }
     };
 
@@ -118,10 +147,10 @@ private:
 inline bool CelModel::hasTween(CelData& celData)
 {
     return !(
-            celData.mAlphaTweenType == eTT_Fix &&
-            celData.mPositionTweenType == eTT_Fix &&
-            celData.mRotationTweenType == eTT_Fix &&
-            celData.mScaleTweenType == eTT_Fix
+            celData.mTweenTypes[TweenAttribute_position] == eTT_None &&
+            celData.mTweenTypes[TweenAttribute_scale] == eTT_None &&
+            celData.mTweenTypes[TweenAttribute_rotation] == eTT_None &&
+            celData.mTweenTypes[TweenAttribute_alpha] == eTT_None
             );
 }
 
@@ -133,12 +162,15 @@ static inline CelModel::CelData makeDefaultCelData()
     celData.mLookAtTarget = false;
     celData.mRelativeToTarget = false;
     celData.mCelNo = 0;
+    celData.mIsTweenCel = false;
 
     celData.mSpriteDescriptor = makeDefaultSpriteDescriptor();
-    celData.mAlphaTweenType = CelModel::eTT_Fix;
-    celData.mPositionTweenType = CelModel::eTT_Fix;
-    celData.mRotationTweenType = CelModel::eTT_Fix;
-    celData.mScaleTweenType = CelModel::eTT_Fix;
+
+    for (int i = 0; i < CelModel::TweenAttribute_COUNT; i++)
+    {
+        celData.mTweenTypes[i] = CelModel::eTT_Fix;
+    }
+
     return celData;
 }
 
