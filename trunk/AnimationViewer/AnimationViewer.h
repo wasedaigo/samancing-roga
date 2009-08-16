@@ -30,7 +30,8 @@ private slots:
     void onSaveAnimationButtonClicked();
     void onSwitchTextureButtonClicked();
 
-    void onSliderValueChanged(int);
+    void onTweenTypeChanged(int tweenType);
+    void onSliderValueChanged(int value);
     void onAnimationDurationChanged(int duration);
     void onPlayButtonClicked();
     void onTick();

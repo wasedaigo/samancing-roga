@@ -15,8 +15,11 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     m_ui->setupUi(this);
 
     mpTweenModel = new QStandardItemModel();
+    // Set Tween types
+    mpTweenModel->appendRow(new QStandardItem(QString("None")));
     mpTweenModel->appendRow(new QStandardItem(QString("Fix")));
     mpTweenModel->appendRow(new QStandardItem(QString("Tween")));
+
     m_ui->alphaTweenTypeComboBox->setModel(mpTweenModel);
     m_ui->positionTweenTypeComboBox->setModel(mpTweenModel);
     m_ui->rotationTweenTypeComboBox->setModel(mpTweenModel);
@@ -41,17 +44,21 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     // connect Cel model and controls
     connect(m_ui->alphaSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setAlpha(double)));
     connect(m_ui->alphaTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setAlphaTweenType(int)));
+    connect(m_ui->alphaTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
     connect(m_ui->positionXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setPositionX(int)));
     connect(m_ui->positionYSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setPositionY(int)));
     connect(m_ui->positionTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setPositionTweenType(int)));
+    connect(m_ui->positionTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
     connect(m_ui->scaleXSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setScaleX(double)));
     connect(m_ui->scaleYSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setScaleY(double)));
     connect(m_ui->scaleTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setScaleTweenType(int)));
+    connect(m_ui->scaleTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
     connect(m_ui->rotationXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setRotationX(int)));
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setRotationTweenType(int)));
+    connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
     connect(m_ui->celNoSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCelNo(int)));
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
@@ -271,6 +278,26 @@ void AnimationViewer::onCurrentFrameNoChanged(int frameNo)
             m_ui->celListTableWidget->setEnabled(false);
         }
     }
+}
+
+void AnimationViewer::onTweenTypeChanged(int tweenType)
+{
+    bool alphaTweenEnabled = (m_ui->alphaTweenTypeComboBox->currentIndex() != 0);
+    m_ui->alphaSpinBox->setEnabled(alphaTweenEnabled);
+
+    bool scaleTweenEnabled = (m_ui->scaleTweenTypeComboBox->currentIndex() != 0);
+    m_ui->scaleXSpinBox->setEnabled(scaleTweenEnabled);
+    m_ui->scaleYSpinBox->setEnabled(scaleTweenEnabled);
+
+    bool positionTweenEnabled = (m_ui->positionTweenTypeComboBox->currentIndex() != 0);
+    m_ui->positionXSpinBox->setEnabled(positionTweenEnabled);
+    m_ui->positionYSpinBox->setEnabled(positionTweenEnabled);
+    m_ui->positionZSpinBox->setEnabled(positionTweenEnabled);
+
+    bool rotationTweenEnabled = (m_ui->rotationTweenTypeComboBox->currentIndex() != 0);
+    m_ui->rotationXSpinBox->setEnabled(rotationTweenEnabled);
+
+
 }
 
 void AnimationViewer::onSliderValueChanged(int value)

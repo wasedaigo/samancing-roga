@@ -27,8 +27,8 @@ public:
 
     struct TweenData
     {
-        int mStartFrameNo;
-        int mEndFrameNo;
+        int mStartKeyFrameNo;
+        int mEndKeyFrameNo;
         int mCelNo;
 
         CelModel::TweenType mPositionTweenType;
