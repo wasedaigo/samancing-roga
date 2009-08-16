@@ -6,11 +6,11 @@
  </data>
  <data>
   <variable>RunConfiguration0-Executable</variable>
-  <value type="QString" >C:\Documents and Settings\WASEDAIGO\My Documents\Qt\Splash\debug\Splash.exe</value>
+  <value type="QString" >C:\Documents and Settings\WASEDAIGO\My Documents\SVN\Splash\debug\Splash.exe</value>
  </data>
  <data>
   <variable>RunConfiguration0-RunConfiguration.name</variable>
-  <value type="QString" >C:\Documents and Settings\WASEDAIGO\My Documents\Qt\Splash\debug\Splash.exe を実行</value>
+  <value type="QString" >C:\Documents and Settings\WASEDAIGO\My Documents\SVN\Splash\debug\Splash.exe を実行</value>
  </data>
  <data>
   <variable>RunConfiguration0-UseTerminal</variable>
@@ -70,9 +70,6 @@
     <value type="QString" >APPDATA=C:\Documents and Settings\WASEDAIGO\Application Data</value>
     <value type="QString" >CLASSPATH=.;C:\Program Files\Java\jre6\lib\ext\QTJava.zip</value>
     <value type="QString" >CLIENTNAME=Console</value>
-    <value type="QString" >COM.ADOBE.VERSIONCUE.CLIENT.APPLOCALE=ja_JP</value>
-    <value type="QString" >COM.ADOBE.VERSIONCUE.CLIENT.APPNAME=AdobeDrive</value>
-    <value type="QString" >COM.ADOBE.VERSIONCUE.CLIENT.APPVERSION=1.0.0</value>
     <value type="QString" >COMMONPROGRAMFILES=C:\Program Files\Common Files</value>
     <value type="QString" >COMPUTERNAME=DAIGO</value>
     <value type="QString" >COMSPEC=C:\WINDOWS\system32\cmd.exe</value>
@@ -123,9 +120,6 @@
     <value type="QString" >APPDATA=C:\Documents and Settings\WASEDAIGO\Application Data</value>
     <value type="QString" >CLASSPATH=.;C:\Program Files\Java\jre6\lib\ext\QTJava.zip</value>
     <value type="QString" >CLIENTNAME=Console</value>
-    <value type="QString" >COM.ADOBE.VERSIONCUE.CLIENT.APPLOCALE=ja_JP</value>
-    <value type="QString" >COM.ADOBE.VERSIONCUE.CLIENT.APPNAME=AdobeDrive</value>
-    <value type="QString" >COM.ADOBE.VERSIONCUE.CLIENT.APPVERSION=1.0.0</value>
     <value type="QString" >COMMONPROGRAMFILES=C:\Program Files\Common Files</value>
     <value type="QString" >COMPUTERNAME=DAIGO</value>
     <value type="QString" >COMSPEC=C:\WINDOWS\system32\cmd.exe</value>

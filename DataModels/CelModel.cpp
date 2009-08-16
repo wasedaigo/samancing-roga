@@ -47,10 +47,10 @@ SETSLOT(RelativeToTarget, relativeToTarget, bool, bool);
 SETSLOT(LookAtTarget, lookAtTarget, bool, bool);
 SETSLOT(Blur, blur, bool, bool);
 
-SETSLOT(PositionTweenType, positionTweenType, int, TweenType);
-SETSLOT(RotationTweenType, rotationTweenType, int, TweenType);
-SETSLOT(ScaleTweenType, scaleTweenType, int, TweenType);
-SETSLOT(AlphaTweenType, alphaTweenType, int, TweenType);
+SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_position], PositionTweenType, positionTweenType, int, TweenType);
+SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_rotation], RotationTweenType, rotationTweenType, int, TweenType);
+SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_scale], ScaleTweenType, scaleTweenType, int, TweenType);
+SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, TweenType);
 
 SETSLOT_STRUCT(SpriteDescriptor.mTextureSrcRect, TextureSrcRect, textureSrcRect, GLSprite::Rect, GLSprite::Rect);
 SETSLOT_STRUCT(SpriteDescriptor.mBlendType, BlendType, blendType, int, GLSprite::BlendType);

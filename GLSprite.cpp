@@ -3,12 +3,18 @@
 #include <QPixmap>
 #include <QPainter>
 
-GLSprite::GLSprite(const int& id, QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor)
+GLSprite::GLSprite(const int& id, QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor, bool selectable)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
-          mpPixmap(pixmap)
+          mpPixmap(pixmap),
+          mIsSelectable(selectable)
 
 {
+}
+
+bool GLSprite::isSelectable() const
+{
+    return mIsSelectable;
 }
 
 void GLSprite::render(QPoint renderCenterPoint, QPainter& painter)
