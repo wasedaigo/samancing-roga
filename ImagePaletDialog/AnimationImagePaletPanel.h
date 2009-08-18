@@ -10,9 +10,10 @@ class QPaintEvent;
 class QPixmap;
 class AnimationImagePaletPanel : public QWidget
 {
+    Q_OBJECT
+
 public:
-    void setPixmap(QPixmap* pixmap);
-    AnimationImagePaletPanel(AnimationModel* pAnimationModel);
+    AnimationImagePaletPanel(int paletNo, AnimationModel* pAnimationModel);
     
     void setSnapGrid(int gridX, int gridY, bool snapGridCheck);
     
@@ -22,6 +23,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
+private slots:
+    void onAnimationImagePaletChanged(int paletNo, QString id);
 
 private:
     QPoint getSnappedPosition(int x, int y);
@@ -29,11 +32,12 @@ private:
     QRect mSelectedRect;
     AnimationModel* mpAnimationModel;
     QColor mClearColor;
-    QPixmap* mpPixmap;
     bool mPressed;
     int mSnapGridX;
     int mSnapGridY;
     bool mSnapGridCheck;
+    int mPaletNo;
+
 };
 
 #endif // ANIMATIONIMAGEPALETPANEL_H

@@ -364,5 +364,5 @@ void AnimationViewer::onTick()
 // Save Button
 void AnimationViewer::onSaveAnimationButtonClicked()
 {
-
+    mpAnimationModel->saveData();
 }

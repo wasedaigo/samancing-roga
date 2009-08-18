@@ -34,7 +34,7 @@ public slots:
     void onKeyFrameBoxVHeaderSelected(int row);
     void onKeyFrameDurationChanged(int index, int duration);
     void onCurrentFrameNoChanged(int frameNo);
-
+    void onKeyframesCleared();
     // event list control
     void insertEventRow(int row);
     void onAddEventButtonClicked();
@@ -69,10 +69,6 @@ private:
     QStandardItemModel *mpAnimationImageNameListModel;
 
     ImagePaletDialog *mpDialogs[AnimationModel::ImagePaletCount];
-
-    QDir mAnimationDirectory;
-    QDir mAnimationImageDirectory;
-    QDir mSoundDirectory;
 };
 
 #endif // MAINWINDOW_H

@@ -31,7 +31,8 @@ void MainWindow::setupConnections()
     connect(ui->keyFramesTableWidget, SIGNAL(cellChanged(int, int)), this, SLOT(onKeyFrameCellChanged(int, int)));
     connect(ui->keyFramesTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(onKeyFrameBoxCellClicked(int, int)));
     connect(ui->keyFramesTableWidget->verticalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(onKeyFrameBoxVHeaderSelected(int)) );
-    
+    connect(mpAnimationModel, SIGNAL(clearKeyframes()), this, SLOT(onKeyframesCleared()));
+
     connect(mpAnimationModel, SIGNAL(keyFrameDurationChanged(int, int)), this, SLOT(onKeyFrameDurationChanged(int, int)));
     connect(mpAnimationModel, SIGNAL(currentFrameNoChanged(int)), this, SLOT(onCurrentFrameNoChanged(int)));
 
@@ -72,7 +73,7 @@ void MainWindow::setupUI()
 
     for (int i = 0; i < AnimationModel::ImagePaletCount; i++)
     {
-        mpDialogs[i] = new ImagePaletDialog(i, this, mpAnimationModel, mAnimationImageDirectory, mpAnimationImageNameListModel);
+        mpDialogs[i] = new ImagePaletDialog(i, this, mpAnimationModel, mpAnimationImageNameListModel);
     }
 
     mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
@@ -84,11 +85,8 @@ void MainWindow::setupUI()
 void MainWindow::loadConfigFile()
 {
   // todo: load data from config file
-  mAnimationDirectory = QDir(QString("GameResource/Animations"));
-  mAnimationImageDirectory = QDir(QString("GameResource/Images"));
-  mSoundDirectory = QDir(QString("GameResource/Sounds"));
 
-  QStringList list = mAnimationImageDirectory.entryList(QDir::Files, QDir::Name);
+  QStringList list = ANIMATION_IMAGE_DIR.entryList(QDir::Files, QDir::Name);
 
   QList<QString>::Iterator iter;
 
@@ -116,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mpAnimationModel->insertEmptyKeyFrame(0);
     mpAnimationModel->setCurrentKeyFrameNo(0);
+    mpAnimationModel->loadData();
 }
 
 MainWindow::~MainWindow()
@@ -184,6 +183,14 @@ void MainWindow::onKeyFrameAdded(int index, int duration, QString comment)
     item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
     ui->keyFramesTableWidget->setItem(index, 1, item);
     ui->keyFramesTableWidget->verticalHeader()->setResizeMode(index, QHeaderView::Fixed);
+}
+
+void MainWindow::onKeyframesCleared()
+{
+   for (int i = ui->keyFramesTableWidget->rowCount() - 1; i >= 0; i--)
+   {
+        ui->keyFramesTableWidget->removeRow(i);
+   }
 }
 
 // Remove button click

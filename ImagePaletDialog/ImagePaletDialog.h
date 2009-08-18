@@ -2,7 +2,6 @@
 #define IMAGEPALETDIALOG_H
 
 #include <QtGui/QDialog>
-#include <QDir>
 
 namespace Ui {
     class ImagePaletDialog;
@@ -14,12 +13,13 @@ class QStandardItemModel;
 class ImagePaletDialog : public QDialog {
     Q_OBJECT
 public:
-    ImagePaletDialog(int paletNo, QWidget *parent, AnimationModel* pAnimationModel, QDir animationImageDirectory, QStandardItemModel* pAnimationImageListModel);
+    ImagePaletDialog(int paletNo, QWidget *parent, AnimationModel* pAnimationModel, QStandardItemModel* pAnimationImageListModel);
     ~ImagePaletDialog();
 
 private slots:
     void onAnimationImageComboBoxChanged(QString id);
     void snapGridChanged();
+    void onAnimationImagePaletChanged(int paletNo, QString id);
 
 protected:
     void changeEvent(QEvent *e);
@@ -30,7 +30,6 @@ private:
     Ui::ImagePaletDialog *m_ui;
     int mPaletNo;
     AnimationModel* mpAnimationModel;
-    QDir mAnimationImageDirectory;
     QStandardItemModel* mpAnimationImageListModel;
     AnimationImagePaletPanel* mpAnimationImagePaletPanel;
 };
