@@ -743,7 +743,7 @@ void AnimationModel::loadData()
 
             celData.mSpriteDescriptor.mBlendType = (GLSprite::BlendType)(cel["blendType"].asInt());
 
-            celData.mSpriteDescriptor.mAlpha = cel["scaleTween"].asDouble();
+            celData.mSpriteDescriptor.mAlpha = cel["alpha"].asDouble();
 
             celData.mSpriteDescriptor.mPosition.mX = cel["position"][static_cast<unsigned int>(0)].asDouble();
             celData.mSpriteDescriptor.mPosition.mY = cel["position"][1].asDouble();

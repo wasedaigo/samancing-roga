@@ -79,8 +79,8 @@ void AnimationViewerPanel::resizeEvent(QResizeEvent *event)
 QPoint AnimationViewerPanel::getCenterPoint() const
 {
     return QPoint(
-        (width() - TARGET_SCREEN_WIDTH) / 2,
-        (height() - TARGET_SCREEN_HEIGHT) / 2
+        (width()) / 2,
+        (height()) / 2
     );
 }
 
@@ -147,8 +147,13 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
         {
             painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha);
         }
+
+        QPoint spriteRenderPoint;
+        spriteRenderPoint.setX((int)(centerPoint.x() - glSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2));
+        spriteRenderPoint.setY((int)(centerPoint.y() - glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2));
+
         // render sprite
-        glSprite->render(centerPoint, painter);
+        glSprite->render(spriteRenderPoint, painter);
 
         // Don't render when playing the animation
         if (!mIsAnimationPlaying)
@@ -174,13 +179,13 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
             if(mpAnimationModel->isKeyFrameSelected())
             {
                 QRect rect = glSprite->getRect();
-                rect.translate(centerPoint);
+                rect.translate(spriteRenderPoint);
                 painter.drawRect(rect);
 
                 // Draw Text
                 painter.drawText(QRect(
-                                        (int)glSprite->mSpriteDescriptor.mPosition.mX + centerPoint.x(),
-                                        (int)glSprite->mSpriteDescriptor.mPosition.mY + centerPoint.y(),
+                                        (int)glSprite->mSpriteDescriptor.mPosition.mX + spriteRenderPoint.x(),
+                                        (int)glSprite->mSpriteDescriptor.mPosition.mY + spriteRenderPoint.y(),
                                         16,
                                         16
                                        ),
@@ -280,7 +285,11 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
     while (iter != mGlSpriteList.end())
     {
         GLSprite* glSprite = (GLSprite*)*iter;
-        if (glSprite->isSelectable() && glSprite->contains(relativePressedPosition))
+        if (glSprite->isSelectable() &&
+            glSprite->contains(
+                    relativePressedPosition + QPoint((int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2), (int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2))
+                )
+            )
         {
             mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
             selectCel(glSprite->mID);
