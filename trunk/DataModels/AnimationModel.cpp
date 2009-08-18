@@ -1,6 +1,12 @@
 #include "AnimationModel.h"
 #include <QPixmap>
+#include "Common.h"
 #include "Macros.h"
+#include "json/writer.h"
+#include "json/reader.h"
+#include <fstream>
+#include <sstream>
+#include <QPixmap>
 
 // Macros
 // Tween fields
@@ -27,6 +33,7 @@ AnimationModel::AnimationModel()
       mCurrentFrameNo(-1),
       mSelectedPaletNo(-1),
       mAnimationDuration(0)
+
 {
     for (int i = 0; i < ImagePaletCount; i++)
     {
@@ -101,18 +108,30 @@ inline void AnimationModel::addTweenData(int keyFrameNo, const CelModel::CelData
     // Add reference to previous tween data
     if (celData.mTweenTypes[tweenAttribute] != CelModel::eTT_Fix)
     {
+        bool hitEnd = false;
         for (int i = keyFrameNo + 1; i < mKeyFrameList.count(); i++)
         {
             CelModel::CelData* endCelData = getCelDataRef(i, celData.mCelNo);
             if (endCelData && endCelData->mTweenTypes[tweenAttribute] != CelModel::eTT_None)
             {
                 tweenData.mEndKeyFrameNo = i;
+                hitEnd = true;
                 break;
             }
             else
             {
                 // Add reference to previous tween data
                 mKeyFrameList[i].mTweenIDList.push_front(tweenCelID);
+            }
+        }
+
+        // If it reached the end without hitting target tween keyframe
+        // Remove all data
+        if (!hitEnd)
+        {
+            for (int i = keyFrameNo + 1; i < mKeyFrameList.count(); i++)
+            {
+                mKeyFrameList[i].mTweenIDList.removeOne(tweenCelID);
             }
         }
     }
@@ -298,12 +317,23 @@ QPixmap* AnimationModel::getPixmap(int paletNo) const
     }
 }
 
-void AnimationModel::setPixmap(int paletNo, QPixmap* pixmap)
+QString AnimationModel::getAnimationPaletID(int paletNo) const
 {
-    delete mpPixmaps[paletNo];
-    mpPixmaps[paletNo] = pixmap;
-    emit paletImageChanged(paletNo);
+    return mImagePalets[paletNo];
 }
+
+void AnimationModel::setAnimationImagePalet(int paletNo, QString id)
+{
+    if (id != "")
+    {
+        mImagePalets[paletNo] = id;
+        QString filename = ANIMATION_IMAGE_DIR.filePath(QString("%0.%1").arg(id, IMAGE_FORMAT));
+        mpPixmaps[paletNo] = new QPixmap(filename);
+
+        emit animationImagePaletChanged(paletNo, id);
+    }
+}
+
 //
 // Frame control
 //
@@ -568,8 +598,184 @@ CelModel::CelData* AnimationModel::getCelDataRef(int keyFrameNo, int celNo)
     return celData;
 }
 
-void AnimationModel::write(QString path)
+void AnimationModel::saveData()
 {
+    Json::Value root;
 
+    // save animation name
+    root["name"] = "TEST";
+
+    // save animation image palet filenames
+    Json::Value palets;
+    palets.resize(ImagePaletCount);
+    for (int i = 0; i < ImagePaletCount; i++)
+    {
+        palets[i] = mImagePalets[i].toStdString();
+    }
+    root["palets"] = palets;
+
+    // save keyframes
+    Json::Value& keyframes = root["keyframes"];
+    keyframes.resize(mKeyFrameList.count());
+    for (int i = 0; i < mKeyFrameList.count(); i++)
+    {
+        keyframes[i]["comment"] = mKeyFrameList[i].mComment.toStdString();
+        keyframes[i]["duration"] = mKeyFrameList[i].mDuration;
+
+        QHash<int, CelModel::CelData>& celHash = mKeyFrameList[i].mCelHash;
+        keyframes[i]["cels"].resize(celHash.count());
+        QHash<int, CelModel::CelData>::Iterator celIter = celHash.begin();
+        int j = 0;
+        while (celIter != celHash.end())
+        {
+            CelModel::CelData& celData = celIter.value();
+
+            Json::Value cel;
+            cel["celNo"] = celData.mCelNo;
+            cel["textureID"] = celData.mTextureID;
+            cel["blur"] = celData.mBlur;
+            cel["lookAtTarget"] = celData.mLookAtTarget;
+            cel["relativeToTarget"] = celData.mRelativeToTarget;
+
+            Json::Value textureRect;
+            textureRect[static_cast<unsigned int>(0)] = celData.mSpriteDescriptor.mTextureSrcRect.mX;
+            textureRect[1] = celData.mSpriteDescriptor.mTextureSrcRect.mY;
+            textureRect[2] = celData.mSpriteDescriptor.mTextureSrcRect.mWidth;
+            textureRect[3] = celData.mSpriteDescriptor.mTextureSrcRect.mHeight;
+            cel["textureRect"] = textureRect;
+
+            cel["blendType"] = celData.mSpriteDescriptor.mBlendType;
+
+            Json::Value centerPoint;
+            centerPoint[static_cast<unsigned int>(0)] = celData.mSpriteDescriptor.mCenter.mX;
+            centerPoint[1] = celData.mSpriteDescriptor.mCenter.mY;
+            cel["centerPoint"] = centerPoint;
+
+            Json::Value scale;
+            scale[static_cast<unsigned int>(0)] = celData.mSpriteDescriptor.mScale.mX;
+            scale[1] = celData.mSpriteDescriptor.mScale.mY;
+            cel["scale"] = scale;
+
+            Json::Value position;
+            position[static_cast<unsigned int>(0)] = celData.mSpriteDescriptor.mPosition.mX;
+            position[1] = celData.mSpriteDescriptor.mPosition.mY;
+            position[2] = celData.mSpriteDescriptor.mPosition.mZ;
+            cel["position"] = position;
+
+            Json::Value rotation;
+            rotation[static_cast<unsigned int>(0)] = celData.mSpriteDescriptor.mRotation.mX;
+            rotation[1] = celData.mSpriteDescriptor.mRotation.mY;
+            rotation[2] = celData.mSpriteDescriptor.mRotation.mZ;
+            cel["rotation"] = rotation;
+
+            cel["alpha"] = celData.mSpriteDescriptor.mAlpha;
+
+            cel["alphaTween"] = celData.mTweenTypes[CelModel::TweenAttribute_alpha];
+            cel["positionTween"] = celData.mTweenTypes[CelModel::TweenAttribute_position];
+            cel["rotationTween"] = celData.mTweenTypes[CelModel::TweenAttribute_rotation];
+            cel["scaleTween"] = celData.mTweenTypes[CelModel::TweenAttribute_scale];
+
+            keyframes[i]["cels"][j] = cel;
+
+            celIter++;
+            j++;
+        }
+    }
+
+    Json::StyledWriter writer;
+    std::string outputJson = writer.write(root);
+    std::ofstream ofs;
+    ofs.open("test.json");
+    ofs << outputJson << std::endl;
+
+    ofs.close();
 }
 
+void AnimationModel::loadData()
+{
+    mKeyFrameList.clear();
+    emit clearKeyframes();
+
+    Json::Value root;
+    Json::Reader reader;
+
+    std::ifstream ifs("test.json");
+    std::string inputJson((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+    //std::string json_doc = readInputFile(path);
+    if(!reader.parse(inputJson, root))
+    {
+        std::string error_message = reader.getFormatedErrorMessages();
+        printf("JSON error:%s\n", error_message.c_str());
+        exit(EXIT_FAILURE);
+    }
+
+    Json::Value& palets = root["palets"];
+    for (int i = 0; i < ImagePaletCount; i++)
+    {
+        QString id = QString::fromStdString(palets[i].asString());
+        setAnimationImagePalet(i, id);
+    }
+
+    Json::Value& keyframes = root["keyframes"];
+    unsigned int keyFrameCount = keyframes.size();
+    for (unsigned int i = 0; i < keyFrameCount; i++)
+    {
+        KeyFrame keyframe;
+
+        keyframe.mComment = QString::fromStdString(keyframes[i]["comment"].asString());
+        keyframe.mDuration = keyframes[i]["duration"].asInt();
+        Json::Value& cels = keyframes[i]["cels"];
+        for (unsigned int j = 0; j < cels.size(); j++)
+        {
+            Json::Value& cel = cels[j];
+            CelModel::CelData celData;
+            celData.mCelNo = cel["celNo"].asInt();
+            celData.mTextureID = cel["textureID"].asInt();
+            celData.mBlur = cel["blur"].asBool();
+            celData.mLookAtTarget = cel["lookAtTarget"].asBool();
+            celData.mRelativeToTarget = cel["relativeToTarget"].asBool();
+
+            celData.mTweenTypes[CelModel::TweenAttribute_alpha] = (CelModel::TweenType)(cel["alphaTween"].asInt());
+            celData.mTweenTypes[CelModel::TweenAttribute_position] = (CelModel::TweenType)(cel["positionTween"].asInt());
+            celData.mTweenTypes[CelModel::TweenAttribute_rotation] = (CelModel::TweenType)(cel["rotationTween"].asInt());
+            celData.mTweenTypes[CelModel::TweenAttribute_scale] = (CelModel::TweenType)(cel["scaleTween"].asInt());
+
+            celData.mSpriteDescriptor.mBlendType = (GLSprite::BlendType)(cel["blendType"].asInt());
+
+            celData.mSpriteDescriptor.mAlpha = cel["scaleTween"].asDouble();
+
+            celData.mSpriteDescriptor.mPosition.mX = cel["position"][static_cast<unsigned int>(0)].asDouble();
+            celData.mSpriteDescriptor.mPosition.mY = cel["position"][1].asDouble();
+            celData.mSpriteDescriptor.mPosition.mZ = cel["position"][2].asDouble();
+
+            celData.mSpriteDescriptor.mRotation.mX = cel["rotation"][static_cast<unsigned int>(0)].asDouble();
+            celData.mSpriteDescriptor.mRotation.mY = cel["rotation"][1].asDouble();
+            celData.mSpriteDescriptor.mRotation.mZ = cel["rotation"][2].asDouble();
+
+            celData.mSpriteDescriptor.mScale.mX = cel["scale"][static_cast<unsigned int>(0)].asDouble();
+            celData.mSpriteDescriptor.mScale.mY = cel["scale"][1].asDouble();
+
+            celData.mSpriteDescriptor.mCenter.mX = cel["center"][static_cast<unsigned int>(0)].asDouble();
+            celData.mSpriteDescriptor.mCenter.mY = cel["center"][1].asDouble();
+
+            celData.mSpriteDescriptor.mTextureSrcRect.mX = cel["textureRect"][static_cast<unsigned int>(0)].asInt();
+            celData.mSpriteDescriptor.mTextureSrcRect.mY = cel["textureRect"][1].asInt();
+            celData.mSpriteDescriptor.mTextureSrcRect.mWidth = cel["textureRect"][2].asInt();
+            celData.mSpriteDescriptor.mTextureSrcRect.mHeight = cel["textureRect"][3].asInt();
+            celData.mIsTweenCel = false;
+
+            keyframe.mCelHash.insert(celData.mCelNo, celData);
+        }
+
+        mKeyFrameList.push_back(keyframe);
+        emit keyFrameAdded(mKeyFrameList.count() - 1, keyframe.mDuration, keyframe.mComment);
+    }
+
+    resetTweenHash();   
+    calculateAnimationDuration();
+
+    // make it emit frame change event
+    mCurrentFrameNo = -1;
+    setCurrentKeyFrameNo(0);
+}

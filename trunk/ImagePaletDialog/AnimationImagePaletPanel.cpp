@@ -5,19 +5,21 @@
 #include <QPaintEvent>
 #include <QPixmap>
 
-AnimationImagePaletPanel::AnimationImagePaletPanel(AnimationModel* pAnimationModel)
+AnimationImagePaletPanel::AnimationImagePaletPanel(int paletNo, AnimationModel* pAnimationModel)
         : mpAnimationModel(pAnimationModel),
           mClearColor(Qt::black),
-          mpPixmap(NULL),
           mPressed(false),
           mSnapGridX(0),
-          mSnapGridY(0)
+          mSnapGridY(0),
+          mSnapGridCheck(false),
+          mPaletNo(paletNo)
 {
     mSelectedRect = QRect(0, 0, 96, 96);
     this->setFixedSize(320, 240);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
 
+    connect(mpAnimationModel, SIGNAL(animationImagePaletChanged(int, QString)), this, SLOT(onAnimationImagePaletChanged(int, QString)));
 }
 
 void AnimationImagePaletPanel::setSnapGrid(int gridX, int gridY, bool snapGridCheck)
@@ -34,9 +36,10 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::NoBrush);
     painter.fillRect(QRect(0, 0, width() - 1, height() - 1), Qt::SolidPattern);
 
-    if (mpPixmap)
+    const QPixmap* pPixmap = mpAnimationModel->getPixmap(mPaletNo);
+    if (pPixmap)
     {
-        painter.drawPixmap(0, 0, *mpPixmap);
+        painter.drawPixmap(0, 0, *pPixmap);
     }
     painter.setPen(Qt::white);
     painter.drawRect(mSelectedRect);
@@ -46,11 +49,14 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 }
 
-void AnimationImagePaletPanel::setPixmap(QPixmap* pixmap)
+void AnimationImagePaletPanel::onAnimationImagePaletChanged(int paletNo, QString id)
 {
-    setFixedSize(pixmap->width(), pixmap->height());
-    mpPixmap = pixmap;
-    this->repaint();
+    if (paletNo == mPaletNo)
+    {
+        const QPixmap* pPixmap = mpAnimationModel->getPixmap(paletNo);
+        setFixedSize(pPixmap->width(), pPixmap->height());
+        this->repaint();
+    }
 }
 
 QPoint AnimationImagePaletPanel::getSnappedPosition(int x, int y)

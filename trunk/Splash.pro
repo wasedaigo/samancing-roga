@@ -4,6 +4,8 @@
 include(ImagePaletDialog/ImagePaletDialog.pri)
 include(DataModels/DataModels.pri)
 include(AnimationViewer/AnimationViewer.pri)
+include(Lib/jsoncpp/jsoncpp.pri)
+
 QT += opengl
 TARGET = Splash
 TEMPLATE = app

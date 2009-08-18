@@ -5,6 +5,7 @@
 #include <QList>
 #include <QObject>
 #include <QPixmap>
+#include <QDir>
 
 #include "DataModels/CelModel.h"
 
@@ -47,6 +48,7 @@ public:
     AnimationModel();
     ~AnimationModel();
 
+
     int getAnimationDuration();
     void calculateAnimationDuration();
 
@@ -66,7 +68,8 @@ public:
 
     // Getter / Setter
     QPixmap* getPixmap(int paletNo) const;
-    void setPixmap(int paletNo, QPixmap* pixmap);
+    QString getAnimationPaletID(int paletNo) const;
+    void setAnimationImagePalet(int paletNo, QString id);
 
     // Frame
     int getFrameNoByKeyFrameNo(int keyFrameNo);
@@ -87,12 +90,10 @@ public:
     int getSelectedPaletNo() const;
 
     QHash<int, CelModel::CelData> getCelHash(int keyFrameNo) const;
-
-
     QHash<int, CelModel::CelData> getCelHashAt(int frameNo);
-
     CelModel::CelData* getCelDataRef(int keyFrameNo, int celNo);
-
+    void saveData();
+    void loadData();
     // public member variables
     QString mAnimationName;
     GLSprite::Rect mSelectedPaletTextureSrcRect;
@@ -126,8 +127,9 @@ signals:
     void keyFrameDurationChanged(int index, int duration);
     void currentFrameNoChanged(int);
 
+    void animationImagePaletChanged(int paletNo, QString id);
     void animationDurationChanged(int duration);
-    void paletImageChanged(int paletNo);
+    void clearKeyframes();
 };
 
 inline AnimationModel::KeyFrame AnimationModel::makeEmptyKeyFrame()
