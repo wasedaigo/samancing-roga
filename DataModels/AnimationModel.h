@@ -7,7 +7,9 @@
 #include <QPixmap>
 #include <QDir>
 
-#include "DataModels/CelModel.h"
+#include "KeyFrameData.h"
+#include "GLSprite.h"
+#include "DataModels/KeyFrame.h"
 
 class AnimationModel : public QObject
 {
@@ -16,7 +18,8 @@ Q_OBJECT
 public:
     enum
     {
-        ImagePaletCount = 4
+        ImagePaletCount = 4,
+        MaxLineNo = 8
     };
 
     struct Event
@@ -26,119 +29,75 @@ public:
         QString mValue;
     };
 
-    struct TweenData
-    {
-        int mStartKeyFrameNo;
-        int mEndKeyFrameNo;
-        int mCelNo;
-        //TweenType mTweenTypes[TweenAttribute_COUNT];
-        CelModel::TweenAttribute mTweenAttribute;
-    };
-
-    struct KeyFrame
-    {
-        int mDuration;
-        QString mComment;
-        QHash<int, CelModel::CelData> mCelHash;
-        QList<int> mTweenIDList;
-    };
-
-    static inline KeyFrame makeEmptyKeyFrame();
-
     AnimationModel();
     ~AnimationModel();
 
+    int getMaxFrameCount();
 
-    int getAnimationDuration();
-    void calculateAnimationDuration();
+    KeyFrame* getKeyFrame(int lineNo, int frameNo) const;
 
-    void clearTweenHash();
-    void resetTweenHash();
+    int getKeyFrameIndex(int lineNo, int frameNo) const;
 
-    // Cel data control
-    void addCelData(int keyFrameNo, const GLSprite::Point2& position);
-    int changeCelNo(int keyFrameNo, int prevCelNo, int newCelNo);
-    void setCelData(int keyFrameNo, int celNo, const CelModel::CelData& celData);
-    void removeCelData(int keyFrameNo, int celDataID);
-    // Key frame control
-    void addEmptyKeyFrame();
-    void insertEmptyKeyFrame(int index);
-    void removeKeyFrame(int index);
+    bool isKeyData(KeyFrameData::TweenAttribute tweenAttribute, const KeyFrame* pKeyframe) const;
+    int getPreviousKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
+    int getNextKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
+
+    void setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2& position);
+    void setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyframeData);
+
+    void insertEmptyKeyFrame(int lineNo, int frameNo);
+    void addFrameLength(int lineNo, int frameNo, int value);
+    void reduceFrameLength(int lineNo, int frameNo);
+
+    void clearFrames(int lineNo, int startFrameNo, int endFrameNo);
     void clearAllKeyFrames();
+
+    const QList<KeyFrame*>& getKeyFrameList(int lineNo) const;
+    const QList<KeyFrame*> createKeyFrameListAt(int frameNo) const;
 
     // Getter / Setter
     QPixmap* getPixmap(int paletNo) const;
     QString getAnimationPaletID(int paletNo) const;
     void setAnimationImagePalet(int paletNo, QString id);
 
-    // Frame
-    int getFrameNoByKeyFrameNo(int keyFrameNo);
-    int getKeyFrameNoByFrameNo(int frameNo);
-    bool isKeyFrame(int frameNo);
-    int getCurrentFrameNo() const;
-    void setCurrentFrameNo(int frameNo);
-
-    // Keyframe
-    bool isKeyFrameSelected();
-    void setKeyFrameDuration(int index, int duration);
-    void setKeyFrameComment(int index, QString comment);
-
-    void setCurrentKeyFrameNo(int keyFrameNo);    
-    int getCurrentKeyFrameNo() const;
-
     void setSelectedPaletNo(int paletNo);
     int getSelectedPaletNo() const;
 
-    QHash<int, CelModel::CelData> getCelHash(int keyFrameNo) const;
-    QHash<int, CelModel::CelData> getCelHashAt(int frameNo);
-    CelModel::CelData* getCelDataRef(int keyFrameNo, int celNo);
+    KeyFrame::KeyFramePosition getCurrentKeyFramePosition();
+    void selectCurrentKeyFramePosition(int lineNo, int frameNo);
+
+    void tellTimeLineToRefresh();
+
     void saveData();
     void loadData();
+
     // public member variables
     QString mAnimationName;
     GLSprite::Rect mSelectedPaletTextureSrcRect;
 
-
 private:
-    void tweenElement(CelModel::CelData& celData, CelModel::TweenAttribute tweenAttribute, CelModel::CelData& startCelData, CelModel::CelData& endCelData, int frameNo, int startFrameNo, int endFrameNo);
-    void tweenFrame(QHash<int, CelModel::CelData>& returnCelHash, CelModel::TweenAttribute tweenAttribute, int celNo, int startFrameNo, int frameNo, int startKeyFrameNo, int endKeyFrameNo);
-    inline void addTweenData(int keyFrameNo, const CelModel::CelData& celData, CelModel::TweenAttribute tweenAttribute);
+    void tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const;
+    KeyFrame* tweenFrame(int lineNo, int frameNo) const;
 
     // Key Frames
-    QList<KeyFrame> mKeyFrameList;
+    QList<KeyFrame*> mKeyFrames[MaxLineNo];
 
     // Animation Events
     QList<Event> mAnimationEventList;
-    QHash<int, TweenData> mTweenHash;
 
     QString mImagePalets[ImagePaletCount];
     QPixmap* mpPixmaps[ImagePaletCount];
 
-    int mCurrentKeyFrameNo;
-    int mCurrentFrameNo;
     int mSelectedPaletNo;
-    int mAnimationDuration;
+    KeyFrame::KeyFramePosition mSelectedKeyFramePosition;
 
 signals:
-    void celAdded(CelModel::CelData celData);
-    void celRemoved(CelModel::CelData celData);
-    void keyFrameAdded(int index, int duration, QString comment);
-    void keyFrameRemoved(int index);
-    void keyFrameDurationChanged(int index, int duration);
-    void currentFrameNoChanged(int);
-
     void animationImagePaletChanged(int paletNo, QString id);
-    void animationDurationChanged(int duration);
-    void clearKeyframes();
+    void animationDurationChanged(int length);
+
+    void refreshTimeLine();
+    void refreshTimeLine(int lineNo);
+    void selectedKeyFramePositionChanged(int lineNo, int frameNo);
 };
-
-inline AnimationModel::KeyFrame AnimationModel::makeEmptyKeyFrame()
-{
-    KeyFrame keyFrame;
-    keyFrame.mDuration = 1;
-    keyFrame.mComment = "";
-
-    return keyFrame;
-}
 
 #endif // ANIMATIONMODEL_H

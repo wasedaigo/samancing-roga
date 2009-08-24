@@ -1,5 +1,8 @@
 #include "AnimationViewerPanel.h"
 #include "DataModels/AnimationModel.h"
+#include "DataModels/CelModel.h"
+#include "DataModels/KeyFrame.h"
+#include "DataModels/KeyFrameData.h"
 #include "GLSprite.h"
 #include <QMouseEvent>
 #include <QPixmap>
@@ -17,21 +20,14 @@ AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAni
           mClearColor(Qt::black),
           mSelectedOffset(QPoint(0, 0)),
           mpSelectedCelModel(pSelectedCelModel),
-          mIsAnimationPlaying(false)
+          mIsAnimationPlaying(false),
+          mCelGrabbed(false)
 {
     setAutoFillBackground(false);
 
-    connect(mpAnimationModel, SIGNAL(currentFrameNoChanged(int)), this, SLOT(onCurrentFrameNoChanged(int)));
-    connect(mpAnimationModel, SIGNAL(celAdded(CelModel::CelData)), this, SLOT(onCelAdded(CelModel::CelData)));
-
-    //QTimer* mpTimer = new QTimer();
-    //mpTimer->start(10);
-    //connect(mpTimer,SIGNAL(timeout()), this , SLOT(timerEvent()));
-}
-
-AnimationViewerPanel::~AnimationViewerPanel()
-{
-    //delete mpTimer;
+    connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refresh()));
+    connect(mpAnimationModel, SIGNAL(refreshTimeLine(int)), this, SLOT(refresh()));
+    connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refresh()));
 }
 
 void AnimationViewerPanel::playAnimation()
@@ -46,20 +42,13 @@ void AnimationViewerPanel::stopAnimation()
 
 void AnimationViewerPanel::gotoNextFrame()
 {
-    int frameNo =  mpAnimationModel->getCurrentFrameNo();
-    if (frameNo < mpAnimationModel->getAnimationDuration() - 1)
-    {
-       mpAnimationModel->setCurrentFrameNo(frameNo + 1);
-       refresh();
-    }
-}
+    const KeyFrame::KeyFramePosition& keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
 
-void AnimationViewerPanel::unselectCels()
-{
-    if (mpSelectedCelModel->getCelDataRef())
+    int frameNo =  keyframePosition.mFrameNo;
+    if (frameNo < mpAnimationModel->getMaxFrameCount())
     {
-        mpSelectedCelModel->setCelDataRef(NULL);
-        emit celUnselected();
+       mpAnimationModel->selectCurrentKeyFramePosition(keyframePosition.mLineNo, keyframePosition.mFrameNo + 1);
+       refresh();
     }
 }
 
@@ -86,24 +75,21 @@ QPoint AnimationViewerPanel::getCenterPoint() const
 
 void AnimationViewerPanel::keyPressEvent (QKeyEvent* e)
 {
-    // Delete selected cel
-    if (e->key() == Qt::Key_Delete)
+    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+    switch(e->key())
     {
-        if (mpSelectedCelModel->getCelDataRef())
-        {
-            mpAnimationModel->removeCelData(
-                    mpAnimationModel->getCurrentKeyFrameNo(),
-                    mpSelectedCelModel->getCelDataRef()->mCelNo
-                    );
-
-            unselectCels();
-            refresh();
-        }
+        // Delete selected cel
+        case Qt::Key_Delete:
+            mpAnimationModel->clearFrames(currentPosition.mLineNo, currentPosition.mFrameNo, currentPosition.mFrameNo);
+        break;
     }
 }
 
 void AnimationViewerPanel::paintEvent(QPaintEvent *event)
 {
+    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+    //KeyFrame& keyframe = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
+
     // Get center point, all cel position should be relative to this
     QPoint centerPoint = getCenterPoint();
 
@@ -135,11 +121,16 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
     painter.drawLine(QPoint(width() / 2, 0), QPoint(width() / 2, height()));
 
     // Render all sprites
+
     QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
     while (iter != mGlSpriteList.end())
     {
         GLSprite* glSprite = (GLSprite*)*iter;
-        if (!mIsAnimationPlaying && mpAnimationModel->isKeyFrame(mpAnimationModel->getCurrentFrameNo()) && !glSprite->isSelectable())
+        if (
+                !mIsAnimationPlaying &&
+                mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) >= 0 &&
+                !glSprite->isSelectable()
+        )
         {
             painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha * 0.5);
         }
@@ -160,38 +151,38 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
         {
             if (!glSprite->isSelectable())
             {
+                // unselectable cel
                 painter.setPen(QColor(100, 100, 200));
                 painter.setOpacity(0.5);
             }
-            else if (mpSelectedCelModel->getCelDataRef() && glSprite->mID == mpSelectedCelModel->getCelDataRef()->mCelNo)
+            else if (glSprite->mID == currentPosition.mLineNo)
             {
+                // If the cel is selected
                 painter.setPen(Qt::yellow);
                 painter.setOpacity(1.0);
             }
             else
             {
+                // unselected cel
                 painter.setPen(Qt::white);
                 painter.setOpacity(0.5);
             }
 
             // Draw image border rectanble
             // Calculate draw position and draw
-            if(mpAnimationModel->isKeyFrameSelected())
-            {
-                QRect rect = glSprite->getRect();
-                rect.translate(spriteRenderPoint);
-                painter.drawRect(rect);
+            QRect rect = glSprite->getRect();
+            rect.translate(spriteRenderPoint);
+            painter.drawRect(rect);
 
-                // Draw Text
-                painter.drawText(QRect(
-                                        (int)glSprite->mSpriteDescriptor.mPosition.mX + spriteRenderPoint.x(),
-                                        (int)glSprite->mSpriteDescriptor.mPosition.mY + spriteRenderPoint.y(),
-                                        16,
-                                        16
-                                       ),
-                                 Qt::AlignCenter, QString("%0").arg(glSprite->mID));
+            // Draw Text
+            painter.drawText(QRect(
+                                    (int)glSprite->mSpriteDescriptor.mPosition.mX + spriteRenderPoint.x(),
+                                    (int)glSprite->mSpriteDescriptor.mPosition.mY + spriteRenderPoint.y(),
+                                    16,
+                                    16
+                                   ),
+                             Qt::AlignCenter, QString("%0").arg(glSprite->mID + 1));
             }
-        }
 
         iter++;
     }
@@ -206,33 +197,51 @@ void AnimationViewerPanel::clearSprites()
     }
 }
 
-void AnimationViewerPanel::addCelSprite(const CelModel::CelData& celData)
+void AnimationViewerPanel::addCelSprite(const KeyFrame* pKeyFrame)
 {
+    const KeyFrameData* pKeyFrameData = pKeyFrame->mpKeyFrameData;
     mGlSpriteList.push_front(
             new GLSprite(
-                    celData.mCelNo,
-                    mpAnimationModel->getPixmap(celData.mTextureID),
-                    celData.mSpriteDescriptor,
-                    !celData.mIsTweenCel
+                    pKeyFrame->mLineNo,
+                    mpAnimationModel->getPixmap(pKeyFrameData->mTextureID),
+                    pKeyFrameData->mSpriteDescriptor,
+                    !pKeyFrameData->mIsTweenCel
             )
     );
-}
-
-void AnimationViewerPanel::removeCelSprite(const CelModel::CelData& celData)
-{
-
 }
 
 void AnimationViewerPanel::refresh()
 {
     clearSprites();
-    QHash<int, CelModel::CelData> celHash = mpAnimationModel->getCelHashAt(mpAnimationModel->getCurrentFrameNo());
-    QHash<int, CelModel::CelData>::Iterator iter = celHash.begin();
-    while (iter != celHash.end())
+
+    // set cel reference
+    KeyFrame::KeyFramePosition keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
+    KeyFrame* pKeyframe = mpAnimationModel->getKeyFrame(keyframePosition.mLineNo, keyframePosition.mFrameNo);
+
+    if (pKeyframe)
     {
-        CelModel::CelData& celData = iter.value();
-        addCelSprite(celData);
-        iter++;
+        mpSelectedCelModel->setKeyFrameDataReference(pKeyframe->mpKeyFrameData);
+        emit celSelected(pKeyframe->mpKeyFrameData);
+    }
+    else
+    {
+        mpSelectedCelModel->setKeyFrameDataReference(NULL);
+        emit celSelected(NULL);
+    }
+
+    QList<KeyFrame*> keyframeList = mpAnimationModel->createKeyFrameListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
+    for (int i = 0; i < keyframeList.count(); i++)
+    {
+        if (keyframeList[i]->mpKeyFrameData)
+        {
+            addCelSprite(keyframeList[i]);
+        }
+    }
+
+    for (int i = keyframeList.count() - 1; i >= 0; i--)
+    {
+        delete keyframeList[i];
+        keyframeList.removeAt(i);
     }
 
     repaint();
@@ -243,39 +252,29 @@ void AnimationViewerPanel::refresh()
  Cel list change event
 
 ---------------------------------------------------------------------*/
-void AnimationViewerPanel::onCurrentFrameNoChanged(int frameNo)
-{
-    unselectCels();
-
-    refresh();
-}
-
-void AnimationViewerPanel::onCelAdded(CelModel::CelData celData)
-{
-    addCelSprite(celData);
-    repaint();
-}
-
 void AnimationViewerPanel::addNewCel(QPoint& relativePressedPosition)
 {
     QPixmap* pixmap = mpAnimationModel->getPixmap(mpAnimationModel->getSelectedPaletNo());
     if (pixmap != NULL)
     {
+
         GLSprite::Point2 position;
         position.mX = relativePressedPosition.x();
         position.mY = relativePressedPosition.y();
-        mpAnimationModel->addCelData(mpAnimationModel->getCurrentKeyFrameNo(), position);
+
+        KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+        mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, position);
     }
 }
 
-void AnimationViewerPanel::selectCel(int celNo)
+void AnimationViewerPanel::selectCel(int lineNo)
 {
-    mpSelectedCelModel->setCelDataRef(mpAnimationModel->getCelDataRef(mpAnimationModel->getCurrentKeyFrameNo(), celNo));
-    if (mpSelectedCelModel->getCelDataRef())
+    KeyFrame::KeyFramePosition keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
+    if (keyframePosition.mLineNo != lineNo)
     {
-        emit celSelected(mpSelectedCelModel->getCelDataRef());
+        mpAnimationModel->selectCurrentKeyFramePosition(lineNo, keyframePosition.mFrameNo);
+        repaint();
     }
-    repaint();
 }
 
 void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
@@ -293,6 +292,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
         {
             mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
             selectCel(glSprite->mID);
+            mCelGrabbed = true;
             break;
         }
         iter++;
@@ -301,34 +301,37 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
 
 void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 {
-    if(mpAnimationModel->isKeyFrameSelected())
+    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+
+    this->setFocus();
+    // Get center point here
+    QPoint centerPoint = getCenterPoint();
+    // Calculate pressed position relative from center
+    QPoint relativePressedPosition = QPoint(event->x(), event->y()) - centerPoint;
+
+    pickCel(relativePressedPosition);
+
+    if(!mCelGrabbed)
     {
-        unselectCels();
-        this->setFocus();
-
-        // Get center point here
-        QPoint centerPoint = getCenterPoint();
-        // Calculate pressed position relative from center
-        QPoint relativePressedPosition = QPoint(event->x(), event->y()) - centerPoint;
-
-        pickCel(relativePressedPosition);
-
-        // If no cel is selected, it will add new cel to the key frame
-        if (!mpSelectedCelModel->getCelDataRef())
+        if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
         {
-            addNewCel(relativePressedPosition);
+            GLSprite::Point2 pt;
+            pt.mX = relativePressedPosition.x();
+            pt.mY = relativePressedPosition.y();
+
+            mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
         }
     }
 }
 
 void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
 {
-    // Move cel if it is selected
-    if (mpSelectedCelModel->getCelDataRef())
+    if (mCelGrabbed)
     {
-        QPoint centerPoint = getCenterPoint();
-        if (mpSelectedCelModel->getCelDataRef()->mCelNo >= 0)
+        // Move cel if it is selected
+        if (mpSelectedCelModel->getKeyFrameDataReference())
         {
+            QPoint centerPoint = getCenterPoint();
             mpSelectedCelModel->setPositionX(event->x() - centerPoint.x() + mSelectedOffset.x());
             mpSelectedCelModel->setPositionY(event->y() - centerPoint.y() + mSelectedOffset.y());
             refresh();
@@ -338,6 +341,7 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
 
 void AnimationViewerPanel::mouseReleaseEvent(QMouseEvent *event)
 {
+    mCelGrabbed = false;
     repaint();
 }
 
