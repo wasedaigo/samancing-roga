@@ -23,24 +23,6 @@ public:
     ~MainWindow();
 
 public slots:
-    // key frame list control
-    void onAddKeyFrameButtonClicked();
-    void onInsertKeyFrameButtonClicked();
-    void onKeyFrameAdded(int index, int duration, QString comment);
-    void onRemoveKeyFrameButtonClicked();
-    void onKeyFrameRemoved(int index);
-    void onKeyFrameCellChanged(int row, int col);
-    void onKeyFrameBoxCellClicked(int row, int col);
-    void onKeyFrameBoxVHeaderSelected(int row);
-    void onKeyFrameDurationChanged(int index, int duration);
-    void onCurrentFrameNoChanged(int frameNo);
-    void onKeyframesCleared();
-    // event list control
-    void insertEventRow(int row);
-    void onAddEventButtonClicked();
-    void onInsertEventButtonClicked();
-    void onRemoveEventButtonClicked();
-
     // animation list control
     void onAddAnimationButtonClicked();
     void onRemoveAnimationButtonClicked();

@@ -2,8 +2,8 @@
 #define ANIMATIONVIEWER_H
 
 #include <QtGui/QWidget>
-#include "DataModels/Celmodel.h"
-
+#include "DataModels/KeyFrameData.h"
+#include "DataModels/KeyFrame.h"
 namespace Ui
 {
     class AnimationViewer;
@@ -12,6 +12,7 @@ namespace Ui
 class AnimationViewerPanel;
 class AnimationModel;
 class QStandardItemModel;
+class CelModel;
 class AnimationViewer : public QWidget
 {
 Q_OBJECT
@@ -20,34 +21,22 @@ public:
     ~AnimationViewer();
 
 private slots:
-    void onCelAdded(CelModel::CelData celData);
-    void onCelRemoved(CelModel::CelData celData);
-    void onCelNoChanged(int celNo);
-    void onCelSelected(CelModel::CelData* pCelData);
-    void onCelUnselected();
-    void onCelHashCelClicked(int row, int col);
-    void onCurrentFrameNoChanged(int keyFrameNo);
+    void onCelSelected(KeyFrameData* pKeyFrameData);
 
     void onSaveAnimationButtonClicked();
     void onSwitchTextureButtonClicked();
 
     void onTweenTypeChanged(int tweenType);
-    void onSliderValueChanged(int value);
-    void onAnimationDurationChanged(int duration);
     void onPlayButtonClicked();
     void onTick();
 
 signals:
     void playAnimation(bool stop);
-
+    
 protected:
     void changeEvent(QEvent *e);
 
 private:
-    void clearCels();
-    int selectCelIndexOfCelHash(int celNo) const;
-    void addCel(int celNo, QString comment);
-    void removeCel(int celNo);
     
     Ui::AnimationViewer *m_ui;
     CelModel* mpSelectedCelModel;
@@ -55,7 +44,8 @@ private:
     AnimationViewerPanel* mpAnimationViewerPanel;
     AnimationModel* mpAnimationModel;
     QTimer* mpAnimationPlayTimer;
-    int mAnimationStartFrameNo;
+    
+    KeyFrame::KeyFramePosition mSelectedKeyFramePosition;
 };
 
 #endif // ANIMATIONVIEWER_H

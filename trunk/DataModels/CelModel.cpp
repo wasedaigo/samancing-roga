@@ -1,18 +1,18 @@
 #include "CelModel.h"
-
+#include "KeyFrameData.h"
 CelModel::CelModel()
-:   mpCelData(NULL)
+:   mpKeyFrameData(NULL)
 {
 }
 
-CelModel::CelData* CelModel::getCelDataRef() const
+KeyFrameData* CelModel::getKeyFrameDataReference() const
 {
-    return mpCelData;
+    return mpKeyFrameData;
 }
 
-void CelModel::setCelDataRef(CelModel::CelData* pCelData)
+void CelModel::setKeyFrameDataReference(KeyFrameData* pKeyFrameData)
 {
-    mpCelData = pCelData;
+    mpKeyFrameData = pKeyFrameData;
 }
 
 // Make our life easier by defining a macro here.
@@ -23,8 +23,8 @@ void CelModel::setCelDataRef(CelModel::CelData* pCelData)
 #define SETSLOT(name1, name2, type1, type2)\
 void CelModel::set##name1(type1 value)\
 {\
- if (mpCelData && mpCelData->m##name1 != value) {\
-        mpCelData->m##name1 = (type2)value;\
+ if (mpKeyFrameData && mpKeyFrameData->m##name1 != value) {\
+        mpKeyFrameData->m##name1 = (type2)value;\
         emit name2##Changed(value);\
     }\
 }
@@ -33,8 +33,8 @@ void CelModel::set##name1(type1 value)\
 #define SETSLOT_STRUCT(name0, name1, name2, type1, type2)\
 void CelModel::set##name1(type1 value)\
 {\
- if (mpCelData && mpCelData->m##name0 != value) {\
-        mpCelData->m##name0 = (type2)value;\
+ if (mpKeyFrameData && mpKeyFrameData->m##name0 != value) {\
+        mpKeyFrameData->m##name0 = (type2)value;\
         emit name2##Changed(value);\
     }\
 }
@@ -44,12 +44,12 @@ SETSLOT(TextureID, textureID, int, int);
 
 SETSLOT(RelativeToTarget, relativeToTarget, bool, bool);
 SETSLOT(LookAtTarget, lookAtTarget, bool, bool);
-SETSLOT(Blur, blur, bool, bool);
+SETSLOT(Blur, blur, int, int);
 
-SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_position], PositionTweenType, positionTweenType, int, TweenType);
-SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_rotation], RotationTweenType, rotationTweenType, int, TweenType);
-SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_scale], ScaleTweenType, scaleTweenType, int, TweenType);
-SETSLOT_STRUCT(TweenTypes[CelModel::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, TweenType);
+SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_position], PositionTweenType, positionTweenType, int, KeyFrameData::TweenType);
+SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_rotation], RotationTweenType, rotationTweenType, int, KeyFrameData::TweenType);
+SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_scale], ScaleTweenType, scaleTweenType, int, KeyFrameData::TweenType);
+SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, KeyFrameData::TweenType);
 
 SETSLOT_STRUCT(SpriteDescriptor.mTextureSrcRect, TextureSrcRect, textureSrcRect, GLSprite::Rect, GLSprite::Rect);
 SETSLOT_STRUCT(SpriteDescriptor.mBlendType, BlendType, blendType, int, GLSprite::BlendType);

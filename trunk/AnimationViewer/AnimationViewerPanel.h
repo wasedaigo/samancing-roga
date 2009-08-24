@@ -2,16 +2,18 @@
 #define AnimationViewerPanel_H
 
 #include <QWidget>
-#include "DataModels/CelModel.h"
 
 class AnimationModel;
+class CelModel;
 class GLSprite;
+class KeyFrame;
+class KeyFrameData;
 class AnimationViewerPanel : public QWidget
 {
 Q_OBJECT
 public:
     AnimationViewerPanel(QWidget* parent, AnimationModel* pAnimationModel, CelModel* const pSelectedCelModel);
-    ~AnimationViewerPanel();
+
     void selectCel(int celNo);
     void playAnimation();
     void stopAnimation();
@@ -26,14 +28,10 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 public slots:
-    // cel list control
     void refresh();
-    void onCurrentFrameNoChanged(int frameNo);
-    void onCelAdded(CelModel::CelData celData);
 
 signals:
-    void celSelected(CelModel::CelData* pCelData);
-    void celUnselected();
+    void celSelected(KeyFrameData* pKeyFrameData);
 
 private slots:
     void addNewCel(QPoint& relativePressedPosition);
@@ -42,12 +40,10 @@ private slots:
 
 
 private:
-    void unselectCels();
     QPoint getCenterPoint() const;
 
     void clearSprites();
-    void addCelSprite(const CelModel::CelData& celData);
-    void removeCelSprite(const CelModel::CelData& celData);
+    void addCelSprite(const KeyFrame* pKeyFrame);
 
     QList<GLSprite*> mGlSpriteList;
 
@@ -61,6 +57,7 @@ private:
     CelModel* const mpSelectedCelModel;
     QTimer* mpTimer;
     bool mIsAnimationPlaying;
+    bool mCelGrabbed;
 };
 
 #endif // AnimationViewerPanel_H

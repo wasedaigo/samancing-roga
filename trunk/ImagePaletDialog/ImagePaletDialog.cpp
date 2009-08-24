@@ -63,10 +63,7 @@ void ImagePaletDialog::onAnimationImagePaletChanged(int paletNo, QString id)
 
 void ImagePaletDialog::setPaletImage(int paletNo, QString id)
 {
-    if (id != NONE)
-    {
-        mpAnimationModel->setAnimationImagePalet(paletNo, id);
-    }
+    mpAnimationModel->setAnimationImagePalet(paletNo, id);
 }
 
 void ImagePaletDialog::onAnimationImageComboBoxChanged(QString id)

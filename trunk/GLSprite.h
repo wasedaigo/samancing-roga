@@ -96,7 +96,9 @@ public:
         }
     };
 
+    static SpriteDescriptor makeDefaultSpriteDescriptor();
     GLSprite(const int& id,  QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor, bool selectable);
+
     bool isSelectable() const;
     void render(QPoint renderCenterPoint, QPainter& painter);
     QRect getRect() const;
@@ -109,30 +111,5 @@ private:
     QPixmap* mpPixmap;
     bool mIsSelectable;
 };
-
-
-static inline GLSprite::SpriteDescriptor makeDefaultSpriteDescriptor()
-{
-    GLSprite::SpriteDescriptor spriteDescriptor;
-    spriteDescriptor.mBlendType = GLSprite::eBT_Alpha;
-
-    spriteDescriptor.mCenter.mX = 0;
-    spriteDescriptor.mCenter.mY = 0;
-    spriteDescriptor.mCenter.mZ = 0;
-
-    spriteDescriptor.mAlpha = 1.0;
-
-    spriteDescriptor.mPosition.mX = 0;
-    spriteDescriptor.mPosition.mY = 0;
-    spriteDescriptor.mPosition.mZ = 0;
-
-    spriteDescriptor.mRotation.mX = 0;
-    spriteDescriptor.mRotation.mY = 0;
-    spriteDescriptor.mRotation.mZ = 0;
-
-    spriteDescriptor.mScale.mX = 1.0f;
-    spriteDescriptor.mScale.mY = 1.0f;
-    return spriteDescriptor;
-}
 
 #endif // GLSPRITE_H
