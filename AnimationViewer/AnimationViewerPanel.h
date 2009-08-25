@@ -13,6 +13,7 @@ class AnimationViewerPanel : public QWidget
 Q_OBJECT
 public:
     AnimationViewerPanel(QWidget* parent, AnimationModel* pAnimationModel, CelModel* const pSelectedCelModel);
+    ~AnimationViewerPanel();
 
     void selectCel(int celNo);
     void playAnimation();
@@ -42,6 +43,9 @@ private slots:
 private:
     QPoint getCenterPoint() const;
 
+    void renderCross(QPainter& painter);
+    void renderCelSprites(const QPoint& centerPoint, QPainter& painter);
+    void renderTargetSprite(const QPoint& centerPoint, QPainter& painter);
     void clearSprites();
     void addCelSprite(const KeyFrame* pKeyFrame);
 
@@ -58,6 +62,7 @@ private:
     QTimer* mpTimer;
     bool mIsAnimationPlaying;
     bool mCelGrabbed;
+    bool mTargetGrabbed;
 };
 
 #endif // AnimationViewerPanel_H

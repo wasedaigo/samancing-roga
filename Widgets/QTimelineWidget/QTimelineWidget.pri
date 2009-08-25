@@ -6,3 +6,4 @@ SOURCES += QTimelineWidget.cpp \
 HEADERS += QTimelineWidget.h \
     QTimelinePanel.h
 RESOURCES += icons.qrc
+FORMS += QTimelinePanel.ui

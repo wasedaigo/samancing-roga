@@ -53,10 +53,10 @@ public:
 
     struct Rect
     {
-        float mX;
-        float mY;
-        float mWidth;
-        float mHeight;
+        int mX;
+        int mY;
+        int mWidth;
+        int mHeight;
 
         bool operator!=(Rect& rect)
         {
@@ -74,6 +74,10 @@ public:
 
     struct SpriteDescriptor
     {
+        bool mRelativeToTarget;
+        bool mLookAtTarget;
+        int mBlur;
+
         Rect mTextureSrcRect;
         BlendType mBlendType;
 
@@ -86,6 +90,9 @@ public:
 
         void operator=(SpriteDescriptor spriteDescriptor)
         {
+            mRelativeToTarget = spriteDescriptor.mRelativeToTarget;
+            mLookAtTarget = spriteDescriptor.mLookAtTarget;
+            mBlur = spriteDescriptor.mBlur;
             mAlpha = spriteDescriptor.mAlpha;
             mTextureSrcRect = spriteDescriptor.mTextureSrcRect;
             mBlendType = spriteDescriptor.mBlendType;
@@ -100,9 +107,9 @@ public:
     GLSprite(const int& id,  QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor, bool selectable);
 
     bool isSelectable() const;
-    void render(QPoint renderCenterPoint, QPainter& painter);
+    void render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite);
     QRect getRect() const;
-    bool contains(QPoint point) const;
+    bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
 
     int mID;
     SpriteDescriptor mSpriteDescriptor;
