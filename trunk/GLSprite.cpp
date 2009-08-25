@@ -1,5 +1,7 @@
 #include "GLSprite.h"
 
+#include "Common.h"
+#include <math.h>
 #include <QPixmap>
 #include <QPainter>
 
@@ -7,7 +9,9 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
 {
     GLSprite::SpriteDescriptor spriteDescriptor;
     spriteDescriptor.mBlendType = GLSprite::eBT_Alpha;
-
+    spriteDescriptor.mLookAtTarget = false;
+    spriteDescriptor.mRelativeToTarget = false;
+    spriteDescriptor.mBlur = 0;
     spriteDescriptor.mCenter.mX = 0;
     spriteDescriptor.mCenter.mY = 0;
     spriteDescriptor.mCenter.mZ = 0;
@@ -24,6 +28,12 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
 
     spriteDescriptor.mScale.mX = 1.0f;
     spriteDescriptor.mScale.mY = 1.0f;
+
+    spriteDescriptor.mTextureSrcRect.mX = 0;
+    spriteDescriptor.mTextureSrcRect.mY = 0;
+    spriteDescriptor.mTextureSrcRect.mWidth = 0;
+    spriteDescriptor.mTextureSrcRect.mHeight = 0;
+
     return spriteDescriptor;
 }
 
@@ -41,8 +51,28 @@ bool GLSprite::isSelectable() const
     return mIsSelectable;
 }
 
-void GLSprite::render(QPoint renderCenterPoint, QPainter& painter)
+void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite)
 {
+    // Relative to target option
+    QPoint positionOffset = QPoint(0, 0);
+    if (mSpriteDescriptor.mRelativeToTarget)
+    {
+        positionOffset.setX((int)pTargetSprite->mSpriteDescriptor.mPosition.mX);
+        positionOffset.setY((int)pTargetSprite->mSpriteDescriptor.mPosition.mY);
+    }
+    renderCenterPoint += positionOffset;
+
+    // Look at target option
+    float angleOffset = 0;
+    if (mSpriteDescriptor.mLookAtTarget)
+    {
+        float dx = pTargetSprite->mSpriteDescriptor.mPosition.mX - mSpriteDescriptor.mPosition.mX - positionOffset.x();
+        float dy = pTargetSprite->mSpriteDescriptor.mPosition.mY - mSpriteDescriptor.mPosition.mY - positionOffset.y();
+
+        angleOffset = floor((180 * atan2(dy, dx)) / PI);
+    }
+
+    // Choose Blend Type
     switch (mSpriteDescriptor.mBlendType)
     {
         default:
@@ -54,13 +84,16 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter)
             painter.setCompositionMode(QPainter::CompositionMode_Plus);
             break;
     }
+
+    // Rotation & Scale
     int dx = (int)mSpriteDescriptor.mPosition.mX + renderCenterPoint.x() + (int)mSpriteDescriptor.mTextureSrcRect.mWidth / 2;
     int dy = (int)mSpriteDescriptor.mPosition.mY + renderCenterPoint.y() + (int)mSpriteDescriptor.mTextureSrcRect.mHeight / 2;
     painter.translate(dx, dy);
-    painter.rotate(mSpriteDescriptor.mRotation.mX);
+    painter.rotate(mSpriteDescriptor.mRotation.mX + angleOffset);
     painter.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
     painter.translate(-dx, -dy);
 
+    // Render
     QPoint dstPoint(
                     (int)mSpriteDescriptor.mPosition.mX,
                     (int)mSpriteDescriptor.mPosition.mY
@@ -86,7 +119,11 @@ QRect GLSprite::getRect() const
         (int)mSpriteDescriptor.mTextureSrcRect.mHeight
     );
 }
-bool GLSprite::contains(QPoint point) const
+bool GLSprite::contains(QPoint point, const GLSprite::Point3& targetPosition) const
 {
+    if (mSpriteDescriptor.mRelativeToTarget)
+    {
+        point -= QPoint((int)targetPosition.mX, (int)targetPosition.mY);
+    }
     return getRect().contains(point, true);
 }

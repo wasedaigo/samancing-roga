@@ -42,14 +42,14 @@ void CelModel::set##name1(type1 value)\
 // Define all slots
 SETSLOT(TextureID, textureID, int, int);
 
-SETSLOT(RelativeToTarget, relativeToTarget, bool, bool);
-SETSLOT(LookAtTarget, lookAtTarget, bool, bool);
-SETSLOT(Blur, blur, int, int);
-
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_position], PositionTweenType, positionTweenType, int, KeyFrameData::TweenType);
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_rotation], RotationTweenType, rotationTweenType, int, KeyFrameData::TweenType);
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_scale], ScaleTweenType, scaleTweenType, int, KeyFrameData::TweenType);
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, KeyFrameData::TweenType);
+
+SETSLOT_STRUCT(SpriteDescriptor.mRelativeToTarget, RelativeToTarget, relativeToTarget, bool, bool);
+SETSLOT_STRUCT(SpriteDescriptor.mLookAtTarget, LookAtTarget, lookAtTarget, bool, bool);
+SETSLOT_STRUCT(SpriteDescriptor.mBlur, Blur, blur, int, int);
 
 SETSLOT_STRUCT(SpriteDescriptor.mTextureSrcRect, TextureSrcRect, textureSrcRect, GLSprite::Rect, GLSprite::Rect);
 SETSLOT_STRUCT(SpriteDescriptor.mBlendType, BlendType, blendType, int, GLSprite::BlendType);

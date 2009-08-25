@@ -63,6 +63,9 @@ public:
     void setSelectedPaletNo(int paletNo);
     int getSelectedPaletNo() const;
 
+    void setTargetSpritePosition(int x, int y);
+    GLSprite* getTargetSprite() const;
+
     KeyFrame::KeyFramePosition getCurrentKeyFramePosition();
     void selectCurrentKeyFramePosition(int lineNo, int frameNo);
 
@@ -91,9 +94,15 @@ private:
     int mSelectedPaletNo;
     KeyFrame::KeyFramePosition mSelectedKeyFramePosition;
 
+    KeyFrameData* mpTargetCel;
+
+    QPixmap* mpTargetPixmap;
+    GLSprite* mpTargetSprite;
+
 signals:
     void animationImagePaletChanged(int paletNo, QString id);
     void animationDurationChanged(int length);
+    void targetPositionMoved(int x, int y);
 
     void refreshTimeLine();
     void refreshTimeLine(int lineNo);

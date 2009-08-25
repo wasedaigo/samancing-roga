@@ -520,25 +520,17 @@
       <string>Animation Canvas</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QVBoxLayout" name="cellDataBox">
-        <item>
-         <layout class="QHBoxLayout" name="celFrameDataBox">
-          <item>
-           <spacer name="horizontalSpacer_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
         <item>
          <layout class="QVBoxLayout" name="animationViewerContainer"/>
         </item>

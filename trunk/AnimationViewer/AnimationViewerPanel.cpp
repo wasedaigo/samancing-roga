@@ -21,13 +21,20 @@ AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAni
           mSelectedOffset(QPoint(0, 0)),
           mpSelectedCelModel(pSelectedCelModel),
           mIsAnimationPlaying(false),
-          mCelGrabbed(false)
+          mCelGrabbed(false),
+          mTargetGrabbed(false)
 {
     setAutoFillBackground(false);
 
     connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refresh()));
     connect(mpAnimationModel, SIGNAL(refreshTimeLine(int)), this, SLOT(refresh()));
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refresh()));
+    connect(mpAnimationModel, SIGNAL(targetPositionMoved(int, int)), this, SLOT(refresh()));
+}
+
+AnimationViewerPanel::~AnimationViewerPanel()
+{
+
 }
 
 void AnimationViewerPanel::playAnimation()
@@ -87,7 +94,6 @@ void AnimationViewerPanel::keyPressEvent (QKeyEvent* e)
 
 void AnimationViewerPanel::paintEvent(QPaintEvent *event)
 {
-    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
     //KeyFrame& keyframe = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
 
     // Get center point, all cel position should be relative to this
@@ -116,11 +122,23 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
                     )
     );
 
-    // Draw cross
+
+    renderCross(painter);
+    renderCelSprites(centerPoint, painter);
+    renderTargetSprite(centerPoint, painter);
+
+    painter.end();
+}
+
+void AnimationViewerPanel::renderCross(QPainter& painter)
+{
     painter.drawLine(QPoint(0, height() / 2), QPoint(width(), height() / 2));
     painter.drawLine(QPoint(width() / 2, 0), QPoint(width() / 2, height()));
+}
 
-    // Render all sprites
+void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter& painter)
+{
+    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
 
     QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
     while (iter != mGlSpriteList.end())
@@ -144,11 +162,19 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
         spriteRenderPoint.setY((int)(centerPoint.y() - glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2));
 
         // render sprite
-        glSprite->render(spriteRenderPoint, painter);
+        glSprite->render(spriteRenderPoint, painter, mpAnimationModel->getTargetSprite());
 
         // Don't render when playing the animation
         if (!mIsAnimationPlaying)
         {
+
+            // This code is redundunt of the code in GLSprite, however I want to do the same calcuration again for cel drawing sake
+            if (glSprite->mSpriteDescriptor.mRelativeToTarget)
+            {
+                spriteRenderPoint.setX(spriteRenderPoint.x() + (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX);
+                spriteRenderPoint.setY(spriteRenderPoint.y() + (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY);
+            }
+
             if (!glSprite->isSelectable())
             {
                 // unselectable cel
@@ -186,7 +212,16 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
 
         iter++;
     }
-    painter.end();
+}
+
+void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainter& painter)
+{
+    painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
+    QPoint spriteRenderPoint;
+
+    spriteRenderPoint.setX((int)(centerPoint.x() - mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mWidth / 2));
+    spriteRenderPoint.setY((int)(centerPoint.y() - mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mHeight / 2));
+    mpAnimationModel->getTargetSprite()->render(spriteRenderPoint, painter, NULL);
 }
 
 void AnimationViewerPanel::clearSprites()
@@ -279,28 +314,44 @@ void AnimationViewerPanel::selectCel(int lineNo)
 
 void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
 {
-    // Select a cel, if mouse has clicked on it
-    QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
-    while (iter != mGlSpriteList.end())
+    GLSprite::Point3 pt3 = {0, 0, 0};
+    if(mpAnimationModel->getTargetSprite()->contains(
+            relativePressedPosition + QPoint((int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mWidth / 2), (int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mHeight / 2)),
+            pt3
+       )
+    )
     {
-        GLSprite* glSprite = (GLSprite*)*iter;
-        if (glSprite->isSelectable() &&
-            glSprite->contains(
-                    relativePressedPosition + QPoint((int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2), (int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2))
-                )
-            )
+        mSelectedOffset = mpAnimationModel->getTargetSprite()->getRect().topLeft() - relativePressedPosition;
+        mTargetGrabbed = true;
+    }
+    else
+    {
+        // Select a cel, if mouse has clicked on it
+        QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
+        while (iter != mGlSpriteList.end())
         {
-            mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
-            selectCel(glSprite->mID);
-            mCelGrabbed = true;
-            break;
+            GLSprite* glSprite = (GLSprite*)*iter;
+            if (glSprite->isSelectable() &&
+                glSprite->contains(
+                        relativePressedPosition + QPoint((int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2), (int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2)),
+                        mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition
+                   )
+                )
+            {
+                mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
+                selectCel(glSprite->mID);
+                mCelGrabbed = true;
+                break;
+            }
+            iter++;
         }
-        iter++;
     }
 }
 
 void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 {
+    mCelGrabbed = false;
+    mTargetGrabbed = false;
     KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
 
     this->setFocus();
@@ -311,7 +362,7 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 
     pickCel(relativePressedPosition);
 
-    if(!mCelGrabbed)
+    if(!mCelGrabbed && !mTargetGrabbed)
     {
         if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
         {
@@ -326,23 +377,39 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 
 void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!mCelGrabbed && !mTargetGrabbed){return;}
+
     if (mCelGrabbed)
     {
+        QPoint centerPoint = getCenterPoint();
+        int newPosX = event->x() - centerPoint.x() + mSelectedOffset.x();
+        int newPosY = event->y() - centerPoint.y() + mSelectedOffset.y();
+
         // Move cel if it is selected
-        if (mpSelectedCelModel->getKeyFrameDataReference())
+        KeyFrameData* pKeyFrameData = mpSelectedCelModel->getKeyFrameDataReference();
+        if (pKeyFrameData)
         {
-            QPoint centerPoint = getCenterPoint();
-            mpSelectedCelModel->setPositionX(event->x() - centerPoint.x() + mSelectedOffset.x());
-            mpSelectedCelModel->setPositionY(event->y() - centerPoint.y() + mSelectedOffset.y());
+            mpSelectedCelModel->setPositionX(newPosX);
+            mpSelectedCelModel->setPositionY(newPosY);
             refresh();
         }
+    }
+
+    if (mTargetGrabbed)
+    {
+        QPoint centerPoint = getCenterPoint();
+        int newPosX = event->x() - centerPoint.x() + mSelectedOffset.x();
+        int newPosY = event->y() - centerPoint.y() + mSelectedOffset.y();
+
+        mpAnimationModel->setTargetSpritePosition(newPosX, newPosY);
+        refresh();
     }
 }
 
 void AnimationViewerPanel::mouseReleaseEvent(QMouseEvent *event)
 {
     mCelGrabbed = false;
-    repaint();
+    mTargetGrabbed = false;
 }
 
 void AnimationViewerPanel::timerEvent()

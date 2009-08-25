@@ -31,13 +31,9 @@ public:
     KeyFrameData();
 
     int mTextureID;
-    bool mRelativeToTarget;
-    bool mLookAtTarget;
-    int mBlur;
+    
     bool mIsTweenCel;
-
     GLSprite::SpriteDescriptor mSpriteDescriptor;
-
     TweenType mTweenTypes[TweenAttribute_COUNT];
     void copyAttribute(TweenAttribute tweenAttribute, KeyFrameData* item);
     bool hasTween() const;

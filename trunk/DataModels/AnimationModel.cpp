@@ -6,19 +6,18 @@
 #include "json/reader.h"
 #include <fstream>
 #include <sstream>
-#include <QPixmap>
 #include "KeyFrameData.h"
 
 // Macros
 // Tween fields
-#define TweenValue(keyframeData, startKeyFrameData, endKeyFrameData, field, frameNo, startFrameNo, endFrameNo)\
-keyframeData->m##field = LERP(startKeyFrameData->m##field, endKeyFrameData->m##field, frameNo, startFrameNo, endFrameNo)
+#define TweenValue(field, startValue, endValue, frameNo, startFrameNo, endFrameNo)\
+field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
 
-#define Tween(keyframeData, tweenType, startKeyFrameData, endKeyFrameData, field, frameNo, startFrameNo, endFrameNo)\
+#define Tween(keyframeData, tweenType, startValue, endValue, field, frameNo, startFrameNo, endFrameNo)\
 {\
  switch (startKeyFrameData->m##tweenType){\
     case KeyFrameData::eTT_Linear:\
-        TweenValue(keyframeData, startKeyFrameData, endKeyFrameData, field, frameNo, startFrameNo, endFrameNo);\
+        TweenValue(keyframeData->m##field, startValue, endValue, frameNo, startFrameNo, endFrameNo);\
     break;\
     case KeyFrameData::eTT_Fix:\
         keyframeData->m##field = startKeyFrameData->m##field;\
@@ -41,10 +40,22 @@ AnimationModel::AnimationModel()
         mImagePalets[i] = QString("");
         mpPixmaps[i] = NULL;
     }
+
+    QString filename = "GameResource/target.png";//:/ui/target.png";
+    mpTargetPixmap = new QPixmap(filename);
+    GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
+    spriteDescriptor.mPosition.mX = -100;
+    spriteDescriptor.mTextureSrcRect.mWidth = 32;
+    spriteDescriptor.mTextureSrcRect.mHeight = 32;
+
+    mpTargetSprite = new GLSprite(-1, mpTargetPixmap, spriteDescriptor,false);
 }
 
 AnimationModel::~AnimationModel()
 {
+    delete mpTargetSprite;
+    delete mpTargetPixmap;
+
     for (int i = 0; i < ImagePaletCount; i++)
     {
         delete mpPixmaps[i];
@@ -308,7 +319,7 @@ void AnimationModel::setAnimationImagePalet(int paletNo, QString id)
         mImagePalets[paletNo] = id;
         QString filename = ANIMATION_IMAGE_DIR.filePath(QString("%0.%1").arg(id, IMAGE_FORMAT));
         mpPixmaps[paletNo] = new QPixmap(filename);
-
+        printf("test %s", filename.toStdString().c_str());
         emit animationImagePaletChanged(paletNo, id);
     }
 }
@@ -324,23 +335,64 @@ int AnimationModel::getSelectedPaletNo() const
     return mSelectedPaletNo;
 }
 
+void AnimationModel::setTargetSpritePosition(int x, int y)
+{
+    if (mpTargetSprite->mSpriteDescriptor.mPosition.mX != x || mpTargetSprite->mSpriteDescriptor.mPosition.mY != y)
+    {
+        mpTargetSprite->mSpriteDescriptor.mPosition.mX = x;
+        mpTargetSprite->mSpriteDescriptor.mPosition.mY = y;
+
+        emit targetPositionMoved(x, y);
+    }
+}
+
+GLSprite* AnimationModel::getTargetSprite() const
+{
+    return mpTargetSprite;
+}
+
 void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const
 {
+    GLSprite::SpriteDescriptor& startDescriptor = startKeyFrameData->mSpriteDescriptor;
+    GLSprite::SpriteDescriptor& endDescriptor = endKeyFrameData->mSpriteDescriptor;
+
     switch(tweenAttribute)
     {
         case KeyFrameData::TweenAttribute_alpha:
-            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_alpha], startKeyFrameData, endKeyFrameData, SpriteDescriptor.mAlpha, frameNo, startFrameNo, endFrameNo);
+            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_alpha], startDescriptor.mAlpha, endDescriptor.mAlpha, SpriteDescriptor.mAlpha, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_position:
-            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_position], startKeyFrameData, endKeyFrameData, SpriteDescriptor.mPosition.mX, frameNo, startFrameNo, endFrameNo);
-            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_position], startKeyFrameData, endKeyFrameData, SpriteDescriptor.mPosition.mY, frameNo, startFrameNo, endFrameNo);
+            float startX = startDescriptor.mPosition.mX;
+            float startY = startDescriptor.mPosition.mY;
+            float endX = endDescriptor.mPosition.mX;
+            float endY = endDescriptor.mPosition.mY;
+            if (!startDescriptor.mRelativeToTarget && endDescriptor.mRelativeToTarget)
+            {
+                endX += mpTargetSprite->mSpriteDescriptor.mPosition.mX;
+                endY += mpTargetSprite->mSpriteDescriptor.mPosition.mY;
+            }
+            else if (startDescriptor.mRelativeToTarget && !endDescriptor.mRelativeToTarget)
+            {
+                endX -= mpTargetSprite->mSpriteDescriptor.mPosition.mX;
+                endY -= mpTargetSprite->mSpriteDescriptor.mPosition.mY;
+            }
+
+            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_position], startX, endX, SpriteDescriptor.mPosition.mX, frameNo, startFrameNo, endFrameNo);
+            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_position], startY, endY, SpriteDescriptor.mPosition.mY, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_rotation:
-            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_rotation], startKeyFrameData, endKeyFrameData, SpriteDescriptor.mRotation.mX, frameNo, startFrameNo, endFrameNo);
+            float startRotationX = startDescriptor.mRotation.mX;
+            float endRotationX = endDescriptor.mRotation.mX;
+            if (endDescriptor.mLookAtTarget)
+            {
+                endRotationX += mpTargetSprite->mSpriteDescriptor.mRotation.mX;
+            }
+
+            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_rotation], startRotationX, endRotationX, SpriteDescriptor.mRotation.mX, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_scale:
-            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_scale], startKeyFrameData, endKeyFrameData, SpriteDescriptor.mScale.mX, frameNo, startFrameNo, endFrameNo);
-            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_scale], startKeyFrameData, endKeyFrameData, SpriteDescriptor.mScale.mY, frameNo, startFrameNo, endFrameNo);
+            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_scale], startDescriptor.mScale.mX, endDescriptor.mScale.mX, SpriteDescriptor.mScale.mX, frameNo, startFrameNo, endFrameNo);
+            Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_scale], startDescriptor.mScale.mY, endDescriptor.mScale.mY, SpriteDescriptor.mScale.mY, frameNo, startFrameNo, endFrameNo);
             break;
         default:
             break;
@@ -365,14 +417,10 @@ KeyFrame* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     // If the keyframe is empty, don't generate any temporaly keyframe
     if (!pBaseKeyFrameData) {return NULL;}
 
+    pKeyFrameData->mTextureID = pBaseKeyFrameData->mTextureID;
     pKeyFrameData->mIsTweenCel = (pBaseKeyFrame->mFrameNo != frameNo);
     pKeyFrameData->mSpriteDescriptor = pBaseKeyFrameData->mSpriteDescriptor;
 
-    pKeyFrameData->mTextureID = pBaseKeyFrameData->mTextureID;
-    pKeyFrameData->mLookAtTarget = pBaseKeyFrameData->mLookAtTarget;
-    pKeyFrameData->mRelativeToTarget = pBaseKeyFrameData->mRelativeToTarget;
-    pKeyFrameData->mBlur = pBaseKeyFrameData->mBlur;
-    
     // Tween for each attribute
     bool noTweenFound = true;
     for (int i = 0; i < KeyFrameData::TweenAttribute_COUNT; i++)

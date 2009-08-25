@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>690</width>
-    <height>809</height>
+    <width>694</width>
+    <height>374</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -86,7 +86,7 @@
         <item>
          <layout class="QHBoxLayout" name="header">
           <property name="sizeConstraint">
-           <enum>QLayout::SetFixedSize</enum>
+           <enum>QLayout::SetDefaultConstraint</enum>
           </property>
           <item>
            <widget class="QGroupBox" name="paletBox">
@@ -307,7 +307,7 @@
              <item>
               <widget class="QTableWidget" name="tableWidget">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -326,7 +326,11 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="animationViewer"/>
+         <layout class="QHBoxLayout" name="animationViewer">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMaximumSize</enum>
+          </property>
+         </layout>
         </item>
        </layout>
       </item>

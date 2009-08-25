@@ -63,7 +63,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->lookAtTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setLookAtTarget(bool)));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
-    connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(valueChanged(int)));
+    connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setBlur(int)));
 
     connect(mpSelectedCelModel, SIGNAL(alphaChanged(double)), m_ui->alphaSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(positionXChanged(int)), m_ui->positionXSpinBox, SLOT(setValue(int)));
@@ -79,6 +79,11 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->scaleXSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->scaleYSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->rotationXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->lookAtTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+
 
     // Cel selection
     connect(mpAnimationViewerPanel, SIGNAL(celSelected(KeyFrameData*)), this, SLOT(onCelSelected(KeyFrameData*)));
@@ -151,10 +156,22 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
 
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
 
-        m_ui->blurSpinBox->setValue(pKeyFrameData->mBlur);
-        m_ui->relativeToTargetCheckBox->setChecked(pKeyFrameData->mRelativeToTarget);
-        m_ui->lookAtTargetCheckBox->setChecked(pKeyFrameData->mLookAtTarget);
+        m_ui->blurSpinBox->blockSignals(true);
+        m_ui->blurSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mBlur);
+        m_ui->blurSpinBox->blockSignals(false);
+
+        m_ui->relativeToTargetCheckBox->blockSignals(true);
+        m_ui->relativeToTargetCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mRelativeToTarget);
+        m_ui->relativeToTargetCheckBox->blockSignals(false);
+
+        m_ui->lookAtTargetCheckBox->blockSignals(true);
+        m_ui->lookAtTargetCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mLookAtTarget);
+        m_ui->lookAtTargetCheckBox->blockSignals(false);
+
+        m_ui->blendTypeComboBox->blockSignals(true);
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
+        m_ui->blendTypeComboBox->blockSignals(false);
+
     }
     else
     {

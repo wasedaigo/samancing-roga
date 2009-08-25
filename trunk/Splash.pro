@@ -6,7 +6,6 @@ include(DataModels/DataModels.pri)
 include(AnimationViewer/AnimationViewer.pri)
 include(Lib/jsoncpp/jsoncpp.pri)
 include(Widgets/QTimelineWidget/QTimelineWidget.pri)
-
 INCLUDEPATH += Widgets
 QT += opengl
 TARGET = Splash
@@ -19,3 +18,4 @@ HEADERS += mainwindow.h \
     Common.h \
     Macros.h
 FORMS += mainwindow.ui
+RESOURCES += ui.qrc

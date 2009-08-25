@@ -4,9 +4,7 @@
 KeyFrameData::KeyFrameData()
 {
     mTextureID = 0;
-    mBlur = false;
-    mLookAtTarget = false;
-    mRelativeToTarget = false;
+
     mIsTweenCel = false;
 
     mSpriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();

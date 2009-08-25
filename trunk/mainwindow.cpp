@@ -56,6 +56,7 @@ void MainWindow::setupUI()
     ui->animationViewer->addWidget(mpAnimationViewer);
 
     QTimelinePanel* pQTimelinePanel = new QTimelinePanel(mpAnimationModel, this);
+    pQTimelinePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     ui->timelineContainer->addWidget(pQTimelinePanel);
 }
 
