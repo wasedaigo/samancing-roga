@@ -28,38 +28,41 @@ field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
 }
 ////
 AnimationModel::AnimationModel()
-    : mAnimationName(QString("")),
-      mSelectedPaletNo(-1)
+    : mAnimationName(QString(""))
 
 {
+    mSelectedSourcePath = "";
+
     mSelectedKeyFramePosition.mFrameNo = -1;
     mSelectedKeyFramePosition.mLineNo = -1;
 
-    for (int i = 0; i < ImagePaletCount; i++)
-    {
-        mImagePalets[i] = QString("");
-        mpPixmaps[i] = NULL;
-    }
-
-    QString filename = "GameResource/target.png";//:/ui/target.png";
+    QString filename = ":/resource/target.png";
     mpTargetPixmap = new QPixmap(filename);
     GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
     spriteDescriptor.mPosition.mX = -100;
     spriteDescriptor.mTextureSrcRect.mWidth = 32;
     spriteDescriptor.mTextureSrcRect.mHeight = 32;
 
-    mpTargetSprite = new GLSprite(-1, mpTargetPixmap, spriteDescriptor,false);
+    mpTargetSprite = new GLSprite(-1, spriteDescriptor, false, 0, mpTargetPixmap);
 }
 
 AnimationModel::~AnimationModel()
 {
+    clearPixmapHash();
+
     delete mpTargetSprite;
     delete mpTargetPixmap;
+}
 
-    for (int i = 0; i < ImagePaletCount; i++)
+void AnimationModel::clearPixmapHash()
+{
+    QHash<QString, QPixmap*>::Iterator iter = mSourceImageHash.begin();
+    while(iter != mSourceImageHash.end())
     {
-        delete mpPixmaps[i];
+        delete iter.value();
+        iter++;
     }
+    mSourceImageHash.clear();
 }
 
 int AnimationModel::getMaxFrameCount()
@@ -167,7 +170,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2
         KeyFrameData* pKeyframeData = new KeyFrameData();
         pKeyframeData->mSpriteDescriptor.mPosition = position;
         pKeyframeData->mSpriteDescriptor.mTextureSrcRect = mSelectedPaletTextureSrcRect;
-        pKeyframeData->mTextureID = mSelectedPaletNo;
+        pKeyframeData->mSpriteDescriptor.mSourcePath = mSelectedSourcePath;
 
         KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyframeData);
         mKeyFrames[lineNo].insert(index + 1, pKeyFrame);
@@ -295,44 +298,40 @@ const QList<KeyFrame*> AnimationModel::createKeyFrameListAt(int frameNo) const
 }
 
 // Palets
-QPixmap* AnimationModel::getPixmap(int paletNo) const
+QPixmap* AnimationModel::getPixmap(QString path)
 {
-    if (paletNo < 0 || paletNo >= ImagePaletCount)
+    if (!mSourceImageHash.contains(path))
     {
-        return NULL;
-    }
-    else
-    {
-        return mpPixmaps[paletNo];
-    }
-}
+        QString rootPath = QDir::currentPath();
+        QString fullPath = rootPath.append("/").append(ROOT_RESOURCE_DIR.path()).append(path);
+        try
+        {
+            mSourceImageHash.insert(path, new QPixmap(fullPath));
+        }
+        catch(long)
+        {
+            printf("File:%s couldn't be loaded.", path.toStdString().c_str());
+            return NULL;
+        }
+    };
 
-QString AnimationModel::getAnimationPaletID(int paletNo) const
-{
-    return mImagePalets[paletNo];
-}
-
-void AnimationModel::setAnimationImagePalet(int paletNo, QString id)
-{
-    if (id != "")
-    {
-        mImagePalets[paletNo] = id;
-        QString filename = ANIMATION_IMAGE_DIR.filePath(QString("%0.%1").arg(id, IMAGE_FORMAT));
-        mpPixmaps[paletNo] = new QPixmap(filename);
-        printf("test %s", filename.toStdString().c_str());
-        emit animationImagePaletChanged(paletNo, id);
-    }
+    return mSourceImageHash[path];
 }
 
 // Palet No (set / get)
-void AnimationModel::setSelectedPaletNo(int paletNo)
+void AnimationModel::setSelectedSourcePath(QString path)
 {
-    mSelectedPaletNo = paletNo;
+    if (mSelectedSourcePath != path)
+    {
+        mSelectedSourcePath = path;
+        emit selectedPaletChanged(path);
+    }
+
 }
 
-int AnimationModel::getSelectedPaletNo() const
+QString AnimationModel::getSelectedSourcePath() const
 {
-    return mSelectedPaletNo;
+    return mSelectedSourcePath;
 }
 
 void AnimationModel::setTargetSpritePosition(int x, int y)
@@ -417,7 +416,6 @@ KeyFrame* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     // If the keyframe is empty, don't generate any temporaly keyframe
     if (!pBaseKeyFrameData) {return NULL;}
 
-    pKeyFrameData->mTextureID = pBaseKeyFrameData->mTextureID;
     pKeyFrameData->mIsTweenCel = (pBaseKeyFrame->mFrameNo != frameNo);
     pKeyFrameData->mSpriteDescriptor = pBaseKeyFrameData->mSpriteDescriptor;
 

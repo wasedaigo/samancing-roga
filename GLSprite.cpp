@@ -4,10 +4,12 @@
 #include <math.h>
 #include <QPixmap>
 #include <QPainter>
+#include "DataModels/AnimationModel.h"
 
 GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
 {
     GLSprite::SpriteDescriptor spriteDescriptor;
+    spriteDescriptor.mSourcePath = "";
     spriteDescriptor.mBlendType = GLSprite::eBT_Alpha;
     spriteDescriptor.mLookAtTarget = false;
     spriteDescriptor.mRelativeToTarget = false;
@@ -37,11 +39,25 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     return spriteDescriptor;
 }
 
-GLSprite::GLSprite(const int& id, QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor, bool selectable)
+GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, AnimationModel* pAnimationModel)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
-          mpPixmap(pixmap),
-          mIsSelectable(selectable)
+          mIsSelectable(selectable),
+          mAnimationDepth(animationDepth),
+          mpAnimationModel(pAnimationModel),
+          mpPixmap(NULL)
+
+{
+}
+
+//
+GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, QPixmap* pPixmap)
+        : mID(id),
+          mSpriteDescriptor(spriteDescriptor),
+          mIsSelectable(selectable),
+          mAnimationDepth(animationDepth),
+          mpAnimationModel(NULL),
+          mpPixmap(pPixmap)
 
 {
 }
@@ -49,6 +65,11 @@ GLSprite::GLSprite(const int& id, QPixmap* pixmap, const SpriteDescriptor& sprit
 bool GLSprite::isSelectable() const
 {
     return mIsSelectable;
+}
+
+int GLSprite::getAnimationDepth() const
+{
+    return mAnimationDepth;
 }
 
 void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite)
@@ -105,7 +126,21 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
             (int)mSpriteDescriptor.mTextureSrcRect.mWidth,
             (int)mSpriteDescriptor.mTextureSrcRect.mHeight
     );
-    painter.drawPixmap(dstPoint, *mpPixmap, srcRect);
+
+    QPixmap* pQPixmap;
+    if (mpPixmap)
+    {
+        pQPixmap = mpPixmap;
+    }
+    else
+    {
+         pQPixmap = mpAnimationModel->getPixmap(mSpriteDescriptor.mSourcePath);
+    }
+
+    if (pQPixmap)
+    {
+        painter.drawPixmap(dstPoint, *pQPixmap, srcRect);
+    }
 
     painter.resetTransform();
 }

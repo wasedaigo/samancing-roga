@@ -39,9 +39,6 @@ void CelModel::set##name1(type1 value)\
     }\
 }
 
-// Define all slots
-SETSLOT(TextureID, textureID, int, int);
-
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_position], PositionTweenType, positionTweenType, int, KeyFrameData::TweenType);
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_rotation], RotationTweenType, rotationTweenType, int, KeyFrameData::TweenType);
 SETSLOT_STRUCT(TweenTypes[KeyFrameData::TweenAttribute_scale], ScaleTweenType, scaleTweenType, int, KeyFrameData::TweenType);

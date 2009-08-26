@@ -3,10 +3,6 @@
 
 KeyFrameData::KeyFrameData()
 {
-    mTextureID = 0;
-
-    mIsTweenCel = false;
-
     mSpriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
 
     for (int i = 0; i < TweenAttribute_COUNT; i++)

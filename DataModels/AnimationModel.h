@@ -18,7 +18,6 @@ Q_OBJECT
 public:
     enum
     {
-        ImagePaletCount = 4,
         MaxLineNo = 8
     };
 
@@ -32,6 +31,7 @@ public:
     AnimationModel();
     ~AnimationModel();
 
+    void clearPixmapHash();
     int getMaxFrameCount();
 
     KeyFrame* getKeyFrame(int lineNo, int frameNo) const;
@@ -55,13 +55,10 @@ public:
     const QList<KeyFrame*>& getKeyFrameList(int lineNo) const;
     const QList<KeyFrame*> createKeyFrameListAt(int frameNo) const;
 
-    // Getter / Setter
-    QPixmap* getPixmap(int paletNo) const;
-    QString getAnimationPaletID(int paletNo) const;
-    void setAnimationImagePalet(int paletNo, QString id);
+    QPixmap* getPixmap(QString path);
 
-    void setSelectedPaletNo(int paletNo);
-    int getSelectedPaletNo() const;
+    void setSelectedSourcePath(QString sourcePath);
+    QString getSelectedSourcePath() const;
 
     void setTargetSpritePosition(int x, int y);
     GLSprite* getTargetSprite() const;
@@ -79,6 +76,8 @@ public:
     GLSprite::Rect mSelectedPaletTextureSrcRect;
 
 private:
+    QHash<QString, QPixmap*> mSourceImageHash;
+
     void tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const;
     KeyFrame* tweenFrame(int lineNo, int frameNo) const;
 
@@ -88,10 +87,8 @@ private:
     // Animation Events
     QList<Event> mAnimationEventList;
 
-    QString mImagePalets[ImagePaletCount];
-    QPixmap* mpPixmaps[ImagePaletCount];
+    QString mSelectedSourcePath;
 
-    int mSelectedPaletNo;
     KeyFrame::KeyFramePosition mSelectedKeyFramePosition;
 
     KeyFrameData* mpTargetCel;
@@ -100,7 +97,7 @@ private:
     GLSprite* mpTargetSprite;
 
 signals:
-    void animationImagePaletChanged(int paletNo, QString id);
+    void selectedPaletChanged(QString path);
     void animationDurationChanged(int length);
     void targetPositionMoved(int x, int y);
 

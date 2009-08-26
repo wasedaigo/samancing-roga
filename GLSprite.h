@@ -5,10 +5,12 @@
 
 class QPainter;
 class QPoint;
+class AnimationModel;
 class QPixmap;
 class GLSprite
 {
 public:
+
     enum BlendType
     {
         eBT_Alpha,
@@ -74,11 +76,12 @@ public:
 
     struct SpriteDescriptor
     {
+        QString mSourcePath;
+
         bool mRelativeToTarget;
         bool mLookAtTarget;
         int mBlur;
-
-        Rect mTextureSrcRect;
+        Rect mTextureSrcRect; // only valid when it is not a child animation
         BlendType mBlendType;
 
         Point3 mCenter;
@@ -90,6 +93,7 @@ public:
 
         void operator=(SpriteDescriptor spriteDescriptor)
         {
+            mSourcePath = spriteDescriptor.mSourcePath;
             mRelativeToTarget = spriteDescriptor.mRelativeToTarget;
             mLookAtTarget = spriteDescriptor.mLookAtTarget;
             mBlur = spriteDescriptor.mBlur;
@@ -103,20 +107,24 @@ public:
         }
     };
 
+
     static SpriteDescriptor makeDefaultSpriteDescriptor();
-    GLSprite(const int& id,  QPixmap* pixmap, const SpriteDescriptor& spriteDescriptor, bool selectable);
+    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, AnimationModel* pAnimationModel);
+    GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, QPixmap* pPixmap);
 
     bool isSelectable() const;
     void render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite);
     QRect getRect() const;
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
-
+    int getAnimationDepth() const;
     int mID;
     SpriteDescriptor mSpriteDescriptor;
 
 private:
-    QPixmap* mpPixmap;
     bool mIsSelectable;
+    int mAnimationDepth;
+    AnimationModel* mpAnimationModel;
+    QPixmap* mpPixmap;
 };
 
 #endif // GLSPRITE_H

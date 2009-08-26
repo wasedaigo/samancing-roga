@@ -5,21 +5,21 @@
 #include <QPaintEvent>
 #include <QPixmap>
 
-AnimationImagePaletPanel::AnimationImagePaletPanel(int paletNo, AnimationModel* pAnimationModel)
+AnimationImagePaletPanel::AnimationImagePaletPanel(AnimationModel* pAnimationModel)
         : mpAnimationModel(pAnimationModel),
           mClearColor(Qt::black),
           mPressed(false),
           mSnapGridX(0),
           mSnapGridY(0),
           mSnapGridCheck(false),
-          mPaletNo(paletNo)
+          mSourcePath("")
 {
     mSelectedRect = QRect(0, 0, 96, 96);
     this->setFixedSize(320, 240);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
 
-    connect(mpAnimationModel, SIGNAL(animationImagePaletChanged(int, QString)), this, SLOT(onAnimationImagePaletChanged(int, QString)));
+    connect(mpAnimationModel, SIGNAL(selectedPaletChanged(QString)), this, SLOT(onAnimationImagePaletChanged(QString)));
 }
 
 void AnimationImagePaletPanel::setSnapGrid(int gridX, int gridY, bool snapGridCheck)
@@ -36,7 +36,7 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::NoBrush);
     painter.fillRect(QRect(0, 0, width() - 1, height() - 1), Qt::SolidPattern);
 
-    const QPixmap* pPixmap = mpAnimationModel->getPixmap(mPaletNo);
+    const QPixmap* pPixmap = mpAnimationModel->getPixmap(mSourcePath);
     if (pPixmap)
     {
         painter.drawPixmap(0, 0, *pPixmap);
@@ -49,13 +49,18 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 }
 
-void AnimationImagePaletPanel::onAnimationImagePaletChanged(int paletNo, QString id)
+void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
 {
-    if (paletNo == mPaletNo)
+    const QPixmap* pPixmap = mpAnimationModel->getPixmap(path);
+    if (pPixmap)
     {
-        const QPixmap* pPixmap = mpAnimationModel->getPixmap(paletNo);
+        mSourcePath = path;
         setFixedSize(pPixmap->width(), pPixmap->height());
         this->repaint();
+    }
+    else
+    {
+        mSourcePath = "";
     }
 }
 
