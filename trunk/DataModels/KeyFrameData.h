@@ -30,8 +30,6 @@ public:
 
     KeyFrameData();
 
-    int mTextureID;
-    
     bool mIsTweenCel;
     GLSprite::SpriteDescriptor mSpriteDescriptor;
     TweenType mTweenTypes[TweenAttribute_COUNT];

@@ -238,9 +238,10 @@ void AnimationViewerPanel::addCelSprite(const KeyFrame* pKeyFrame)
     mGlSpriteList.push_front(
             new GLSprite(
                     pKeyFrame->mLineNo,
-                    mpAnimationModel->getPixmap(pKeyFrameData->mTextureID),
                     pKeyFrameData->mSpriteDescriptor,
-                    !pKeyFrameData->mIsTweenCel
+                    !pKeyFrameData->mIsTweenCel,
+                    0,
+                    mpAnimationModel
             )
     );
 }
@@ -289,10 +290,8 @@ void AnimationViewerPanel::refresh()
 ---------------------------------------------------------------------*/
 void AnimationViewerPanel::addNewCel(QPoint& relativePressedPosition)
 {
-    QPixmap* pixmap = mpAnimationModel->getPixmap(mpAnimationModel->getSelectedPaletNo());
-    if (pixmap != NULL)
+    if (mpAnimationModel->getSelectedSourcePath() != "")
     {
-
         GLSprite::Point2 position;
         position.mX = relativePressedPosition.x();
         position.mY = relativePressedPosition.y();

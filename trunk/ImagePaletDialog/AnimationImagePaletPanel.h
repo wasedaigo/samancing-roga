@@ -13,7 +13,7 @@ class AnimationImagePaletPanel : public QWidget
     Q_OBJECT
 
 public:
-    AnimationImagePaletPanel(int paletNo, AnimationModel* pAnimationModel);
+    AnimationImagePaletPanel(AnimationModel* pAnimationModel);
     
     void setSnapGrid(int gridX, int gridY, bool snapGridCheck);
     
@@ -24,7 +24,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private slots:
-    void onAnimationImagePaletChanged(int paletNo, QString id);
+    void onAnimationImagePaletChanged(QString id);
 
 private:
     QPoint getSnappedPosition(int x, int y);
@@ -36,7 +36,7 @@ private:
     int mSnapGridX;
     int mSnapGridY;
     bool mSnapGridCheck;
-    int mPaletNo;
+    QString mSourcePath;
 
 };
 

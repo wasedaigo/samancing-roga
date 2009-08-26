@@ -9,6 +9,7 @@ class AnimationViewer;
 class ImagePaletDialog;
 class QSignalMapper;
 class QStandardItemModel;
+
 namespace Ui
 {
     class MainWindow;
@@ -27,7 +28,7 @@ public slots:
     void onAddAnimationButtonClicked();
     void onRemoveAnimationButtonClicked();
 
-    void onPaletButtonClicked(int no);
+    void onPaletButtonClicked();
     
     void onAnimationSelected(int index);
 
@@ -43,14 +44,13 @@ private:
     void loadConfigFile();
 
     Ui::MainWindow *ui;
-    QSignalMapper *mpPaletButtonSignalMapper;
+
     QStandardItemModel *mpAnimationListModel;
 
     AnimationModel* mpAnimationModel;
     AnimationViewer* mpAnimationViewer;
-    QStandardItemModel *mpAnimationImageNameListModel;
 
-    ImagePaletDialog *mpDialogs[AnimationModel::ImagePaletCount];
+    ImagePaletDialog *mpDialog;
 };
 
 #endif // MAINWINDOW_H

@@ -7,32 +7,63 @@
 #include <QPixmap>
 #include <QString>
 
-ImagePaletDialog::ImagePaletDialog(int paletNo, QWidget *parent, AnimationModel* pAnimationModel, QStandardItemModel* pAnimationImageListModel)
+ImagePaletDialog::ImagePaletDialog(QWidget *parent, AnimationModel* pAnimationModel)
     : QDialog(parent),
     m_ui(new Ui::ImagePaletDialog),
-    mPaletNo(paletNo),
-    mpAnimationModel(pAnimationModel),
-    mpAnimationImageListModel(pAnimationImageListModel)
+    mpAnimationModel(pAnimationModel)
 {
     m_ui->setupUi(this);
-    mpAnimationImagePaletPanel = new AnimationImagePaletPanel(paletNo, pAnimationModel);
+    mpAnimationImagePaletPanel = new AnimationImagePaletPanel(pAnimationModel);
     mpAnimationImagePaletPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_ui->scrollArea->setWidget(mpAnimationImagePaletPanel);
-    m_ui->animationImageComboBox->setModel(mpAnimationImageListModel);
 
-    connect(m_ui->animationImageComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(onAnimationImageComboBoxChanged(QString)));
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ROOT_RESOURCE_DIR.path());
+    
+    QStringList stringList;
+//    stringList.append("Animations");
+//    stringList.append("Images");
+//    stringList.append("*.png");
 
+//    mSourceFileTreeViewModel.setNameFilters(stringList);
+    mSourceFileTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    mSourceFileTreeViewModel.setReadOnly(true);
+    mSourceFileTreeViewModel.removeColumns(1, 3, QModelIndex());
+    mSourceFileTreeViewModel.removeColumn(0, QModelIndex());
+    m_ui->fileSelectionTreeView->setModel(&mSourceFileTreeViewModel);
+    m_ui->fileSelectionTreeView->setRootIndex(mSourceFileTreeViewModel.index(rootPath) );
+    m_ui->fileSelectionTreeView->setAutoScroll(true);
+
+    connect(m_ui->fileSelectionTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+            this, SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
     connect(m_ui->spinBoxGridX, SIGNAL(valueChanged(int)), this, SLOT(snapGridChanged()));
     connect(m_ui->spinBoxGridY, SIGNAL(valueChanged(int)), this, SLOT(snapGridChanged()));
     connect(m_ui->snapGridCheckBox, SIGNAL(toggled(bool)), this, SLOT(snapGridChanged()));
     
-    connect(mpAnimationModel, SIGNAL(animationImagePaletChanged(int, QString)), this, SLOT(onAnimationImagePaletChanged(int, QString)));
+    connect(mpAnimationModel, SIGNAL(selectedPaletChanged(QString)), this, SLOT(onAnimationImagePaletChanged(QString)));
     snapGridChanged();
 }
 
 ImagePaletDialog::~ImagePaletDialog()
 {
     delete m_ui;
+}
+
+void ImagePaletDialog::onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2)
+{
+    QModelIndexList indexes = item1.indexes();
+    QModelIndex index = indexes.takeFirst();
+
+    QString path = mSourceFileTreeViewModel.filePath(index);
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ROOT_RESOURCE_DIR.path());
+
+    // we don't want to store absolute path
+    path.replace(rootPath, "", Qt::CaseInsensitive);
+
+    mpAnimationModel->setSelectedSourcePath(path);
 }
 
 void ImagePaletDialog::changeEvent(QEvent *e)
@@ -52,21 +83,7 @@ void ImagePaletDialog::snapGridChanged()
     mpAnimationImagePaletPanel->setSnapGrid(m_ui->spinBoxGridX->value(), m_ui->spinBoxGridY->value(), m_ui->snapGridCheckBox->isChecked());
 }
 
-void ImagePaletDialog::onAnimationImagePaletChanged(int paletNo, QString id)
+void ImagePaletDialog::onAnimationImagePaletChanged(QString path)
 {
-    if (mPaletNo == paletNo)
-    {
-        int index = m_ui->animationImageComboBox->findText(id, Qt::MatchCaseSensitive);
-        m_ui->animationImageComboBox->setCurrentIndex(index);
-    }
-}
 
-void ImagePaletDialog::setPaletImage(int paletNo, QString id)
-{
-    mpAnimationModel->setAnimationImagePalet(paletNo, id);
-}
-
-void ImagePaletDialog::onAnimationImageComboBoxChanged(QString id)
-{
-    setPaletImage(mPaletNo, id);
 }

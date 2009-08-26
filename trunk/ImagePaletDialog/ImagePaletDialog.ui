@@ -27,6 +27,16 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_5">
    <item>
+    <widget class="QTreeView" name="fileSelectionTreeView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
@@ -41,9 +51,6 @@
          <property name="sizeConstraint">
           <enum>QLayout::SetMinimumSize</enum>
          </property>
-         <item>
-          <widget class="QComboBox" name="animationImageComboBox"/>
-         </item>
          <item>
           <widget class="QCheckBox" name="snapGridCheckBox">
            <property name="sizePolicy">
@@ -151,36 +158,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="PaletBar">
-         <item>
-          <widget class="QPushButton" name="pushButton_4">
-           <property name="text">
-            <string>Palet1</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_3">
-           <property name="text">
-            <string>Palet2</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_2">
-           <property name="text">
-            <string>Palet3</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton">
-           <property name="text">
-            <string>Palet4</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <layout class="QHBoxLayout" name="PaletBar"/>
        </item>
        <item>
         <widget class="QScrollArea" name="scrollArea">
@@ -195,8 +173,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>455</width>
-            <height>284</height>
+            <width>201</width>
+            <height>309</height>
            </rect>
           </property>
          </widget>
