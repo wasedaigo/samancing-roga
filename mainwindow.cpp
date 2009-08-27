@@ -19,6 +19,8 @@ void MainWindow::setupConnections()
 
     // connec Animation Viewer
     connect(mpAnimationViewer, SIGNAL(playAnimation(bool)), this, SLOT(setEnabled(bool)));
+    connect(ui->lineEditAnimationName, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationName(QString)));
+    connect(mpAnimationModel, SIGNAL(animationNameChanged(QString)), ui->lineEditAnimationName, SLOT(setText(QString)));
 }
 
 void MainWindow::setupModels()
@@ -30,7 +32,6 @@ void MainWindow::setupModels()
 void MainWindow::setupUIModels()
 {
     ui->animationListView->setModel(mpAnimationListModel);
-    ui->animationComboBox->setModel(mpAnimationListModel);
 }
 void MainWindow::setupUI()
 {

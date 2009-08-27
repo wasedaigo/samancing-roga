@@ -92,6 +92,13 @@ void AnimationViewerPanel::keyPressEvent (QKeyEvent* e)
     }
 }
 
+void AnimationViewerPanel::keyReleaseEvent (QKeyEvent* e)
+{
+    switch(e->key())
+    {
+    }
+}
+
 void AnimationViewerPanel::paintEvent(QPaintEvent *event)
 {
     //KeyFrame& keyframe = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
@@ -157,24 +164,22 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
             painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha);
         }
 
-        QPoint spriteRenderPoint;
-        spriteRenderPoint.setX((int)(centerPoint.x() - glSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2));
-        spriteRenderPoint.setY((int)(centerPoint.y() - glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2));
-
         // render sprite
-        glSprite->render(spriteRenderPoint, painter, mpAnimationModel->getTargetSprite());
+        glSprite->render(centerPoint, painter, mpAnimationModel->getTargetSprite());
+
+        // This code is redundunt of the code in GLSprite, however I want to do the same calcuration again for cel drawing
+        QPoint spriteRenderPoint = centerPoint;
+        if (glSprite->mSpriteDescriptor.mRelativeToTarget)
+        {
+            spriteRenderPoint.setX(spriteRenderPoint.x() + (int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX));
+            spriteRenderPoint.setY(spriteRenderPoint.y() + (int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY));
+        }
+        spriteRenderPoint.setX(spriteRenderPoint.x() - (int)glSprite->mSpriteDescriptor.mCenter.mX);
+        spriteRenderPoint.setY(spriteRenderPoint.y() - (int)glSprite->mSpriteDescriptor.mCenter.mY);
 
         // Don't render when playing the animation
         if (!mIsAnimationPlaying)
         {
-
-            // This code is redundunt of the code in GLSprite, however I want to do the same calcuration again for cel drawing sake
-            if (glSprite->mSpriteDescriptor.mRelativeToTarget)
-            {
-                spriteRenderPoint.setX(spriteRenderPoint.x() + (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX);
-                spriteRenderPoint.setY(spriteRenderPoint.y() + (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY);
-            }
-
             if (!glSprite->isSelectable())
             {
                 // unselectable cel
@@ -183,7 +188,8 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
             }
             else if (glSprite->mID == currentPosition.mLineNo)
             {
-                // If the cel is selected
+                renderCenterPointSprite(glSprite, spriteRenderPoint, painter);
+                // Cel selecte color
                 painter.setPen(Qt::yellow);
                 painter.setOpacity(1.0);
             }
@@ -202,8 +208,8 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 
             // Draw Text
             painter.drawText(QRect(
-                                    (int)glSprite->mSpriteDescriptor.mPosition.mX + spriteRenderPoint.x(),
-                                    (int)glSprite->mSpriteDescriptor.mPosition.mY + spriteRenderPoint.y(),
+                                    spriteRenderPoint.x() + (int)glSprite->mSpriteDescriptor.mPosition.mX,
+                                    spriteRenderPoint.y() + (int)glSprite->mSpriteDescriptor.mPosition.mY,
                                     16,
                                     16
                                    ),
@@ -214,14 +220,22 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
     }
 }
 
+void AnimationViewerPanel::renderCenterPointSprite(GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter)
+{
+    // render center point
+    GLSprite* centerPointSprite = mpAnimationModel->getCenterPointSprite();
+    QPoint centerPointPos = QPoint(
+            (centerPoint.x() + (int)pGlSprite->mSpriteDescriptor.mPosition.mX + (int)pGlSprite->mSpriteDescriptor.mCenter.mX),
+            (centerPoint.y() + (int)pGlSprite->mSpriteDescriptor.mPosition.mY + (int)pGlSprite->mSpriteDescriptor.mCenter.mY)
+    );
+
+    centerPointSprite->render(centerPointPos, painter, NULL);
+}
+
 void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainter& painter)
 {
     painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
-    QPoint spriteRenderPoint;
-
-    spriteRenderPoint.setX((int)(centerPoint.x() - mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mWidth / 2));
-    spriteRenderPoint.setY((int)(centerPoint.y() - mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mHeight / 2));
-    mpAnimationModel->getTargetSprite()->render(spriteRenderPoint, painter, NULL);
+    mpAnimationModel->getTargetSprite()->render(centerPoint, painter, NULL);
 }
 
 void AnimationViewerPanel::clearSprites()
@@ -315,7 +329,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
 {
     GLSprite::Point3 pt3 = {0, 0, 0};
     if(mpAnimationModel->getTargetSprite()->contains(
-            relativePressedPosition + QPoint((int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mWidth / 2), (int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mTextureSrcRect.mHeight / 2)),
+            relativePressedPosition,
             pt3
        )
     )
@@ -332,7 +346,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
             GLSprite* glSprite = (GLSprite*)*iter;
             if (glSprite->isSelectable() &&
                 glSprite->contains(
-                        relativePressedPosition + QPoint((int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2), (int)(glSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2)),
+                        relativePressedPosition,
                         mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition
                    )
                 )
@@ -351,6 +365,14 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 {
     mCelGrabbed = false;
     mTargetGrabbed = false;
+
+    // Don't do anything if it is center point mode
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        setCenterPoint(event);
+        return;
+    }
+
     KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
 
     this->setFocus();
@@ -371,35 +393,65 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 
             mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
         }
+        else
+        {
+            if (event->modifiers() & Qt::ShiftModifier)
+            {
+                swapSourceTexture();
+            }
+        }
+    }
+}
+
+// When the user clicked on the canvas with Shift key pressed,
+// it causes the cel to swap its texture to currenly selected palet
+void AnimationViewerPanel::swapSourceTexture()
+{
+    KeyFrameData* pKeyFrameData = mpSelectedCelModel->getKeyFrameDataReference();
+    if (pKeyFrameData)
+    {
+        QString path = mpAnimationModel->getSelectedSourcePath();
+        if (path != "")
+        {
+            mpSelectedCelModel->setSourceTexture(path, mpAnimationModel->mSelectedPaletTextureSrcRect);
+            refresh();
+        }
+    }
+}
+
+void AnimationViewerPanel::setCenterPoint(QMouseEvent *event)
+{
+    KeyFrameData* pKeyFrameData = mpSelectedCelModel->getKeyFrameDataReference();
+    if (pKeyFrameData)
+    {
+        QPoint centerPoint = getCenterPoint();
+        mpSelectedCelModel->setCenterX((int)(event->x() - centerPoint.x() - pKeyFrameData->mSpriteDescriptor.mPosition.mX + pKeyFrameData->mSpriteDescriptor.mCenter.mX));
+        mpSelectedCelModel->setCenterY((int)(event->y() - centerPoint.y() - pKeyFrameData->mSpriteDescriptor.mPosition.mY + pKeyFrameData->mSpriteDescriptor.mCenter.mY));
     }
 }
 
 void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
 {
-    if(!mCelGrabbed && !mTargetGrabbed){return;}
+    QPoint centerPoint = getCenterPoint();
+    int newPosX = event->x() - centerPoint.x() + mSelectedOffset.x();
+    int newPosY = event->y() - centerPoint.y() + mSelectedOffset.y();
+    KeyFrameData* pKeyFrameData = mpSelectedCelModel->getKeyFrameDataReference();
 
-    if (mCelGrabbed)
+    if (event->modifiers() & Qt::ControlModifier)
     {
-        QPoint centerPoint = getCenterPoint();
-        int newPosX = event->x() - centerPoint.x() + mSelectedOffset.x();
-        int newPosY = event->y() - centerPoint.y() + mSelectedOffset.y();
-
+        setCenterPoint(event);
+    }
+    else if (mCelGrabbed)
+    {
         // Move cel if it is selected
-        KeyFrameData* pKeyFrameData = mpSelectedCelModel->getKeyFrameDataReference();
         if (pKeyFrameData)
         {
             mpSelectedCelModel->setPositionX(newPosX);
             mpSelectedCelModel->setPositionY(newPosY);
-            refresh();
         }
     }
-
-    if (mTargetGrabbed)
+    else if (mTargetGrabbed)
     {
-        QPoint centerPoint = getCenterPoint();
-        int newPosX = event->x() - centerPoint.x() + mSelectedOffset.x();
-        int newPosY = event->y() - centerPoint.y() + mSelectedOffset.y();
-
         mpAnimationModel->setTargetSpritePosition(newPosX, newPosY);
         refresh();
     }

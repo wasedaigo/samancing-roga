@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/" >
         <file>resource/target.png</file>
+        <file>resource/center_point.png</file>
     </qresource>
 </RCC>

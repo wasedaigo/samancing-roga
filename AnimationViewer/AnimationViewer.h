@@ -24,7 +24,6 @@ private slots:
     void onCelSelected(KeyFrameData* pKeyFrameData);
 
     void onSaveAnimationButtonClicked();
-    void onSwitchTextureButtonClicked();
 
     void onTweenTypeChanged(int tweenType);
     void onPlayButtonClicked();
