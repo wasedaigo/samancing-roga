@@ -15,6 +15,7 @@ public:
     CelModel();
 
 public slots:
+    void setSourceTexture(QString path, GLSprite::Rect rect);
     void setTextureSrcRect(GLSprite::Rect value);
 
     void setBlendType(int index);
@@ -44,6 +45,8 @@ public slots:
     void setAlphaTweenType(int index);
 
 signals:
+    void sourceTextureChanged(QString path, GLSprite::Rect rect);
+
     void textureSrcRectChanged(GLSprite::Rect value);
 
     void blendTypeChanged(int value);

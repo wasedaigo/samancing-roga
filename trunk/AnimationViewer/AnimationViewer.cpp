@@ -65,12 +65,18 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setBlur(int)));
 
+    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterX(int)));
+    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterY(int)));
+
     connect(mpSelectedCelModel, SIGNAL(alphaChanged(double)), m_ui->alphaSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(positionXChanged(int)), m_ui->positionXSpinBox, SLOT(setValue(int)));
     connect(mpSelectedCelModel, SIGNAL(positionYChanged(int)), m_ui->positionYSpinBox, SLOT(setValue(int)));
     connect(mpSelectedCelModel, SIGNAL(scaleXChanged(double)), m_ui->scaleXSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(scaleYChanged(double)), m_ui->scaleYSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(rotationXChanged(int)), m_ui->rotationXSpinBox, SLOT(setValue(int)));
+
+    connect(mpSelectedCelModel, SIGNAL(centerXChanged(int)), m_ui->centerXSpinBox, SLOT(setValue(int)));
+    connect(mpSelectedCelModel, SIGNAL(centerYChanged(int)), m_ui->centerYSpinBox, SLOT(setValue(int)));
 
     // Refresh the screen if KeyFrameData changed
     connect(m_ui->positionXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -83,13 +89,11 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->lookAtTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
-
+    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
 
     // Cel selection
     connect(mpAnimationViewerPanel, SIGNAL(celSelected(KeyFrameData*)), this, SLOT(onCelSelected(KeyFrameData*)));
-
-    // connect switch texture button
-    connect(m_ui->switchTextureButton, SIGNAL(clicked()), this, SLOT(onSwitchTextureButtonClicked()));
 
     // connect save button
     connect(m_ui->saveAnimationButton, SIGNAL(clicked()), this, SLOT(onSaveAnimationButtonClicked()));
@@ -172,17 +176,18 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
         m_ui->blendTypeComboBox->blockSignals(false);
 
+        m_ui->centerXSpinBox->blockSignals(true);
+        m_ui->centerXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mX);
+        m_ui->centerXSpinBox->blockSignals(false);
+
+        m_ui->centerYSpinBox->blockSignals(true);
+        m_ui->centerYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+        m_ui->centerYSpinBox->blockSignals(false);
     }
     else
     {
         m_ui->gridCelDataBox->setEnabled(false);
     }
-}
-
-//Switch Texture
-void AnimationViewer::onSwitchTextureButtonClicked()
-{
-
 }
 
 void AnimationViewer::onTweenTypeChanged(int tweenType)

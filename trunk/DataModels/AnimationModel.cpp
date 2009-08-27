@@ -36,14 +36,27 @@ AnimationModel::AnimationModel()
     mSelectedKeyFramePosition.mFrameNo = -1;
     mSelectedKeyFramePosition.mLineNo = -1;
 
-    QString filename = ":/resource/target.png";
-    mpTargetPixmap = new QPixmap(filename);
+    // Target sprite
+    mpTargetPixmap = new QPixmap(":/resource/target.png");
     GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
-    spriteDescriptor.mPosition.mX = -100;
+
     spriteDescriptor.mTextureSrcRect.mWidth = 32;
     spriteDescriptor.mTextureSrcRect.mHeight = 32;
+    spriteDescriptor.mCenter.mX = 16;
+    spriteDescriptor.mCenter.mY = 16;
+    spriteDescriptor.mPosition.mX = -100;
 
     mpTargetSprite = new GLSprite(-1, spriteDescriptor, false, 0, mpTargetPixmap);
+
+    // Center point Sprite
+    mpCenterPointPixmap = new QPixmap(":/resource/center_point.png");
+    spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
+    spriteDescriptor.mTextureSrcRect.mWidth = 8;
+    spriteDescriptor.mTextureSrcRect.mHeight = 8;
+    spriteDescriptor.mCenter.mX = 4;
+    spriteDescriptor.mCenter.mY = 4;
+
+    mpCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, 0, mpCenterPointPixmap);
 }
 
 AnimationModel::~AnimationModel()
@@ -52,6 +65,17 @@ AnimationModel::~AnimationModel()
 
     delete mpTargetSprite;
     delete mpTargetPixmap;
+
+    delete mpCenterPointSprite;
+    delete mpCenterPointPixmap;
+}
+
+void AnimationModel::setAnimationName(QString name)
+{
+    if (mAnimationName != name)
+    {
+        emit animationNameChanged(name);
+    }
 }
 
 void AnimationModel::clearPixmapHash()
@@ -170,6 +194,8 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2
         KeyFrameData* pKeyframeData = new KeyFrameData();
         pKeyframeData->mSpriteDescriptor.mPosition = position;
         pKeyframeData->mSpriteDescriptor.mTextureSrcRect = mSelectedPaletTextureSrcRect;
+        pKeyframeData->mSpriteDescriptor.mCenter.mX = mSelectedPaletTextureSrcRect.mWidth / 2;
+        pKeyframeData->mSpriteDescriptor.mCenter.mY = mSelectedPaletTextureSrcRect.mHeight / 2;
         pKeyframeData->mSpriteDescriptor.mSourcePath = mSelectedSourcePath;
 
         KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyframeData);
@@ -350,6 +376,11 @@ GLSprite* AnimationModel::getTargetSprite() const
     return mpTargetSprite;
 }
 
+GLSprite* AnimationModel::getCenterPointSprite() const
+{
+    return mpCenterPointSprite;
+}
+
 void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const
 {
     GLSprite::SpriteDescriptor& startDescriptor = startKeyFrameData->mSpriteDescriptor;
@@ -476,16 +507,7 @@ void AnimationModel::saveData()
 //    Json::Value root;
 //
 //    // save animation name
-//    root["name"] = "TEST";
-//
-//    // save animation image palet filenames
-//    Json::Value palets;
-//    palets.resize(ImagePaletCount);
-//    for (int i = 0; i < ImagePaletCount; i++)
-//    {
-//        palets[i] = mImagePalets[i].toStdString();
-//    }
-//    root["palets"] = palets;
+//    root["name"] = mAnimationName;
 //
 //    // save keyframes
 //    Json::Value& keyframesData = root["keyframes"];

@@ -22,6 +22,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -42,12 +43,14 @@ private slots:
 
 private:
     QPoint getCenterPoint() const;
-
+    void setCenterPoint(QMouseEvent *event);
     void renderCross(QPainter& painter);
     void renderCelSprites(const QPoint& centerPoint, QPainter& painter);
+    void renderCenterPointSprite(GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter);
     void renderTargetSprite(const QPoint& centerPoint, QPainter& painter);
     void clearSprites();
     void addCelSprite(const KeyFrame* pKeyFrame);
+    void swapSourceTexture();
 
     QList<GLSprite*> mGlSpriteList;
 

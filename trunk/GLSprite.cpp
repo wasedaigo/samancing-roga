@@ -78,8 +78,8 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
     QPoint positionOffset = QPoint(0, 0);
     if (mSpriteDescriptor.mRelativeToTarget)
     {
-        positionOffset.setX((int)pTargetSprite->mSpriteDescriptor.mPosition.mX);
-        positionOffset.setY((int)pTargetSprite->mSpriteDescriptor.mPosition.mY);
+        positionOffset.setX((int)(pTargetSprite->mSpriteDescriptor.mPosition.mX));
+        positionOffset.setY((int)(pTargetSprite->mSpriteDescriptor.mPosition.mY));
     }
     renderCenterPoint += positionOffset;
 
@@ -107,8 +107,8 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
     }
 
     // Rotation & Scale
-    int dx = (int)mSpriteDescriptor.mPosition.mX + renderCenterPoint.x() + (int)mSpriteDescriptor.mTextureSrcRect.mWidth / 2;
-    int dy = (int)mSpriteDescriptor.mPosition.mY + renderCenterPoint.y() + (int)mSpriteDescriptor.mTextureSrcRect.mHeight / 2;
+    int dx = (int)(mSpriteDescriptor.mPosition.mX + renderCenterPoint.x());
+    int dy = (int)(mSpriteDescriptor.mPosition.mY + renderCenterPoint.y());
     painter.translate(dx, dy);
     painter.rotate(mSpriteDescriptor.mRotation.mX + angleOffset);
     painter.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
@@ -116,8 +116,8 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
 
     // Render
     QPoint dstPoint(
-                    (int)mSpriteDescriptor.mPosition.mX,
-                    (int)mSpriteDescriptor.mPosition.mY
+                    (int)(mSpriteDescriptor.mPosition.mX - mSpriteDescriptor.mCenter.mX),
+                    (int)(mSpriteDescriptor.mPosition.mY - mSpriteDescriptor.mCenter.mY)
                    );
     dstPoint += renderCenterPoint;
     QRect srcRect(
@@ -160,5 +160,6 @@ bool GLSprite::contains(QPoint point, const GLSprite::Point3& targetPosition) co
     {
         point -= QPoint((int)targetPosition.mX, (int)targetPosition.mY);
     }
+    point += QPoint((int)(mSpriteDescriptor.mCenter.mX), (int)(mSpriteDescriptor.mCenter.mY));
     return getRect().contains(point, true);
 }

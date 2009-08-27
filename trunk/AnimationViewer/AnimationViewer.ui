@@ -159,13 +159,6 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QPushButton" name="switchTextureButton">
-             <property name="text">
-              <string>Switch Texture</string>
-             </property>
-            </widget>
-           </item>
            <item row="4" column="0">
             <widget class="QLabel" name="label7_3">
              <property name="text">
@@ -260,6 +253,43 @@
              </property>
              <property name="value">
               <double>1.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label7_4">
+             <property name="text">
+              <string>Center</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QSpinBox" name="centerXSpinBox">
+             <property name="minimum">
+              <number>-9999</number>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="3">
+            <widget class="QSpinBox" name="centerYSpinBox">
+             <property name="minimum">
+              <number>-9999</number>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QLabel" name="label6_2">
+             <property name="text">
+              <string>x</string>
              </property>
             </widget>
            </item>
