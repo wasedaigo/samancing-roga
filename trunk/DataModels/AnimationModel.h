@@ -71,7 +71,7 @@ public:
     void tellTimeLineToRefresh();
 
     void saveData();
-    void loadData();
+    void loadData(QString path);
 
     // public member variables
     QString mAnimationName;

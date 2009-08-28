@@ -1,6 +1,27 @@
 #include "KeyFrameData.h"
 #include "GLSprite.h"
 
+QString KeyFrameData::tweenTypeSting[KeyFrameData::eTT_COUNT] =
+{
+    "none",
+    "fix",
+    "easeIn",
+    "easeOut",
+    "easeInOut"
+};
+
+KeyFrameData::TweenType KeyFrameData::getTweenTypeByString(QString typeString)
+{
+    for (int i = 0; i < eTT_COUNT; i++)
+    {
+        if (typeString == tweenTypeSting[i])
+        {
+            return static_cast<KeyFrameData::TweenType>(i);
+        }
+    }
+    return eTT_None;
+}
+
 KeyFrameData::KeyFrameData()
 {
     mSpriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();

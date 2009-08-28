@@ -8,6 +8,7 @@
 #include "QStandardItemModel.h"
 #include "QTimelineWidget/QTimelinePanel.h"
 #include <QDirModel>
+#include "ResourceTree/ResourceTree.h"
 
 void MainWindow::setupConnections()
 {
@@ -21,6 +22,9 @@ void MainWindow::setupConnections()
     connect(mpAnimationViewer, SIGNAL(playAnimation(bool)), this, SLOT(setEnabled(bool)));
     connect(ui->lineEditAnimationName, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationName(QString)));
     connect(mpAnimationModel, SIGNAL(animationNameChanged(QString)), ui->lineEditAnimationName, SLOT(setText(QString)));
+
+    connect(mpResourceTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+        this, SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
 }
 
 void MainWindow::setupModels()
@@ -31,13 +35,26 @@ void MainWindow::setupModels()
 
 void MainWindow::setupUIModels()
 {
-    ui->animationListView->setModel(mpAnimationListModel);
+//    mAnimationTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+//    mAnimationTreeViewModel.setReadOnly(true);
+//
+//    QString rootPath = QDir::currentPath();
+//    rootPath.append("/");
+//    rootPath.append(ANIMATION_DIR.path());
+//
+//    ui->animationTreeView->setAutoScroll(true);
+//    ui->animationTreeView->setModel(&mAnimationTreeViewModel);
+//    ui->animationTreeView->setRootIndex(mAnimationTreeViewModel.index(rootPath) );
 }
 void MainWindow::setupUI()
 {
     ui->setupUi(this);
 
     mpDialog = new ImagePaletDialog(this, mpAnimationModel);
+
+    mpResourceTree = new ResourceTree(this);
+    mpResourceTree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    ui->animationViewerContainer->addWidget(mpResourceTree);
 
     mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
     mpAnimationViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -46,6 +63,13 @@ void MainWindow::setupUI()
     QTimelinePanel* pQTimelinePanel = new QTimelinePanel(mpAnimationModel, this);
     pQTimelinePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     ui->timelineContainer->addWidget(pQTimelinePanel);
+
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ANIMATION_DIR.path());
+    rootPath.append("/test.ani");
+
+    mpResourceTree->read(rootPath);
 }
 
 void MainWindow::loadConfigFile()
@@ -64,8 +88,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupConnections();
 
-    mpAnimationModel->selectCurrentKeyFramePosition(0, 0);
-    mpAnimationModel->loadData();
+    ui->animationDataContainer->setEnabled(false);
+    ui->animationViewer->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -93,9 +117,33 @@ void MainWindow::onAnimationSelected(int index)
 
 /* -------------------------------------------------------------------
 
- Animation list box control
+ Animation treeview control
 
 ---------------------------------------------------------------------*/
+void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2)
+{
+//    QModelIndexList indexes = item1.indexes();
+//    QModelIndex index = indexes.takeFirst();
+//
+//    QString path = mAnimationTreeViewModel.filePath(index);
+//    QFileInfo fileInfo = QFileInfo (path);
+//    if (fileInfo.isFile())
+//    {
+//        mpAnimationModel->loadData(path);
+//    }
+
+//    QString rootPath = QDir::currentPath();
+//    rootPath.append("/");
+//    rootPath.append(ANIMATION_DIR.path());
+//
+//    mpAnimationModel->loadData();
+//    // we don't want to store absolute path
+//    path.replace(rootPath, "", Qt::CaseInsensitive);
+//
+//    mpAnimationModel->setSelectedSourcePath(path);
+}
+
+
 void MainWindow::onAddAnimationButtonClicked()
 {
     QStandardItem* item = new QStandardItem(QString("%0").arg("NO NAME"));
@@ -106,14 +154,14 @@ void MainWindow::onAddAnimationButtonClicked()
 
 void MainWindow::onRemoveAnimationButtonClicked()
 {
-    QModelIndexList list = ui->animationListView->selectionModel()->selectedRows();
-
-    QList<QModelIndex>::Iterator iter;
-    for (iter = list.begin(); iter != list.end(); iter++)
-    {
-        QModelIndex modelIndex = (QModelIndex)*iter;
-        mpAnimationListModel->removeRow(modelIndex.row(), QModelIndex());
-    }
+//    QModelIndexList list = ui->animationListView->selectionModel()->selectedRows();
+//
+//    QList<QModelIndex>::Iterator iter;
+//    for (iter = list.begin(); iter != list.end(); iter++)
+//    {
+//        QModelIndex modelIndex = (QModelIndex)*iter;
+//        mpAnimationListModel->removeRow(modelIndex.row(), QModelIndex());
+//    }
 }
 
 

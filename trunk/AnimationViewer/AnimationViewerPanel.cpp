@@ -385,19 +385,23 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 
     if(!mCelGrabbed && !mTargetGrabbed)
     {
-        if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
+        QPixmap* pTryPixmap = mpAnimationModel->getPixmap(mpAnimationModel->getSelectedSourcePath());
+        if (pTryPixmap)
         {
-            GLSprite::Point2 pt;
-            pt.mX = relativePressedPosition.x();
-            pt.mY = relativePressedPosition.y();
-
-            mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
-        }
-        else
-        {
-            if (event->modifiers() & Qt::ShiftModifier)
+            if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
             {
-                swapSourceTexture();
+                GLSprite::Point2 pt;
+                pt.mX = relativePressedPosition.x();
+                pt.mY = relativePressedPosition.y();
+
+                mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
+            }
+            else
+            {
+                if (event->modifiers() & Qt::ShiftModifier)
+                {
+                    swapSourceTexture();
+                }
             }
         }
     }

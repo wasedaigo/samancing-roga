@@ -4,12 +4,14 @@
 #include <QtGui/QMainWindow>
 #include "DataModels/AnimationModel.h"
 #include "QDir.h"
+#include "ImagePaletDialog/SourceFileDirModel.h"
 
 class AnimationViewer;
 class ImagePaletDialog;
+class ResourceTree;
 class QSignalMapper;
 class QStandardItemModel;
-
+class QItemSelection;
 namespace Ui
 {
     class MainWindow;
@@ -23,7 +25,7 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
+private slots:
     // animation list control
     void onAddAnimationButtonClicked();
     void onRemoveAnimationButtonClicked();
@@ -34,6 +36,7 @@ public slots:
 
     // Animation Panel Control
     void onAnimationDurationChanged(int duration);
+    void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
 
 private:
     void setupConnections();
@@ -49,8 +52,11 @@ private:
 
     AnimationModel* mpAnimationModel;
     AnimationViewer* mpAnimationViewer;
+    SourceFileDirModel mAnimationTreeViewModel;
 
     ImagePaletDialog *mpDialog;
+
+    ResourceTree *mpResourceTree;
 };
 
 #endif // MAINWINDOW_H

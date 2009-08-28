@@ -4,7 +4,7 @@
 #include "GLSprite.h"
 class KeyFrameData
 {
-public:
+public:   
     enum TweenType
     {
         eTT_None,
@@ -36,6 +36,9 @@ public:
     void copyAttribute(TweenAttribute tweenAttribute, KeyFrameData* item);
     bool hasTween() const;
     bool allAttributesNone() const;
+
+    static QString tweenTypeSting[eTT_COUNT];
+    static TweenType getTweenTypeByString(QString typeString);
 };
 
 #endif // KEYFRAMEDATA_H

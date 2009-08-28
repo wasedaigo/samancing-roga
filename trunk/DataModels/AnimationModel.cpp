@@ -74,6 +74,7 @@ void AnimationModel::setAnimationName(QString name)
 {
     if (mAnimationName != name)
     {
+        mAnimationName = name;
         emit animationNameChanged(name);
     }
 }
@@ -123,6 +124,7 @@ KeyFrame* AnimationModel::getKeyFrame(int lineNo, int frameNo) const
 
 int AnimationModel::getKeyFrameIndex(int lineNo, int frameNo) const
 {
+    if (lineNo < 0 || frameNo < 0) {return -2;}
     for (int i = 0; i < mKeyFrames[lineNo].count(); i++)
     {
         if (mKeyFrames[lineNo][i]->mFrameNo == frameNo)
@@ -290,12 +292,12 @@ void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
 
 void AnimationModel::clearAllKeyFrames()
 {
-    for (int i = 0; i < mKeyFrames[0].count(); i++)
+    for (int lineNo = 0;  lineNo < MaxLineNo; lineNo++)
     {
-        for (int j = mKeyFrames[i].count() - 1; i >= 0; j--)
+        for (int frameNo = mKeyFrames[lineNo].count() - 1; frameNo >= 0; frameNo--)
         {
-            delete mKeyFrames[i][j];
-            mKeyFrames[i].removeAt(j);
+            delete mKeyFrames[lineNo][frameNo];
+            mKeyFrames[lineNo].removeAt(frameNo);
         }
     }
     emit refreshTimeLine();
@@ -330,13 +332,16 @@ QPixmap* AnimationModel::getPixmap(QString path)
     {
         QString rootPath = QDir::currentPath();
         QString fullPath = rootPath.append("/").append(ROOT_RESOURCE_DIR.path()).append(path);
+        QFileInfo fileInfo = QFileInfo (fullPath);
+
+        if (!fileInfo.isFile()) {return NULL;}
         try
         {
             mSourceImageHash.insert(path, new QPixmap(fullPath));
         }
-        catch(long)
+        catch(char *str)
         {
-            printf("File:%s couldn't be loaded.", path.toStdString().c_str());
+            printf("File:%s couldn't be loaded.", str);
             return NULL;
         }
     };
@@ -392,10 +397,10 @@ void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::Twee
             Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_alpha], startDescriptor.mAlpha, endDescriptor.mAlpha, SpriteDescriptor.mAlpha, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_position:
-            float startX = startDescriptor.mPosition.mX;
-            float startY = startDescriptor.mPosition.mY;
-            float endX = endDescriptor.mPosition.mX;
-            float endY = endDescriptor.mPosition.mY;
+            int startX = startDescriptor.mPosition.mX;
+            int startY = startDescriptor.mPosition.mY;
+            int endX = endDescriptor.mPosition.mX;
+            int endY = endDescriptor.mPosition.mY;
             if (!startDescriptor.mRelativeToTarget && endDescriptor.mRelativeToTarget)
             {
                 endX += mpTargetSprite->mSpriteDescriptor.mPosition.mX;
@@ -411,8 +416,8 @@ void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::Twee
             Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_position], startY, endY, SpriteDescriptor.mPosition.mY, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_rotation:
-            float startRotationX = startDescriptor.mRotation.mX;
-            float endRotationX = endDescriptor.mRotation.mX;
+            int startRotationX = startDescriptor.mRotation.mX;
+            int endRotationX = endDescriptor.mRotation.mX;
             if (endDescriptor.mLookAtTarget)
             {
                 endRotationX += mpTargetSprite->mSpriteDescriptor.mRotation.mX;
@@ -504,167 +509,159 @@ void AnimationModel::tellTimeLineToRefresh()
 
 void AnimationModel::saveData()
 {
-//    Json::Value root;
-//
-//    // save animation name
-//    root["name"] = mAnimationName;
-//
-//    // save keyframes
-//    Json::Value& keyframesData = root["keyframes"];
-//    keyframesData.resize(MaxLineNo);
-//    for (int i = 0; i < MaxLineNo; i++)
-//    {
-//        keyframesData[i].resize(mKeyFrames[i].count());
-//
-//        for (unsigned int j = 0; j < mKeyFrames[i].count(); j++)
-//        {
-//            const KeyFrame& keyframe = mKeyFrames[i][j];
-//
-//            Json::Value keyframeData;
-//            keyframeData["lineNo"] = keyframe.mLineNo;
-//            keyframeData["frameNo"] = keyframe.mFrameNo;
-//
-//            if (keyframe.mpKeyFrameData)
-//            {
-//                KeyFrameData* pKeyFrameData = keyframe.mpKeyFrameData;
-//                keyframeData["textureID"] = pKeyFrameData->mTextureID;
-//                keyframeData["blur"] = pKeyFrameData->mBlur;
-//                keyframeData["lookAtTarget"] = pKeyFrameData->mLookAtTarget;
-//                keyframeData["relativeToTarget"] = pKeyFrameData->mRelativeToTarget;
-//
-//                Json::Value textureRect;
-//                textureRect[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX;
-//                textureRect[1] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY;
-//                textureRect[2] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth;
-//                textureRect[3] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight;
-//                keyframeData["textureRect"] = textureRect;
-//
-//                keyframeData["blendType"] = pKeyFrameData->mSpriteDescriptor.mBlendType;
-//
-//                Json::Value centerPoint;
-//                centerPoint[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mCenter.mX;
-//                centerPoint[1] = pKeyFrameData->mSpriteDescriptor.mCenter.mY;
-//                keyframeData["centerPoint"] = centerPoint;
-//
-//                Json::Value scale;
-//                scale[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mScale.mX;
-//                scale[1] = pKeyFrameData->mSpriteDescriptor.mScale.mY;
-//                keyframeData["scale"] = scale;
-//
-//                Json::Value position;
-//                position[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mPosition.mX;
-//                position[1] = pKeyFrameData->mSpriteDescriptor.mPosition.mY;
-//                position[2] = pKeyFrameData->mSpriteDescriptor.mPosition.mZ;
-//                keyframeData["position"] = position;
-//
-//                Json::Value rotation;
-//                rotation[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mRotation.mX;
-//                rotation[1] = pKeyFrameData->mSpriteDescriptor.mRotation.mY;
-//                rotation[2] = pKeyFrameData->mSpriteDescriptor.mRotation.mZ;
-//                keyframeData["rotation"] = rotation;
-//
-//                keyframeData["alpha"] = pKeyFrameData->mSpriteDescriptor.mAlpha;
-//
-//                keyframeData["alphaTween"] = pKeyFrameData->mTweenTypes[KeyFrame::TweenAttribute_alpha];
-//                keyframeData["positionTween"] = pKeyFrameData->mTweenTypes[KeyFrame::TweenAttribute_position];
-//                keyframeData["rotationTween"] = pKeyFrameData->mTweenTypes[KeyFrame::TweenAttribute_rotation];
-//                keyframeData["scaleTween"] = pKeyFrameData->mTweenTypes[KeyFrame::TweenAttribute_scale];
-//                keyframesData[i][j] = keyframeData;
-//            }
-//        }
-//    }
-//
-//    Json::StyledWriter writer;
-//    std::string outputJson = writer.write(root);
-//    std::ofstream ofs;
-//    ofs.open("test.json");
-//    ofs << outputJson << std::endl;
-//
-//    ofs.close();
+    Json::Value root;
+
+    // save animation name
+    root["name"] = mAnimationName.toStdString();
+
+    // save keyframes
+    Json::Value& keyframesData = root["keyframes"];
+    keyframesData.resize(MaxLineNo);
+    for (int i = 0; i < MaxLineNo; i++)
+    {
+        keyframesData[i].resize(mKeyFrames[i].count());
+
+        for (int j = 0; j < mKeyFrames[i].count(); j++)
+        {
+            const KeyFrame* keyframe = mKeyFrames[i][j];
+
+            Json::Value keyframeData;
+            keyframeData["lineNo"] = keyframe->mLineNo;
+            keyframeData["frameNo"] = keyframe->mFrameNo;
+
+            if (keyframe->mpKeyFrameData)
+            {
+                KeyFrameData* pKeyFrameData = keyframe->mpKeyFrameData;
+                keyframeData["sourcePath"] = pKeyFrameData->mSpriteDescriptor.mSourcePath.toStdString();
+                keyframeData["blur"] = pKeyFrameData->mSpriteDescriptor.mBlur;
+                keyframeData["lookAtTarget"] = pKeyFrameData->mSpriteDescriptor.mLookAtTarget;
+                keyframeData["relativeToTarget"] = pKeyFrameData->mSpriteDescriptor.mRelativeToTarget;
+
+                Json::Value textureRect;
+                textureRect[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX;
+                textureRect[1] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY;
+                textureRect[2] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth;
+                textureRect[3] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight;
+                keyframeData["textureRect"] = textureRect;
+
+                keyframeData["blendType"] = GLSprite::blendTypeSting[pKeyFrameData->mSpriteDescriptor.mBlendType].toStdString();
+
+                Json::Value centerPoint;
+                centerPoint[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mCenter.mX;
+                centerPoint[1] = pKeyFrameData->mSpriteDescriptor.mCenter.mY;
+                keyframeData["center"] = centerPoint;
+
+                Json::Value scale;
+                scale[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mScale.mX;
+                scale[1] = pKeyFrameData->mSpriteDescriptor.mScale.mY;
+                keyframeData["scale"] = scale;
+
+                Json::Value position;
+                position[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mPosition.mX;
+                position[1] = pKeyFrameData->mSpriteDescriptor.mPosition.mY;
+                position[2] = pKeyFrameData->mSpriteDescriptor.mPosition.mZ;
+                keyframeData["position"] = position;
+
+                Json::Value rotation;
+                rotation[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mRotation.mX;
+                rotation[1] = pKeyFrameData->mSpriteDescriptor.mRotation.mY;
+                rotation[2] = pKeyFrameData->mSpriteDescriptor.mRotation.mZ;
+                keyframeData["rotation"] = rotation;
+
+                keyframeData["alpha"] = pKeyFrameData->mSpriteDescriptor.mAlpha;
+
+                keyframeData["alphaTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha]].toStdString();
+                keyframeData["positionTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position]].toStdString();
+                keyframeData["rotationTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]].toStdString();
+                keyframeData["scaleTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale]].toStdString();
+                keyframesData[i][j] = keyframeData;
+            }
+        }
+    }
+
+    Json::StyledWriter writer;
+    std::string outputJson = writer.write(root);
+    std::ofstream ofs;
+    ofs.open("test.json");
+    ofs << outputJson << std::endl;
+
+    ofs.close();
 }
 
-void AnimationModel::loadData()
+void AnimationModel::loadData(QString path)
 {
-//    mKeyFrames.clear();
-//    emit clearKeyframes();
-//
-//    Json::Value root;
-//    Json::Reader reader;
-//
-//    std::ifstream ifs("test.json");
-//    std::string inputJson((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-//
-//    //std::string json_doc = readInputFile(path);
-//    if(!reader.parse(inputJson, root))
-//    {
-//        std::string error_message = reader.getFormatedErrorMessages();
-//        printf("JSON error:%s\n", error_message.c_str());
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    Json::Value& palets = root["palets"];
-//    for (int i = 0; i < ImagePaletCount; i++)
-//    {
-//        QString id = QString::fromStdString(palets[i].asString());
-//        setAnimationImagePalet(i, id);
-//    }
-//
-//    Json::Value& lines = root["lines"];
-//    unsigned int lineCount = lines.size();
-//    for (unsigned int i = 0; i < lineCount; i++)
-//    {
-//        KeyFrame keyframe;
-//        for (unsigned int j = 0; j < keyframes[i].size(); j++)
-//        {
-//            Json::Value& keyframe = keyframes[i][j];
-//            KeyFrame keyframe;
-//            keyframe.mFrameNo = keyframe["frameNo"].asInt();
-//            keyframe.mLineNo = keyframe["lineNo"].asInt();
-//            keyframe.mTextureID = keyframe["textureID"].asInt();
-//            keyframe.mBlur = keyframe["blur"].asBool();
-//            keyframe.mLookAtTarget = keyframe["lookAtTarget"].asBool();
-//            keyframe.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
-//
-//            keyframe.mTweenTypes[KeyFrame::TweenAttribute_alpha] = (KeyFrame::TweenType)(cel["alphaTween"].asInt());
-//            keyframe.mTweenTypes[KeyFrame::TweenAttribute_position] = (KeyFrame::TweenType)(cel["positionTween"].asInt());
-//            keyframe.mTweenTypes[KeyFrame::TweenAttribute_rotation] = (KeyFrame::TweenType)(cel["rotationTween"].asInt());
-//            keyframe.mTweenTypes[KeyFrame::TweenAttribute_scale] = (KeyFrame::TweenType)(cel["scaleTween"].asInt());
-//
-//            keyframe.mSpriteDescriptor.mBlendType = (GLSprite::BlendType)(cel["blendType"].asInt());
-//
-//            keyframe.mSpriteDescriptor.mAlpha = cel["alpha"].asDouble();
-//
-//            keyframe.mSpriteDescriptor.mPosition.mX = cel["position"][static_cast<unsigned int>(0)].asDouble();
-//            keyframe.mSpriteDescriptor.mPosition.mY = cel["position"][1].asDouble();
-//            keyframe.mSpriteDescriptor.mPosition.mZ = cel["position"][2].asDouble();
-//
-//            keyframe.mSpriteDescriptor.mRotation.mX = cel["rotation"][static_cast<unsigned int>(0)].asDouble();
-//            keyframe.mSpriteDescriptor.mRotation.mY = cel["rotation"][1].asDouble();
-//            keyframe.mSpriteDescriptor.mRotation.mZ = cel["rotation"][2].asDouble();
-//
-//            keyframe.mSpriteDescriptor.mScale.mX = cel["scale"][static_cast<unsigned int>(0)].asDouble();
-//            keyframe.mSpriteDescriptor.mScale.mY = cel["scale"][1].asDouble();
-//
-//            keyframe.mSpriteDescriptor.mCenter.mX = cel["center"][static_cast<unsigned int>(0)].asDouble();
-//            keyframe.mSpriteDescriptor.mCenter.mY = cel["center"][1].asDouble();
-//
-//            keyframe.mSpriteDescriptor.mTextureSrcRect.mX = cel["textureRect"][static_cast<unsigned int>(0)].asInt();
-//            keyframe.mSpriteDescriptor.mTextureSrcRect.mY = cel["textureRect"][1].asInt();
-//            keyframe.mSpriteDescriptor.mTextureSrcRect.mWidth = cel["textureRect"][2].asInt();
-//            keyframe.mSpriteDescriptor.mTextureSrcRect.mHeight = cel["textureRect"][3].asInt();
-//            keyframe.mIsTweenCel = false;
-//
-//            keyframe.mCelHash.insert(keyframe.mLineNo, keyframe);
-//        }
-//
-//        mKeyFrames.push_back(keyframe);
-//        emit keyFrameAdded(MaxLineNo - 1, keyframe.mComment);
-//    }
-//
-//    resetTweenHash();
-//    calculateAnimationLength();
-//
-//    // make it emit frame change event
-//    mCurrentFrameNo = -1;
-//    setCurrentKeyFrameNo(0);
+    clearAllKeyFrames();
+
+    Json::Value root;
+    Json::Reader reader;
+
+    std::ifstream ifs(path.toStdString().c_str());
+    std::string inputJson((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+
+    //std::string json_doc = readInputFile(path);
+    if(!reader.parse(inputJson, root))
+    {
+        std::string error_message = reader.getFormatedErrorMessages();
+        printf("JSON error:%s\n", error_message.c_str());
+        exit(EXIT_FAILURE);
+    }
+
+    // save animation name
+    setAnimationName(QString::fromStdString(root["name"].asString()));
+    root["name"] = mAnimationName.toStdString();
+
+    Json::Value& lines = root["keyframes"];
+    for (unsigned int i = 0; i < MaxLineNo; i++)
+    {
+        for (unsigned int j = 0; j < lines[i].size(); j++)
+        {
+            Json::Value& keyframe = lines[i][j];
+            int frameNo = keyframe["frameNo"].asInt();
+            int lineNo = keyframe["lineNo"].asInt();
+
+            KeyFrameData* pKeyFrameData = new KeyFrameData();
+            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["alphaTween"].asString()));
+            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["positionTween"].asString()));
+            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["rotationTween"].asString()));
+            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["scaleTween"].asString()));
+
+            pKeyFrameData->mSpriteDescriptor.mBlur = keyframe["blur"].asBool();
+            pKeyFrameData->mSpriteDescriptor.mLookAtTarget = keyframe["lookAtTarget"].asBool();
+            pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
+
+            pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());
+            pKeyFrameData->mSpriteDescriptor.mBlendType = GLSprite::getBlendTypeByString(QString::fromStdString(keyframe["blendType"].asString()));
+
+            pKeyFrameData->mSpriteDescriptor.mAlpha = keyframe["alpha"].asDouble();
+
+            pKeyFrameData->mSpriteDescriptor.mPosition.mX = keyframe["position"][static_cast<unsigned int>(0)].asInt();
+            pKeyFrameData->mSpriteDescriptor.mPosition.mY = keyframe["position"][1].asInt();
+            pKeyFrameData->mSpriteDescriptor.mPosition.mZ = keyframe["position"][2].asInt();
+
+            pKeyFrameData->mSpriteDescriptor.mRotation.mX = keyframe["rotation"][static_cast<unsigned int>(0)].asInt();
+            pKeyFrameData->mSpriteDescriptor.mRotation.mY = keyframe["rotation"][1].asInt();
+            pKeyFrameData->mSpriteDescriptor.mRotation.mZ = keyframe["rotation"][2].asInt();
+
+            pKeyFrameData->mSpriteDescriptor.mScale.mX = keyframe["scale"][static_cast<unsigned int>(0)].asDouble();
+            pKeyFrameData->mSpriteDescriptor.mScale.mY = keyframe["scale"][1].asDouble();
+
+            pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asInt();
+            pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asInt();
+
+            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX = keyframe["textureRect"][static_cast<unsigned int>(0)].asInt();
+            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY = keyframe["textureRect"][1].asInt();
+            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth = keyframe["textureRect"][2].asInt();
+            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight = keyframe["textureRect"][3].asInt();
+            pKeyFrameData->mIsTweenCel = false;
+
+            KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyFrameData);
+            mKeyFrames[i].push_back(pKeyFrame);
+        }
+    }
+
+    mSelectedKeyFramePosition.mFrameNo = -1;
+    mSelectedKeyFramePosition.mLineNo = -1;
+
+    emit refreshTimeLine();
 }
