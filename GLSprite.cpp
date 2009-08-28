@@ -6,6 +6,26 @@
 #include <QPainter>
 #include "DataModels/AnimationModel.h"
 
+QString GLSprite::blendTypeSting[GLSprite::eBT_COUNT] =
+{
+    "alpha",
+    "add",
+    "sub"
+};
+
+GLSprite::BlendType GLSprite::getBlendTypeByString(QString typeString)
+{
+    for (int i = 0; i < eBT_COUNT; i++)
+    {
+        if (typeString == blendTypeSting[i])
+        {
+            return static_cast<GLSprite::BlendType>(i);;
+        }
+    }
+    return eBT_Alpha;
+}
+
+
 GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
 {
     GLSprite::SpriteDescriptor spriteDescriptor;

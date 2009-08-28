@@ -34,14 +34,14 @@ public:
 
     struct Point3
     {
-        float mX;
-        float mY;
-        float mZ;
+        int mX;
+        int mY;
+        int mZ;
 
         void operator=(const Point2& point)
         {
-            mX = point.mX;
-            mY = point.mY;
+            mX = static_cast<int>(point.mX);
+            mY = static_cast<int>(point.mY);
             mZ = 0;
         }
 
@@ -107,6 +107,8 @@ public:
         }
     };
 
+    static QString blendTypeSting[eBT_COUNT];
+    static BlendType getBlendTypeByString(QString typeString) ;
 
     static SpriteDescriptor makeDefaultSpriteDescriptor();
     GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, AnimationModel* pAnimationModel);

@@ -22,15 +22,10 @@ ImagePaletDialog::ImagePaletDialog(QWidget *parent, AnimationModel* pAnimationMo
     rootPath.append(ROOT_RESOURCE_DIR.path());
     
     QStringList stringList;
-//    stringList.append("Animations");
-//    stringList.append("Images");
-//    stringList.append("*.png");
 
-//    mSourceFileTreeViewModel.setNameFilters(stringList);
     mSourceFileTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
     mSourceFileTreeViewModel.setReadOnly(true);
-    mSourceFileTreeViewModel.removeColumns(1, 3, QModelIndex());
-    mSourceFileTreeViewModel.removeColumn(0, QModelIndex());
+
     m_ui->fileSelectionTreeView->setModel(&mSourceFileTreeViewModel);
     m_ui->fileSelectionTreeView->setRootIndex(mSourceFileTreeViewModel.index(rootPath) );
     m_ui->fileSelectionTreeView->setAutoScroll(true);

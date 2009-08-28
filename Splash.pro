@@ -6,8 +6,10 @@ include(DataModels/DataModels.pri)
 include(AnimationViewer/AnimationViewer.pri)
 include(Lib/jsoncpp/jsoncpp.pri)
 include(Widgets/QTimelineWidget/QTimelineWidget.pri)
+include(Widgets/ResourceTree/ResourceTree.pri)
 INCLUDEPATH += Widgets
 QT += opengl
+QT += xml
 TARGET = Splash
 TEMPLATE = app
 SOURCES += main.cpp \
