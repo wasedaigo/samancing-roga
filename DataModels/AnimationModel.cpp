@@ -1,5 +1,6 @@
 #include "AnimationModel.h"
 #include <QPixmap>
+#include <QMessageBox>
 #include "Common.h"
 #include "Macros.h"
 #include "json/writer.h"
@@ -27,9 +28,12 @@ field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
     }\
 }
 ////
-AnimationModel::AnimationModel()
-    : mAnimationName(QString(""))
-
+AnimationModel::AnimationModel(QWidget* parent)
+    : mAnimationName(QString("")),
+      mAnimationDirectory(QString("")),
+      mAnimationID(QString("")),
+      mOriginalAnimationID(QString("")),
+      mpParent(parent)
 {
     mSelectedSourcePath = "";
 
@@ -76,6 +80,15 @@ void AnimationModel::setAnimationName(QString name)
     {
         mAnimationName = name;
         emit animationNameChanged(name);
+    }
+}
+
+void AnimationModel::setAnimationID(QString id)
+{
+    if (mAnimationID != id)
+    {
+        mAnimationID = id;
+        emit animationIDChanged(id);
     }
 }
 
@@ -203,7 +216,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2
         KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyframeData);
         mKeyFrames[lineNo].insert(index + 1, pKeyFrame);
 
-        emit refreshTimeLine(lineNo);
+        emit refreshTimeLine();
     }
 }
 
@@ -216,7 +229,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyfram
         KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyframeData);
         mKeyFrames[lineNo].insert(index + 1, pKeyFrame);
 
-        emit refreshTimeLine(lineNo);
+        emit refreshTimeLine();
     }
 }
 
@@ -230,7 +243,7 @@ void AnimationModel::insertEmptyKeyFrame(int lineNo, int frameNo)
         KeyFrame* pKeyframe = new KeyFrame(lineNo, frameNo, NULL);
         mKeyFrames[lineNo].insert(index + 1, pKeyframe);
 
-        emit refreshTimeLine(lineNo);
+        emit refreshTimeLine();
     }
 }
 
@@ -244,7 +257,7 @@ void AnimationModel::addFrameLength(int lineNo, int frameNo, int value)
             mKeyFrames[lineNo][i]->mFrameNo += value;
         }
 
-        emit refreshTimeLine(lineNo);
+        emit refreshTimeLine();
     }
 }
 
@@ -270,7 +283,7 @@ void AnimationModel::reduceFrameLength(int lineNo, int frameNo)
             mKeyFrames[lineNo][i]->mFrameNo -= 1;
         }
 
-        emit refreshTimeLine(lineNo);
+        emit refreshTimeLine();
     }
 }
 
@@ -287,7 +300,7 @@ void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
         }
     }
 
-    emit refreshTimeLine(lineNo);
+    emit refreshTimeLine();
 }
 
 void AnimationModel::clearAllKeyFrames()
@@ -509,6 +522,27 @@ void AnimationModel::tellTimeLineToRefresh()
 
 void AnimationModel::saveData()
 {
+    // Get path with directory info
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ANIMATION_DIR.path());
+
+    // we don't want to store absolute path
+    QString saveDirName = rootPath.append(mAnimationDirectory).append("/");
+    QDir saveDir = QDir(saveDirName);
+    QString savePath = saveDirName.append(mAnimationID).append(".").append(ANIMATION_FORMAT);
+    QString originalPath = rootPath.append(mAnimationDirectory).append("/").append(mOriginalAnimationID).append(".").append(ANIMATION_FORMAT);
+    QFileInfo info = QFileInfo(savePath);
+
+    QString error = QString("File %0.ani already exists.").arg(mAnimationID);
+    // unless you are overriding loaded animation ID, we won't allow to override existing files
+    if (mOriginalAnimationID != mAnimationID && info.exists())
+    {
+        QMessageBox::information(mpParent->window(), tr("File saving error"),
+                             tr(error.toStdString().c_str()));
+        return;
+    }
+
     Json::Value root;
 
     // save animation name
@@ -579,13 +613,17 @@ void AnimationModel::saveData()
         }
     }
 
+    saveDir.remove(mOriginalAnimationID.append(".").append(ANIMATION_FORMAT));
     Json::StyledWriter writer;
     std::string outputJson = writer.write(root);
     std::ofstream ofs;
-    ofs.open("test.json");
+    ofs.open(savePath.toStdString().c_str());
     ofs << outputJson << std::endl;
 
     ofs.close();
+
+    mOriginalAnimationID = mAnimationID;
+    emit fileSaved(QModelIndex());
 }
 
 void AnimationModel::loadData(QString path)
@@ -598,7 +636,6 @@ void AnimationModel::loadData(QString path)
     std::ifstream ifs(path.toStdString().c_str());
     std::string inputJson((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-
     //std::string json_doc = readInputFile(path);
     if(!reader.parse(inputJson, root))
     {
@@ -606,6 +643,17 @@ void AnimationModel::loadData(QString path)
         printf("JSON error:%s\n", error_message.c_str());
         exit(EXIT_FAILURE);
     }
+
+    // Get path without directory info & extension
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ANIMATION_DIR.path());
+
+    QFileInfo fileInfo = QFileInfo(path);
+
+    mAnimationDirectory = fileInfo.absolutePath().replace(rootPath, "");;
+    mOriginalAnimationID = fileInfo.baseName();
+    setAnimationID(mOriginalAnimationID);
 
     // save animation name
     setAnimationName(QString::fromStdString(root["name"].asString()));
@@ -660,8 +708,8 @@ void AnimationModel::loadData(QString path)
         }
     }
 
-    mSelectedKeyFramePosition.mFrameNo = -1;
-    mSelectedKeyFramePosition.mLineNo = -1;
+    mSelectedKeyFramePosition.mFrameNo = 0;
+    mSelectedKeyFramePosition.mLineNo = 0;
 
     emit refreshTimeLine();
 }

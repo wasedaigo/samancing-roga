@@ -59,11 +59,12 @@ public:
 
 private slots:
     void updateDomElement(QTreeWidgetItem *item, int column);
+    void contextMenu(const QPoint &pos);
+    void addItem();
 
 private:
     void parseFolderElement(const QDomElement& element,
                             QTreeWidgetItem* parentItem = 0);
-
 
     QTreeWidgetItem *createItem(const QDomElement &element,
                                 QTreeWidgetItem *parentItem = 0);

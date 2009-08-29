@@ -1,5 +1,6 @@
 #include "AnimationImagePaletpanel.h"
 #include "DataModels/AnimationModel.h"
+#include "Common.h"
 #include "GLSprite.h"
 #include <QPainter>
 #include <QPaintEvent>
@@ -36,31 +37,56 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::NoBrush);
     painter.fillRect(QRect(0, 0, width() - 1, height() - 1), Qt::SolidPattern);
 
-    const QPixmap* pPixmap = mpAnimationModel->getPixmap(mSourcePath);
-    if (pPixmap)
+    switch(mCanvasType)
     {
-        painter.drawPixmap(0, 0, *pPixmap);
-    }
-    painter.setPen(Qt::white);
-    painter.drawRect(mSelectedRect);
+        case CanvasType_Image:
+            const QPixmap* pPixmap = mpAnimationModel->getPixmap(mSourcePath);
+            if (pPixmap)
+            {
+                painter.drawPixmap(0, 0, *pPixmap);
+            }
+            painter.setPen(Qt::white);
+            painter.drawRect(mSelectedRect);
 
-    painter.setPen(palette().dark().color());
-    painter.setBrush(Qt::NoBrush);
-    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+            painter.setPen(palette().dark().color());
+            painter.setBrush(Qt::NoBrush);
+            painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+            break;
+        case CanvasType_Animation:
+
+            break;
+        default:
+            break;
+    }
+
 }
 
 void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
 {
-    const QPixmap* pPixmap = mpAnimationModel->getPixmap(path);
-    if (pPixmap)
+    QFileInfo info = QFileInfo(path);
+    QString suffix = info.suffix();
+
+    if (suffix.compare(IMAGE_FORMAT, Qt::CaseInsensitive) == 0)
+    {
+        const QPixmap* pPixmap = mpAnimationModel->getPixmap(path);
+        if (pPixmap)
+        {
+            mSourcePath = path;
+            setFixedSize(pPixmap->width(), pPixmap->height());
+
+            mCanvasType = CanvasType_Image;
+            this->repaint();
+        }
+        else
+        {
+            mSourcePath = "";
+            mCanvasType = CanvasType_None;
+        }
+    }
+    else if (suffix.compare(ANIMATION_FORMAT, Qt::CaseInsensitive) == 0)
     {
         mSourcePath = path;
-        setFixedSize(pPixmap->width(), pPixmap->height());
-        this->repaint();
-    }
-    else
-    {
-        mSourcePath = "";
+        mCanvasType = CanvasType_Animation;
     }
 }
 

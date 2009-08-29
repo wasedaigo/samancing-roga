@@ -101,18 +101,15 @@ QTimelineWidget::QTimelineWidget(AnimationModel* pAnimationModel, QWidget *paren
 
     this->setFocusPolicy(Qt::NoFocus);
 
-
-    this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenu(const QPoint &)));
-
     this->setContextMenuPolicy(Qt::CustomContextMenu);
+
     connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(onCellDoubleClicked(int, int)));
     connect(this, SIGNAL(cellPressed(int, int)), this, SLOT(onCellPressed(int, int)));
     connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(onCellEntered(int, int)));
 
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(onSelectedCellChanged(int, int)));
     connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refreshTimeLine()));
-    connect(mpAnimationModel, SIGNAL(refreshTimeLine(int)), this, SLOT(refreshTimeLine(int)));
 
 }
 
@@ -282,12 +279,6 @@ void QTimelineWidget::refreshTimeLine()
     KeyFrame::KeyFramePosition keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
     setCellSelection(keyframePosition.mLineNo, keyframePosition.mFrameNo, true);
 }
-
-void QTimelineWidget::refreshTimeLine(int lineNo)
-{
-    refreshTimeLine();
-}
-
  void QTimelineWidget::clearCells()
  {
     this->clear();
