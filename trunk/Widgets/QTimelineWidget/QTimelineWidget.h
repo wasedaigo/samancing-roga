@@ -42,7 +42,7 @@ public:
 
 public slots:
  void refreshTimeLine();
- void refreshTimeLine(int lineNo);
+
  void onSelectedCellChanged(int row, int column);
 
 protected:

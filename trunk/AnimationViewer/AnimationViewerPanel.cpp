@@ -27,7 +27,6 @@ AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAni
     setAutoFillBackground(false);
 
     connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refresh()));
-    connect(mpAnimationModel, SIGNAL(refreshTimeLine(int)), this, SLOT(refresh()));
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refresh()));
     connect(mpAnimationModel, SIGNAL(targetPositionMoved(int, int)), this, SLOT(refresh()));
 }

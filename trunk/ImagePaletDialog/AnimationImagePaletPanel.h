@@ -13,6 +13,14 @@ class AnimationImagePaletPanel : public QWidget
     Q_OBJECT
 
 public:
+
+    enum CanvasType
+    {
+        CanvasType_None,
+        CanvasType_Image,
+        CanvasType_Animation
+    };
+
     AnimationImagePaletPanel(AnimationModel* pAnimationModel);
     
     void setSnapGrid(int gridX, int gridY, bool snapGridCheck);
@@ -37,7 +45,7 @@ private:
     int mSnapGridY;
     bool mSnapGridCheck;
     QString mSourcePath;
-
+    CanvasType mCanvasType;
 };
 
 #endif // ANIMATIONIMAGEPALETPANEL_H

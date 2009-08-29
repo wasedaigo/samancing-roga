@@ -59,6 +59,25 @@ ResourceTree::ResourceTree(QWidget *parent)
     folderIcon.addPixmap(style()->standardPixmap(QStyle::SP_DirOpenIcon),
                          QIcon::Normal, QIcon::On);
     bookmarkIcon.addPixmap(style()->standardPixmap(QStyle::SP_FileIcon));
+
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenu(const QPoint &)));
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+}
+
+void ResourceTree::contextMenu(const QPoint &pos)
+{
+    QMenu *menu = new QMenu;
+
+    menu->addAction(tr("&Add"), this, SLOT(addItem()));
+    menu->addAction(tr("&Cut"), this, SLOT(cutItem()));
+    menu->addAction(tr("&Copy"), this, SLOT(copyFrame()));
+    menu->addAction(tr("&Paste"), this, SLOT(pasteFrame()));
+
+    menu->exec(this->mapToGlobal(pos));
+}
+
+void ResourceTree::addItem()
+{
 }
 
 bool ResourceTree::read(QString path)

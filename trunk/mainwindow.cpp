@@ -21,40 +21,44 @@ void MainWindow::setupConnections()
     // connec Animation Viewer
     connect(mpAnimationViewer, SIGNAL(playAnimation(bool)), this, SLOT(setEnabled(bool)));
     connect(ui->lineEditAnimationName, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationName(QString)));
-    connect(mpAnimationModel, SIGNAL(animationNameChanged(QString)), ui->lineEditAnimationName, SLOT(setText(QString)));
+    connect(ui->lineEditAnimationID, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationID(QString)));
 
-    connect(mpResourceTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+    connect(mpAnimationModel, SIGNAL(animationNameChanged(QString)), ui->lineEditAnimationName, SLOT(setText(QString)));
+    connect(mpAnimationModel, SIGNAL(animationIDChanged(QString)), ui->lineEditAnimationID, SLOT(setText(QString)));
+
+    connect(ui->animationTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
         this, SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
+    connect(mpAnimationModel, SIGNAL(fileSaved(QModelIndex)), &mAnimationTreeViewModel, SLOT(refresh(QModelIndex)));
 }
 
 void MainWindow::setupModels()
 {
-    mpAnimationModel = new AnimationModel();
+    mpAnimationModel = new AnimationModel(this);
     mpAnimationListModel = new QStandardItemModel(0, 1, this);
 }
 
 void MainWindow::setupUIModels()
 {
-//    mAnimationTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-//    mAnimationTreeViewModel.setReadOnly(true);
-//
-//    QString rootPath = QDir::currentPath();
-//    rootPath.append("/");
-//    rootPath.append(ANIMATION_DIR.path());
-//
-//    ui->animationTreeView->setAutoScroll(true);
-//    ui->animationTreeView->setModel(&mAnimationTreeViewModel);
-//    ui->animationTreeView->setRootIndex(mAnimationTreeViewModel.index(rootPath) );
+    mAnimationTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    mAnimationTreeViewModel.setReadOnly(true);
+
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ANIMATION_DIR.path());
+
+    ui->animationTreeView->setAutoScroll(true);
+    ui->animationTreeView->setModel(&mAnimationTreeViewModel);
+    ui->animationTreeView->setRootIndex(mAnimationTreeViewModel.index(rootPath) );
 }
 void MainWindow::setupUI()
 {
     ui->setupUi(this);
 
     mpDialog = new ImagePaletDialog(this, mpAnimationModel);
-
-    mpResourceTree = new ResourceTree(this);
-    mpResourceTree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    ui->animationViewerContainer->addWidget(mpResourceTree);
+//
+//    mpResourceTree = new ResourceTree(this);
+//    mpResourceTree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+//    ui->animationViewerContainer->addWidget(mpResourceTree);
 
     mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
     mpAnimationViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -69,7 +73,7 @@ void MainWindow::setupUI()
     rootPath.append(ANIMATION_DIR.path());
     rootPath.append("/test.ani");
 
-    mpResourceTree->read(rootPath);
+    //mpResourceTree->read(rootPath);
 }
 
 void MainWindow::loadConfigFile()
@@ -122,15 +126,15 @@ void MainWindow::onAnimationSelected(int index)
 ---------------------------------------------------------------------*/
 void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2)
 {
-//    QModelIndexList indexes = item1.indexes();
-//    QModelIndex index = indexes.takeFirst();
-//
-//    QString path = mAnimationTreeViewModel.filePath(index);
-//    QFileInfo fileInfo = QFileInfo (path);
-//    if (fileInfo.isFile())
-//    {
-//        mpAnimationModel->loadData(path);
-//    }
+    QModelIndexList indexes = item1.indexes();
+    QModelIndex index = indexes.takeFirst();
+
+    QString path = mAnimationTreeViewModel.filePath(index);
+    QFileInfo fileInfo = QFileInfo (path);
+    if (fileInfo.isFile())
+    {
+        mpAnimationModel->loadData(path);
+    }
 
 //    QString rootPath = QDir::currentPath();
 //    rootPath.append("/");

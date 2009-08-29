@@ -5,6 +5,7 @@
 #include <QList>
 #include <QObject>
 #include <QPixmap>
+#include <QModelIndex>
 #include <QDir>
 
 #include "KeyFrameData.h"
@@ -28,7 +29,7 @@ public:
         QString mValue;
     };
 
-    AnimationModel();
+    AnimationModel(QWidget* parent);
     ~AnimationModel();
 
     void clearPixmapHash();
@@ -75,9 +76,14 @@ public:
 
     // public member variables
     QString mAnimationName;
+    QString mAnimationDirectory;
+    QString mAnimationID;
+    QString mOriginalAnimationID;
+
     GLSprite::Rect mSelectedPaletTextureSrcRect;
 
 private:
+    QWidget* mpParent;
     QHash<QString, QPixmap*> mSourceImageHash;
 
     void tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const;
@@ -101,15 +107,18 @@ private:
 
 public slots:
     void setAnimationName(QString name);
+    void setAnimationID(QString id);
 
 signals:
     void animationNameChanged(QString animationName);
+    void animationIDChanged(QString animationName);
+
     void selectedPaletChanged(QString path);
     void animationDurationChanged(int length);
     void targetPositionMoved(int x, int y);
 
     void refreshTimeLine();
-    void refreshTimeLine(int lineNo);
+    void fileSaved(QModelIndex);
     void selectedKeyFramePositionChanged(int lineNo, int frameNo);
 };
 

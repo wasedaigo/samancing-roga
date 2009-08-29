@@ -4,7 +4,6 @@
 #include "ImagePaletDialog/AnimationImagePaletPanel.h"
 #include "Common.h"
 #include <QStandardItemModel>
-#include <QPixmap>
 #include <QString>
 
 ImagePaletDialog::ImagePaletDialog(QWidget *parent, AnimationModel* pAnimationModel)
@@ -20,7 +19,7 @@ ImagePaletDialog::ImagePaletDialog(QWidget *parent, AnimationModel* pAnimationMo
     QString rootPath = QDir::currentPath();
     rootPath.append("/");
     rootPath.append(ROOT_RESOURCE_DIR.path());
-    
+
     QStringList stringList;
 
     mSourceFileTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);

@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define ANIMATION_FORMAT "ani"
 #define IMAGE_FORMAT "png"
 //#define NONE "none"
 
