@@ -111,21 +111,18 @@ public:
     static BlendType getBlendTypeByString(QString typeString) ;
 
     static SpriteDescriptor makeDefaultSpriteDescriptor();
-    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, AnimationModel* pAnimationModel);
-    GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, QPixmap* pPixmap);
+    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable);
+    GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
     bool isSelectable() const;
     void render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite);
     QRect getRect() const;
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
-    int getAnimationDepth() const;
     int mID;
     SpriteDescriptor mSpriteDescriptor;
 
 private:
     bool mIsSelectable;
-    int mAnimationDepth;
-    AnimationModel* mpAnimationModel;
     QPixmap* mpPixmap;
 };
 

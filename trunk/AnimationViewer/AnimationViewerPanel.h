@@ -49,12 +49,9 @@ private:
     void renderCenterPointSprite(GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter);
     void renderTargetSprite(const QPoint& centerPoint, QPainter& painter);
     void clearSprites();
-    void addCelSprite(const KeyFrame* pKeyFrame);
     void swapSourceTexture();
 
     QList<GLSprite*> mGlSpriteList;
-
-    void setFrame(int frameNo);
 
     AnimationModel* mpAnimationModel;
     int mCurrentFrameNo;

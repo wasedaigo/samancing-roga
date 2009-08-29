@@ -59,24 +59,20 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     return spriteDescriptor;
 }
 
-GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, AnimationModel* pAnimationModel)
+GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mIsSelectable(selectable),
-          mAnimationDepth(animationDepth),
-          mpAnimationModel(pAnimationModel),
           mpPixmap(NULL)
 
 {
 }
 
 //
-GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int animationDepth, QPixmap* pPixmap)
+GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mIsSelectable(selectable),
-          mAnimationDepth(animationDepth),
-          mpAnimationModel(NULL),
           mpPixmap(pPixmap)
 
 {
@@ -86,12 +82,6 @@ bool GLSprite::isSelectable() const
 {
     return mIsSelectable;
 }
-
-int GLSprite::getAnimationDepth() const
-{
-    return mAnimationDepth;
-}
-
 void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite)
 {
     // Relative to target option
@@ -154,7 +144,7 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
     }
     else
     {
-         pQPixmap = mpAnimationModel->getPixmap(mSpriteDescriptor.mSourcePath);
+         pQPixmap = AnimationModel::getPixmap(mSpriteDescriptor.mSourcePath);
     }
 
     if (pQPixmap)
