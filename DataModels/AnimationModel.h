@@ -29,6 +29,8 @@ public:
         QString mValue;
     };
 
+    static QPixmap* getPixmap(QString path);
+
     AnimationModel(QWidget* parent);
     ~AnimationModel();
 
@@ -54,9 +56,7 @@ public:
     void clearAllKeyFrames();
 
     const QList<KeyFrame*>& getKeyFrameList(int lineNo) const;
-    const QList<KeyFrame*> createKeyFrameListAt(int frameNo) const;
-
-    QPixmap* getPixmap(QString path);
+    const QList<GLSprite*> createGLSpriteListAt(int frameNo) const;
 
     void setSelectedSourcePath(QString sourcePath);
     QString getSelectedSourcePath() const;
@@ -84,10 +84,9 @@ public:
 
 private:
     QWidget* mpParent;
-    QHash<QString, QPixmap*> mSourceImageHash;
 
     void tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const;
-    KeyFrame* tweenFrame(int lineNo, int frameNo) const;
+    GLSprite* tweenFrame(int lineNo, int frameNo) const;
 
     // Key Frames
     QList<KeyFrame*> mKeyFrames[MaxLineNo];

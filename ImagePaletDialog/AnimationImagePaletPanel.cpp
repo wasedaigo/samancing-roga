@@ -40,7 +40,8 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     switch(mCanvasType)
     {
         case CanvasType_Image:
-            const QPixmap* pPixmap = mpAnimationModel->getPixmap(mSourcePath);
+
+            const QPixmap* pPixmap = AnimationModel::getPixmap(mSourcePath);
             if (pPixmap)
             {
                 painter.drawPixmap(0, 0, *pPixmap);

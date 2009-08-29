@@ -58,14 +58,6 @@ void AnimationViewerPanel::gotoNextFrame()
     }
 }
 
-void AnimationViewerPanel::setFrame(int frameNo)
-{
-    while (!mGlSpriteList.isEmpty())
-    {
-        delete mGlSpriteList.takeFirst();
-    }
-}
-
 void AnimationViewerPanel::resizeEvent(QResizeEvent *event)
 {
     repaint();
@@ -245,20 +237,6 @@ void AnimationViewerPanel::clearSprites()
     }
 }
 
-void AnimationViewerPanel::addCelSprite(const KeyFrame* pKeyFrame)
-{
-    const KeyFrameData* pKeyFrameData = pKeyFrame->mpKeyFrameData;
-    mGlSpriteList.push_front(
-            new GLSprite(
-                    pKeyFrame->mLineNo,
-                    pKeyFrameData->mSpriteDescriptor,
-                    !pKeyFrameData->mIsTweenCel,
-                    0,
-                    mpAnimationModel
-            )
-    );
-}
-
 void AnimationViewerPanel::refresh()
 {
     clearSprites();
@@ -278,20 +256,7 @@ void AnimationViewerPanel::refresh()
         emit celSelected(NULL);
     }
 
-    QList<KeyFrame*> keyframeList = mpAnimationModel->createKeyFrameListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
-    for (int i = 0; i < keyframeList.count(); i++)
-    {
-        if (keyframeList[i]->mpKeyFrameData)
-        {
-            addCelSprite(keyframeList[i]);
-        }
-    }
-
-    for (int i = keyframeList.count() - 1; i >= 0; i--)
-    {
-        delete keyframeList[i];
-        keyframeList.removeAt(i);
-    }
+    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
 
     repaint();
 }

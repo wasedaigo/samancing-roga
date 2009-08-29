@@ -28,6 +28,33 @@ field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
     }\
 }
 ////
+
+static QHash<QString, QPixmap*> sSourceImageHash;
+
+// Palets
+QPixmap* AnimationModel::getPixmap(QString path)
+{
+    if (!sSourceImageHash.contains(path))
+    {
+        QString rootPath = QDir::currentPath();
+        QString fullPath = rootPath.append("/").append(ROOT_RESOURCE_DIR.path()).append(path);
+        QFileInfo fileInfo = QFileInfo (fullPath);
+
+        if (!fileInfo.isFile()) {return NULL;}
+        try
+        {
+            sSourceImageHash.insert(path, new QPixmap(fullPath));
+        }
+        catch(char *str)
+        {
+            printf("File:%s couldn't be loaded.", str);
+            return NULL;
+        }
+    };
+
+    return sSourceImageHash[path];
+}
+
 AnimationModel::AnimationModel(QWidget* parent)
     : mAnimationName(QString("")),
       mAnimationDirectory(QString("")),
@@ -50,7 +77,7 @@ AnimationModel::AnimationModel(QWidget* parent)
     spriteDescriptor.mCenter.mY = 16;
     spriteDescriptor.mPosition.mX = -100;
 
-    mpTargetSprite = new GLSprite(-1, spriteDescriptor, false, 0, mpTargetPixmap);
+    mpTargetSprite = new GLSprite(-1, spriteDescriptor, false, mpTargetPixmap);
 
     // Center point Sprite
     mpCenterPointPixmap = new QPixmap(":/resource/center_point.png");
@@ -60,13 +87,11 @@ AnimationModel::AnimationModel(QWidget* parent)
     spriteDescriptor.mCenter.mX = 4;
     spriteDescriptor.mCenter.mY = 4;
 
-    mpCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, 0, mpCenterPointPixmap);
+    mpCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, mpCenterPointPixmap);
 }
 
 AnimationModel::~AnimationModel()
 {
-    clearPixmapHash();
-
     delete mpTargetSprite;
     delete mpTargetPixmap;
 
@@ -94,13 +119,13 @@ void AnimationModel::setAnimationID(QString id)
 
 void AnimationModel::clearPixmapHash()
 {
-    QHash<QString, QPixmap*>::Iterator iter = mSourceImageHash.begin();
-    while(iter != mSourceImageHash.end())
+    QHash<QString, QPixmap*>::Iterator iter = sSourceImageHash.begin();
+    while(iter != sSourceImageHash.end())
     {
         delete iter.value();
         iter++;
     }
-    mSourceImageHash.clear();
+    sSourceImageHash.clear();
 }
 
 int AnimationModel::getMaxFrameCount()
@@ -323,43 +348,19 @@ const QList<KeyFrame*>& AnimationModel::getKeyFrameList(int lineNo) const
     return mKeyFrames[lineNo];
 }
 
-const QList<KeyFrame*> AnimationModel::createKeyFrameListAt(int frameNo) const
+const QList<GLSprite*> AnimationModel::createGLSpriteListAt(int frameNo) const
 {
-    QList<KeyFrame*> keyframeList;
+    QList<GLSprite*> glSpriteList;
     for (int lineNo = 0; lineNo < MaxLineNo; lineNo++)
     {
-        KeyFrame* pKeyFrame = tweenFrame(lineNo, frameNo);
-        if (pKeyFrame)
+        GLSprite* pGLSprite = tweenFrame(lineNo, frameNo);
+        if (pGLSprite)
         {
-            keyframeList.push_back(pKeyFrame);
+            glSpriteList.push_back(pGLSprite);
         }
     }
 
-    return keyframeList;
-}
-
-// Palets
-QPixmap* AnimationModel::getPixmap(QString path)
-{
-    if (!mSourceImageHash.contains(path))
-    {
-        QString rootPath = QDir::currentPath();
-        QString fullPath = rootPath.append("/").append(ROOT_RESOURCE_DIR.path()).append(path);
-        QFileInfo fileInfo = QFileInfo (fullPath);
-
-        if (!fileInfo.isFile()) {return NULL;}
-        try
-        {
-            mSourceImageHash.insert(path, new QPixmap(fullPath));
-        }
-        catch(char *str)
-        {
-            printf("File:%s couldn't be loaded.", str);
-            return NULL;
-        }
-    };
-
-    return mSourceImageHash[path];
+    return glSpriteList;
 }
 
 // Palet No (set / get)
@@ -448,7 +449,7 @@ void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::Twee
 }
 
 // Return true if it find a cel to tween, if not return false;
-KeyFrame* AnimationModel::tweenFrame(int lineNo, int frameNo) const
+GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
 {
     if (mKeyFrames[lineNo].count() == 0) {return NULL;}
 
@@ -464,8 +465,7 @@ KeyFrame* AnimationModel::tweenFrame(int lineNo, int frameNo) const
 
     // If the keyframe is empty, don't generate any temporaly keyframe
     if (!pBaseKeyFrameData) {return NULL;}
-
-    pKeyFrameData->mIsTweenCel = (pBaseKeyFrame->mFrameNo != frameNo);
+    bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
     pKeyFrameData->mSpriteDescriptor = pBaseKeyFrameData->mSpriteDescriptor;
 
     // Tween for each attribute
@@ -491,7 +491,7 @@ KeyFrame* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     }
     else
     {
-        return new KeyFrame(lineNo, frameNo, pKeyFrameData);
+        return new GLSprite(lineNo, pKeyFrameData->mSpriteDescriptor, isTweenCel);
     }
 }
 
@@ -701,7 +701,6 @@ void AnimationModel::loadData(QString path)
             pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY = keyframe["textureRect"][1].asInt();
             pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth = keyframe["textureRect"][2].asInt();
             pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight = keyframe["textureRect"][3].asInt();
-            pKeyFrameData->mIsTweenCel = false;
 
             KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyFrameData);
             mKeyFrames[i].push_back(pKeyFrame);

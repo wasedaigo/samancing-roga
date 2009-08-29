@@ -30,7 +30,6 @@ public:
 
     KeyFrameData();
 
-    bool mIsTweenCel;
     GLSprite::SpriteDescriptor mSpriteDescriptor;
     TweenType mTweenTypes[TweenAttribute_COUNT];
     void copyAttribute(TweenAttribute tweenAttribute, KeyFrameData* item);
