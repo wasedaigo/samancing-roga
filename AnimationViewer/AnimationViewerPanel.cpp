@@ -3,12 +3,14 @@
 #include "DataModels/CelModel.h"
 #include "DataModels/KeyFrame.h"
 #include "DataModels/KeyFrameData.h"
+#include "ResourceManager.h"
 #include "GLSprite.h"
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QTimer>
 #include <QPainter>
 #include <QColor>
+#include <QMessageBox>
 
 #define TARGET_SCREEN_WIDTH 320
 #define TARGET_SCREEN_HEIGHT 240
@@ -111,16 +113,6 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
     // Color of helper lines
     painter.setPen(QColor(120, 150, 200));
 
-    // Draw Screen Size Indicator
-    painter.drawRect(QRect(
-                    centerPoint.x(),
-                    centerPoint.y(),
-                    TARGET_SCREEN_WIDTH,
-                    TARGET_SCREEN_HEIGHT
-                    )
-    );
-
-
     renderCross(painter);
     renderCelSprites(centerPoint, painter);
     renderTargetSprite(centerPoint, painter);
@@ -156,7 +148,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         }
 
         // render sprite
-        glSprite->render(centerPoint, painter, mpAnimationModel->getTargetSprite());
+        glSprite->render(centerPoint, painter, NULL, AnimationModel::getTargetSprite());
 
         // This code is redundunt of the code in GLSprite, however I want to do the same calcuration again for cel drawing
         QPoint spriteRenderPoint = centerPoint;
@@ -214,19 +206,19 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 void AnimationViewerPanel::renderCenterPointSprite(GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter)
 {
     // render center point
-    GLSprite* centerPointSprite = mpAnimationModel->getCenterPointSprite();
+    GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
     QPoint centerPointPos = QPoint(
             (centerPoint.x() + (int)pGlSprite->mSpriteDescriptor.mPosition.mX + (int)pGlSprite->mSpriteDescriptor.mCenter.mX),
             (centerPoint.y() + (int)pGlSprite->mSpriteDescriptor.mPosition.mY + (int)pGlSprite->mSpriteDescriptor.mCenter.mY)
     );
 
-    centerPointSprite->render(centerPointPos, painter, NULL);
+    centerPointSprite->render(centerPointPos, painter, NULL, NULL);
 }
 
 void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainter& painter)
 {
     painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
-    mpAnimationModel->getTargetSprite()->render(centerPoint, painter, NULL);
+    mpAnimationModel->getTargetSprite()->render(centerPoint, painter, NULL, NULL);
 }
 
 void AnimationViewerPanel::clearSprites()
@@ -240,6 +232,17 @@ void AnimationViewerPanel::clearSprites()
 void AnimationViewerPanel::refresh()
 {
     clearSprites();
+    int targetX = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
+    int targetY = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
+
+    QPoint centerPoint = getCenterPoint();
+
+    if (targetX < -centerPoint.x()){targetX = -centerPoint.x();}
+    if (targetX > centerPoint.x()){targetX = centerPoint.x();}
+    if (targetY < -centerPoint.y()){targetY = -centerPoint.y();}
+    if (targetY > centerPoint.y()){targetY = centerPoint.y();}
+
+    mpAnimationModel->setTargetSpritePosition(targetX, targetY);
 
     // set cel reference
     KeyFrame::KeyFramePosition keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
@@ -349,25 +352,41 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 
     if(!mCelGrabbed && !mTargetGrabbed)
     {
-        QPixmap* pTryPixmap = mpAnimationModel->getPixmap(mpAnimationModel->getSelectedSourcePath());
-        if (pTryPixmap)
+        QString path1 = mpAnimationModel->getLoadedAnimationPath();
+        QString path2 = mpAnimationModel->getSelectedSourcePath();
+      if (mpAnimationModel->getLoadedAnimationPath() == mpAnimationModel->getSelectedSourcePath())
+      {
+          QMessageBox::information(window(), tr("Animation nest error"),
+                 tr("You cannot nest the same animation"));
+      }
+      else
+      {
+        switch(ResourceManager::getFileType(mpAnimationModel->getSelectedSourcePath()))
         {
+            case ResourceManager::FileType_Animation:
+            case ResourceManager::FileType_Image:
             if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
-            {
-                GLSprite::Point2 pt;
-                pt.mX = relativePressedPosition.x();
-                pt.mY = relativePressedPosition.y();
-
-                mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
-            }
-            else
-            {
-                if (event->modifiers() & Qt::ShiftModifier)
                 {
-                    swapSourceTexture();
+                    GLSprite::Point2 pt;
+                    pt.mX = relativePressedPosition.x();
+                    pt.mY = relativePressedPosition.y();
+
+                    mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
                 }
-            }
+                else
+                {
+                    if (event->modifiers() & Qt::ShiftModifier)
+                    {
+                        swapSourceTexture();
+                    }
+                }
+            break;
+
+            default:
+
+            break;
         }
+      }
     }
 }
 

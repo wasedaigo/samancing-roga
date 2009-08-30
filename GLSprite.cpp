@@ -1,10 +1,12 @@
 #include "GLSprite.h"
 
-#include "Common.h"
 #include <math.h>
 #include <QPixmap>
 #include <QPainter>
 #include "DataModels/AnimationModel.h"
+#include "ResourceManager.h"
+
+#define PI 3.14159265358979323846
 
 QString GLSprite::blendTypeSting[GLSprite::eBT_COUNT] =
 {
@@ -37,6 +39,7 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mCenter.mX = 0;
     spriteDescriptor.mCenter.mY = 0;
     spriteDescriptor.mCenter.mZ = 0;
+    spriteDescriptor.mFrameNo = 0;
 
     spriteDescriptor.mAlpha = 1.0;
 
@@ -82,7 +85,7 @@ bool GLSprite::isSelectable() const
 {
     return mIsSelectable;
 }
-void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite)
+void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite)
 {
     // Relative to target option
     QPoint positionOffset = QPoint(0, 0);
@@ -91,7 +94,13 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
         positionOffset.setX((int)(pTargetSprite->mSpriteDescriptor.mPosition.mX));
         positionOffset.setY((int)(pTargetSprite->mSpriteDescriptor.mPosition.mY));
     }
-    renderCenterPoint += positionOffset;
+
+    QPoint spriteRenderPoint = renderCenterPoint + positionOffset;
+//    if (pParentSprite)
+//    {
+//        spriteRenderPoint.setX(spriteRenderPoint.x() + pParentSprite->mSpriteDescriptor.mPosition.mX);
+//        spriteRenderPoint.setY(spriteRenderPoint.y() + pParentSprite->mSpriteDescriptor.mPosition.mY);
+//    }
 
     // Look at target option
     float angleOffset = 0;
@@ -117,19 +126,22 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
     }
 
     // Rotation & Scale
-    int dx = (int)(mSpriteDescriptor.mPosition.mX + renderCenterPoint.x());
-    int dy = (int)(mSpriteDescriptor.mPosition.mY + renderCenterPoint.y());
-    painter.translate(dx, dy);
+    QPoint effectCenter = QPoint(
+                mSpriteDescriptor.mPosition.mX + spriteRenderPoint.x(),
+                mSpriteDescriptor.mPosition.mY + spriteRenderPoint.y()
+            );
+
+    painter.translate(effectCenter.x(), effectCenter.y());
     painter.rotate(mSpriteDescriptor.mRotation.mX + angleOffset);
     painter.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
-    painter.translate(-dx, -dy);
+    painter.translate(-effectCenter.x(), -effectCenter.y());
 
     // Render
     QPoint dstPoint(
                     (int)(mSpriteDescriptor.mPosition.mX - mSpriteDescriptor.mCenter.mX),
                     (int)(mSpriteDescriptor.mPosition.mY - mSpriteDescriptor.mCenter.mY)
                    );
-    dstPoint += renderCenterPoint;
+    dstPoint += spriteRenderPoint;
     QRect srcRect(
             (int)mSpriteDescriptor.mTextureSrcRect.mX,
             (int)mSpriteDescriptor.mTextureSrcRect.mY,
@@ -141,15 +153,38 @@ void GLSprite::render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTa
     if (mpPixmap)
     {
         pQPixmap = mpPixmap;
+        if (pQPixmap) {painter.drawPixmap(dstPoint, *pQPixmap, srcRect);}
     }
     else
     {
-         pQPixmap = AnimationModel::getPixmap(mSpriteDescriptor.mSourcePath);
-    }
+         QString sourcePath = mSpriteDescriptor.mSourcePath;
+         switch(ResourceManager::getFileType(sourcePath))
+         {
+            case ResourceManager::FileType_Image:
+                pQPixmap = AnimationModel::getPixmap(mSpriteDescriptor.mSourcePath);
+                painter.drawPixmap(dstPoint, *pQPixmap, srcRect);
+                break;
+            case ResourceManager::FileType_Animation:
+                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath);
+                if (pAnimationModel)
+                {
+                    // frame no for subanimation
+                    if (pAnimationModel->getMaxFrameCount() > 0)
+                    {
+                        int subFrameNo = mSpriteDescriptor.mFrameNo % pAnimationModel->getMaxFrameCount();
+                        QList<GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(subFrameNo);
+                        for (int i = 0; i < glSpriteList.count(); i++)
+                        {
+                            glSpriteList[i]->render(renderCenterPoint, painter, this, pTargetSprite);
+                        }
+                        while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
+                    }
+                }
+                break;
+            default:
 
-    if (pQPixmap)
-    {
-        painter.drawPixmap(dstPoint, *pQPixmap, srcRect);
+             break;
+         }
     }
 
     painter.resetTransform();

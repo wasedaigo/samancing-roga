@@ -2,7 +2,7 @@
 #include "ui_imagepaletdialog.h"
 #include "DataModels/AnimationModel.h"
 #include "ImagePaletDialog/AnimationImagePaletPanel.h"
-#include "Common.h"
+#include "ResourceManager.h"
 #include <QStandardItemModel>
 #include <QString>
 

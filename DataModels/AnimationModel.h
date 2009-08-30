@@ -30,9 +30,12 @@ public:
     };
 
     static QPixmap* getPixmap(QString path);
+    static GLSprite* getTargetSprite();
+    static GLSprite* getCenterPointSprite();
 
     AnimationModel(QWidget* parent);
     ~AnimationModel();
+    void setTargetSpritePosition(int x, int y);
 
     void clearPixmapHash();
     int getMaxFrameCount();
@@ -44,6 +47,7 @@ public:
     bool isKeyData(KeyFrameData::TweenAttribute tweenAttribute, const KeyFrame* pKeyframe) const;
     int getPreviousKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
     int getNextKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
+    int getSubanimationStartKeyFrameIndex(int lineNo, int frameNo) const;
 
     void setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2& position);
     void setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyframeData);
@@ -61,28 +65,25 @@ public:
     void setSelectedSourcePath(QString sourcePath);
     QString getSelectedSourcePath() const;
 
-    void setTargetSpritePosition(int x, int y);
-    GLSprite* getTargetSprite() const;
 
-    GLSprite* getCenterPointSprite() const;
 
     KeyFrame::KeyFramePosition getCurrentKeyFramePosition();
     void selectCurrentKeyFramePosition(int lineNo, int frameNo);
 
     void tellTimeLineToRefresh();
 
-    void saveData();
-    void loadData(QString path);
-
+    bool saveData();
+    bool loadData(QString path);
+    QString getLoadedAnimationPath() const;
     // public member variables
+    GLSprite::Rect mSelectedPaletTextureSrcRect;
+
+private:
     QString mAnimationName;
     QString mAnimationDirectory;
     QString mAnimationID;
     QString mOriginalAnimationID;
 
-    GLSprite::Rect mSelectedPaletTextureSrcRect;
-
-private:
     QWidget* mpParent;
 
     void tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const;
@@ -99,10 +100,6 @@ private:
     KeyFrame::KeyFramePosition mSelectedKeyFramePosition;
     KeyFrameData* mpTargetCel;
 
-    QPixmap* mpTargetPixmap;
-    GLSprite* mpTargetSprite;
-    QPixmap* mpCenterPointPixmap;
-    GLSprite* mpCenterPointSprite;
 
 public slots:
     void setAnimationName(QString name);

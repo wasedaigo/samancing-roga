@@ -3,7 +3,7 @@
 #include "ui_mainwindow.h"
 #include "ui_AnimationViewer.h"
 #include "ImagePaletDialog/ImagePaletDialog.h"
-#include "Common.h"
+#include "ResourceManager.h"
 #include "AnimationViewer/AnimationViewer.h"
 #include "QStandardItemModel.h"
 #include "QTimelineWidget/QTimelinePanel.h"
@@ -55,18 +55,14 @@ void MainWindow::setupUI()
     ui->setupUi(this);
 
     mpDialog = new ImagePaletDialog(this, mpAnimationModel);
-//
-//    mpResourceTree = new ResourceTree(this);
-//    mpResourceTree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-//    ui->animationViewerContainer->addWidget(mpResourceTree);
 
     mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
     mpAnimationViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->animationViewer->addWidget(mpAnimationViewer);
 
-    QTimelinePanel* pQTimelinePanel = new QTimelinePanel(mpAnimationModel, this);
-    pQTimelinePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    ui->timelineContainer->addWidget(pQTimelinePanel);
+    mpQTimelinePanel = new QTimelinePanel(mpAnimationModel, this);
+    mpQTimelinePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    ui->timelineContainer->addWidget(mpQTimelinePanel);
 
     QString rootPath = QDir::currentPath();
     rootPath.append("/");
@@ -92,8 +88,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupConnections();
 
-    ui->animationDataContainer->setEnabled(false);
-    ui->animationViewer->setEnabled(false);
+    setEditEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -102,6 +97,13 @@ MainWindow::~MainWindow()
     delete mpAnimationModel;
     delete mpAnimationListModel;
     delete ui;
+}
+
+void MainWindow::setEditEnabled(bool enabled)
+{
+    ui->gridInfoBox->setEnabled(enabled);
+    mpQTimelinePanel->setEnabled(enabled);
+    mpAnimationViewer->setEnabled(enabled);
 }
 
 /* -------------------------------------------------------------------
@@ -133,7 +135,14 @@ void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSele
     QFileInfo fileInfo = QFileInfo (path);
     if (fileInfo.isFile())
     {
-        mpAnimationModel->loadData(path);
+        if (mpAnimationModel->loadData(path))
+        {
+            setEditEnabled(true);
+        }
+        else
+        {
+            setEditEnabled(false);
+        }
     }
 
 //    QString rootPath = QDir::currentPath();

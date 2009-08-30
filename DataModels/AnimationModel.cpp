@@ -1,7 +1,7 @@
 #include "AnimationModel.h"
 #include <QPixmap>
 #include <QMessageBox>
-#include "Common.h"
+#include "ResourceManager.h"
 #include "Macros.h"
 #include "json/writer.h"
 #include "json/reader.h"
@@ -9,8 +9,9 @@
 #include <sstream>
 #include "KeyFrameData.h"
 
+#define DEFAULT_SELECTION_RECT GLSprite::Rect(0, 0, 32, 32);
+
 // Macros
-// Tween fields
 #define TweenValue(field, startValue, endValue, frameNo, startFrameNo, endFrameNo)\
 field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
 
@@ -30,8 +31,11 @@ field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
 ////
 
 static QHash<QString, QPixmap*> sSourceImageHash;
+static QPixmap* spTargetPixmap = NULL;
+static GLSprite* spTargetSprite = NULL;
+static QPixmap* spCenterPointPixmap = NULL;
+static GLSprite* spCenterPointSprite = NULL;
 
-// Palets
 QPixmap* AnimationModel::getPixmap(QString path)
 {
     if (!sSourceImageHash.contains(path))
@@ -55,6 +59,16 @@ QPixmap* AnimationModel::getPixmap(QString path)
     return sSourceImageHash[path];
 }
 
+GLSprite* AnimationModel::getTargetSprite()
+{
+    return spTargetSprite;
+}
+
+GLSprite* AnimationModel::getCenterPointSprite()
+{
+    return spCenterPointSprite;
+}
+
 AnimationModel::AnimationModel(QWidget* parent)
     : mAnimationName(QString("")),
       mAnimationDirectory(QString("")),
@@ -68,35 +82,47 @@ AnimationModel::AnimationModel(QWidget* parent)
     mSelectedKeyFramePosition.mLineNo = -1;
 
     // Target sprite
-    mpTargetPixmap = new QPixmap(":/resource/target.png");
-    GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
+    if (spTargetPixmap == NULL)
+    {
+        spTargetPixmap = new QPixmap(":/resource/target.png");
+        GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
 
-    spriteDescriptor.mTextureSrcRect.mWidth = 32;
-    spriteDescriptor.mTextureSrcRect.mHeight = 32;
-    spriteDescriptor.mCenter.mX = 16;
-    spriteDescriptor.mCenter.mY = 16;
-    spriteDescriptor.mPosition.mX = -100;
+        spriteDescriptor.mTextureSrcRect.mWidth = 32;
+        spriteDescriptor.mTextureSrcRect.mHeight = 32;
+        spriteDescriptor.mCenter.mX = 16;
+        spriteDescriptor.mCenter.mY = 16;
+        spriteDescriptor.mPosition.mX = -100;
 
-    mpTargetSprite = new GLSprite(-1, spriteDescriptor, false, mpTargetPixmap);
+        spTargetSprite = new GLSprite(-1, spriteDescriptor, false, spTargetPixmap);
+    }
 
-    // Center point Sprite
-    mpCenterPointPixmap = new QPixmap(":/resource/center_point.png");
-    spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
-    spriteDescriptor.mTextureSrcRect.mWidth = 8;
-    spriteDescriptor.mTextureSrcRect.mHeight = 8;
-    spriteDescriptor.mCenter.mX = 4;
-    spriteDescriptor.mCenter.mY = 4;
+    // Center sprite
+    if (spCenterPointPixmap == NULL)
+    {
+        spCenterPointPixmap = new QPixmap(":/resource/center_point.png");
+        GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
+        spriteDescriptor.mTextureSrcRect.mWidth = 8;
+        spriteDescriptor.mTextureSrcRect.mHeight = 8;
+        spriteDescriptor.mCenter.mX = 4;
+        spriteDescriptor.mCenter.mY = 4;
 
-    mpCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, mpCenterPointPixmap);
+        spCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, spCenterPointPixmap);
+    }
 }
 
 AnimationModel::~AnimationModel()
 {
-    delete mpTargetSprite;
-    delete mpTargetPixmap;
+}
 
-    delete mpCenterPointSprite;
-    delete mpCenterPointPixmap;
+void AnimationModel::setTargetSpritePosition(int x, int y)
+{
+    if (spTargetSprite->mSpriteDescriptor.mPosition.mX != x || spTargetSprite->mSpriteDescriptor.mPosition.mY != y)
+    {
+        spTargetSprite->mSpriteDescriptor.mPosition.mX = x;
+        spTargetSprite->mSpriteDescriptor.mPosition.mY = y;
+
+        emit targetPositionMoved(x, y);
+    }
 }
 
 void AnimationModel::setAnimationName(QString name)
@@ -135,7 +161,7 @@ int AnimationModel::getMaxFrameCount()
     {
         if (mKeyFrames[i].count() > 0)
         {
-            int t = mKeyFrames[i].last()->mFrameNo;
+            int t = mKeyFrames[i].last()->mFrameNo + 1;
             if (t > max)
             {
                 max = t;
@@ -221,6 +247,25 @@ int AnimationModel::getNextKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::
     }
 
     return -1;
+}
+
+
+int AnimationModel::getSubanimationStartKeyFrameIndex(int lineNo, int frameNo) const
+{
+    int prevIndex = getPreviousKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
+    if (prevIndex < 0){return -1;}
+    if (!mKeyFrames[lineNo][prevIndex]->mpKeyFrameData){return -1;}
+    QString sourthPath = mKeyFrames[lineNo][prevIndex]->mpKeyFrameData->mSpriteDescriptor.mSourcePath;
+
+    for (int i = prevIndex - 1; i >= 0; i--)
+    {
+        if(!mKeyFrames[lineNo][i]->mpKeyFrameData || sourthPath != mKeyFrames[lineNo][i]->mpKeyFrameData->mSpriteDescriptor.mSourcePath)
+        {
+            return i + 1;
+        }
+    }
+
+    return 0;
 }
 
 // set new key frame
@@ -363,15 +408,16 @@ const QList<GLSprite*> AnimationModel::createGLSpriteListAt(int frameNo) const
     return glSpriteList;
 }
 
-// Palet No (set / get)
 void AnimationModel::setSelectedSourcePath(QString path)
 {
+    if (ResourceManager::getFileType(path) == ResourceManager::FileType_Invalid) { path = ""; }
+
     if (mSelectedSourcePath != path)
     {
         mSelectedSourcePath = path;
+        mSelectedPaletTextureSrcRect = DEFAULT_SELECTION_RECT;
         emit selectedPaletChanged(path);
     }
-
 }
 
 QString AnimationModel::getSelectedSourcePath() const
@@ -379,30 +425,17 @@ QString AnimationModel::getSelectedSourcePath() const
     return mSelectedSourcePath;
 }
 
-void AnimationModel::setTargetSpritePosition(int x, int y)
-{
-    if (mpTargetSprite->mSpriteDescriptor.mPosition.mX != x || mpTargetSprite->mSpriteDescriptor.mPosition.mY != y)
-    {
-        mpTargetSprite->mSpriteDescriptor.mPosition.mX = x;
-        mpTargetSprite->mSpriteDescriptor.mPosition.mY = y;
-
-        emit targetPositionMoved(x, y);
-    }
-}
-
-GLSprite* AnimationModel::getTargetSprite() const
-{
-    return mpTargetSprite;
-}
-
-GLSprite* AnimationModel::getCenterPointSprite() const
-{
-    return mpCenterPointSprite;
-}
-
 void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const
 {
     GLSprite::SpriteDescriptor& startDescriptor = startKeyFrameData->mSpriteDescriptor;
+
+    // if the last frame is empty, just copy the start frame
+    if(!endKeyFrameData)
+    {
+        keyframeData->mSpriteDescriptor = startDescriptor;
+        return;
+    }
+
     GLSprite::SpriteDescriptor& endDescriptor = endKeyFrameData->mSpriteDescriptor;
 
     switch(tweenAttribute)
@@ -417,13 +450,13 @@ void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::Twee
             int endY = endDescriptor.mPosition.mY;
             if (!startDescriptor.mRelativeToTarget && endDescriptor.mRelativeToTarget)
             {
-                endX += mpTargetSprite->mSpriteDescriptor.mPosition.mX;
-                endY += mpTargetSprite->mSpriteDescriptor.mPosition.mY;
+                endX += spTargetSprite->mSpriteDescriptor.mPosition.mX;
+                endY += spTargetSprite->mSpriteDescriptor.mPosition.mY;
             }
             else if (startDescriptor.mRelativeToTarget && !endDescriptor.mRelativeToTarget)
             {
-                endX -= mpTargetSprite->mSpriteDescriptor.mPosition.mX;
-                endY -= mpTargetSprite->mSpriteDescriptor.mPosition.mY;
+                endX -= spTargetSprite->mSpriteDescriptor.mPosition.mX;
+                endY -= spTargetSprite->mSpriteDescriptor.mPosition.mY;
             }
 
             Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_position], startX, endX, SpriteDescriptor.mPosition.mX, frameNo, startFrameNo, endFrameNo);
@@ -434,7 +467,7 @@ void AnimationModel::tweenElement(KeyFrameData* keyframeData, KeyFrameData::Twee
             int endRotationX = endDescriptor.mRotation.mX;
             if (endDescriptor.mLookAtTarget)
             {
-                endRotationX += mpTargetSprite->mSpriteDescriptor.mRotation.mX;
+                endRotationX += spTargetSprite->mSpriteDescriptor.mRotation.mX;
             }
 
             Tween(keyframeData, TweenTypes[KeyFrameData::TweenAttribute_rotation], startRotationX, endRotationX, SpriteDescriptor.mRotation.mX, frameNo, startFrameNo, endFrameNo);
@@ -457,6 +490,9 @@ GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     KeyFrameData* pKeyFrameData = new KeyFrameData();
     int baseIndex = getPreviousKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
 
+    // It will return when the same source file path was first used, this is needed for subanimation playback
+    int subAnimationStartIndex = getSubanimationStartKeyFrameIndex(lineNo, frameNo);
+
     // No valid keyframe has been found before specified cel position
     if (baseIndex < 0){return NULL;}
 
@@ -467,7 +503,7 @@ GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     if (!pBaseKeyFrameData) {return NULL;}
     bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
     pKeyFrameData->mSpriteDescriptor = pBaseKeyFrameData->mSpriteDescriptor;
-
+    
     // Tween for each attribute
     bool noTweenFound = true;
     for (int i = 0; i < KeyFrameData::TweenAttribute_COUNT; i++)
@@ -482,6 +518,16 @@ GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
             KeyFrame* pEndKeyFrame = mKeyFrames[lineNo][endIndex];
             tweenElement(pKeyFrameData, tweenAttribute, pStartKeyFrame->mpKeyFrameData, pEndKeyFrame->mpKeyFrameData, frameNo, pStartKeyFrame->mFrameNo, pEndKeyFrame->mFrameNo);
         }
+    }
+
+    // frame no for subanimation in the frame
+    if (subAnimationStartIndex < 0)
+    {
+        pKeyFrameData->mSpriteDescriptor.mFrameNo = 0;
+    }
+    else
+    {
+        pKeyFrameData->mSpriteDescriptor.mFrameNo = frameNo - mKeyFrames[lineNo][subAnimationStartIndex]->mFrameNo;
     }
 
     if (noTweenFound)
@@ -520,7 +566,7 @@ void AnimationModel::tellTimeLineToRefresh()
     emit refreshTimeLine();
 }
 
-void AnimationModel::saveData()
+bool AnimationModel::saveData()
 {
     // Get path with directory info
     QString rootPath = QDir::currentPath();
@@ -540,7 +586,7 @@ void AnimationModel::saveData()
     {
         QMessageBox::information(mpParent->window(), tr("File saving error"),
                              tr(error.toStdString().c_str()));
-        return;
+        return false;
     }
 
     Json::Value root;
@@ -608,8 +654,13 @@ void AnimationModel::saveData()
                 keyframeData["positionTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position]].toStdString();
                 keyframeData["rotationTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]].toStdString();
                 keyframeData["scaleTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale]].toStdString();
-                keyframesData[i][j] = keyframeData;
+                keyframeData["isEmpty"] = false;
             }
+            else
+            {
+                keyframeData["isEmpty"] = true;
+            }
+            keyframesData[i][j] = keyframeData;
         }
     }
 
@@ -624,9 +675,11 @@ void AnimationModel::saveData()
 
     mOriginalAnimationID = mAnimationID;
     emit fileSaved(QModelIndex());
+
+    return true;
 }
 
-void AnimationModel::loadData(QString path)
+bool AnimationModel::loadData(QString path)
 {
     clearAllKeyFrames();
 
@@ -639,9 +692,10 @@ void AnimationModel::loadData(QString path)
     //std::string json_doc = readInputFile(path);
     if(!reader.parse(inputJson, root))
     {
-        std::string error_message = reader.getFormatedErrorMessages();
-        printf("JSON error:%s\n", error_message.c_str());
-        exit(EXIT_FAILURE);
+        QString error = QString("File %0 is not correct JSON format").arg(path);
+        printf("%s", error.toStdString().c_str());
+        //QMessageBox::information(mpParent->window(), tr("File loading error"), tr(error.toStdString().c_str()));
+        return false;
     }
 
     // Get path without directory info & extension
@@ -665,44 +719,52 @@ void AnimationModel::loadData(QString path)
         for (unsigned int j = 0; j < lines[i].size(); j++)
         {
             Json::Value& keyframe = lines[i][j];
+
             int frameNo = keyframe["frameNo"].asInt();
             int lineNo = keyframe["lineNo"].asInt();
+            KeyFrame* pKeyFrame = NULL;
+            if (!keyframe["isEmpty"].asBool())
+            {
+                KeyFrameData* pKeyFrameData = new KeyFrameData();
+                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["alphaTween"].asString()));
+                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["positionTween"].asString()));
+                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["rotationTween"].asString()));
+                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["scaleTween"].asString()));
 
-            KeyFrameData* pKeyFrameData = new KeyFrameData();
-            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["alphaTween"].asString()));
-            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["positionTween"].asString()));
-            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["rotationTween"].asString()));
-            pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["scaleTween"].asString()));
+                pKeyFrameData->mSpriteDescriptor.mBlur = keyframe["blur"].asBool();
+                pKeyFrameData->mSpriteDescriptor.mLookAtTarget = keyframe["lookAtTarget"].asBool();
+                pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
 
-            pKeyFrameData->mSpriteDescriptor.mBlur = keyframe["blur"].asBool();
-            pKeyFrameData->mSpriteDescriptor.mLookAtTarget = keyframe["lookAtTarget"].asBool();
-            pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
+                pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());
+                pKeyFrameData->mSpriteDescriptor.mBlendType = GLSprite::getBlendTypeByString(QString::fromStdString(keyframe["blendType"].asString()));
 
-            pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());
-            pKeyFrameData->mSpriteDescriptor.mBlendType = GLSprite::getBlendTypeByString(QString::fromStdString(keyframe["blendType"].asString()));
+                pKeyFrameData->mSpriteDescriptor.mAlpha = keyframe["alpha"].asDouble();
 
-            pKeyFrameData->mSpriteDescriptor.mAlpha = keyframe["alpha"].asDouble();
+                pKeyFrameData->mSpriteDescriptor.mPosition.mX = keyframe["position"][static_cast<unsigned int>(0)].asInt();
+                pKeyFrameData->mSpriteDescriptor.mPosition.mY = keyframe["position"][1].asInt();
+                pKeyFrameData->mSpriteDescriptor.mPosition.mZ = keyframe["position"][2].asInt();
 
-            pKeyFrameData->mSpriteDescriptor.mPosition.mX = keyframe["position"][static_cast<unsigned int>(0)].asInt();
-            pKeyFrameData->mSpriteDescriptor.mPosition.mY = keyframe["position"][1].asInt();
-            pKeyFrameData->mSpriteDescriptor.mPosition.mZ = keyframe["position"][2].asInt();
+                pKeyFrameData->mSpriteDescriptor.mRotation.mX = keyframe["rotation"][static_cast<unsigned int>(0)].asInt();
+                pKeyFrameData->mSpriteDescriptor.mRotation.mY = keyframe["rotation"][1].asInt();
+                pKeyFrameData->mSpriteDescriptor.mRotation.mZ = keyframe["rotation"][2].asInt();
 
-            pKeyFrameData->mSpriteDescriptor.mRotation.mX = keyframe["rotation"][static_cast<unsigned int>(0)].asInt();
-            pKeyFrameData->mSpriteDescriptor.mRotation.mY = keyframe["rotation"][1].asInt();
-            pKeyFrameData->mSpriteDescriptor.mRotation.mZ = keyframe["rotation"][2].asInt();
+                pKeyFrameData->mSpriteDescriptor.mScale.mX = keyframe["scale"][static_cast<unsigned int>(0)].asDouble();
+                pKeyFrameData->mSpriteDescriptor.mScale.mY = keyframe["scale"][1].asDouble();
 
-            pKeyFrameData->mSpriteDescriptor.mScale.mX = keyframe["scale"][static_cast<unsigned int>(0)].asDouble();
-            pKeyFrameData->mSpriteDescriptor.mScale.mY = keyframe["scale"][1].asDouble();
+                pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asInt();
+                pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asInt();
 
-            pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asInt();
-            pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asInt();
+                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX = keyframe["textureRect"][static_cast<unsigned int>(0)].asInt();
+                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY = keyframe["textureRect"][1].asInt();
+                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth = keyframe["textureRect"][2].asInt();
+                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight = keyframe["textureRect"][3].asInt();
 
-            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX = keyframe["textureRect"][static_cast<unsigned int>(0)].asInt();
-            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY = keyframe["textureRect"][1].asInt();
-            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth = keyframe["textureRect"][2].asInt();
-            pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight = keyframe["textureRect"][3].asInt();
-
-            KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyFrameData);
+                pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyFrameData);
+            }
+            else
+            {
+                pKeyFrame = new KeyFrame(lineNo, frameNo, NULL);
+            }
             mKeyFrames[i].push_back(pKeyFrame);
         }
     }
@@ -711,4 +773,11 @@ void AnimationModel::loadData(QString path)
     mSelectedKeyFramePosition.mLineNo = 0;
 
     emit refreshTimeLine();
+    return true;
+}
+
+QString AnimationModel::getLoadedAnimationPath() const
+{
+    QString path = mAnimationDirectory;
+    return path.append("/Animations/").append(mAnimationID).append(".").append(ANIMATION_FORMAT);
 }

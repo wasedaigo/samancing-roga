@@ -1,10 +1,11 @@
 #include "AnimationImagePaletpanel.h"
 #include "DataModels/AnimationModel.h"
-#include "Common.h"
+#include "ResourceManager.h"
 #include "GLSprite.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPixmap>
+#include <QTimer>
 
 AnimationImagePaletPanel::AnimationImagePaletPanel(AnimationModel* pAnimationModel)
         : mpAnimationModel(pAnimationModel),
@@ -13,14 +14,25 @@ AnimationImagePaletPanel::AnimationImagePaletPanel(AnimationModel* pAnimationMod
           mSnapGridX(0),
           mSnapGridY(0),
           mSnapGridCheck(false),
-          mSourcePath("")
+          mpPlayingAnimationModel(NULL),
+          mAnimationFrameNo(0)
 {
     mSelectedRect = QRect(0, 0, 96, 96);
     this->setFixedSize(320, 240);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
 
+    mpAnimationPlayTimer = new QTimer(this);
+    mpAnimationPlayTimer->setInterval(30);
+    connect(mpAnimationPlayTimer, SIGNAL(timeout()), this, SLOT(onTick()));
     connect(mpAnimationModel, SIGNAL(selectedPaletChanged(QString)), this, SLOT(onAnimationImagePaletChanged(QString)));
+}
+
+AnimationImagePaletPanel::~AnimationImagePaletPanel()
+{
+    while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
+    delete mpPlayingAnimationModel;
+    delete mpAnimationPlayTimer;
 }
 
 void AnimationImagePaletPanel::setSnapGrid(int gridX, int gridY, bool snapGridCheck)
@@ -40,8 +52,7 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     switch(mCanvasType)
     {
         case CanvasType_Image:
-
-            const QPixmap* pPixmap = AnimationModel::getPixmap(mSourcePath);
+            const QPixmap* pPixmap = AnimationModel::getPixmap(mpAnimationModel->getSelectedSourcePath());
             if (pPixmap)
             {
                 painter.drawPixmap(0, 0, *pPixmap);
@@ -53,41 +64,55 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
             painter.setBrush(Qt::NoBrush);
             painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
             break;
-        case CanvasType_Animation:
 
+        case CanvasType_Animation:
+            {
+                QPoint centerPoint = QPoint((width()) / 2, (height()) / 2);
+                QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
+                while (iter != mGlSpriteList.end())
+                {
+                    GLSprite* glSprite = (GLSprite*)*iter;
+                    glSprite->render(centerPoint, painter, NULL, mpAnimationModel->getTargetSprite());
+                    iter++;
+                }
+            }
             break;
         default:
             break;
     }
 
+    painter.end();
 }
 
 void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
 {
-    QFileInfo info = QFileInfo(path);
-    QString suffix = info.suffix();
-
-    if (suffix.compare(IMAGE_FORMAT, Qt::CaseInsensitive) == 0)
+    delete mpPlayingAnimationModel;
+    switch(ResourceManager::getFileType(path))
     {
-        const QPixmap* pPixmap = mpAnimationModel->getPixmap(path);
-        if (pPixmap)
-        {
-            mSourcePath = path;
-            setFixedSize(pPixmap->width(), pPixmap->height());
+        case ResourceManager::FileType_Image:
+            {
+                const QPixmap* pPixmap = AnimationModel::getPixmap(path);
+                setFixedSize(pPixmap->width(), pPixmap->height());
 
-            mCanvasType = CanvasType_Image;
-            this->repaint();
-        }
-        else
-        {
-            mSourcePath = "";
+                mCanvasType = CanvasType_Image;
+                this->repaint();
+            }
+            break;
+
+        case ResourceManager::FileType_Animation:
+            {
+                mCanvasType = CanvasType_Animation;
+                mpPlayingAnimationModel = new AnimationModel(this);
+                mpPlayingAnimationModel->loadData(ResourceManager::getResourcePath(path));
+
+                mAnimationFrameNo = 0;
+                mpAnimationPlayTimer->start();
+            }
+            break;
+
+        default:
             mCanvasType = CanvasType_None;
-        }
-    }
-    else if (suffix.compare(ANIMATION_FORMAT, Qt::CaseInsensitive) == 0)
-    {
-        mSourcePath = path;
-        mCanvasType = CanvasType_Animation;
+            break;
     }
 }
 
@@ -106,56 +131,89 @@ QPoint AnimationImagePaletPanel::getSnappedPosition(int x, int y)
 
 void AnimationImagePaletPanel::mousePressEvent(QMouseEvent *event)
 {
-    mPressed = true;
-    QPoint pos = getSnappedPosition(event->x(), event->y());
-
-    mSelectedRect.setTopLeft(pos);
-    if (mSnapGridCheck)
-    {
-        pos += QPoint(mSnapGridX, mSnapGridY);
-    }
-    mSelectedRect.setBottomRight(pos);
-    repaint();
-}
-
-void AnimationImagePaletPanel::mouseMoveEvent(QMouseEvent *event)
-{
-    if (mPressed)
-    {
+   if (mCanvasType == CanvasType_Image)
+   {
+        mPressed = true;
         QPoint pos = getSnappedPosition(event->x(), event->y());
+
+        mSelectedRect.setTopLeft(pos);
         if (mSnapGridCheck)
         {
-            if (pos.x() > 0)
-            {
-                pos.setX(pos.x() + mSnapGridX);
-            }
-            if (pos.y() > 0)
-            {
-                pos.setY(pos.y() + mSnapGridY);
-            }
-
-            QPoint dPoint = pos - mSelectedRect.topLeft();
-            if (dPoint.x() == 0)
-            {
-                int t = event->x() - mSelectedRect.topLeft().x();
-                pos.setX(pos.x() + (t >= 0 ? mSnapGridX : -mSnapGridX));
-            }
-            if (dPoint.y() == 0)
-            {
-                int t = event->y() - mSelectedRect.topLeft().y();
-                pos.setY(pos.y() + (t >= 0 ? mSnapGridY : -mSnapGridY));
-            }
+            pos += QPoint(mSnapGridX, mSnapGridY);
         }
         mSelectedRect.setBottomRight(pos);
         repaint();
     }
 }
 
+void AnimationImagePaletPanel::mouseMoveEvent(QMouseEvent *event)
+{
+   if (mCanvasType == CanvasType_Image)
+   {
+        if (mPressed)
+        {
+            QPoint pos = getSnappedPosition(event->x(), event->y());
+            if (mSnapGridCheck)
+            {
+                if (pos.x() > 0)
+                {
+                    pos.setX(pos.x() + mSnapGridX);
+                }
+                if (pos.y() > 0)
+                {
+                    pos.setY(pos.y() + mSnapGridY);
+                }
+
+                QPoint dPoint = pos - mSelectedRect.topLeft();
+                if (dPoint.x() == 0)
+                {
+                    int t = event->x() - mSelectedRect.topLeft().x();
+                    pos.setX(pos.x() + (t >= 0 ? mSnapGridX : -mSnapGridX));
+                }
+                if (dPoint.y() == 0)
+                {
+                    int t = event->y() - mSelectedRect.topLeft().y();
+                    pos.setY(pos.y() + (t >= 0 ? mSnapGridY : -mSnapGridY));
+                }
+            }
+            mSelectedRect.setBottomRight(pos);
+            repaint();
+        }
+    }
+}
+
 void AnimationImagePaletPanel::mouseReleaseEvent(QMouseEvent *event)
 {
-    mpAnimationModel->mSelectedPaletTextureSrcRect.mX = mSelectedRect.x();
-    mpAnimationModel->mSelectedPaletTextureSrcRect.mY = mSelectedRect.y();
-    mpAnimationModel->mSelectedPaletTextureSrcRect.mWidth = mSelectedRect.width();
-    mpAnimationModel->mSelectedPaletTextureSrcRect.mHeight = mSelectedRect.height();
-    mPressed = false;
+    if (mCanvasType == CanvasType_Image)
+    {
+        mpAnimationModel->mSelectedPaletTextureSrcRect.mX = mSelectedRect.x();
+        mpAnimationModel->mSelectedPaletTextureSrcRect.mY = mSelectedRect.y();
+        mpAnimationModel->mSelectedPaletTextureSrcRect.mWidth = mSelectedRect.width();
+        mpAnimationModel->mSelectedPaletTextureSrcRect.mHeight = mSelectedRect.height();
+        mPressed = false;
+    }
+}
+
+void AnimationImagePaletPanel::onTick()
+{
+    // Don't play an animation without any frames
+    if (mpPlayingAnimationModel->getMaxFrameCount() > 0)
+    {
+        // goto next frame
+        mAnimationFrameNo++;
+
+        // Loop animation
+        if(mAnimationFrameNo >= mpPlayingAnimationModel->getMaxFrameCount())
+        {
+            mAnimationFrameNo = 0;
+        }
+
+        // Delete previous generated sprites
+        while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
+
+        // Set current glsprite list
+        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(mAnimationFrameNo);
+
+        repaint();
+    }
 }

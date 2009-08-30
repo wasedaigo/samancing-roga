@@ -59,6 +59,21 @@ public:
         int mY;
         int mWidth;
         int mHeight;
+        Rect(int x, int y, int width, int height)
+        {
+            mX = x;
+            mY = y;
+            mWidth = width;
+            mHeight = height;
+        }
+
+        Rect()
+        {
+            mX = 0;
+            mY = 0;
+            mWidth = 0;
+            mHeight = 0;
+        }
 
         bool operator!=(Rect& rect)
         {
@@ -72,6 +87,8 @@ public:
             mWidth = rect.mWidth;
             mHeight = rect.mHeight;
         }
+
+
     };
 
     struct SpriteDescriptor
@@ -90,6 +107,7 @@ public:
         Point3 mRotation;
 
         float mAlpha;
+        int mFrameNo; // frameNo for sub animation
 
         void operator=(SpriteDescriptor spriteDescriptor)
         {
@@ -104,6 +122,7 @@ public:
             mScale = spriteDescriptor.mScale;
             mPosition = spriteDescriptor.mPosition;
             mRotation = spriteDescriptor.mRotation;
+            mFrameNo = spriteDescriptor.mFrameNo;
         }
     };
 
@@ -115,7 +134,7 @@ public:
     GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
     bool isSelectable() const;
-    void render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pTargetSprite);
+    void render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite);
     QRect getRect() const;
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
     int mID;

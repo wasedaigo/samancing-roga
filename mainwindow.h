@@ -12,6 +12,7 @@ class ResourceTree;
 class QSignalMapper;
 class QStandardItemModel;
 class QItemSelection;
+class QTimelinePanel;
 namespace Ui
 {
     class MainWindow;
@@ -24,6 +25,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void setEditEnabled(bool enabled);
 
 private slots:
     // animation list control
@@ -52,6 +55,8 @@ private:
 
     AnimationModel* mpAnimationModel;
     AnimationViewer* mpAnimationViewer;
+    QTimelinePanel* mpQTimelinePanel;
+
     SourceFileDirModel mAnimationTreeViewModel;
 
     ImagePaletDialog *mpDialog;
