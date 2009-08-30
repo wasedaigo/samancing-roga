@@ -3,11 +3,13 @@
 
 #include <QWidget>
 #include <QPixmap>
+#include <QList>
 
 class AnimationModel;
 class GLSprite;
 class QPaintEvent;
 class QPixmap;
+class QTimer;
 class AnimationImagePaletPanel : public QWidget
 {
     Q_OBJECT
@@ -22,7 +24,8 @@ public:
     };
 
     AnimationImagePaletPanel(AnimationModel* pAnimationModel);
-    
+    ~AnimationImagePaletPanel();
+
     void setSnapGrid(int gridX, int gridY, bool snapGridCheck);
     
 protected:
@@ -33,6 +36,7 @@ protected:
 
 private slots:
     void onAnimationImagePaletChanged(QString id);
+    void onTick();
 
 private:
     QPoint getSnappedPosition(int x, int y);
@@ -44,8 +48,12 @@ private:
     int mSnapGridX;
     int mSnapGridY;
     bool mSnapGridCheck;
-    QString mSourcePath;
     CanvasType mCanvasType;
+
+    QList<GLSprite*> mGlSpriteList;
+    AnimationModel* mpPlayingAnimationModel;
+    QTimer* mpAnimationPlayTimer;
+    int mAnimationFrameNo;
 };
 
 #endif // ANIMATIONIMAGEPALETPANEL_H

@@ -14,10 +14,11 @@ TARGET = Splash
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
-    GLSprite.cpp
+    GLSprite.cpp \
+    ResourceManager.cpp
 HEADERS += mainwindow.h \
     GLSprite.h \
-    Common.h \
-    Macros.h
+    Macros.h \
+    ResourceManager.h
 FORMS += mainwindow.ui
 RESOURCES += ui.qrc
