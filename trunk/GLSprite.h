@@ -107,6 +107,8 @@ public:
         Point3 mRotation;
 
         float mAlpha;
+
+        // Sub animation data
         int mFrameNo; // frameNo for sub animation
 
         void operator=(SpriteDescriptor spriteDescriptor)
@@ -122,7 +124,6 @@ public:
             mScale = spriteDescriptor.mScale;
             mPosition = spriteDescriptor.mPosition;
             mRotation = spriteDescriptor.mRotation;
-            mFrameNo = spriteDescriptor.mFrameNo;
         }
     };
 
@@ -134,7 +135,7 @@ public:
     GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
     bool isSelectable() const;
-    void render(QPoint renderCenterPoint, QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite);
+    void render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite);
     QRect getRect() const;
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
     int mID;

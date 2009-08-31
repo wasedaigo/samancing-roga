@@ -60,7 +60,9 @@ public:
     void clearAllKeyFrames();
 
     const QList<KeyFrame*>& getKeyFrameList(int lineNo) const;
-    const QList<GLSprite*> createGLSpriteListAt(int frameNo) const;
+
+    GLSprite* createGLSpriteAt(int frameNo, int lineNo, const GLSprite* pParentSprite) const;
+    const QList<GLSprite*> createGLSpriteListAt(int frameNo, const GLSprite* pParentSprite) const;
 
     void setSelectedSourcePath(QString sourcePath);
     QString getSelectedSourcePath() const;
@@ -86,8 +88,12 @@ private:
 
     QWidget* mpParent;
 
-    void tweenElement(KeyFrameData* keyframeData, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* startKeyFrameData, KeyFrameData* endKeyFrameData, int frameNo, int startFrameNo, int endFrameNo) const;
-    GLSprite* tweenFrame(int lineNo, int frameNo) const;
+    void setFinalAlpha(GLSprite::SpriteDescriptor& spriteDescriptor, const GLSprite* pParentSprite) const;
+    void setFinalPosition(GLSprite::SpriteDescriptor& spriteDescriptor, const GLSprite* pParentSprite) const;
+    void setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteDescriptor& spriteDescriptor, const GLSprite* pParentSprite) const;
+    bool copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDescriptor, int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute, const GLSprite* pParentSprite) const;
+    void tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData::TweenType tweenType, GLSprite::SpriteDescriptor& startDescriptor, GLSprite::SpriteDescriptor& endDescriptor, int frameNo, int startFrameNo, int endFrameNo, const GLSprite* pParentSprite) const;
+    GLSprite* tweenFrame(int lineNo, int frameNo, const GLSprite* pParentSprite) const;
 
     // Key Frames
     QList<KeyFrame*> mKeyFrames[MaxLineNo];

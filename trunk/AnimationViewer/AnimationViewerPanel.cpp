@@ -148,17 +148,14 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         }
 
         // render sprite
-        glSprite->render(centerPoint, painter, NULL, AnimationModel::getTargetSprite());
+        painter.translate(centerPoint.x(), centerPoint.y());
+        glSprite->render(painter, NULL, AnimationModel::getTargetSprite());
+        painter.translate(-centerPoint.x(), -centerPoint.y());
 
-        // This code is redundunt of the code in GLSprite, however I want to do the same calcuration again for cel drawing
-        QPoint spriteRenderPoint = centerPoint;
-        if (glSprite->mSpriteDescriptor.mRelativeToTarget)
-        {
-            spriteRenderPoint.setX(spriteRenderPoint.x() + (int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX));
-            spriteRenderPoint.setY(spriteRenderPoint.y() + (int)(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY));
-        }
-        spriteRenderPoint.setX(spriteRenderPoint.x() - (int)glSprite->mSpriteDescriptor.mCenter.mX);
-        spriteRenderPoint.setY(spriteRenderPoint.y() - (int)glSprite->mSpriteDescriptor.mCenter.mY);
+        QPoint spriteRenderPoint = QPoint(
+            centerPoint.x() - (int)glSprite->mSpriteDescriptor.mCenter.mX,
+            centerPoint.y() - (int)glSprite->mSpriteDescriptor.mCenter.mY
+        );
 
         // Don't render when playing the animation
         if (!mIsAnimationPlaying)
@@ -212,13 +209,18 @@ void AnimationViewerPanel::renderCenterPointSprite(GLSprite* pGlSprite, const QP
             (centerPoint.y() + (int)pGlSprite->mSpriteDescriptor.mPosition.mY + (int)pGlSprite->mSpriteDescriptor.mCenter.mY)
     );
 
-    centerPointSprite->render(centerPointPos, painter, NULL, NULL);
+    painter.translate(centerPointPos.x(), centerPointPos.y());
+    centerPointSprite->render(painter, NULL, AnimationModel::getTargetSprite());
+    painter.translate(-centerPointPos.x(), -centerPointPos.y());
 }
 
 void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainter& painter)
 {
     painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
-    mpAnimationModel->getTargetSprite()->render(centerPoint, painter, NULL, NULL);
+
+    painter.translate(centerPoint.x(), centerPoint.y());
+    mpAnimationModel->getTargetSprite()->render(painter, NULL, NULL);
+    painter.translate(-centerPoint.x(), -centerPoint.y());
 }
 
 void AnimationViewerPanel::clearSprites()
@@ -259,7 +261,7 @@ void AnimationViewerPanel::refresh()
         emit celSelected(NULL);
     }
 
-    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
+    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo, NULL);
 
     repaint();
 }

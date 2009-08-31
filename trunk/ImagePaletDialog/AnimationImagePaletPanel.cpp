@@ -72,7 +72,11 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
                 while (iter != mGlSpriteList.end())
                 {
                     GLSprite* glSprite = (GLSprite*)*iter;
-                    glSprite->render(centerPoint, painter, NULL, mpAnimationModel->getTargetSprite());
+
+                    painter.translate(centerPoint.x(), centerPoint.y());
+                    glSprite->render(painter, NULL, mpAnimationModel->getTargetSprite());
+                    painter.translate(-centerPoint.x(), -centerPoint.y());
+
                     iter++;
                 }
             }
@@ -212,7 +216,7 @@ void AnimationImagePaletPanel::onTick()
         while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
 
         // Set current glsprite list
-        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(mAnimationFrameNo);
+        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(mAnimationFrameNo, NULL);
 
         repaint();
     }
