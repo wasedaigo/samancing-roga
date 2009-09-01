@@ -20,7 +20,7 @@ public slots:
 
     void setBlendType(int index);
     void setRelativeToTarget(bool value);
-    void setLookAtTarget(bool value);
+    void setFacingOptionType(int value);
     void setBlur(int value);
 
     void setCenterX(int value);
@@ -51,7 +51,7 @@ signals:
 
     void blendTypeChanged(int value);
     void relativeToTargetChanged(bool value);
-    void lookAtTargetChanged(bool value);
+    void facingOptionTypeChanged(int value);
     void blurChanged(int value);
 
     void centerXChanged(int value);

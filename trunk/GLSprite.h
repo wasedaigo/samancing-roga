@@ -11,6 +11,15 @@ class GLSprite
 {
 public:
 
+    enum FacingOptionType
+    {
+        FacingOptionType_none,
+        FacingOptionType_lookAtTarget,
+        FacingOptionType_FaceToMovingDir,
+
+        FacingOptionType_COUNT
+    };
+
     enum BlendType
     {
         eBT_Alpha,
@@ -96,7 +105,7 @@ public:
         QString mSourcePath;
 
         bool mRelativeToTarget;
-        bool mLookAtTarget;
+        FacingOptionType mFacingOptionType;
         int mBlur;
         Rect mTextureSrcRect; // only valid when it is not a child animation
         BlendType mBlendType;
@@ -115,7 +124,7 @@ public:
         {
             mSourcePath = spriteDescriptor.mSourcePath;
             mRelativeToTarget = spriteDescriptor.mRelativeToTarget;
-            mLookAtTarget = spriteDescriptor.mLookAtTarget;
+            mFacingOptionType = spriteDescriptor.mFacingOptionType;
             mBlur = spriteDescriptor.mBlur;
             mAlpha = spriteDescriptor.mAlpha;
             mTextureSrcRect = spriteDescriptor.mTextureSrcRect;
@@ -129,9 +138,11 @@ public:
 
     static QString blendTypeSting[eBT_COUNT];
     static BlendType getBlendTypeByString(QString typeString) ;
+    static QString facingOptionTypeSting[eBT_COUNT];
+    static FacingOptionType getFacingOptionTypeByString(QString typeString) ;
 
     static SpriteDescriptor makeDefaultSpriteDescriptor();
-    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable);
+    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo);
     GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
     bool isSelectable() const;
@@ -140,6 +151,9 @@ public:
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
     int mID;
     SpriteDescriptor mSpriteDescriptor;
+
+    int mLineNo;
+    int mFrameNo;
 
 private:
     bool mIsSelectable;
