@@ -92,7 +92,7 @@ private:
     void setFinalPosition(GLSprite::SpriteDescriptor& spriteDescriptor, const GLSprite* pParentSprite) const;
     void setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteDescriptor& spriteDescriptor, const GLSprite* pParentSprite) const;
     bool copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDescriptor, int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute, const GLSprite* pParentSprite) const;
-    void tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData::TweenType tweenType, GLSprite::SpriteDescriptor& startDescriptor, GLSprite::SpriteDescriptor& endDescriptor, int frameNo, int startFrameNo, int endFrameNo, const GLSprite* pParentSprite) const;
+    void tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData::TweenType tweenType, GLSprite::SpriteDescriptor& startDescriptor, GLSprite::SpriteDescriptor& endDescriptor, int lineNo, int frameNo, int startFrameNo, int endFrameNo, const GLSprite* pParentSprite) const;
     GLSprite* tweenFrame(int lineNo, int frameNo, const GLSprite* pParentSprite) const;
 
     // Key Frames

@@ -25,13 +25,31 @@ GLSprite::BlendType GLSprite::getBlendTypeByString(QString typeString)
     return eBT_Alpha;
 }
 
+QString GLSprite::facingOptionTypeSting[GLSprite::FacingOptionType_COUNT] =
+{
+    "none",
+    "lookAtTarget",
+    "faceToMov"
+};
+
+GLSprite::FacingOptionType GLSprite::getFacingOptionTypeByString(QString typeString)
+{
+    for (int i = 0; i < eBT_COUNT; i++)
+    {
+        if (typeString == facingOptionTypeSting[i])
+        {
+            return static_cast<GLSprite::FacingOptionType>(i);
+        }
+    }
+    return FacingOptionType_none;
+}
 
 GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
 {
     GLSprite::SpriteDescriptor spriteDescriptor;
     spriteDescriptor.mSourcePath = "";
     spriteDescriptor.mBlendType = GLSprite::eBT_Alpha;
-    spriteDescriptor.mLookAtTarget = false;
+    spriteDescriptor.mFacingOptionType = FacingOptionType_none;
     spriteDescriptor.mRelativeToTarget = false;
     spriteDescriptor.mBlur = 0;
     spriteDescriptor.mCenter.mX = 0;
@@ -60,9 +78,11 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     return spriteDescriptor;
 }
 
-GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable)
+GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
+          mLineNo(lineNo),
+          mFrameNo(frameNo),
           mIsSelectable(selectable),
           mpPixmap(NULL)
 
@@ -73,9 +93,10 @@ GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool
 GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
+          mLineNo(0),
+          mFrameNo(0),
           mIsSelectable(selectable),
           mpPixmap(pPixmap)
-
 {
 }
 
@@ -83,6 +104,7 @@ bool GLSprite::isSelectable() const
 {
     return mIsSelectable;
 }
+
 void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite)
 {
     QPoint spritePosition = QPoint(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
@@ -101,9 +123,17 @@ void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTar
             break;
     }
 
+    int parentCenterX = 0;
+    int parentCenterY = 0;
+    if(pParentSprite)
+    {
+        parentCenterX = pParentSprite->mSpriteDescriptor.mCenter.mX - pParentSprite->mSpriteDescriptor.mTextureSrcRect.mWidth / 2;
+        parentCenterY = pParentSprite->mSpriteDescriptor.mCenter.mY - pParentSprite->mSpriteDescriptor.mTextureSrcRect.mHeight / 2;
+    }
+
     // Rotation & Scale & translate
     QTransform saveTransform = painter.combinedTransform();
-    painter.translate(spriteRenderPoint.x(), spriteRenderPoint.y());
+    painter.translate(spriteRenderPoint.x() + parentCenterX, spriteRenderPoint.y() + parentCenterY);
     painter.rotate(mSpriteDescriptor.mRotation.mX);
     painter.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
 

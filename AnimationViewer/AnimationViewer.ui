@@ -370,20 +370,49 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QCheckBox" name="relativeToTargetCheckBox">
-               <property name="text">
-                <string>Relative to Target</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="lookAtTargetCheckBox">
-               <property name="text">
-                <string>Look at Target</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Facing Option</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="facingOptionCombobox">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>None</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Look at target</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Look at moving direction</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="relativeToTargetCheckBox">
+             <property name="text">
+              <string>Relative to Target</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
