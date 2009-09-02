@@ -19,6 +19,18 @@ public:
         int mLineNo;
         int mFrameNo;
 
+        KeyFramePosition()
+        {
+            mLineNo = 0;
+            mFrameNo = 0;
+        }
+
+        KeyFramePosition(int lineNo, int frameNo)
+        {
+            mLineNo = lineNo;
+            mFrameNo = frameNo;
+        }
+
         bool operator==(const KeyFramePosition& item)
         {
             return mFrameNo == item.mFrameNo && mLineNo == item.mLineNo;

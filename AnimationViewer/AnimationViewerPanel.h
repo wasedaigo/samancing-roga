@@ -17,8 +17,10 @@ public:
 
     void selectCel(int celNo);
     void playAnimation();
+    bool isAnimationPlaying() const;
     void stopAnimation();
     void gotoNextFrame();
+
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -39,7 +41,6 @@ private slots:
     void addNewCel(QPoint& relativePressedPosition);
     void pickCel(QPoint& relativePressedPosition);
     void timerEvent();
-
 
 private:
     QPoint getCenterPoint() const;

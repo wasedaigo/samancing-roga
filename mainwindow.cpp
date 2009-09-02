@@ -137,6 +137,7 @@ void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSele
     {
         if (mpAnimationModel->loadData(path))
         {
+            ResourceManager::clearAnimationCache();
             setEditEnabled(true);
         }
         else
