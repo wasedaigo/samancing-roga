@@ -38,6 +38,11 @@ AnimationViewerPanel::~AnimationViewerPanel()
 
 }
 
+bool AnimationViewerPanel::isAnimationPlaying() const
+{
+    return mIsAnimationPlaying;
+}
+
 void AnimationViewerPanel::playAnimation()
 {
     mIsAnimationPlaying = true;
@@ -94,8 +99,6 @@ void AnimationViewerPanel::keyReleaseEvent (QKeyEvent* e)
 
 void AnimationViewerPanel::paintEvent(QPaintEvent *event)
 {
-    //KeyFrame& keyframe = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
-
     // Get center point, all cel position should be relative to this
     QPoint centerPoint = getCenterPoint();
 
@@ -107,12 +110,6 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::NoBrush);
     painter.fillRect(QRect(0, 0, width() - 1, height() - 1), Qt::SolidPattern);
 
-    // Antialiazing will make them look nicer
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    // Color of helper lines
-    painter.setPen(QColor(120, 150, 200));
-
     renderCross(painter);
     renderCelSprites(centerPoint, painter);
     renderTargetSprite(centerPoint, painter);
@@ -122,6 +119,7 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
 
 void AnimationViewerPanel::renderCross(QPainter& painter)
 {
+    painter.setPen(QColor(120, 150, 200));
     painter.drawLine(QPoint(0, height() / 2), QPoint(width(), height() / 2));
     painter.drawLine(QPoint(width() / 2, 0), QPoint(width() / 2, height()));
 }
@@ -234,34 +232,37 @@ void AnimationViewerPanel::clearSprites()
 void AnimationViewerPanel::refresh()
 {
     clearSprites();
-    int targetX = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
-    int targetY = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
 
-    QPoint centerPoint = getCenterPoint();
-
-    if (targetX < -centerPoint.x()){targetX = -centerPoint.x();}
-    if (targetX > centerPoint.x()){targetX = centerPoint.x();}
-    if (targetY < -centerPoint.y()){targetY = -centerPoint.y();}
-    if (targetY > centerPoint.y()){targetY = centerPoint.y();}
-
-    mpAnimationModel->setTargetSpritePosition(targetX, targetY);
-
-    // set cel reference
-    KeyFrame::KeyFramePosition keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
-    KeyFrame* pKeyframe = mpAnimationModel->getKeyFrame(keyframePosition.mLineNo, keyframePosition.mFrameNo);
-
-    if (pKeyframe)
+    if (!isAnimationPlaying())
     {
-        mpSelectedCelModel->setKeyFrameDataReference(pKeyframe->mpKeyFrameData);
-        emit celSelected(pKeyframe->mpKeyFrameData);
-    }
-    else
-    {
-        mpSelectedCelModel->setKeyFrameDataReference(NULL);
-        emit celSelected(NULL);
-    }
+        int targetX = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
+        int targetY = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
 
-    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo, NULL);
+        QPoint centerPoint = getCenterPoint();
+
+        if (targetX < -centerPoint.x()){targetX = -centerPoint.x();}
+        if (targetX > centerPoint.x()){targetX = centerPoint.x();}
+        if (targetY < -centerPoint.y()){targetY = -centerPoint.y();}
+        if (targetY > centerPoint.y()){targetY = centerPoint.y();}
+
+        mpAnimationModel->setTargetSpritePosition(targetX, targetY);
+
+        // set cel reference
+        KeyFrame::KeyFramePosition keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
+        KeyFrame* pKeyframe = mpAnimationModel->getKeyFrame(keyframePosition.mLineNo, keyframePosition.mFrameNo);
+
+        if (pKeyframe)
+        {
+            mpSelectedCelModel->setKeyFrameDataReference(pKeyframe->mpKeyFrameData);
+            emit celSelected(pKeyframe->mpKeyFrameData);
+        }
+        else
+        {
+            mpSelectedCelModel->setKeyFrameDataReference(NULL);
+            emit celSelected(NULL);
+        }
+    }
+    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
 
     repaint();
 }

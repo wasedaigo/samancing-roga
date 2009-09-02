@@ -1,7 +1,8 @@
 #ifndef GLSPRITE_H
 #define GLSPRITE_H
 #include "qgl.h"
-
+#include <QMatrix>
+#include "DataModels/KeyFrame.h"
 
 class QPainter;
 class QPoint;
@@ -142,8 +143,14 @@ public:
     static FacingOptionType getFacingOptionTypeByString(QString typeString) ;
 
     static SpriteDescriptor makeDefaultSpriteDescriptor();
-    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo);
+    GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, const AnimationModel* pParentAnimationModel);
     GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
+
+    const GLSprite* getRootSprite() const;
+    QPoint getAbsolutePositionAt(int currentFrameNo, int currentLineNo, int nextFrameNo);
+    QMatrix getTransformationMatrix() const;
+    QMatrix getWorldMatrix() const;
+    QList<KeyFrame::KeyFramePosition> getNodePath() const;
 
     bool isSelectable() const;
     void render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite);
@@ -152,8 +159,9 @@ public:
     int mID;
     SpriteDescriptor mSpriteDescriptor;
 
-    int mLineNo;
-    int mFrameNo;
+    const int mLineNo;
+    const int mFrameNo;
+    const AnimationModel* mpParentAnimationModel;
 
 private:
     bool mIsSelectable;

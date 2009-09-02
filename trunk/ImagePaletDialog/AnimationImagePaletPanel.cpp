@@ -216,7 +216,7 @@ void AnimationImagePaletPanel::onTick()
         while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
 
         // Set current glsprite list
-        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(mAnimationFrameNo, NULL);
+        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(mAnimationFrameNo);
 
         repaint();
     }

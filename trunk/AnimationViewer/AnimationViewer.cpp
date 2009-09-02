@@ -124,65 +124,47 @@ void AnimationViewer::changeEvent(QEvent *e)
     }
 }
 
+void AnimationViewer::blockSignals(bool block)
+{
+    m_ui->alphaSpinBox->blockSignals(block);
+    m_ui->positionXSpinBox->blockSignals(block);
+    m_ui->positionYSpinBox->blockSignals(block);
+    m_ui->scaleXSpinBox->blockSignals(block);
+    m_ui->scaleYSpinBox->blockSignals(block);
+    m_ui->rotationXSpinBox->blockSignals(block);
+    m_ui->blurSpinBox->blockSignals(block);
+    m_ui->relativeToTargetCheckBox->blockSignals(block);
+    m_ui->facingOptionCombobox->blockSignals(block);
+    m_ui->blendTypeComboBox->blockSignals(block);
+    m_ui->centerXSpinBox->blockSignals(block);
+    m_ui->centerYSpinBox->blockSignals(block);
+}
+
 // Cel selected
 void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
 {
     if (pKeyFrameData)
     {
         m_ui->gridCelDataBox->setEnabled(true);
-        
+        blockSignals(true);
         m_ui->alphaSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mAlpha);
         m_ui->alphaTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha]);
 
-        m_ui->positionXSpinBox->blockSignals(true);
         m_ui->positionXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mPosition.mX);
-        m_ui->positionXSpinBox->blockSignals(false);
-
-        m_ui->positionYSpinBox->blockSignals(true);
         m_ui->positionYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mPosition.mY);
-        m_ui->positionYSpinBox->blockSignals(false);
-
         m_ui->positionTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position]);
-
-        m_ui->scaleXSpinBox->blockSignals(true);
         m_ui->scaleXSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mX);
-        m_ui->scaleXSpinBox->blockSignals(false);
-
-        m_ui->scaleYSpinBox->blockSignals(true);
         m_ui->scaleYSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mY);
-        m_ui->scaleYSpinBox->blockSignals(false);
-
         m_ui->scaleTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale]);
-
-        m_ui->rotationXSpinBox->blockSignals(true);
         m_ui->rotationXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mRotation.mX);
-        m_ui->rotationXSpinBox->blockSignals(false);
-
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
-
-        m_ui->blurSpinBox->blockSignals(true);
         m_ui->blurSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mBlur);
-        m_ui->blurSpinBox->blockSignals(false);
-
-        m_ui->relativeToTargetCheckBox->blockSignals(true);
         m_ui->relativeToTargetCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mRelativeToTarget);
-        m_ui->relativeToTargetCheckBox->blockSignals(false);
-
-        m_ui->facingOptionCombobox->blockSignals(true);
         m_ui->facingOptionCombobox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mFacingOptionType);
-        m_ui->facingOptionCombobox->blockSignals(false);
-
-        m_ui->blendTypeComboBox->blockSignals(true);
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
-        m_ui->blendTypeComboBox->blockSignals(false);
-
-        m_ui->centerXSpinBox->blockSignals(true);
         m_ui->centerXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mX);
-        m_ui->centerXSpinBox->blockSignals(false);
-
-        m_ui->centerYSpinBox->blockSignals(true);
         m_ui->centerYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mY);
-        m_ui->centerYSpinBox->blockSignals(false);
+        blockSignals(false);
     }
     else
     {
@@ -217,6 +199,7 @@ void AnimationViewer::onPlayButtonClicked()
     mpAnimationModel->getCurrentKeyFramePosition();
     mSelectedKeyFramePosition = mpAnimationModel->getCurrentKeyFramePosition();
     mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, 0);
+    blockSignals(true);
     emit playAnimation(false);
 }
 
@@ -227,6 +210,7 @@ void AnimationViewer::onTick()
         mpAnimationViewerPanel->stopAnimation();
         mpAnimationPlayTimer->stop();
         emit playAnimation(true);
+        blockSignals(false);
         mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, mSelectedKeyFramePosition.mFrameNo);
     }
     else

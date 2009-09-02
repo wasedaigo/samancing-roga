@@ -36,7 +36,7 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
-    
+    void blockSignals(bool block);
     Ui::AnimationViewer *m_ui;
     CelModel* mpSelectedCelModel;
     QStandardItemModel* mpTweenModel;
