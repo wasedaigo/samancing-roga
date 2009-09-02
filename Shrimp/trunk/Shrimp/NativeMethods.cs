@@ -217,7 +217,8 @@ namespace Shrimp
            IntPtr prcClip, IntPtr hrgnUpdate, IntPtr prcUpdate, uint flags);
 
         [DllImport("gdi32.dll")]
-        public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, TernaryRasterOperations dwRop);
+        public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest,
+            int nWidth, int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, TernaryRasterOperations dwRop);
 
         [DllImport("gdi32.dll")]
         public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);

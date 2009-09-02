@@ -10,7 +10,7 @@ namespace Shrimp
 {
     internal class SingleModelStore<T> : IModelStore where T : class, IModel
     {
-        private static readonly Encoding UTF8N = new UTF8Encoding(false);
+        private static readonly Encoding UTF8 = new UTF8Encoding(false);
 
         public SingleModelStore(T model, string filePath)
         {
@@ -32,7 +32,7 @@ namespace Shrimp
             {
                 Directory.CreateDirectory(directory2);
             }
-            using (var sw = new StreamWriter(path, false, UTF8N))
+            using (var sw = new StreamWriter(path, false, UTF8))
             using (var writer = new JsonTextWriter(sw))
             {
                 writer.Formatting = Formatting.Indented;
@@ -48,7 +48,7 @@ namespace Shrimp
             string path = Path.Combine(directory, this.FilePath);
             if (result = File.Exists(path))
             {
-                string jsonText = File.ReadAllText(path, UTF8N);
+                string jsonText = File.ReadAllText(path, UTF8);
                 JToken json;
                 switch (jsonText[0])
                 {

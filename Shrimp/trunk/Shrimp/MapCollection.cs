@@ -108,10 +108,7 @@ namespace Shrimp
 
         public IEnumerable<int> NodeIds
         {
-            get
-            {
-                return this.Nodes.Select(n => n.Id);
-            }
+            get { return this.Nodes.Select(n => n.Id); }
         }
 
         public int[] Roots

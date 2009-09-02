@@ -285,6 +285,7 @@ namespace Shrimp
                 Math.Min(Math.Max(mousePosition.X / this.GridSize, 0), this.Map.Width - 1);
             this.CursorTileY =
                 Math.Min(Math.Max(mousePosition.Y / this.GridSize, 0), this.Map.Height - 1);
+            this.TempCommands = new List<ICommand>();
             if (this.EditorState.LayerMode != LayerMode.Event)
             {
                 if ((e.Button & MouseButtons.Left) != 0)
@@ -303,7 +304,6 @@ namespace Shrimp
                     Command command =
                         this.Map.CreateSettingTilesCommand(layer, x, y, this.EditorState.SelectedTiles, 0, 0);
                     command.Do();
-                    this.TempCommands = new List<ICommand>();
                     this.TempCommands.Add(command);
                 }
                 else if ((e.Button & MouseButtons.Right) != 0)
@@ -382,16 +382,15 @@ namespace Shrimp
                                 layer, x, y, selectedTiles,
                                 x - this.RenderingTileStartX, y - this.RenderingTileStartY);
                             command.Do();
-                            if (this.TempCommands == null)
+                            if (this.TempCommands != null)
                             {
-                                this.TempCommands = new List<ICommand>();
+                                this.TempCommands.Add(command);
+                                if (previousFrameRect != this.FrameRect)
+                                {
+                                    this.Invalidate(this.FrameRect);
+                                }
+                                this.Update();
                             }
-                            this.TempCommands.Add(command);
-                            if (previousFrameRect != this.FrameRect)
-                            {
-                                this.Invalidate(this.FrameRect);
-                            }
-                            this.Update();
                         }
                         else
                         {
@@ -472,7 +471,12 @@ namespace Shrimp
                     };
                     command.Undone += delegate
                     {
+                        this.Map.Updated -= this.Map_Updated;
                         foreach (var c in commands.Reverse()) { c.Undo(); }
+                        this.Map.Updated += this.Map_Updated;
+                        this.Invalidate();
+                        this.UpdateOffscreen();
+                        this.Update();
                     };
                     this.EditorState.AddCommand(command);
                     this.TempCommands = null;

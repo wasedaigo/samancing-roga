@@ -51,7 +51,7 @@ namespace Shrimp
                 {
                     if (value < MinWidth || MaxWidth < value)
                     {
-                        throw new ArgumentOutOfRangeException("Invalid width");
+                        throw new ArgumentOutOfRangeException("Width");
                     }
                     if (this.width < value)
                     {
@@ -91,7 +91,7 @@ namespace Shrimp
                 {
                     if (value < MinHeight || MaxHeight < value)
                     {
-                        throw new ArgumentOutOfRangeException("Invalid height");
+                        throw new ArgumentOutOfRangeException("Height");
                     }
                     if (this.height < value)
                     {
@@ -118,8 +118,6 @@ namespace Shrimp
         private int height;
 
         private List<List<Tile>> Layers = new List<List<Tile>>();
-
-        
 
         public Tile GetTile(int layerNumber, int x, int y)
         {
