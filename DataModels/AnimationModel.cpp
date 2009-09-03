@@ -604,7 +604,6 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
                     }
                     // Transform target position to screen coordinate
                     QPoint targetPoint = QPoint(pTargetSprite->mSpriteDescriptor.mPosition.mX, pTargetSprite->mSpriteDescriptor.mPosition.mY);
-
                     if (pTargetSprite->mpParentAnimationModel->getParentSprite())
                     {
                         targetPoint = targetPoint * pTargetSprite->mpParentAnimationModel->getParentSprite()->getCombinedTransform();
