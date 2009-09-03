@@ -230,7 +230,7 @@ bool AnimationModel::isKeyData(KeyFrameData::TweenAttribute tweenAttribute, cons
     if(pKeyframe->getKeyFrameType() == KeyFrame::KeyFrameType_empty) {return true;}
 
     // Whatever keyframe
-    if (tweenAttribute == KeyFrameData::TweenAttribute_any && !pKeyframe->mpKeyFrameData->allAttributesNone()) {return true;}
+    if (tweenAttribute == KeyFrameData::TweenAttribute_any) {return true;}
 
     // keyframe with specified tween attribute
     if( pKeyframe->mpKeyFrameData->mTweenTypes[tweenAttribute] != KeyFrameData::eTT_None ) { return true; }
@@ -431,13 +431,21 @@ GLSprite* AnimationModel::createGLSpriteAt(QList<KeyFrame::KeyFramePosition>node
     for (int i = 0; i < nodePath.count(); i++)
     {
         pGLSprite = pAnimationModel->createGLSpriteAt(nodePath[i].mFrameNo, nodePath[i].mLineNo);
+        if (pAnimationModel != this)
+        {
+            delete pAnimationModel;
+            pAnimationModel = NULL;
+        }
         if (!pGLSprite) {return NULL;}
         if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
         {
             pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath , pGLSprite, mpRenderTarget);
         }
     }
-
+    if (pAnimationModel != this)
+    {
+        delete pAnimationModel;
+    }
     return pGLSprite;
 }
 
@@ -619,6 +627,8 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
                     int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
                     spriteDescriptor.mRotation.mX += angleOffset;
                 }
+
+                delete pTargetSprite;
            }
            break;
        default:
@@ -716,15 +726,8 @@ GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
         baseSpriteDescriptor.mFrameNo = frameNo - mKeyFrames[lineNo][subAnimationStartIndex]->mFrameNo;
     }
 
-    if (anyTweenFound)
-    {
-        bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
-        return new GLSprite(lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, this);
-    }
-    else
-    {
-        return NULL;
-    }
+    bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
+    return new GLSprite(lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, this);
 }
 
 KeyFrame::KeyFramePosition AnimationModel::getCurrentKeyFramePosition()
