@@ -44,9 +44,9 @@ public:
 
     struct Point3
     {
-        int mX;
-        int mY;
-        int mZ;
+        float mX;
+        float mY;
+        float mZ;
 
         void operator=(const Point2& point)
         {
