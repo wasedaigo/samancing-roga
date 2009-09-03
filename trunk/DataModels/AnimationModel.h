@@ -34,11 +34,11 @@ public:
     static GLSprite* getCenterPointSprite();
 
     AnimationModel(QWidget* parent);
-    AnimationModel(QWidget* parent, GLSprite* pParentGLSprite);
     ~AnimationModel();
     
     void setup();
 
+    void setRenderTarget(const QWidget* parent);
     void setParentSprite(GLSprite* pParentGLSprite);
     const GLSprite* getParentSprite() const;
 
@@ -88,7 +88,7 @@ public:
     GLSprite::Rect mSelectedPaletTextureSrcRect;
 
     const QWidget* mpParent;
-
+    const QWidget* mpRenderTarget;
 private:
     GLSprite* mpParentGLSprite;
     QString mAnimationName;

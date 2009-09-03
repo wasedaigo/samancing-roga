@@ -135,6 +135,16 @@ public:
             mPosition = spriteDescriptor.mPosition;
             mRotation = spriteDescriptor.mRotation;
         }
+
+        QTransform getTransform() const
+        {
+            QTransform transform;
+            transform.translate(mPosition.mX, mPosition.mY);
+            transform.rotate(mRotation.mX);
+            transform.scale(mScale.mX, mScale.mY);
+
+            return transform;
+        }
     };
 
     static QString blendTypeSting[eBT_COUNT];
@@ -144,24 +154,26 @@ public:
 
     static SpriteDescriptor makeDefaultSpriteDescriptor();
     GLSprite(const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, const AnimationModel* pParentAnimationModel);
-    GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
+    GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap, const AnimationModel* pParentAnimationModel);
 
     const GLSprite* getRootSprite() const;
-    QPoint getAbsolutePositionAt(int currentFrameNo, int currentLineNo, int nextFrameNo);
-    QMatrix getTransformationMatrix() const;
-    QMatrix getWorldMatrix() const;
+    QTransform getTransform() const;
+    QMatrix getCombinedMatrix() const;
     QList<KeyFrame::KeyFramePosition> getNodePath() const;
 
     bool isSelectable() const;
-    void render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite);
+    void render(QPoint offset, QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite);
     QRect getRect() const;
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
+    QTransform getCombinedTransform() const;
+
     int mID;
     SpriteDescriptor mSpriteDescriptor;
 
     const int mLineNo;
     const int mFrameNo;
     const AnimationModel* mpParentAnimationModel;
+
 
 private:
     bool mIsSelectable;

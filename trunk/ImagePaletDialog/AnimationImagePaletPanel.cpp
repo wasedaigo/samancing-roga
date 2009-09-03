@@ -74,7 +74,7 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
                     GLSprite* glSprite = (GLSprite*)*iter;
 
                     painter.translate(centerPoint.x(), centerPoint.y());
-                    glSprite->render(painter, NULL, mpAnimationModel->getTargetSprite());
+                    glSprite->render(QPoint(0, 0), painter, NULL, mpAnimationModel->getTargetSprite());
                     painter.translate(-centerPoint.x(), -centerPoint.y());
 
                     iter++;
@@ -107,6 +107,7 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
             {
                 mCanvasType = CanvasType_Animation;
                 mpPlayingAnimationModel = new AnimationModel(this);
+                mpPlayingAnimationModel->setRenderTarget(this);
                 mpPlayingAnimationModel->loadData(ResourceManager::getResourcePath(path));
 
                 mAnimationFrameNo = 0;

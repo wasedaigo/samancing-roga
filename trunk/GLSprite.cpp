@@ -99,72 +99,24 @@ GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool
 }
 
 //
-GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap)
+GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap, const AnimationModel* pParentAnimationModel)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(0),
           mFrameNo(0),
-          mpParentAnimationModel(NULL),
+          mpParentAnimationModel(pParentAnimationModel),
           mIsSelectable(selectable),
           mpPixmap(pPixmap)
 {
 }
 
 
-QPoint GLSprite::getAbsolutePositionAt(int currentFrameNo, int currentLineNo, int nextFrameNo)
-{
-    QList<KeyFrame::KeyFramePosition> list;
-    KeyFrame::KeyFramePosition position;
-    position.mFrameNo = currentFrameNo;
-    position.mLineNo = currentLineNo;
-    list.push_front(position);
-
-    const GLSprite* pRootSprite = this;
-    const AnimationModel* pParentAnimationModel = mpParentAnimationModel;
-
-    // get trace result
-    while(true)
-    {
-        KeyFrame::KeyFramePosition position;
-        position.mFrameNo = pRootSprite->mFrameNo;
-        position.mLineNo = pRootSprite->mLineNo;
-        list.push_front(position);
-
-        const GLSprite* pTempSprite = pParentAnimationModel->getParentSprite();
-        if (!pTempSprite) {break;}
-        pRootSprite = pTempSprite;
-    }
-
-    // calculate absolute positions
-    const AnimationModel* pAnimationModel = pRootSprite->mpParentAnimationModel;
-    GLSprite::SpriteDescriptor spriteDescriptor = pRootSprite->mSpriteDescriptor;
-    pAnimationModel->copyTweenedAttribute(spriteDescriptor, currentLineNo, nextFrameNo, KeyFrameData::TweenAttribute_position);
-    int absX = spriteDescriptor.mPosition.mX;
-    int absY = spriteDescriptor.mPosition.mY;
-
-    for (int i = 1; i < list.count(); i++)
-    {
-        int index = pAnimationModel->getPreviousKeyFrameIndex(list[i].mLineNo, list[i].mFrameNo, KeyFrameData::TweenAttribute_any);
-        KeyFrame* pKeyFrame = pAnimationModel->getKeyFrameList(list[i].mLineNo).at(index);
-
-        GLSprite::SpriteDescriptor spriteDescriptor = pKeyFrame->mpKeyFrameData->mSpriteDescriptor;
-        pAnimationModel = ResourceManager::getAnimation(spriteDescriptor.mSourcePath, this);
-        if (!pAnimationModel) {break;}
-
-        pAnimationModel->copyTweenedAttribute(spriteDescriptor, list[i].mLineNo, list[i].mFrameNo, KeyFrameData::TweenAttribute_position);
-        absX += spriteDescriptor.mPosition.mX;
-        absY += spriteDescriptor.mPosition.mY;
-    }
-
-    return QPoint(absX, absY);
-}
-
 bool GLSprite::isSelectable() const
 {
     return mIsSelectable;
 }
 
-void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite)
+void GLSprite::render(QPoint offset, QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite)
 {
     QPoint spritePosition = QPoint(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
     QPoint spriteRenderPoint = spritePosition;
@@ -174,7 +126,8 @@ void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTar
 
    // Rotation & Scale & translate
     QTransform saveTransform = painter.combinedTransform();
-    painter.setMatrix(getTransformationMatrix(), true);
+    //painter.setTransform(getTransform(), true);
+    painter.setTransform(getCombinedTransform(), false);
 //    QMatrix offSetMatrix = QMatrix();
 //    offSetMatrix.translate(320, 240);
 //    painter.setMatrix((getWorldMatrix()).inverted(), false);
@@ -188,7 +141,7 @@ void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTar
     );
 
     // Where it actually render the iamge
-    QPoint dstPoint = QPoint(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY);
+    QPoint dstPoint = QPoint(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) + offset;
     QPixmap* pQPixmap;
     if (mpPixmap)
     {
@@ -206,7 +159,7 @@ void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTar
                 break;
             case ResourceManager::FileType_Animation:
                 // Render Subanimation
-                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath, this);
+                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath, this, mpParentAnimationModel->mpRenderTarget);
                 if (pAnimationModel)
                 {
                     if (pAnimationModel->getMaxFrameCount() > 0)
@@ -215,7 +168,7 @@ void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTar
                         QList<GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(subFrameNo);
                         for (int i = 0; i < glSpriteList.count(); i++)
                         {
-                            glSpriteList[i]->render(painter, this, pTargetSprite);
+                            glSpriteList[i]->render(QPoint(0, 0), painter, this, pTargetSprite);
                         }
                         while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
                     }
@@ -233,39 +186,46 @@ void GLSprite::render(QPainter& painter, GLSprite* pParentSprite, GLSprite* pTar
 const GLSprite* GLSprite::getRootSprite() const
 {
     const GLSprite* pRootSprite = this;
-    while (const GLSprite* pSprite = this->mpParentAnimationModel->getParentSprite())
+    const GLSprite* pSprite = NULL;
+    const AnimationModel* pAnimationModel = mpParentAnimationModel;
+    while (pSprite = pAnimationModel->getParentSprite())
     {
         pRootSprite = pSprite;
+        pAnimationModel = pSprite->mpParentAnimationModel;
     }
     return pRootSprite;
 }
 
-QMatrix GLSprite::getTransformationMatrix() const
+QTransform GLSprite::getTransform() const
 {
-    QMatrix matrix = QMatrix();
-    matrix.translate(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
-    matrix.rotate(mSpriteDescriptor.mRotation.mX);
-    matrix.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
+    QTransform transform = QTransform();
+    transform.translate(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
+    transform.rotate(mSpriteDescriptor.mRotation.mX);
+    transform.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
 
-    return matrix;
+    return transform;
 }
 
-QMatrix GLSprite::getWorldMatrix() const
+QTransform GLSprite::getCombinedTransform() const
 {
-    QMatrix matrix = getTransformationMatrix();
+    QTransform transform = getTransform();
     if (mpParentAnimationModel)
     {
         const AnimationModel* pAnimationModel = mpParentAnimationModel;
         while(const GLSprite* pSprite = pAnimationModel->getParentSprite())
         {
-            matrix *= pSprite->getTransformationMatrix();
+            transform = transform * pSprite->getTransform();
             pAnimationModel = pSprite->mpParentAnimationModel;
         }
     }
 
-    QMatrix offSetMatrix = QMatrix();
+    QTransform offsetTransform;
+    int offsetX =  this->mpParentAnimationModel->mpRenderTarget->width() / 2;
+    int offsetY =  this->mpParentAnimationModel->mpRenderTarget->height() / 2;
+    offsetTransform.translate(offsetX, offsetY);
 
-    return matrix * offSetMatrix;
+    transform =  transform * offsetTransform;
+    return transform;
 }
 
 QList<KeyFrame::KeyFramePosition> GLSprite::getNodePath() const

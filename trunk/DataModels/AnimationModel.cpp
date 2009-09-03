@@ -75,6 +75,7 @@ GLSprite* AnimationModel::getCenterPointSprite()
 
 AnimationModel::AnimationModel(QWidget* parent)
     : mpParent(parent),
+      mpRenderTarget(NULL),
       mpParentGLSprite(NULL),
       mAnimationName(QString("")),
       mAnimationDirectory(QString("")),
@@ -84,16 +85,9 @@ AnimationModel::AnimationModel(QWidget* parent)
     setup();
 }
 
-AnimationModel::AnimationModel(QWidget* parent, GLSprite* pParentGLSprite)
-    : mpParent(parent),
-      mpParentGLSprite(pParentGLSprite),
-      mAnimationName(QString("")),
-      mAnimationDirectory(QString("")),
-      mAnimationID(QString("")),
-      mOriginalAnimationID(QString(""))
-
+void AnimationModel::setRenderTarget(const QWidget* parent)
 {
-    setup();
+    mpRenderTarget = parent;
 }
 
 void AnimationModel::setParentSprite(GLSprite* pParentGLSprite)
@@ -124,7 +118,7 @@ void AnimationModel::setup()
         spriteDescriptor.mCenter.mY = 16;
         spriteDescriptor.mPosition.mX = -100;
 
-        spTargetSprite = new GLSprite(-1, spriteDescriptor, false, spTargetPixmap);
+        spTargetSprite = new GLSprite(-1, spriteDescriptor, false, spTargetPixmap, this);
     }
 
     // Center sprite
@@ -137,7 +131,7 @@ void AnimationModel::setup()
         spriteDescriptor.mCenter.mX = 4;
         spriteDescriptor.mCenter.mY = 4;
 
-        spCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, spCenterPointPixmap);
+        spCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, spCenterPointPixmap, this);
     }
 }
 
@@ -440,7 +434,7 @@ GLSprite* AnimationModel::createGLSpriteAt(QList<KeyFrame::KeyFramePosition>node
         if (!pGLSprite) {return NULL;}
         if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
         {
-            pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath , pGLSprite);
+            pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath , pGLSprite, mpRenderTarget);
         }
     }
 
@@ -517,14 +511,19 @@ void AnimationModel::setFinalPosition(GLSprite::SpriteDescriptor& spriteDescript
 {
     if(spriteDescriptor.mRelativeToTarget)
     {
-        // Get target relative position
-        QPoint targetPoint = QPoint(spTargetSprite->mSpriteDescriptor.mPosition.mX, spTargetSprite->mSpriteDescriptor.mPosition.mY);
-        if (mpParentGLSprite)
+        // Transform current position based on target point
+        QPoint point = QPoint(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY);
+        if(mpParentGLSprite)
         {
-            targetPoint = targetPoint * mpParentGLSprite->getWorldMatrix().inverted();
+            point = point * spTargetSprite->getCombinedTransform() * mpParentGLSprite->getCombinedTransform().inverted();
         }
-        spriteDescriptor.mPosition.mX = targetPoint.x() - spriteDescriptor.mPosition.mX;
-        spriteDescriptor.mPosition.mY = targetPoint.y() - spriteDescriptor.mPosition.mY;
+        else
+        {
+            point = point * spTargetSprite->getTransform();
+        }
+
+        spriteDescriptor.mPosition.mX = point.x();
+        spriteDescriptor.mPosition.mY = point.y();
     }
 }
 
@@ -536,14 +535,25 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
     {
         case GLSprite::FacingOptionType_lookAtTarget:
         {
-            // Get target relative position
-            QPoint targetPoint = QPoint(spTargetSprite->mSpriteDescriptor.mPosition.mX, spTargetSprite->mSpriteDescriptor.mPosition.mY);
+            QPoint point = QPoint(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY);
+
+            // Transform current position to screen coordinate
             if (mpParentGLSprite)
             {
-                targetPoint = targetPoint * mpParentGLSprite->getWorldMatrix().inverted();
+                point = point * (mpParentGLSprite->getCombinedTransform());
             }
-            int dx = targetPoint.x() - spriteDescriptor.mPosition.mX;
-            int dy = targetPoint.y() - spriteDescriptor.mPosition.mY;
+            else
+            {
+                point = point * (spTargetSprite->getCombinedTransform() * spTargetSprite->getTransform().inverted());
+            }
+
+            // Transform target position to screen coordinate
+            QPoint targetPoint = QPoint(spTargetSprite->mSpriteDescriptor.mPosition.mX, spTargetSprite->mSpriteDescriptor.mPosition.mY);
+            targetPoint = targetPoint * spTargetSprite->getCombinedTransform() * spTargetSprite->getTransform().inverted();
+
+            // Compare target and current sprite in screen coordinate
+            int dx = targetPoint.x() - point.x();
+            int dy = targetPoint.y() - point.y();
 
             if (dx == 0 && dy == 0)
             {
@@ -577,21 +587,25 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
 
                 if (pTargetSprite)
                 {
-                    QPoint startPoint = QPoint(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY);
-                    QPoint targetPoint = QPoint(pTargetSprite->mSpriteDescriptor.mPosition.mX, pTargetSprite->mSpriteDescriptor.mPosition.mY);
+                    QPoint point = QPoint(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY);
+
+                    // Transform current position to screen coordinate
                     if (mpParentGLSprite)
                     {
-                        QMatrix matrix = mpParentGLSprite->getWorldMatrix();
-                        matrix.translate(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY);
-                        matrix.rotate(spriteDescriptor.mRotation.mX);
-                        matrix.scale(spriteDescriptor.mScale.mX, spriteDescriptor.mScale.mY);
-
-                        startPoint = startPoint * matrix;
-                        targetPoint = targetPoint * pTargetSprite->getWorldMatrix();
+                        point = point * (mpParentGLSprite->getCombinedTransform());
                     }
+                    else
+                    {
+                        point = point * (spTargetSprite->getCombinedTransform() * spTargetSprite->getTransform().inverted());
+                    }
+                    // Transform target position to screen coordinate
+                    QPoint targetPoint = QPoint(pTargetSprite->mSpriteDescriptor.mPosition.mX, pTargetSprite->mSpriteDescriptor.mPosition.mY);
+                    targetPoint = targetPoint * (pTargetSprite->getCombinedTransform() * pTargetSprite->getTransform().inverted());
 
-                    int dx = targetPoint.x() - startPoint.x();
-                    int dy = targetPoint.y() - startPoint.y();
+                    // Compare target and current sprite in screen coordinate
+                    int dx = targetPoint.x() - point.x();
+                    int dy = targetPoint.y() - point.y();
+
                     int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
                     spriteDescriptor.mRotation.mX += angleOffset;
                 }

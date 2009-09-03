@@ -13,6 +13,7 @@
 
 class AnimationModel;
 class GLSprite;
+class QWidget;
 class ResourceManager
 {
 public:
@@ -24,7 +25,7 @@ public:
     };
     ResourceManager();
 
-    static AnimationModel* getAnimation(QString path, GLSprite* pParentGLSprite);
+    static AnimationModel* getAnimation(QString path, GLSprite* pParentGLSprite, const QWidget* pRenderTarget);
     static void clearAnimationCache();
     static QString getResourcePath(QString path);
     static FileType getFileType(QString path);
