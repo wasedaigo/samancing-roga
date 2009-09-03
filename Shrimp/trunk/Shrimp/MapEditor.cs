@@ -365,25 +365,25 @@ namespace Shrimp
                         SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                         if ((e.Button & MouseButtons.Left) != 0)
                         {
-                            int layer = 0;
-                            switch (this.EditorState.LayerMode)
-                            {
-                            case LayerMode.Layer1: layer = 0; break;
-                            case LayerMode.Layer2: layer = 1; break;
-                            default: Debug.Fail("Invalid layer"); break;
-                            }
-                            int x = this.CursorTileX + this.CursorOffsetX;
-                            int y = this.CursorTileY + this.CursorOffsetY;
-                            if (previousFrameRect != this.FrameRect)
-                            {
-                                this.Invalidate(previousFrameRect);
-                            }
-                            Command command = this.Map.CreateSettingTilesCommand(
-                                layer, x, y, selectedTiles,
-                                x - this.RenderingTileStartX, y - this.RenderingTileStartY);
-                            command.Do();
                             if (this.TempCommands != null)
                             {
+                                int layer = 0;
+                                switch (this.EditorState.LayerMode)
+                                {
+                                    case LayerMode.Layer1: layer = 0; break;
+                                    case LayerMode.Layer2: layer = 1; break;
+                                    default: Debug.Fail("Invalid layer"); break;
+                                }
+                                int x = this.CursorTileX + this.CursorOffsetX;
+                                int y = this.CursorTileY + this.CursorOffsetY;
+                                if (previousFrameRect != this.FrameRect)
+                                {
+                                    this.Invalidate(previousFrameRect);
+                                }
+                                Command command = this.Map.CreateSettingTilesCommand(
+                                    layer, x, y, selectedTiles,
+                                    x - this.RenderingTileStartX, y - this.RenderingTileStartY);
+                                command.Do();
                                 this.TempCommands.Add(command);
                                 if (previousFrameRect != this.FrameRect)
                                 {
