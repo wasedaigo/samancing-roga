@@ -173,6 +173,8 @@ void GLSprite::render(QPoint offset, QPainter& painter, GLSprite* pParentSprite,
                         while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
                     }
                 }
+
+                delete pAnimationModel;
                 break;
              default:
 
