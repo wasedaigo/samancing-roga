@@ -19,6 +19,7 @@ Q_OBJECT
 public:
     AnimationViewer(QWidget* parent, AnimationModel* animationModel);
     ~AnimationViewer();
+    AnimationViewerPanel* mpAnimationViewerPanel;
 
 private slots:
     void onCelSelected(KeyFrameData* pKeyFrameData);
@@ -40,7 +41,7 @@ private:
     Ui::AnimationViewer *m_ui;
     CelModel* mpSelectedCelModel;
     QStandardItemModel* mpTweenModel;
-    AnimationViewerPanel* mpAnimationViewerPanel;
+
     AnimationModel* mpAnimationModel;
     QTimer* mpAnimationPlayTimer;
     

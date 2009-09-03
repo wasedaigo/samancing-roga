@@ -146,9 +146,9 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         }
 
         // render sprite
-        painter.translate(centerPoint.x(), centerPoint.y());
-        glSprite->render(painter, NULL, AnimationModel::getTargetSprite());
-        painter.translate(-centerPoint.x(), -centerPoint.y());
+        //painter.translate(centerPoint.x(), centerPoint.y());
+        glSprite->render(QPoint(0, 0), painter, NULL, AnimationModel::getTargetSprite());
+        //painter.translate(-centerPoint.x(), -centerPoint.y());
 
         QPoint spriteRenderPoint = QPoint(
             centerPoint.x() - (int)glSprite->mSpriteDescriptor.mCenter.mX,
@@ -202,23 +202,23 @@ void AnimationViewerPanel::renderCenterPointSprite(GLSprite* pGlSprite, const QP
 {
     // render center point
     GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
-    QPoint centerPointPos = QPoint(
-            (centerPoint.x() + (int)pGlSprite->mSpriteDescriptor.mPosition.mX + (int)pGlSprite->mSpriteDescriptor.mCenter.mX),
-            (centerPoint.y() + (int)pGlSprite->mSpriteDescriptor.mPosition.mY + (int)pGlSprite->mSpriteDescriptor.mCenter.mY)
+    QPoint offset = QPoint(
+            ((int)pGlSprite->mSpriteDescriptor.mPosition.mX),
+            ((int)pGlSprite->mSpriteDescriptor.mPosition.mY)
     );
 
-    painter.translate(centerPointPos.x(), centerPointPos.y());
-    centerPointSprite->render(painter, NULL, AnimationModel::getTargetSprite());
-    painter.translate(-centerPointPos.x(), -centerPointPos.y());
+    //painter.translate(centerPointPos.x(), centerPointPos.y());
+    centerPointSprite->render(offset, painter, NULL, AnimationModel::getTargetSprite());
+    //painter.translate(-centerPointPos.x(), -centerPointPos.y());
 }
 
 void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainter& painter)
 {
     painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
 
-    painter.translate(centerPoint.x(), centerPoint.y());
-    mpAnimationModel->getTargetSprite()->render(painter, NULL, NULL);
-    painter.translate(-centerPoint.x(), -centerPoint.y());
+   // painter.translate(centerPoint.x(), centerPoint.y());
+    mpAnimationModel->getTargetSprite()->render(QPoint(0, 0), painter, NULL, NULL);
+    //painter.translate(-centerPoint.x(), -centerPoint.y());
 }
 
 void AnimationViewerPanel::clearSprites()

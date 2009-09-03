@@ -9,6 +9,7 @@
 #include "QTimelineWidget/QTimelinePanel.h"
 #include <QDirModel>
 #include "ResourceTree/ResourceTree.h"
+#include "AnimationViewer/AnimationViewerPanel.h"
 
 void MainWindow::setupConnections()
 {
@@ -34,6 +35,8 @@ void MainWindow::setupConnections()
 void MainWindow::setupModels()
 {
     mpAnimationModel = new AnimationModel(this);
+    mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
+    mpAnimationModel->setRenderTarget(mpAnimationViewer->mpAnimationViewerPanel);
     mpAnimationListModel = new QStandardItemModel(0, 1, this);
 }
 
@@ -56,7 +59,6 @@ void MainWindow::setupUI()
 
     mpDialog = new ImagePaletDialog(this, mpAnimationModel);
 
-    mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
     mpAnimationViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->animationViewer->addWidget(mpAnimationViewer);
 
@@ -84,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
     loadConfigFile();
     setupModels();
     setupUI();
+
     setupUIModels();
 
     setupConnections();
