@@ -582,7 +582,11 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
                     pAnimationModel = mpParentGLSprite->getRootSprite()->mpParentAnimationModel;
                 }
                 list.push_back(KeyFrame::KeyFramePosition(lineNo, frameNo));
-                list[0].mFrameNo += 1;
+                for (int i = 0; i < list.count(); i++)
+                {
+                    list[i].mFrameNo += 1;
+                }
+
                 GLSprite* pTargetSprite = pAnimationModel->createGLSpriteAt(list);
 
                 if (pTargetSprite)
@@ -600,8 +604,15 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
                     }
                     // Transform target position to screen coordinate
                     QPoint targetPoint = QPoint(pTargetSprite->mSpriteDescriptor.mPosition.mX, pTargetSprite->mSpriteDescriptor.mPosition.mY);
-                    targetPoint = targetPoint * (pTargetSprite->getCombinedTransform() * pTargetSprite->getTransform().inverted());
 
+                    if (pTargetSprite->mpParentAnimationModel->getParentSprite())
+                    {
+                        targetPoint = targetPoint * pTargetSprite->mpParentAnimationModel->getParentSprite()->getCombinedTransform();
+                    }
+                    else
+                    {
+                        targetPoint = targetPoint * (spTargetSprite->getCombinedTransform() * spTargetSprite->getTransform().inverted());
+                    }
                     // Compare target and current sprite in screen coordinate
                     int dx = targetPoint.x() - point.x();
                     int dy = targetPoint.y() - point.y();

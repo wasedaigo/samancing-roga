@@ -12,22 +12,23 @@ ResourceManager::ResourceManager()
 
 AnimationModel* ResourceManager::getAnimation(QString path, GLSprite* pGLSprite, const QWidget* pRenderTarget)
 {
-    AnimationModel* pAnimationModel = NULL;
-    if(!sAnimationHash.contains(path))
-    {
-        pAnimationModel = new AnimationModel(NULL);
+    //AnimationModel* pAnimationModel = NULL;
+    //if(!sAnimationHash.contains(path))
+    //{
+        AnimationModel* pAnimationModel = new AnimationModel(NULL);
         pAnimationModel->setRenderTarget(pRenderTarget);
 
         if (pAnimationModel->loadData(ResourceManager::getResourcePath(path)))
         {
-          sAnimationHash.insert(path, pAnimationModel);
+          //sAnimationHash.insert(path, pAnimationModel);
         }
         else
         {
           delete pAnimationModel;
+          pAnimationModel = NULL;
         }
-    }
-    pAnimationModel = sAnimationHash[path];
+    //}
+    //pAnimationModel = sAnimationHash[path];
     pAnimationModel->setParentSprite(pGLSprite);
     return pAnimationModel;
 }
@@ -72,3 +73,4 @@ ResourceManager::FileType ResourceManager::getFileType(QString path)
 
     return FileType_Invalid;
 }
+
