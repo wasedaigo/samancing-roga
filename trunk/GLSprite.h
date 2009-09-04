@@ -153,9 +153,10 @@ public:
     static FacingOptionType getFacingOptionTypeByString(QString typeString) ;
 
     static SpriteDescriptor makeDefaultSpriteDescriptor();
-    GLSprite(const GLSprite* pGLSprite, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, const AnimationModel* pParentAnimationModel);
-    GLSprite(const GLSprite* pGLSprite, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap, const AnimationModel* pParentAnimationModel);
+    GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo);
+    GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
+    const AnimationModel* getParentAnimationModel() const;
     const GLSprite* getParentSprite() const;
     const GLSprite* getRootSprite() const;
     QTransform getTransform() const;
@@ -167,18 +168,21 @@ public:
     QRect getRect() const;
     bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
     QTransform getCombinedTransform() const;
+    QTransform getParentTransform() const;
 
     int mID;
     SpriteDescriptor mSpriteDescriptor;
 
     const int mLineNo;
     const int mFrameNo;
+
+private:
     const GLSprite* mpParentGLSprite;
     const AnimationModel* mpParentAnimationModel;
 
-private:
     bool mIsSelectable;
     QPixmap* mpPixmap;
+    QTransform mParentTransform;
 };
 
 #endif // GLSPRITE_H
