@@ -25,7 +25,7 @@ public:
     };
     ResourceManager();
 
-    static AnimationModel* getAnimation(QString path, const QWidget* pRenderTarget);
+    static AnimationModel* getAnimation(QString path);
     static void clearAnimationCache();
     static QString getResourcePath(QString path);
     static FileType getFileType(QString path);

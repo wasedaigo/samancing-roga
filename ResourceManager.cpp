@@ -10,26 +10,24 @@ ResourceManager::ResourceManager()
 {
 }
 
-AnimationModel* ResourceManager::getAnimation(QString path, const QWidget* pRenderTarget)
+AnimationModel* ResourceManager::getAnimation(QString path)
 {
-    //AnimationModel* pAnimationModel = NULL;
-    //if(!sAnimationHash.contains(path))
-    //{
+    if(!sAnimationHash.contains(path))
+    {
         AnimationModel* pAnimationModel = new AnimationModel(NULL);
-        pAnimationModel->setRenderTarget(pRenderTarget);
 
         if (pAnimationModel->loadData(ResourceManager::getResourcePath(path)))
         {
-          //sAnimationHash.insert(path, pAnimationModel);
+          sAnimationHash.insert(path, pAnimationModel);
         }
         else
         {
           delete pAnimationModel;
           pAnimationModel = NULL;
         }
-    //}
-    //pAnimationModel = sAnimationHash[path];
-    return pAnimationModel;
+    }
+
+    return sAnimationHash[path];
 }
 
 void ResourceManager::clearAnimationCache()

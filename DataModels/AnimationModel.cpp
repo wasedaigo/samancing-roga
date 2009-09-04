@@ -75,18 +75,12 @@ GLSprite* AnimationModel::getCenterPointSprite()
 
 AnimationModel::AnimationModel(QWidget* parent)
     : mpParent(parent),
-      mpRenderTarget(NULL),
       mAnimationName(QString("")),
       mAnimationDirectory(QString("")),
       mAnimationID(QString("")),
       mOriginalAnimationID(QString(""))
 {
     setup();
-}
-
-void AnimationModel::setRenderTarget(const QWidget* parent)
-{
-    mpRenderTarget = parent;
 }
 
 void AnimationModel::setup()
@@ -107,7 +101,7 @@ void AnimationModel::setup()
         spriteDescriptor.mCenter.mY = 16;
         spriteDescriptor.mPosition.mX = -100;
 
-        spTargetSprite = new GLSprite(NULL, -1, spriteDescriptor, false, spTargetPixmap, this);
+        spTargetSprite = new GLSprite(NULL, NULL, -1, spriteDescriptor, false, spTargetPixmap);
     }
 
     // Center sprite
@@ -120,7 +114,7 @@ void AnimationModel::setup()
         spriteDescriptor.mCenter.mX = 4;
         spriteDescriptor.mCenter.mY = 4;
 
-        spCenterPointSprite = new GLSprite(NULL, -1, spriteDescriptor, false, spCenterPointPixmap, this);
+        spCenterPointSprite = new GLSprite(NULL, NULL, -1, spriteDescriptor, false, spCenterPointPixmap);
     }
 }
 
@@ -442,7 +436,7 @@ const GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite,
         if (!pGLSprite) {return NULL;}
         if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
         {
-            pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath , mpRenderTarget);
+            pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath);
         }
     }
 
@@ -571,7 +565,7 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                 if (parentGLSprite)
                 {
                     list = parentGLSprite->getNodePath();
-                    pAnimationModel = parentGLSprite->getRootSprite()->mpParentAnimationModel;
+                    pAnimationModel = parentGLSprite->getRootSprite()->getParentAnimationModel();
                 }
                 list.push_back(KeyFrame::KeyFramePosition(lineNo, frameNo));
                 for (int i = 0; i < list.count(); i++)
@@ -711,7 +705,7 @@ GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo,
     }
 
     bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
-    return new GLSprite(parentGLSprite, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, this);
+    return new GLSprite(parentGLSprite, this, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo);
 }
 
 KeyFrame::KeyFramePosition AnimationModel::getCurrentKeyFramePosition()

@@ -36,7 +36,6 @@ void MainWindow::setupModels()
 {
     mpAnimationModel = new AnimationModel(this);
     mpAnimationViewer = new AnimationViewer(this, mpAnimationModel);
-    mpAnimationModel->setRenderTarget(mpAnimationViewer->mpAnimationViewerPanel);
     mpAnimationListModel = new QStandardItemModel(0, 1, this);
 }
 

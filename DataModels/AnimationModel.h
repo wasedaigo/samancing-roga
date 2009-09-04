@@ -38,8 +38,6 @@ public:
     
     void setup();
 
-    void setRenderTarget(const QWidget* parent);
-
     void setTargetSpritePosition(float x, float y);
 
     void clearPixmapHash();
@@ -89,7 +87,6 @@ public:
     GLSprite::Rect mSelectedPaletTextureSrcRect;
 
     const QWidget* mpParent;
-    const QWidget* mpRenderTarget;
 private:
     QString mAnimationName;
     QString mAnimationDirectory;

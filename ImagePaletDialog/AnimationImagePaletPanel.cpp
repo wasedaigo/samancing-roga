@@ -107,7 +107,6 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
             {
                 mCanvasType = CanvasType_Animation;
                 mpPlayingAnimationModel = new AnimationModel(this);
-                mpPlayingAnimationModel->setRenderTarget(this);
                 mpPlayingAnimationModel->loadData(ResourceManager::getResourcePath(path));
 
                 mAnimationFrameNo = 0;

@@ -86,13 +86,13 @@ static QPainter::CompositionMode sCompositionMode[GLSprite::eBT_COUNT] =
     QPainter::CompositionMode_SourceOver
 };
 
-GLSprite::GLSprite(const GLSprite* pGLSprite, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, const AnimationModel* pParentAnimationModel)
+GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(lineNo),
           mFrameNo(frameNo),
           mpParentGLSprite(pGLSprite),
-          mpParentAnimationModel(pParentAnimationModel),
+          mpParentAnimationModel(pAnimationModel),
           mIsSelectable(selectable),
           mpPixmap(NULL)
 
@@ -100,21 +100,36 @@ GLSprite::GLSprite(const GLSprite* pGLSprite, const int& id, const SpriteDescrip
 }
 
 //
-GLSprite::GLSprite(const GLSprite* pGLSprite, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap, const AnimationModel* pParentAnimationModel)
+GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(0),
           mFrameNo(0),
           mpParentGLSprite(pGLSprite),
-          mpParentAnimationModel(pParentAnimationModel),
+          mpParentAnimationModel(pAnimationModel),
           mIsSelectable(selectable),
           mpPixmap(pPixmap)
 {
 }
 
+QTransform GLSprite::getParentTransform() const
+{
+    QTransform transform;
+    if (mpParentGLSprite)
+    {
+        transform = transform * mpParentGLSprite->getCombinedTransform();
+    }
+    return transform;
+}
+
 const GLSprite* GLSprite::getParentSprite() const
 {
     return mpParentGLSprite;
+}
+
+const AnimationModel* GLSprite::getParentAnimationModel() const
+{
+    return mpParentAnimationModel;
 }
 
 bool GLSprite::isSelectable() const
@@ -132,8 +147,8 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
 
    // Rotation & Scale & translate
     QTransform saveTransform = painter.combinedTransform();
-    //painter.setTransform(getTransform(), true);
-    painter.setTransform(getCombinedTransform(), false);
+    painter.setTransform(getTransform(), true);
+    //painter.setTransform(getCombinedTransform(), false);
 //    QMatrix offSetMatrix = QMatrix();
 //    offSetMatrix.translate(320, 240);
 //    painter.setMatrix((getWorldMatrix()).inverted(), false);
@@ -165,7 +180,7 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
                 break;
             case ResourceManager::FileType_Animation:
                 // Render Subanimation
-                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath, mpParentAnimationModel->mpRenderTarget);
+                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath);
                 if (pAnimationModel)
                 {
                     if (pAnimationModel->getMaxFrameCount() > 0)
@@ -180,7 +195,6 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
                     }
                 }
 
-                delete pAnimationModel;
                 break;
              default:
 
@@ -215,21 +229,7 @@ QTransform GLSprite::getTransform() const
 
 QTransform GLSprite::getCombinedTransform() const
 {
-    QTransform transform = getTransform();
-
-    const GLSprite* pSprite = this;
-    while(pSprite = pSprite->getParentSprite())
-    {
-        transform = transform * pSprite->getTransform();
-    }
-
-    QTransform offsetTransform;
-    int offsetX =  this->mpParentAnimationModel->mpRenderTarget->width() / 2;
-    int offsetY =  this->mpParentAnimationModel->mpRenderTarget->height() / 2;
-    offsetTransform.translate(offsetX, offsetY);
-
-    transform =  transform * offsetTransform;
-    return transform;
+    return getParentTransform() * getTransform();
 }
 
 QList<KeyFrame::KeyFramePosition> GLSprite::getNodePath() const
