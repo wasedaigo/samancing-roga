@@ -10,7 +10,7 @@ ResourceManager::ResourceManager()
 {
 }
 
-AnimationModel* ResourceManager::getAnimation(QString path, GLSprite* pGLSprite, const QWidget* pRenderTarget)
+AnimationModel* ResourceManager::getAnimation(QString path, const QWidget* pRenderTarget)
 {
     //AnimationModel* pAnimationModel = NULL;
     //if(!sAnimationHash.contains(path))
@@ -29,7 +29,6 @@ AnimationModel* ResourceManager::getAnimation(QString path, GLSprite* pGLSprite,
         }
     //}
     //pAnimationModel = sAnimationHash[path];
-    pAnimationModel->setParentSprite(pGLSprite);
     return pAnimationModel;
 }
 

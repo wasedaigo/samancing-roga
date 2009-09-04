@@ -50,7 +50,7 @@ private:
     bool mSnapGridCheck;
     CanvasType mCanvasType;
 
-    QList<GLSprite*> mGlSpriteList;
+    QList<const GLSprite*> mGlSpriteList;
     AnimationModel* mpPlayingAnimationModel;
     QTimer* mpAnimationPlayTimer;
     int mAnimationFrameNo;

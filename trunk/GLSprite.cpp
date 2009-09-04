@@ -86,11 +86,12 @@ static QPainter::CompositionMode sCompositionMode[GLSprite::eBT_COUNT] =
     QPainter::CompositionMode_SourceOver
 };
 
-GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, const AnimationModel* pParentAnimationModel)
+GLSprite::GLSprite(const GLSprite* pGLSprite, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, const AnimationModel* pParentAnimationModel)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(lineNo),
           mFrameNo(frameNo),
+          mpParentGLSprite(pGLSprite),
           mpParentAnimationModel(pParentAnimationModel),
           mIsSelectable(selectable),
           mpPixmap(NULL)
@@ -99,27 +100,32 @@ GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool
 }
 
 //
-GLSprite::GLSprite(const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap, const AnimationModel* pParentAnimationModel)
+GLSprite::GLSprite(const GLSprite* pGLSprite, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap, const AnimationModel* pParentAnimationModel)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(0),
           mFrameNo(0),
+          mpParentGLSprite(pGLSprite),
           mpParentAnimationModel(pParentAnimationModel),
           mIsSelectable(selectable),
           mpPixmap(pPixmap)
 {
 }
 
+const GLSprite* GLSprite::getParentSprite() const
+{
+    return mpParentGLSprite;
+}
 
 bool GLSprite::isSelectable() const
 {
     return mIsSelectable;
 }
 
-void GLSprite::render(QPoint offset, QPainter& painter, GLSprite* pParentSprite, GLSprite* pTargetSprite)
+void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite) const
 {
-    QPoint spritePosition = QPoint(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
-    QPoint spriteRenderPoint = spritePosition;
+    QPointF spritePosition = QPointF(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
+    QPointF spriteRenderPoint = spritePosition;
 
     // Choose Blend Type
     painter.setCompositionMode(sCompositionMode[mSpriteDescriptor.mBlendType]);
@@ -141,7 +147,7 @@ void GLSprite::render(QPoint offset, QPainter& painter, GLSprite* pParentSprite,
     );
 
     // Where it actually render the iamge
-    QPoint dstPoint = QPoint(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) + offset;
+    QPointF dstPoint = QPointF(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) + offset;
     QPixmap* pQPixmap;
     if (mpPixmap)
     {
@@ -159,16 +165,16 @@ void GLSprite::render(QPoint offset, QPainter& painter, GLSprite* pParentSprite,
                 break;
             case ResourceManager::FileType_Animation:
                 // Render Subanimation
-                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath, this, mpParentAnimationModel->mpRenderTarget);
+                AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath, mpParentAnimationModel->mpRenderTarget);
                 if (pAnimationModel)
                 {
                     if (pAnimationModel->getMaxFrameCount() > 0)
                     {
                         int subFrameNo = mSpriteDescriptor.mFrameNo % pAnimationModel->getMaxFrameCount();
-                        QList<GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(subFrameNo);
+                        QList<const GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(this, subFrameNo);
                         for (int i = 0; i < glSpriteList.count(); i++)
                         {
-                            glSpriteList[i]->render(QPoint(0, 0), painter, this, pTargetSprite);
+                            glSpriteList[i]->render(QPoint(0, 0), painter, pTargetSprite);
                         }
                         while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
                     }
@@ -188,12 +194,11 @@ void GLSprite::render(QPoint offset, QPainter& painter, GLSprite* pParentSprite,
 const GLSprite* GLSprite::getRootSprite() const
 {
     const GLSprite* pRootSprite = this;
-    const GLSprite* pSprite = NULL;
-    const AnimationModel* pAnimationModel = mpParentAnimationModel;
-    while (pSprite = pAnimationModel->getParentSprite())
+
+    const GLSprite* pSprite = this;
+    while (pSprite = pSprite->getParentSprite())
     {
         pRootSprite = pSprite;
-        pAnimationModel = pSprite->mpParentAnimationModel;
     }
     return pRootSprite;
 }
@@ -211,14 +216,11 @@ QTransform GLSprite::getTransform() const
 QTransform GLSprite::getCombinedTransform() const
 {
     QTransform transform = getTransform();
-    if (mpParentAnimationModel)
+
+    const GLSprite* pSprite = this;
+    while(pSprite = pSprite->getParentSprite())
     {
-        const AnimationModel* pAnimationModel = mpParentAnimationModel;
-        while(const GLSprite* pSprite = pAnimationModel->getParentSprite())
-        {
-            transform = transform * pSprite->getTransform();
-            pAnimationModel = pSprite->mpParentAnimationModel;
-        }
+        transform = transform * pSprite->getTransform();
     }
 
     QTransform offsetTransform;
@@ -234,14 +236,11 @@ QList<KeyFrame::KeyFramePosition> GLSprite::getNodePath() const
 {
     QList<KeyFrame::KeyFramePosition> list;
     list.push_front(KeyFrame::KeyFramePosition(mLineNo, mFrameNo));
-    if (mpParentAnimationModel)
+
+    const GLSprite* pSprite = this;
+    while(pSprite = pSprite->getParentSprite())
     {
-        const AnimationModel* pAnimationModel = mpParentAnimationModel;
-        while(const GLSprite* pSprite = pAnimationModel->getParentSprite())
-        {
-            list.push_front(KeyFrame::KeyFramePosition(pSprite->mLineNo, pSprite->mFrameNo));
-            pAnimationModel = pSprite->mpParentAnimationModel;
-        }
+        list.push_front(KeyFrame::KeyFramePosition(pSprite->mLineNo, pSprite->mFrameNo));
     }
 
     return list;
