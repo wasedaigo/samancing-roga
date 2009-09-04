@@ -145,6 +145,9 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
     // Choose Blend Type
     painter.setCompositionMode(sCompositionMode[mSpriteDescriptor.mBlendType]);
 
+    // Alpha
+    painter.setOpacity(mSpriteDescriptor.mAlpha);
+
    // Rotation & Scale & translate
     QTransform saveTransform = painter.combinedTransform();
     painter.setTransform(getTransform(), true);

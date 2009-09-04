@@ -162,18 +162,26 @@ void AnimationModel::clearPixmapHash()
     sSourceImageHash.clear();
 }
 
-int AnimationModel::getMaxFrameCount()
+int AnimationModel::getMaxFrameCount(int lineNo) const
+{
+    int max = 0;
+    if (mKeyFrames[lineNo].count() > 0)
+    {
+        max = mKeyFrames[lineNo].last()->mFrameNo + 1;
+    }
+
+    return max;
+}
+
+int AnimationModel::getMaxFrameCount() const
 {
     int max = 0;
     for (int i = 0; i < MaxLineNo; i++)
     {
-        if (mKeyFrames[i].count() > 0)
+        int t = getMaxFrameCount(i);
+        if (t > max)
         {
-            int t = mKeyFrames[i].last()->mFrameNo + 1;
-            if (t > max)
-            {
-                max = t;
-            }
+            max = t;
         }
     }
 
@@ -485,7 +493,7 @@ void AnimationModel::tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, 
 // Update the sprite so that it reflects some options
 void AnimationModel::setFinalAlpha(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor) const
 {
-    float dAlpha = 1;
+    float dAlpha = 1.0;
     if (parentGLSprite)
     {
         dAlpha = parentGLSprite->mSpriteDescriptor.mAlpha;
@@ -667,7 +675,11 @@ bool AnimationModel::copyTweenedAttribute(const GLSprite* pParentGLSprite, GLSpr
 // Return true if it find a cel to tween, if not return false;
 GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo, int frameNo) const
 {
+    // no keyframes in this line
     if (mKeyFrames[lineNo].count() == 0) {return NULL;}
+
+    // exceeds max frame count
+    if(frameNo >= getMaxFrameCount(lineNo)){return NULL;}
 
     // Set up base for keyframe.(inherit textureID etc from previous keyframe
     int baseIndex = getPreviousKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);

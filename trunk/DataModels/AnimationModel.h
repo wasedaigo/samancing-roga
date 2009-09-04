@@ -41,7 +41,9 @@ public:
     void setTargetSpritePosition(float x, float y);
 
     void clearPixmapHash();
-    int getMaxFrameCount();
+
+    int getMaxFrameCount(int lineNo) const;
+    int getMaxFrameCount() const;
 
     KeyFrame* getKeyFrame(int lineNo, int frameNo) const;
 

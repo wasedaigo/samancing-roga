@@ -132,18 +132,6 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
     while (iter != mGlSpriteList.end())
     {
         const GLSprite* glSprite = (GLSprite*)*iter;
-        if (
-                !mIsAnimationPlaying &&
-                mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) >= 0 &&
-                !glSprite->isSelectable()
-        )
-        {
-            painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha * 0.5);
-        }
-        else
-        {
-            painter.setOpacity(glSprite->mSpriteDescriptor.mAlpha);
-        }
 
         // render sprite
         painter.translate(centerPoint.x(), centerPoint.y());
