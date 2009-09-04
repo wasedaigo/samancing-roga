@@ -68,13 +68,13 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
         case CanvasType_Animation:
             {
                 QPoint centerPoint = QPoint((width()) / 2, (height()) / 2);
-                QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
+                QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
                 while (iter != mGlSpriteList.end())
                 {
-                    GLSprite* glSprite = (GLSprite*)*iter;
+                    const GLSprite* glSprite = (GLSprite*)*iter;
 
                     painter.translate(centerPoint.x(), centerPoint.y());
-                    glSprite->render(QPoint(0, 0), painter, NULL, mpAnimationModel->getTargetSprite());
+                    glSprite->render(QPoint(0, 0), painter, mpAnimationModel->getTargetSprite());
                     painter.translate(-centerPoint.x(), -centerPoint.y());
 
                     iter++;
@@ -217,7 +217,7 @@ void AnimationImagePaletPanel::onTick()
         while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
 
         // Set current glsprite list
-        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(mAnimationFrameNo);
+        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(NULL, mAnimationFrameNo);
 
         repaint();
     }

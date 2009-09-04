@@ -128,10 +128,10 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 {
     KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
 
-    QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
+    QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
     while (iter != mGlSpriteList.end())
     {
-        GLSprite* glSprite = (GLSprite*)*iter;
+        const GLSprite* glSprite = (GLSprite*)*iter;
         if (
                 !mIsAnimationPlaying &&
                 mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) >= 0 &&
@@ -147,7 +147,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 
         // render sprite
         //painter.translate(centerPoint.x(), centerPoint.y());
-        glSprite->render(QPoint(0, 0), painter, NULL, AnimationModel::getTargetSprite());
+        glSprite->render(QPoint(0, 0), painter,AnimationModel::getTargetSprite());
         //painter.translate(-centerPoint.x(), -centerPoint.y());
 
         QPoint spriteRenderPoint = QPoint(
@@ -198,7 +198,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
     }
 }
 
-void AnimationViewerPanel::renderCenterPointSprite(GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter)
+void AnimationViewerPanel::renderCenterPointSprite(const GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter)
 {
     // render center point
     GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
@@ -208,7 +208,7 @@ void AnimationViewerPanel::renderCenterPointSprite(GLSprite* pGlSprite, const QP
     );
 
     //painter.translate(centerPointPos.x(), centerPointPos.y());
-    centerPointSprite->render(offset, painter, NULL, AnimationModel::getTargetSprite());
+    centerPointSprite->render(offset, painter, AnimationModel::getTargetSprite());
     //painter.translate(-centerPointPos.x(), -centerPointPos.y());
 }
 
@@ -217,7 +217,7 @@ void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainte
     painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
 
    // painter.translate(centerPoint.x(), centerPoint.y());
-    mpAnimationModel->getTargetSprite()->render(QPoint(0, 0), painter, NULL, NULL);
+    mpAnimationModel->getTargetSprite()->render(QPoint(0, 0), painter, NULL);
     //painter.translate(-centerPoint.x(), -centerPoint.y());
 }
 
@@ -235,8 +235,8 @@ void AnimationViewerPanel::refresh()
 
     if (!isAnimationPlaying())
     {
-        int targetX = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
-        int targetY = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
+        float targetX = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
+        float targetY = mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
 
         QPoint centerPoint = getCenterPoint();
 
@@ -262,7 +262,7 @@ void AnimationViewerPanel::refresh()
             emit celSelected(NULL);
         }
     }
-    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
+    mGlSpriteList = mpAnimationModel->createGLSpriteListAt(NULL, mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
 
     repaint();
 }
@@ -310,10 +310,10 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
     else
     {
         // Select a cel, if mouse has clicked on it
-        QList<GLSprite*>::Iterator iter = mGlSpriteList.begin();
+        QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
         while (iter != mGlSpriteList.end())
         {
-            GLSprite* glSprite = (GLSprite*)*iter;
+            const GLSprite* glSprite = (GLSprite*)*iter;
             if (glSprite->isSelectable() &&
                 glSprite->contains(
                         relativePressedPosition,

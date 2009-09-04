@@ -3,8 +3,10 @@ DEPENDPATH += . \
 HEADERS += CelModel.h \
     AnimationModel.h \
     KeyFrameData.h \
-    KeyFrame.h
+    KeyFrame.h \
+    AnimationController.h
 SOURCES += CelModel.cpp \
     AnimationModel.cpp \
     KeyFrameData.cpp \
-    KeyFrame.cpp
+    KeyFrame.cpp \
+    AnimationController.cpp

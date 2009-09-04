@@ -76,7 +76,6 @@ GLSprite* AnimationModel::getCenterPointSprite()
 AnimationModel::AnimationModel(QWidget* parent)
     : mpParent(parent),
       mpRenderTarget(NULL),
-      mpParentGLSprite(NULL),
       mAnimationName(QString("")),
       mAnimationDirectory(QString("")),
       mAnimationID(QString("")),
@@ -88,16 +87,6 @@ AnimationModel::AnimationModel(QWidget* parent)
 void AnimationModel::setRenderTarget(const QWidget* parent)
 {
     mpRenderTarget = parent;
-}
-
-void AnimationModel::setParentSprite(GLSprite* pParentGLSprite)
-{
-    mpParentGLSprite = pParentGLSprite;
-}
-
-const GLSprite* AnimationModel::getParentSprite() const
-{
-    return mpParentGLSprite;
 }
 
 void AnimationModel::setup()
@@ -118,7 +107,7 @@ void AnimationModel::setup()
         spriteDescriptor.mCenter.mY = 16;
         spriteDescriptor.mPosition.mX = -100;
 
-        spTargetSprite = new GLSprite(-1, spriteDescriptor, false, spTargetPixmap, this);
+        spTargetSprite = new GLSprite(NULL, -1, spriteDescriptor, false, spTargetPixmap, this);
     }
 
     // Center sprite
@@ -131,7 +120,7 @@ void AnimationModel::setup()
         spriteDescriptor.mCenter.mX = 4;
         spriteDescriptor.mCenter.mY = 4;
 
-        spCenterPointSprite = new GLSprite(-1, spriteDescriptor, false, spCenterPointPixmap, this);
+        spCenterPointSprite = new GLSprite(NULL, -1, spriteDescriptor, false, spCenterPointPixmap, this);
     }
 }
 
@@ -139,14 +128,14 @@ AnimationModel::~AnimationModel()
 {
 }
 
-void AnimationModel::setTargetSpritePosition(int x, int y)
+void AnimationModel::setTargetSpritePosition(float x, float y)
 {
     if (spTargetSprite->mSpriteDescriptor.mPosition.mX != x || spTargetSprite->mSpriteDescriptor.mPosition.mY != y)
     {
         spTargetSprite->mSpriteDescriptor.mPosition.mX = x;
         spTargetSprite->mSpriteDescriptor.mPosition.mY = y;
 
-        emit targetPositionMoved(x, y);
+        emit targetPositionMoved((int)x, (int)y);
     }
 }
 
@@ -418,50 +407,10 @@ const QList<KeyFrame*>& AnimationModel::getKeyFrameList(int lineNo) const
     return mKeyFrames[lineNo];
 }
 
-GLSprite* AnimationModel::createGLSpriteAt(int frameNo, int lineNo) const
-{
-    GLSprite* pGLSprite = tweenFrame(lineNo, frameNo);
-    return pGLSprite;
-}
 
-GLSprite* AnimationModel::createGLSpriteAt(QList<KeyFrame::KeyFramePosition>nodePath) const
+QString AnimationModel::getSelectedSourcePath() const
 {
-    GLSprite* pGLSprite = NULL;
-    const AnimationModel* pAnimationModel = this;
-    for (int i = 0; i < nodePath.count(); i++)
-    {
-        pGLSprite = pAnimationModel->createGLSpriteAt(nodePath[i].mFrameNo, nodePath[i].mLineNo);
-        if (pAnimationModel != this)
-        {
-            delete pAnimationModel;
-            pAnimationModel = NULL;
-        }
-        if (!pGLSprite) {return NULL;}
-        if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
-        {
-            pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath , pGLSprite, mpRenderTarget);
-        }
-    }
-    if (pAnimationModel != this)
-    {
-        delete pAnimationModel;
-    }
-    return pGLSprite;
-}
-
-const QList<GLSprite*> AnimationModel::createGLSpriteListAt(int frameNo) const
-{
-    QList<GLSprite*> glSpriteList;
-    for (int lineNo = 0; lineNo < MaxLineNo; lineNo++)
-    {
-        GLSprite* pGLSprite = createGLSpriteAt(frameNo, lineNo);
-        if (pGLSprite)
-        {
-            glSpriteList.push_back(pGLSprite);
-        }
-    }
-
-    return glSpriteList;
+    return mSelectedSourcePath;
 }
 
 void AnimationModel::setSelectedSourcePath(QString path)
@@ -476,9 +425,44 @@ void AnimationModel::setSelectedSourcePath(QString path)
     }
 }
 
-QString AnimationModel::getSelectedSourcePath() const
+// Tween Related Stuff
+const GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, int frameNo, int lineNo) const
 {
-    return mSelectedSourcePath;
+    const GLSprite* pGLSprite = tweenFrame(parentGLSprite, lineNo, frameNo);
+    return pGLSprite;
+}
+
+const GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, QList<KeyFrame::KeyFramePosition>nodePath) const
+{
+    const GLSprite* pGLSprite = parentGLSprite;
+    const AnimationModel* pAnimationModel = this;
+    for (int i = 0; i < nodePath.count(); i++)
+    {
+        pGLSprite = pAnimationModel->createGLSpriteAt(pGLSprite, nodePath[i].mFrameNo, nodePath[i].mLineNo);
+        if (!pGLSprite) {return NULL;}
+        if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
+        {
+            pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath , mpRenderTarget);
+        }
+    }
+
+    return pGLSprite;
+}
+
+const QList<const GLSprite*> AnimationModel::createGLSpriteListAt(const GLSprite* parentGLSprite, int frameNo) const
+{
+    QList<const GLSprite*> glSpriteList;
+    const GLSprite* pGLSprite = parentGLSprite;
+    for (int lineNo = 0; lineNo < MaxLineNo; lineNo++)
+    {
+        pGLSprite = createGLSpriteAt(parentGLSprite, frameNo, lineNo);
+        if (pGLSprite)
+        {
+            glSpriteList.push_back(pGLSprite);
+        }
+    }
+
+    return glSpriteList;
 }
 
 void AnimationModel::tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData::TweenType tweenType, GLSprite::SpriteDescriptor& startDescriptor, GLSprite::SpriteDescriptor& endDescriptor, int lineNo, int frameNo, int startFrameNo, int endFrameNo) const
@@ -505,25 +489,25 @@ void AnimationModel::tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, 
 }
 
 // Update the sprite so that it reflects some options
-void AnimationModel::setFinalAlpha(GLSprite::SpriteDescriptor& spriteDescriptor) const
+void AnimationModel::setFinalAlpha(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor) const
 {
     float dAlpha = 1;
-    if (mpParentGLSprite)
+    if (parentGLSprite)
     {
-        dAlpha = mpParentGLSprite->mSpriteDescriptor.mAlpha;
+        dAlpha = parentGLSprite->mSpriteDescriptor.mAlpha;
     }
     spriteDescriptor.mAlpha *= dAlpha;
 }
 
-void AnimationModel::setFinalPosition(GLSprite::SpriteDescriptor& spriteDescriptor) const
+void AnimationModel::setFinalPosition(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor) const
 {
     if(spriteDescriptor.mRelativeToTarget)
     {
         // Transform current position based on target point
         QPoint point = QPointF(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY).toPoint();
-        if(mpParentGLSprite)
+        if(parentGLSprite)
         {
-            point = point * spTargetSprite->getCombinedTransform() * mpParentGLSprite->getCombinedTransform().inverted();
+            point = point * spTargetSprite->getCombinedTransform() * parentGLSprite->getCombinedTransform().inverted();
         }
         else
         {
@@ -535,7 +519,7 @@ void AnimationModel::setFinalPosition(GLSprite::SpriteDescriptor& spriteDescript
     }
 }
 
-void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteDescriptor& spriteDescriptor) const
+void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo, int frameNo, GLSprite::SpriteDescriptor& spriteDescriptor) const
 {
     if (sIsNesting){return;} // if it is nesting, don't do this part
     sIsNesting = true;
@@ -546,9 +530,9 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
             QPoint point = QPointF(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY).toPoint();
 
             // Transform current position to screen coordinate
-            if (mpParentGLSprite)
+            if (parentGLSprite)
             {
-                point = point * (mpParentGLSprite->getCombinedTransform());
+                point = point * (parentGLSprite->getCombinedTransform());
             }
             else
             {
@@ -567,8 +551,8 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
             {
                 GLSprite::SpriteDescriptor tempSpriteDescriptor = spriteDescriptor;
                 // In order to face to correct direction, it needs to calculate the position first
-                copyTweenedAttribute(tempSpriteDescriptor, lineNo, frameNo - 1, KeyFrameData::TweenAttribute_position);
-                copyTweenedAttribute(tempSpriteDescriptor, lineNo, frameNo - 1, KeyFrameData::TweenAttribute_rotation);
+                copyTweenedAttribute(parentGLSprite, tempSpriteDescriptor, lineNo, frameNo - 1, KeyFrameData::TweenAttribute_position);
+                copyTweenedAttribute(parentGLSprite, tempSpriteDescriptor, lineNo, frameNo - 1, KeyFrameData::TweenAttribute_rotation);
                 spriteDescriptor.mRotation.mX = tempSpriteDescriptor.mRotation.mX;
                 int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
                 spriteDescriptor.mRotation.mX += angleOffset;
@@ -584,10 +568,10 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
            {
                 const AnimationModel* pAnimationModel = this;
                 QList<KeyFrame::KeyFramePosition> list;
-                if (mpParentGLSprite)
+                if (parentGLSprite)
                 {
-                    list = mpParentGLSprite->getNodePath();
-                    pAnimationModel = mpParentGLSprite->getRootSprite()->mpParentAnimationModel;
+                    list = parentGLSprite->getNodePath();
+                    pAnimationModel = parentGLSprite->getRootSprite()->mpParentAnimationModel;
                 }
                 list.push_back(KeyFrame::KeyFramePosition(lineNo, frameNo));
                 for (int i = 0; i < list.count(); i++)
@@ -595,16 +579,16 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
                     list[i].mFrameNo += 1;
                 }
 
-                GLSprite* pTargetSprite = pAnimationModel->createGLSpriteAt(list);
+                const GLSprite* pTargetSprite = pAnimationModel->createGLSpriteAt(NULL, list);
 
                 if (pTargetSprite)
                 {
                     QPointF point = QPointF(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY);
 
                     // Transform current position to screen coordinate
-                    if (mpParentGLSprite)
+                    if (parentGLSprite)
                     {
-                        point = point * (mpParentGLSprite->getCombinedTransform());
+                        point = point * (parentGLSprite->getCombinedTransform());
                     }
                     else
                     {
@@ -612,9 +596,9 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
                     }
                     // Transform target position to screen coordinate
                     QPointF targetPoint = QPointF(pTargetSprite->mSpriteDescriptor.mPosition.mX, pTargetSprite->mSpriteDescriptor.mPosition.mY);
-                    if (pTargetSprite->mpParentAnimationModel->getParentSprite())
+                    if (pTargetSprite->getParentSprite())
                     {
-                        targetPoint = targetPoint * pTargetSprite->mpParentAnimationModel->getParentSprite()->getCombinedTransform();
+                        targetPoint = targetPoint * pTargetSprite->getParentSprite()->getCombinedTransform();
                     }
                     else
                     {
@@ -638,7 +622,7 @@ void AnimationModel::setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteD
     sIsNesting = false;
 }
 
-bool AnimationModel::copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDescriptor, int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const
+bool AnimationModel::copyTweenedAttribute(const GLSprite* pParentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor, int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const
 {
     bool tweenFound = false;
     int startIndex = getPreviousKeyFrameIndex(lineNo, frameNo, tweenAttribute);
@@ -650,15 +634,15 @@ bool AnimationModel::copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDesc
         KeyFrame* pEndKeyFrame = mKeyFrames[lineNo][endIndex];
 
         GLSprite::SpriteDescriptor startDescriptor = pStartKeyFrame->mpKeyFrameData->mSpriteDescriptor;
-        setFinalAlpha(startDescriptor);
-        setFinalPosition(startDescriptor);
+        setFinalAlpha(pParentGLSprite, startDescriptor);
+        setFinalPosition(pParentGLSprite, startDescriptor);
 
         GLSprite::SpriteDescriptor endDescriptor;
         if (pEndKeyFrame->mpKeyFrameData)
         {
             endDescriptor = pEndKeyFrame->mpKeyFrameData->mSpriteDescriptor;
-            setFinalAlpha(endDescriptor);
-            setFinalPosition(endDescriptor);
+            setFinalAlpha(pParentGLSprite, endDescriptor);
+            setFinalPosition(pParentGLSprite, endDescriptor);
         }
         else
         {
@@ -670,7 +654,7 @@ bool AnimationModel::copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDesc
         
         if(tweenAttribute == KeyFrameData::TweenAttribute_rotation)
         {
-            setFinalRotation(lineNo, frameNo, spriteDescriptor);
+            setFinalRotation(pParentGLSprite, lineNo, frameNo, spriteDescriptor);
         }
     }
     else if (endIndex == startIndex)
@@ -678,7 +662,7 @@ bool AnimationModel::copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDesc
         tweenFound = true;
         if (tweenAttribute == KeyFrameData::TweenAttribute_rotation)
         {
-            setFinalRotation(lineNo, frameNo, spriteDescriptor);
+            setFinalRotation(pParentGLSprite, lineNo, frameNo, spriteDescriptor);
         }
     }
 
@@ -687,7 +671,7 @@ bool AnimationModel::copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDesc
 
 
 // Return true if it find a cel to tween, if not return false;
-GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
+GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo, int frameNo) const
 {
     if (mKeyFrames[lineNo].count() == 0) {return NULL;}
 
@@ -700,14 +684,14 @@ GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     if (!pBaseKeyFrameData) {return NULL;} // empty keyframe
 
     GLSprite::SpriteDescriptor baseSpriteDescriptor = pBaseKeyFrameData->mSpriteDescriptor;
-    setFinalAlpha(baseSpriteDescriptor);
-    setFinalPosition(baseSpriteDescriptor);
+    setFinalAlpha(parentGLSprite, baseSpriteDescriptor);
+    setFinalPosition(parentGLSprite, baseSpriteDescriptor);
 
     // Tween for each attribute
     bool anyTweenFound = false;
     for (int i = 0; i < KeyFrameData::TweenAttribute_COUNT; i++)
     {
-        if (copyTweenedAttribute(baseSpriteDescriptor, lineNo, frameNo, (KeyFrameData::TweenAttribute)i))
+        if (copyTweenedAttribute(parentGLSprite, baseSpriteDescriptor, lineNo, frameNo, (KeyFrameData::TweenAttribute)i))
         {
             anyTweenFound = true;
         }
@@ -727,7 +711,7 @@ GLSprite* AnimationModel::tweenFrame(int lineNo, int frameNo) const
     }
 
     bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
-    return new GLSprite(lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, this);
+    return new GLSprite(parentGLSprite, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, this);
 }
 
 KeyFrame::KeyFramePosition AnimationModel::getCurrentKeyFramePosition()
@@ -883,7 +867,6 @@ bool AnimationModel::loadData(QString path)
     {
         QString error = QString("File %0 is not correct JSON format").arg(path);
         printf("%s", error.toStdString().c_str());
-        //QMessageBox::information(mpParent->window(), tr("File loading error"), tr(error.toStdString().c_str()));
         return false;
     }
 

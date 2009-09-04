@@ -39,10 +39,8 @@ public:
     void setup();
 
     void setRenderTarget(const QWidget* parent);
-    void setParentSprite(GLSprite* pParentGLSprite);
-    const GLSprite* getParentSprite() const;
 
-    void setTargetSpritePosition(int x, int y);
+    void setTargetSpritePosition(float x, float y);
 
     void clearPixmapHash();
     int getMaxFrameCount();
@@ -68,10 +66,6 @@ public:
 
     const QList<KeyFrame*>& getKeyFrameList(int lineNo) const;
 
-    GLSprite* createGLSpriteAt(int frameNo, int lineNo) const;
-    GLSprite* createGLSpriteAt(QList<KeyFrame::KeyFramePosition>nodePath) const;
-    const QList<GLSprite*> createGLSpriteListAt(int frameNo) const;
-
     void setSelectedSourcePath(QString sourcePath);
     QString getSelectedSourcePath() const;
 
@@ -79,28 +73,34 @@ public:
     void selectCurrentKeyFramePosition(int lineNo, int frameNo);
 
     void tellTimeLineToRefresh();
-    bool copyTweenedAttribute(GLSprite::SpriteDescriptor& spriteDescriptor, int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
 
+    // GLSprite related functions
+    const GLSprite* createGLSpriteAt(const GLSprite* parentGLSprite, int frameNo, int lineNo) const;
+    const GLSprite* createGLSpriteAt(const GLSprite* parentGLSprite, QList<KeyFrame::KeyFramePosition>nodePath) const;
+    const QList<const GLSprite*> createGLSpriteListAt(const GLSprite* parentGLSprite, int frameNo) const;
+    bool copyTweenedAttribute(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor, int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
+
+    // Save & Load
     bool saveData();
     bool loadData(QString path);
     QString getLoadedAnimationPath() const;
+
     // public member variables
     GLSprite::Rect mSelectedPaletTextureSrcRect;
 
     const QWidget* mpParent;
     const QWidget* mpRenderTarget;
 private:
-    GLSprite* mpParentGLSprite;
     QString mAnimationName;
     QString mAnimationDirectory;
     QString mAnimationID;
     QString mOriginalAnimationID;
 
-    void setFinalAlpha(GLSprite::SpriteDescriptor& spriteDescriptor) const;
-    void setFinalPosition(GLSprite::SpriteDescriptor& spriteDescriptor) const;
-    void setFinalRotation(int lineNo, int frameNo, GLSprite::SpriteDescriptor& spriteDescriptor) const;
+    void setFinalAlpha(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor) const;
+    void setFinalPosition(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor) const;
+    void setFinalRotation(const GLSprite* parentGLSprite, int lineNo, int frameNo, GLSprite::SpriteDescriptor& spriteDescriptor) const;
     void tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData::TweenType tweenType, GLSprite::SpriteDescriptor& startDescriptor, GLSprite::SpriteDescriptor& endDescriptor, int lineNo, int frameNo, int startFrameNo, int endFrameNo) const;
-    GLSprite* tweenFrame(int lineNo, int frameNo) const;
+    GLSprite* tweenFrame(const GLSprite* parentGLSprite, int lineNo, int frameNo) const;
 
     // Key Frames
     QList<KeyFrame*> mKeyFrames[MaxLineNo];

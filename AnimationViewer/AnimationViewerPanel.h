@@ -47,12 +47,12 @@ private:
     void setCenterPoint(QMouseEvent *event);
     void renderCross(QPainter& painter);
     void renderCelSprites(const QPoint& centerPoint, QPainter& painter);
-    void renderCenterPointSprite(GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter);
+    void renderCenterPointSprite(const GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter);
     void renderTargetSprite(const QPoint& centerPoint, QPainter& painter);
     void clearSprites();
     void swapSourceTexture();
 
-    QList<GLSprite*> mGlSpriteList;
+    QList<const GLSprite*> mGlSpriteList;
 
     AnimationModel* mpAnimationModel;
     int mCurrentFrameNo;
