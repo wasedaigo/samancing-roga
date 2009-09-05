@@ -287,6 +287,7 @@ int AnimationModel::getSubanimationStartKeyFrameIndex(int lineNo, int frameNo) c
 // set new key frame
 void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2& position)
 {
+    if (lineNo >= MaxLineNo){return;}
     // if a keframe already exists, don't add any keyframe
     if (getKeyFrameIndex(lineNo, frameNo) == -1)
     {
@@ -308,6 +309,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2
 
 void AnimationModel::setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyframeData)
 {
+    if (lineNo >= MaxLineNo){return;}
     // if a keframe already exists, don't add any keyframe
     if (getKeyFrameIndex(lineNo, frameNo) == -1)
     {
@@ -321,6 +323,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyfram
 
 void AnimationModel::insertEmptyKeyFrame(int lineNo, int frameNo)
 {
+    if (lineNo >= MaxLineNo){return;}
     // if a keframe already exists, don't add any keyframe
     if (getKeyFrameIndex(lineNo, frameNo) == -1)
     {
@@ -527,6 +530,7 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
     sIsNesting = true;
     switch(spriteDescriptor.mFacingOptionType)
     {
+        // Look at target sprite
         case GLSprite::FacingOptionType_lookAtTarget:
         {
             QPoint point = QPointF(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY).toPoint();
@@ -566,6 +570,8 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
             }
        }
        break;
+
+       // Face to the direction where it is going to move
        case GLSprite::FacingOptionType_FaceToMovingDir:
            {
                 const AnimationModel* pAnimationModel = this;
@@ -614,7 +620,14 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                     spriteDescriptor.mRotation.mX += angleOffset;
                 }
 
-                delete pTargetSprite;
+                // delete all temporaly generated Sprites.
+                const GLSprite* pSprite = pTargetSprite;
+                while (pSprite)
+                {
+                    const GLSprite* tSprite = pSprite->getParentSprite();
+                    delete pSprite;
+                    pSprite = tSprite;
+                }
            }
            break;
        default:

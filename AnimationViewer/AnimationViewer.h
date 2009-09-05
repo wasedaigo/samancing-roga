@@ -21,6 +21,8 @@ public:
     ~AnimationViewer();
     AnimationViewerPanel* mpAnimationViewerPanel;
 
+    Ui::AnimationViewer *m_ui;
+
 private slots:
     void onCelSelected(KeyFrameData* pKeyFrameData);
 
@@ -38,7 +40,7 @@ protected:
 
 private:
     void blockSignals(bool block);
-    Ui::AnimationViewer *m_ui;
+
     CelModel* mpSelectedCelModel;
     QStandardItemModel* mpTweenModel;
 
