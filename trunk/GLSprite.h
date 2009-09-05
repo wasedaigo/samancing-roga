@@ -166,7 +166,7 @@ public:
     bool isSelectable() const;
     void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite) const;
     QRect getRect() const;
-    bool contains(QPoint point, const GLSprite::Point3& targetPosition) const;
+    bool contains(QPoint point, const QPoint& targetPosition) const;
     QTransform getCombinedTransform() const;
     QTransform getParentTransform() const;
 

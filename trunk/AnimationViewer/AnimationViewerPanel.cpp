@@ -61,13 +61,11 @@ void AnimationViewerPanel::gotoNextFrame()
     if (frameNo < mpAnimationModel->getMaxFrameCount())
     {
        mpAnimationModel->selectCurrentKeyFramePosition(keyframePosition.mLineNo, keyframePosition.mFrameNo + 1);
-       refresh();
     }
 }
 
 void AnimationViewerPanel::resizeEvent(QResizeEvent *event)
 {
-    repaint();
 }
 
 QPoint AnimationViewerPanel::getCenterPoint() const
@@ -281,16 +279,16 @@ void AnimationViewerPanel::selectCel(int lineNo)
     if (keyframePosition.mLineNo != lineNo)
     {
         mpAnimationModel->selectCurrentKeyFramePosition(lineNo, keyframePosition.mFrameNo);
-        repaint();
     }
 }
 
 void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
 {
-    GLSprite::Point3 pt3 = {0, 0, 0};
+
+    QPointF pt2 = QPointF(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX, mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY);
     if(mpAnimationModel->getTargetSprite()->contains(
             relativePressedPosition,
-            pt3
+            pt2.toPoint()
        )
     )
     {
@@ -307,7 +305,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
             if (glSprite->isSelectable() &&
                 glSprite->contains(
                         relativePressedPosition,
-                        mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition
+                        QPointF(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX, mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY).toPoint()
                    )
                 )
             {
@@ -358,7 +356,7 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
         {
             case ResourceManager::FileType_Animation:
             case ResourceManager::FileType_Image:
-            if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
+                if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
                 {
                     GLSprite::Point2 pt;
                     pt.mX = relativePressedPosition.x();
@@ -376,7 +374,6 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
             break;
 
             default:
-
             break;
         }
       }
@@ -426,6 +423,11 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
         // Move cel if it is selected
         if (pKeyFrameData)
         {
+            if (pKeyFrameData->mSpriteDescriptor.mRelativeToTarget)
+            {
+                newPosX -= mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
+                newPosY -= mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
+            }
             mpSelectedCelModel->setPositionX(newPosX);
             mpSelectedCelModel->setPositionY(newPosY);
         }

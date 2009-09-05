@@ -36,6 +36,6 @@ void QTimelinePanel::changeEvent(QEvent *e)
 
 void QTimelinePanel::onTimelineScrolled(int value)
 {
-    m_ui->currentFrameNo->setText(QString("%0").arg(value));
+    //m_ui->currentFrameNo->setText(QString("%0").arg(value));
     mpQTimelineWidget->refreshTimeLine();
 }

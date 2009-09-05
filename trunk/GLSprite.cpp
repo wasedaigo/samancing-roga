@@ -258,12 +258,9 @@ QRect GLSprite::getRect() const
         (int)mSpriteDescriptor.mTextureSrcRect.mHeight
     );
 }
-bool GLSprite::contains(QPoint point, const GLSprite::Point3& targetPosition) const
+
+bool GLSprite::contains(QPoint point, const QPoint& targetPosition) const
 {
-    if (mSpriteDescriptor.mRelativeToTarget)
-    {
-        point -= QPoint((int)targetPosition.mX, (int)targetPosition.mY);
-    }
     point += QPoint((int)(mSpriteDescriptor.mCenter.mX), (int)(mSpriteDescriptor.mCenter.mY));
     return getRect().contains(point, true);
 }

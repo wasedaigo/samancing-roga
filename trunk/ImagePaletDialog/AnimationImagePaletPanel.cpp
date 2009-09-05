@@ -31,7 +31,6 @@ AnimationImagePaletPanel::AnimationImagePaletPanel(AnimationModel* pAnimationMod
 AnimationImagePaletPanel::~AnimationImagePaletPanel()
 {
     while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
-    delete mpPlayingAnimationModel;
     delete mpAnimationPlayTimer;
 }
 
@@ -90,7 +89,6 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
 
 void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
 {
-    delete mpPlayingAnimationModel;
     switch(ResourceManager::getFileType(path))
     {
         case ResourceManager::FileType_Image:
@@ -100,13 +98,16 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
 
                 mCanvasType = CanvasType_Image;
                 this->repaint();
+                mpAnimationPlayTimer->stop();
             }
             break;
 
         case ResourceManager::FileType_Animation:
             {
+                setFixedSize(parentWidget()->width(), parentWidget()->height());
+
                 mCanvasType = CanvasType_Animation;
-                mpPlayingAnimationModel = new AnimationModel(this);
+                mpPlayingAnimationModel = ResourceManager::getAnimation(path);
                 mpPlayingAnimationModel->loadData(ResourceManager::getResourcePath(path));
 
                 mAnimationFrameNo = 0;
@@ -119,6 +120,20 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
             break;
     }
 }
+
+void AnimationImagePaletPanel::closeEvent(QCloseEvent *event)
+{
+    mpAnimationPlayTimer->stop();
+}
+
+void AnimationImagePaletPanel::showEvent(QShowEvent *event)
+{
+    if (mCanvasType == CanvasType_Animation)
+    {
+        mpAnimationPlayTimer->start();
+    }
+}
+
 
 QPoint AnimationImagePaletPanel::getSnappedPosition(int x, int y)
 {

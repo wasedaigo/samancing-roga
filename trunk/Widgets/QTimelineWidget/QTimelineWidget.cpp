@@ -78,8 +78,8 @@ QTimelineWidget::QTimelineWidget(AnimationModel* pAnimationModel, QWidget *paren
      }
     }
 
-    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    this->setMinimumHeight(200);
     this->horizontalHeader()->setStretchLastSection(false);
     this->horizontalHeader()->setDefaultSectionSize(10);
 
@@ -93,8 +93,12 @@ QTimelineWidget::QTimelineWidget(AnimationModel* pAnimationModel, QWidget *paren
 
     this->setAlternatingRowColors(true);
     this->setColumnCount(100);
-    this->setRowCount(8);
-    this->setShowGrid(false);
+
+    this->setRowCount(AnimationModel::MaxLineNo + 1);
+    
+    //this->verticalHeaderItem(8)->setText("E");
+
+    //this->setShowGrid(false);
 
     this->setEditTriggers(0);
     this->setSelectionMode(QAbstractItemView::NoSelection);
@@ -110,7 +114,7 @@ QTimelineWidget::QTimelineWidget(AnimationModel* pAnimationModel, QWidget *paren
 
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(onSelectedCellChanged(int, int)));
     connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refreshTimeLine()));
-
+    connect(this, SIGNAL(enabledChangeds(bool)), this, SLOT(onEnabledChange(bool)));
 }
 
 QTimelineWidget::~QTimelineWidget()
@@ -348,6 +352,8 @@ void QTimelineWidget::refreshTimeLine()
      {
          this->item(row, column)->setBackground(sBrushes[selection][cellType]);
      }
+
+     this->setVerticalHeaderItem(8, new QTableWidgetItem(QString("E")));
  }
 
  void QTimelineWidget::setKeyFrame(int row, int column)

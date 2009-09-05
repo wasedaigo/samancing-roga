@@ -13,7 +13,8 @@
 
 void MainWindow::setupConnections()
 {
-    connect(ui->showPaletButton_1, SIGNAL(clicked()), this, SLOT(onPaletButtonClicked()));
+
+    connect(mpAnimationViewer->m_ui->showPaletteButton, SIGNAL(clicked()), this, SLOT(onPaletButtonClicked()));
 
     // connect animation list controls
     connect(ui->addAnimationButton, SIGNAL(clicked()), this, SLOT(onAddAnimationButtonClicked()));
@@ -103,6 +104,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::setEditEnabled(bool enabled)
 {
+    ui->eventsGroupdBox->setEnabled(enabled);
     ui->gridInfoBox->setEnabled(enabled);
     mpQTimelinePanel->setEnabled(enabled);
     mpAnimationViewer->setEnabled(enabled);
