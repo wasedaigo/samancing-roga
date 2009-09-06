@@ -30,6 +30,10 @@ public:
 
 private slots:
     // animation list control
+    void onAddEventButtonClicked();
+    void onRemoveEventButtonClicked();
+    void onEventEdited(int row, int column);
+
     void onAddAnimationButtonClicked();
     void onRemoveAnimationButtonClicked();
 
@@ -40,6 +44,7 @@ private slots:
     // Animation Panel Control
     void onAnimationDurationChanged(int duration);
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
+    void refreshEventList();
 
 private:
     void setupConnections();
@@ -48,6 +53,7 @@ private:
     void setupUI();
     void loadAnimationData(int index);
     void loadConfigFile();
+
 
     Ui::MainWindow *ui;
 

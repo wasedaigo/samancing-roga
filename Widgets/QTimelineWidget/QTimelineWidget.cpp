@@ -232,6 +232,8 @@ void QTimelineWidget::refreshTimeLine()
         for (int keyframeIndex = 0;  keyframeIndex < keyframeList.count(); keyframeIndex++)
         {
             int startFrameNo = keyframeList[keyframeIndex]->mFrameNo;
+            if (startFrameNo > rightColumn) {break;}
+
             int endFrameNo = startFrameNo;
             if (keyframeIndex + 1 < keyframeList.count())
             {
@@ -277,6 +279,16 @@ void QTimelineWidget::refreshTimeLine()
                     setCellItem(lineNo, endFrameNo, sKeyFrameSymbol[KeyFrameState_end][keyframeType]);
                 }
             }
+        }
+    }
+
+    // Refresh Event key
+    for (int i = leftColumn; i <= rightColumn; i++)
+    {
+        AnimationModel::EventList list = mpAnimationModel->getEventList(i);
+        if (list.mList.count() > 0)
+        {
+            setCellItem(AnimationModel::MaxLineNo, i, CellType_key);
         }
     }
 

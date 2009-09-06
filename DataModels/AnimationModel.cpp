@@ -188,6 +188,27 @@ int AnimationModel::getMaxFrameCount() const
     return max;
 }
 
+AnimationModel::EventList AnimationModel::getEventList(int frameNo) const
+{
+    if(mEvents.contains(frameNo))
+    {
+        return mEvents[frameNo];
+    }
+    else
+    {
+        return EventList();
+    }
+}
+
+void AnimationModel::setEventText(int frameNo, int index, QString text)
+{
+    if(index >= 0 && mEvents.contains(frameNo))
+    {
+        mEvents[frameNo].mList[index] = text;
+    }
+
+}
+
 KeyFrame* AnimationModel::getKeyFrame(int lineNo, int frameNo) const
 {
     if (lineNo < 0 || frameNo < 0){return NULL;}
@@ -282,6 +303,27 @@ int AnimationModel::getSubanimationStartKeyFrameIndex(int lineNo, int frameNo) c
     }
 
     return 0;
+}
+
+void AnimationModel::addEvent(int frameNo)
+{
+    if(!mEvents.contains(frameNo))
+    {
+        mEvents.insert(frameNo, EventList());
+    }
+    mEvents[frameNo].mList.push_back(QString(""));
+}
+
+void AnimationModel::removeEvent(int frameNo, int index)
+{
+    if(mEvents.contains(frameNo))
+    {
+        mEvents[frameNo].mList.removeAt(index);
+        if(mEvents[frameNo].mList.count() == 0)
+        {
+            mEvents.remove(frameNo);
+        }
+    }
 }
 
 // set new key frame
@@ -788,17 +830,19 @@ bool AnimationModel::saveData()
 
     // save keyframes
     Json::Value& keyframesData = root["keyframes"];
-    keyframesData.resize(MaxLineNo);
     for (int i = 0; i < MaxLineNo; i++)
     {
-        keyframesData[i].resize(mKeyFrames[i].count());
+        //if no data exists in this line, ignore it.
+        if(mKeyFrames[i].count() == 0)
+        {
+            continue;
+        }
 
         for (int j = 0; j < mKeyFrames[i].count(); j++)
         {
             const KeyFrame* keyframe = mKeyFrames[i][j];
 
             Json::Value keyframeData;
-            keyframeData["lineNo"] = keyframe->mLineNo;
             keyframeData["frameNo"] = keyframe->mFrameNo;
 
             if (keyframe->mpKeyFrameData)
@@ -852,9 +896,26 @@ bool AnimationModel::saveData()
             {
                 keyframeData["isEmpty"] = true;
             }
-            keyframesData[i][j] = keyframeData;
+
+            keyframesData[QString::number(i).toStdString()][j] = keyframeData;
         }
     }
+
+    // Write event data
+    Json::Value events;
+    for(QHash<int, AnimationModel::EventList>::iterator iter = mEvents.begin() ; mEvents.end() != iter ; iter++)
+    {
+        int lineNo = iter.key();
+        AnimationModel::EventList eventList = static_cast<AnimationModel::EventList>(*iter);
+        Json::Value list;
+        for (int i = 0; i < eventList.mList.count(); i++)
+        {
+            list[static_cast<unsigned int>(i)] = eventList.mList[i].toStdString();
+        }
+
+        events[QString::number(lineNo).toStdString()] = list;
+    }
+    root["events"] = events;
 
     saveDir.remove(mOriginalAnimationID.append(".").append(ANIMATION_FORMAT));
     Json::StyledWriter writer;
@@ -874,6 +935,7 @@ bool AnimationModel::saveData()
 bool AnimationModel::loadData(QString path)
 {
     clearAllKeyFrames();
+    mEvents.clear();
 
     Json::Value root;
     Json::Reader reader;
@@ -905,14 +967,18 @@ bool AnimationModel::loadData(QString path)
     root["name"] = mAnimationName.toStdString();
 
     Json::Value& lines = root["keyframes"];
-    for (unsigned int i = 0; i < MaxLineNo; i++)
+
+    for(Json::Value::iterator iter = lines.begin() ; lines.end() != iter ; iter++)
     {
-        for (unsigned int j = 0; j < lines[i].size(); j++)
+        const char* c_str = iter.memberName();
+        int lineNo = atoi(c_str);
+
+        Json::Value& line =  *iter;
+        for (unsigned int j = 0; j < line.size(); j++)
         {
-            Json::Value& keyframe = lines[i][j];
+            Json::Value& keyframe = line[j];
 
             int frameNo = keyframe["frameNo"].asInt();
-            int lineNo = keyframe["lineNo"].asInt();
             KeyFrame* pKeyFrame = NULL;
             if (!keyframe["isEmpty"].asBool())
             {
@@ -957,9 +1023,27 @@ bool AnimationModel::loadData(QString path)
             {
                 pKeyFrame = new KeyFrame(lineNo, frameNo, NULL);
             }
-            mKeyFrames[i].push_back(pKeyFrame);
+            mKeyFrames[lineNo].push_back(pKeyFrame);
         }
     }
+
+
+    Json::Value& events = root["events"];
+    for(Json::Value::iterator iter = events.begin() ; events.end() != iter ; iter++)
+    {
+        // Get frameNo for the event and add to hash
+        const char* c_str = iter.memberName();
+        int frameNo = atoi(c_str);
+        mEvents.insert(frameNo, EventList());
+
+        // add event from event list
+        Json::Value& eventList = *iter;
+        for (unsigned int i = 0; i < eventList.size(); i++)
+        {
+            mEvents[frameNo].mList.push_back(QString::fromStdString(eventList[i].asString()));
+        }
+    }
+    // event data
 
     mSelectedKeyFramePosition.mFrameNo = 0;
     mSelectedKeyFramePosition.mLineNo = 0;
