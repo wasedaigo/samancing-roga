@@ -20,6 +20,10 @@ void MainWindow::setupConnections()
     connect(ui->addAnimationButton, SIGNAL(clicked()), this, SLOT(onAddAnimationButtonClicked()));
     connect(ui->removeAnimationButton, SIGNAL(clicked()), this, SLOT(onRemoveAnimationButtonClicked()));
 
+    connect(ui->addEventButton, SIGNAL(clicked()), this, SLOT(onAddEventButtonClicked()));
+    connect(ui->removeEventButton, SIGNAL(clicked()), this, SLOT(onRemoveEventButtonClicked()));
+    connect(ui->eventTableWidget, SIGNAL(cellChanged(int, int)), this, SLOT(onEventEdited(int, int)));
+
     // connec Animation Viewer
     connect(mpAnimationViewer, SIGNAL(playAnimation(bool)), this, SLOT(setEnabled(bool)));
     connect(ui->lineEditAnimationName, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationName(QString)));
@@ -31,6 +35,7 @@ void MainWindow::setupConnections()
     connect(ui->animationTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
         this, SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
     connect(mpAnimationModel, SIGNAL(fileSaved(QModelIndex)), &mAnimationTreeViewModel, SLOT(refresh(QModelIndex)));
+    connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refreshEventList()));
 }
 
 void MainWindow::setupModels()
@@ -141,6 +146,11 @@ void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSele
     {
         if (mpAnimationModel->loadData(path))
         {
+            for(int i = ui->eventTableWidget->rowCount() - 1; i >= 0; i--)
+            {
+                ui->eventTableWidget->removeRow(i);
+            }
+
             ResourceManager::clearAnimationCache();
             setEditEnabled(true);
         }
@@ -161,6 +171,55 @@ void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSele
 //    mpAnimationModel->setSelectedSourcePath(path);
 }
 
+void MainWindow::onAddEventButtonClicked()
+{
+    KeyFrame::KeyFramePosition position = mpAnimationModel->getCurrentKeyFramePosition();
+    mpAnimationModel->addEvent(position.mFrameNo);
+
+    refreshEventList();
+}
+
+void MainWindow::onRemoveEventButtonClicked()
+{
+    KeyFrame::KeyFramePosition position = mpAnimationModel->getCurrentKeyFramePosition();
+    QList<QTableWidgetSelectionRange> ranges = ui->eventTableWidget->selectedRanges();
+
+    for(int i = 0; i < ranges.count(); i++)
+    {
+        QTableWidgetSelectionRange range = ranges[i];
+        for(int j = range.bottomRow(); j >= range.topRow(); j--)
+        {
+            mpAnimationModel->removeEvent(position.mFrameNo, j);
+        }
+    }
+
+    refreshEventList();
+}
+
+void MainWindow::onEventEdited(int row, int column)
+{
+    KeyFrame::KeyFramePosition position = mpAnimationModel->getCurrentKeyFramePosition();
+    QString text = ui->eventTableWidget->item(row, column)->data(Qt::EditRole).toString();
+    mpAnimationModel->setEventText(position.mFrameNo, row, text);
+}
+
+void MainWindow::refreshEventList()
+{
+    KeyFrame::KeyFramePosition position = mpAnimationModel->getCurrentKeyFramePosition();
+    QList<QString> eventList = mpAnimationModel->getEventList(position.mFrameNo).mList;
+
+    for(int i = ui->eventTableWidget->rowCount() - 1; i >= 0; i--)
+    {
+        ui->eventTableWidget->removeRow(i);
+    }
+
+    for(int i = eventList.count() - 1; i >= 0; i--)
+    {
+        ui->eventTableWidget->insertRow(0);
+        ui->eventTableWidget->setItem(0, 0, new QTableWidgetItem(QString(eventList[i]), Qt::EditRole));
+    }
+    mpAnimationModel->tellTimeLineToRefresh();
+}
 
 void MainWindow::onAddAnimationButtonClicked()
 {

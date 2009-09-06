@@ -22,11 +22,9 @@ public:
         MaxLineNo = 8
     };
 
-    struct Event
+    struct EventList
     {
-        int mFrameNo;
-        QString mType;
-        QString mValue;
+        QList<QString> mList;
     };
 
     static QPixmap* getPixmap(QString path);
@@ -45,6 +43,9 @@ public:
     int getMaxFrameCount(int lineNo) const;
     int getMaxFrameCount() const;
 
+    EventList getEventList(int frameNo) const;
+    void setEventText(int frameNo, int index, QString text);
+
     KeyFrame* getKeyFrame(int lineNo, int frameNo) const;
 
     int getKeyFrameIndex(int lineNo, int frameNo) const;
@@ -53,6 +54,9 @@ public:
     int getPreviousKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
     int getNextKeyFrameIndex(int lineNo, int frameNo, KeyFrameData::TweenAttribute tweenAttribute) const;
     int getSubanimationStartKeyFrameIndex(int lineNo, int frameNo) const;
+
+    void addEvent(int frameNo);
+    void removeEvent(int frameNo, int index);
 
     void setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2& position);
     void setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyframeData);
@@ -103,9 +107,7 @@ private:
 
     // Key Frames
     QList<KeyFrame*> mKeyFrames[MaxLineNo];
-
-    // Animation Events
-    QList<Event> mAnimationEventList;
+    QHash<int, EventList> mEvents;
 
     QString mSelectedSourcePath;
 

@@ -425,8 +425,8 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
         {
             if (pKeyFrameData->mSpriteDescriptor.mRelativeToTarget)
             {
-                newPosX -= mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
-                newPosY -= mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
+                newPosX -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
+                newPosY -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
             }
             mpSelectedCelModel->setPositionX(newPosX);
             mpSelectedCelModel->setPositionY(newPosY);
