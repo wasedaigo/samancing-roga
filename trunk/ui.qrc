@@ -8,5 +8,6 @@
         <file>resource/disk.png</file>
         <file>resource/palette.png</file>
         <file>resource/play.png</file>
+        <file>resource/splash.ico</file>
     </qresource>
 </RCC>
