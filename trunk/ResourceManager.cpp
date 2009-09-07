@@ -31,6 +31,8 @@ AnimationModel* ResourceManager::getAnimation(QString path)
     return sAnimationHash[path];
 }
 
+// Call this function when you want to clean up all animation data allocated to
+// the memory.
 void ResourceManager::clearAnimationCache()
 {
     QHash<QString, AnimationModel*>::Iterator iter = sAnimationHash.begin();
@@ -72,6 +74,7 @@ ResourceManager::FileType ResourceManager::getFileType(QString path)
     return FileType_Invalid;
 }
 
+// Play sound
 void ResourceManager::playSound(QString path)
 {
     QString rootPath = QDir::currentPath();
