@@ -40,6 +40,8 @@ public slots:
     void setAlpha(double value);
     void setAlphaTweenType(int index);
 
+    void setPriority(double value);
+
 signals:
     void sourceTextureChanged(QString path, QRect rect);
 
@@ -55,7 +57,7 @@ signals:
 
     void positionXChanged(int value);
     void positionYChanged(int value);
-    void positionZChanged(int value);
+
     void positionTweenTypeChanged(int value);
 
     void rotationChanged(int value);
@@ -68,6 +70,7 @@ signals:
     void alphaChanged(double value);
     void alphaTweenTypeChanged(float index);
 
+    void priorityChanged(double value);
 private:
     KeyFrameData* mpKeyFrameData;
 };

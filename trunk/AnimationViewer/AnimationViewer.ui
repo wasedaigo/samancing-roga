@@ -258,18 +258,27 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="positionZSpinBox">
+              <widget class="QDoubleSpinBox" name="prioritySpinBox">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
                <property name="minimum">
-                <number>-9999</number>
+                <double>-100.000000000000000</double>
                </property>
                <property name="maximum">
-                <number>9999</number>
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>

@@ -914,10 +914,15 @@ bool AnimationModel::saveData()
                     keyframeData["rotation"] = pKeyFrameData->mSpriteDescriptor.mRotation;
                  }
 
+                 if (pKeyFrameData->mSpriteDescriptor.mPriority != 0.5)
+                 {
+                    keyframeData["priority"] = pKeyFrameData->mSpriteDescriptor.mPriority;
+                 }
+
                  if (pKeyFrameData->mSpriteDescriptor.mAlpha < 1)
                  {
                     keyframeData["alpha"] = pKeyFrameData->mSpriteDescriptor.mAlpha;
-                }
+                 }
 
 
                 for (int k = 0; k < KeyFrameData::TweenAttribute_COUNT; k++)
@@ -1062,7 +1067,13 @@ bool AnimationModel::loadData(QString path)
                     pKeyFrameData->mSpriteDescriptor.mAlpha = keyframe["alpha"].asDouble();
                 }
 
-                // Save position data
+                // priority data
+                if (!keyframe["priority"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mPriority = keyframe["priority"].asDouble();
+                }
+
+                // position data
                 if (!keyframe["position"].isNull())
                 {
                     pKeyFrameData->mSpriteDescriptor.mPosition.mX = keyframe["position"][static_cast<unsigned int>(0)].asInt();

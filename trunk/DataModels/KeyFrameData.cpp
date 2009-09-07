@@ -13,6 +13,7 @@ QString KeyFrameData::tweenTypeSting[KeyFrameData::eTT_COUNT] =
 {
     "none",
     "fix",
+    "linear",
     "easeIn",
     "easeOut",
     "easeInOut"

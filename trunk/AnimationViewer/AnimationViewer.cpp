@@ -46,6 +46,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->alphaTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setAlphaTweenType(int)));
     connect(m_ui->alphaTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
+    connect(m_ui->prioritySpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setPriority(double)));
+
     connect(m_ui->positionXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setPositionX(int)));
     connect(m_ui->positionYSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setPositionY(int)));
     connect(m_ui->positionTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setPositionTweenType(int)));
@@ -71,6 +73,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(mpSelectedCelModel, SIGNAL(alphaChanged(double)), m_ui->alphaSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(positionXChanged(int)), m_ui->positionXSpinBox, SLOT(setValue(int)));
     connect(mpSelectedCelModel, SIGNAL(positionYChanged(int)), m_ui->positionYSpinBox, SLOT(setValue(int)));
+    connect(mpSelectedCelModel, SIGNAL(priorityChanged(double)), m_ui->prioritySpinBox, SLOT(setValue(double)));
+
     connect(mpSelectedCelModel, SIGNAL(scaleXChanged(double)), m_ui->scaleXSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(scaleYChanged(double)), m_ui->scaleYSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(rotationChanged(int)), m_ui->rotationXSpinBox, SLOT(setValue(int)));
@@ -79,6 +83,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(mpSelectedCelModel, SIGNAL(centerYChanged(int)), m_ui->centerYSpinBox, SLOT(setValue(int)));
 
     // Refresh the screen if KeyFrameData changed
+    connect(m_ui->prioritySpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->positionXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->positionYSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->alphaSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -127,6 +132,7 @@ void AnimationViewer::changeEvent(QEvent *e)
 void AnimationViewer::blockSignals(bool block)
 {
     m_ui->alphaSpinBox->blockSignals(block);
+    m_ui->prioritySpinBox->blockSignals(block);
     m_ui->positionXSpinBox->blockSignals(block);
     m_ui->positionYSpinBox->blockSignals(block);
     m_ui->scaleXSpinBox->blockSignals(block);
@@ -150,6 +156,7 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->alphaSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mAlpha);
         m_ui->alphaTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha]);
 
+        m_ui->prioritySpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mPriority);
         m_ui->positionXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mPosition.mX);
         m_ui->positionYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mPosition.mY);
         m_ui->positionTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position]);
@@ -198,7 +205,6 @@ void AnimationViewer::onTweenTypeChanged(int tweenType)
     bool positionTweenEnabled = (m_ui->positionTweenTypeComboBox->currentIndex() != 0);
     m_ui->positionXSpinBox->setEnabled(positionTweenEnabled);
     m_ui->positionYSpinBox->setEnabled(positionTweenEnabled);
-    m_ui->positionZSpinBox->setEnabled(positionTweenEnabled);
 
     bool rotationTweenEnabled = (m_ui->rotationTweenTypeComboBox->currentIndex() != 0);
     m_ui->rotationXSpinBox->setEnabled(rotationTweenEnabled);
