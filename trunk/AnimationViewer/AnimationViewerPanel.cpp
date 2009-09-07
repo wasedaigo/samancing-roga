@@ -297,10 +297,9 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
     else
     {
         // Select a cel, if mouse has clicked on it
-        QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
-        while (iter != mGlSpriteList.end())
+        for (int i = mGlSpriteList.count() - 1; i >= 0; i--)
         {
-            const GLSprite* glSprite = (GLSprite*)*iter;
+            const GLSprite* glSprite = mGlSpriteList[i];
             if (glSprite->isSelectable() &&
                 glSprite->contains(
                         relativePressedPosition                   )
@@ -311,7 +310,6 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
                 mCelGrabbed = true;
                 break;
             }
-            iter++;
         }
     }
 }

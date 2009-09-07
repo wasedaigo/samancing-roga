@@ -81,6 +81,7 @@ public:
             mFacingOptionType = spriteDescriptor.mFacingOptionType;
             mBlur = spriteDescriptor.mBlur;
             mAlpha = spriteDescriptor.mAlpha;
+            mPriority = spriteDescriptor.mPriority;
             mTextureSrcRect = spriteDescriptor.mTextureSrcRect;
             mBlendType = spriteDescriptor.mBlendType;
             mCenter = spriteDescriptor.mCenter;
@@ -120,6 +121,7 @@ public:
     static QString facingOptionTypeSting[eBT_COUNT];
     static FacingOptionType getFacingOptionTypeByString(QString typeString) ;
     static SpriteDescriptor makeDefaultSpriteDescriptor();
+    static bool priorityLessThan(const GLSprite* pItem1, const GLSprite* pItem2);
 
     GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo);
     GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
@@ -152,5 +154,4 @@ private:
     QPixmap* mpPixmap;
     QTransform mParentTransform;
 };
-
 #endif // GLSPRITE_H

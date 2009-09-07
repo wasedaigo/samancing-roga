@@ -506,6 +506,9 @@ const QList<const GLSprite*> AnimationModel::createGLSpriteListAt(const GLSprite
         }
     }
 
+
+    qSort(glSpriteList.begin(), glSpriteList.end(), GLSprite::priorityLessThan);
+
     return glSpriteList;
 }
 

@@ -7,6 +7,11 @@
 #include "DataModels/KeyFrame.h"
 #include "ResourceManager.h"
 
+bool GLSprite::priorityLessThan(const GLSprite* pItem1, const GLSprite* pItem2)
+{
+    return pItem1->mSpriteDescriptor.mPriority < pItem2->mSpriteDescriptor.mPriority;
+}
+
 QString GLSprite::blendTypeSting[GLSprite::eBT_COUNT] =
 {
     "alpha",
