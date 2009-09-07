@@ -1165,3 +1165,27 @@ QString AnimationModel::getLoadedAnimationPath() const
     QString path = mAnimationDirectory;
     return path.append("/Animations/").append(mAnimationID).append(".").append(ANIMATION_FORMAT);
 }
+
+
+void AnimationModel::executeCommand(int frameNo)
+{
+    // Execute event, it possible
+    AnimationModel::EventList eventList = getEventList(frameNo);
+    for (int i = 0; i < eventList.mList.count(); i++)
+    {
+        readCommand(eventList.mList[i]);
+    }
+}
+
+void AnimationModel::readCommand(QString command)
+{
+    QStringList list = command.split(":");
+    if(list.size() >=2)
+    {
+        if(list[0] == "SND")
+        {
+            QString soundName = QString(list[1]);
+            ResourceManager::playSound(soundName);
+        }
+    }
+}

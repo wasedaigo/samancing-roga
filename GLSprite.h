@@ -134,7 +134,7 @@ public:
     QList<KeyFrame::KeyFramePosition> getNodePath() const;
 
     bool isSelectable() const;
-    void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite) const;
+    void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isSoundPlaying) const;
     QRect getRect() const;
     bool contains(QPoint point) const;
     QTransform getCombinedTransform() const;
@@ -147,6 +147,7 @@ public:
     const int mFrameNo;
 
 private:
+
     const GLSprite* mpParentGLSprite;
     const AnimationModel* mpParentAnimationModel;
 

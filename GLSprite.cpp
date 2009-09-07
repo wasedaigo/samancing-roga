@@ -136,7 +136,7 @@ bool GLSprite::isSelectable() const
     return mIsSelectable;
 }
 
-void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite) const
+void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isSoundPlaying) const
 {
     QPointF spritePosition = QPointF(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
     QPointF spriteRenderPoint = spritePosition;
@@ -179,10 +179,14 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
                     if (pAnimationModel->getMaxFrameCount() > 0)
                     {
                         int subFrameNo = mSpriteDescriptor.mFrameNo % pAnimationModel->getMaxFrameCount();
+                        if (isSoundPlaying)
+                        {
+                            pAnimationModel->executeCommand(subFrameNo);
+                        }
                         QList<const GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(this, subFrameNo);
                         for (int i = 0; i < glSpriteList.count(); i++)
                         {
-                            glSpriteList[i]->render(QPoint(0, 0), painter, pTargetSprite);
+                            glSpriteList[i]->render(QPoint(0, 0), painter, pTargetSprite, isSoundPlaying);
                         }
                         while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
                     }
