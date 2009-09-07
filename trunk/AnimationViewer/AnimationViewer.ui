@@ -285,7 +285,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="centerYSpinBox">
+              <widget class="QSpinBox" name="centerXSpinBox">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -297,9 +297,6 @@
                </property>
                <property name="maximum">
                 <number>9999</number>
-               </property>
-               <property name="value">
-                <number>0</number>
                </property>
               </widget>
              </item>
@@ -317,7 +314,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="centerXSpinBox">
+              <widget class="QSpinBox" name="centerYSpinBox">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -329,6 +326,9 @@
                </property>
                <property name="maximum">
                 <number>9999</number>
+               </property>
+               <property name="value">
+                <number>0</number>
                </property>
               </widget>
              </item>

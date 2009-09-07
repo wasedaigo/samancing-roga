@@ -145,16 +145,12 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
    // Rotation & Scale & translate
     QTransform saveTransform = painter.combinedTransform();
     painter.setTransform(getTransform(), true);
-    //painter.setTransform(getCombinedTransform(), false);
-//    QMatrix offSetMatrix = QMatrix();
-//    offSetMatrix.translate(320, 240);
-//    painter.setMatrix((getWorldMatrix()).inverted(), false);
 
     // Get source texture rectangle (Not used for sub animation)
     QRect srcRect = mSpriteDescriptor.mTextureSrcRect;
 
     // Where it actually render the iamge
-    QPointF dstPoint = QPointF(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) + offset;
+    QPointF dstPoint = QPointF(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) - mSpriteDescriptor.textureCenter() + offset;
     QPixmap* pQPixmap;
     if (mpPixmap)
     {
@@ -248,8 +244,9 @@ QRect GLSprite::getRect() const
     );
 }
 
-bool GLSprite::contains(QPoint point, const QPoint& targetPosition) const
+bool GLSprite::contains(QPoint point) const
 {
     point += QPoint((int)(mSpriteDescriptor.mCenter.mX), (int)(mSpriteDescriptor.mCenter.mY));
+    point += mSpriteDescriptor.textureCenter();
     return getRect().contains(point, true);
 }

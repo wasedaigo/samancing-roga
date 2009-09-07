@@ -108,6 +108,10 @@ public:
             return QPoint(mTextureSrcRect.width()/2, mTextureSrcRect.height()/2);
         }
 
+        QPoint center() const
+        {
+            return QPointF(textureCenter().x() + mCenter.mX, textureCenter().y() + mCenter.mY).toPoint();
+        }
     };
 
     static QString blendTypeSting[eBT_COUNT];
@@ -129,7 +133,7 @@ public:
     bool isSelectable() const;
     void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite) const;
     QRect getRect() const;
-    bool contains(QPoint point, const QPoint& targetPosition) const;
+    bool contains(QPoint point) const;
     QTransform getCombinedTransform() const;
     QTransform getParentTransform() const;
 
