@@ -3,6 +3,7 @@
 #include "qgl.h"
 #include <QMatrix>
 #include "DataModels/KeyFrame.h"
+#include "ResourceManager.h"
 
 class QPainter;
 class QPoint;
@@ -40,65 +41,16 @@ public:
             mX = point.mX;
             mY = point.mY;
         }
-    };
 
-    struct Point3
-    {
-        float mX;
-        float mY;
-        float mZ;
-
-        void operator=(const Point2& point)
+        bool operator==(const QPoint& point)
         {
-            mX = static_cast<int>(point.mX);
-            mY = static_cast<int>(point.mY);
-            mZ = 0;
+            return mX == point.x() && mY == point.y();
         }
 
-        void operator=(const Point3& point)
+        bool operator!=(const QPoint& point)
         {
-            mX = point.mX;
-            mY = point.mY;
-            mZ = point.mZ;
+            return !(mX == point.x() && mY == point.y());
         }
-    };
-
-    struct Rect
-    {
-        int mX;
-        int mY;
-        int mWidth;
-        int mHeight;
-        Rect(int x, int y, int width, int height)
-        {
-            mX = x;
-            mY = y;
-            mWidth = width;
-            mHeight = height;
-        }
-
-        Rect()
-        {
-            mX = 0;
-            mY = 0;
-            mWidth = 0;
-            mHeight = 0;
-        }
-
-        bool operator!=(Rect& rect)
-        {
-            return !(rect.mX == mX && rect.mY == mY && rect.mWidth == mWidth && rect.mHeight == mHeight);
-        }
-
-        void operator=(Rect rect)
-        {
-            mX = rect.mX;
-            mY = rect.mY;
-            mWidth = rect.mWidth;
-            mHeight = rect.mHeight;
-        }
-
-
     };
 
     struct SpriteDescriptor
@@ -108,13 +60,13 @@ public:
         bool mRelativeToTarget;
         FacingOptionType mFacingOptionType;
         int mBlur;
-        Rect mTextureSrcRect; // only valid when it is not a child animation
+        QRect mTextureSrcRect; // only valid when it is not a child animation
         BlendType mBlendType;
 
-        Point3 mCenter;
+        Point2 mCenter;
         Point2 mScale;
-        Point3 mPosition;
-        Point3 mRotation;
+        Point2 mPosition;
+        int mRotation;
 
         float mAlpha;
 
@@ -140,19 +92,30 @@ public:
         {
             QTransform transform;
             transform.translate(mPosition.mX, mPosition.mY);
-            transform.rotate(mRotation.mX);
+            transform.rotate(mRotation);
             transform.scale(mScale.mX, mScale.mY);
 
             return transform;
         }
+
+        bool isImage() const
+        {
+            return ResourceManager::getFileType(mSourcePath) == ResourceManager::FileType_Image;
+        }
+
+        QPoint textureCenter() const
+        {
+            return QPoint(mTextureSrcRect.width()/2, mTextureSrcRect.height()/2);
+        }
+
     };
 
     static QString blendTypeSting[eBT_COUNT];
     static BlendType getBlendTypeByString(QString typeString) ;
     static QString facingOptionTypeSting[eBT_COUNT];
     static FacingOptionType getFacingOptionTypeByString(QString typeString) ;
-
     static SpriteDescriptor makeDefaultSpriteDescriptor();
+
     GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo);
     GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 

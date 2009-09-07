@@ -186,18 +186,21 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 
 void AnimationViewerPanel::renderCenterPointSprite(const GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter)
 {
-    // render center point
-    GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
-    QPointF offset = QPointF(
-            (pGlSprite->mSpriteDescriptor.mPosition.mX + pGlSprite->mSpriteDescriptor.mCenter.mX),
-            (pGlSprite->mSpriteDescriptor.mPosition.mY + pGlSprite->mSpriteDescriptor.mCenter.mY)
-    );
+    if (pGlSprite->mSpriteDescriptor.isImage())
+    {
+        // render center point
+        GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
+        QPointF offset = QPointF(
+                (pGlSprite->mSpriteDescriptor.mPosition.mX + pGlSprite->mSpriteDescriptor.mCenter.mX),
+                (pGlSprite->mSpriteDescriptor.mPosition.mY + pGlSprite->mSpriteDescriptor.mCenter.mY)
+        );
 
-    QPoint centerPointCenterPoint = centerPoint + offset.toPoint();
+        QPoint centerPointCenterPoint = centerPoint + offset.toPoint();
 
-    painter.translate(centerPointCenterPoint.x(), centerPointCenterPoint.y());
-    centerPointSprite->render(QPoint(0, 0), painter, AnimationModel::getTargetSprite());
-    painter.translate(-centerPointCenterPoint.x(), -centerPointCenterPoint.y());
+        painter.translate(centerPointCenterPoint.x(), centerPointCenterPoint.y());
+        centerPointSprite->render(QPoint(0, 0), painter, AnimationModel::getTargetSprite());
+        painter.translate(-centerPointCenterPoint.x(), -centerPointCenterPoint.y());
+    }
 }
 
 void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainter& painter)
@@ -399,7 +402,7 @@ void AnimationViewerPanel::swapSourceTexture()
 void AnimationViewerPanel::setCenterPoint(QMouseEvent *event)
 {
     KeyFrameData* pKeyFrameData = mpSelectedCelModel->getKeyFrameDataReference();
-    if (pKeyFrameData)
+    if (pKeyFrameData && pKeyFrameData->mSpriteDescriptor.isImage())
     {
         QPoint centerPoint = getCenterPoint();
         mpSelectedCelModel->setCenterX((int)(event->x() - centerPoint.x() - pKeyFrameData->mSpriteDescriptor.mPosition.mX + pKeyFrameData->mSpriteDescriptor.mCenter.mX));

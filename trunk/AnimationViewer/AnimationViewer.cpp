@@ -56,7 +56,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->scaleTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setScaleTweenType(int)));
     connect(m_ui->scaleTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
-    connect(m_ui->rotationXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setRotationX(int)));
+    connect(m_ui->rotationXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setRotation(int)));
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setRotationTweenType(int)));
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
@@ -73,7 +73,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(mpSelectedCelModel, SIGNAL(positionYChanged(int)), m_ui->positionYSpinBox, SLOT(setValue(int)));
     connect(mpSelectedCelModel, SIGNAL(scaleXChanged(double)), m_ui->scaleXSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(scaleYChanged(double)), m_ui->scaleYSpinBox, SLOT(setValue(double)));
-    connect(mpSelectedCelModel, SIGNAL(rotationXChanged(int)), m_ui->rotationXSpinBox, SLOT(setValue(int)));
+    connect(mpSelectedCelModel, SIGNAL(rotationChanged(int)), m_ui->rotationXSpinBox, SLOT(setValue(int)));
 
     connect(mpSelectedCelModel, SIGNAL(centerXChanged(int)), m_ui->centerXSpinBox, SLOT(setValue(int)));
     connect(mpSelectedCelModel, SIGNAL(centerYChanged(int)), m_ui->centerYSpinBox, SLOT(setValue(int)));
@@ -156,14 +156,28 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->scaleXSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mX);
         m_ui->scaleYSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mY);
         m_ui->scaleTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale]);
-        m_ui->rotationXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mRotation.mX);
+        m_ui->rotationXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mRotation);
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
         m_ui->blurSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mBlur);
         m_ui->relativeToTargetCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mRelativeToTarget);
         m_ui->facingOptionCombobox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mFacingOptionType);
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
-        m_ui->centerXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mX);
-        m_ui->centerYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+
+
+        if (pKeyFrameData->mSpriteDescriptor.isImage())
+        {
+            m_ui->centerXSpinBox->setEnabled(true);
+            m_ui->centerYSpinBox->setEnabled(true);
+            m_ui->centerXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mX);
+            m_ui->centerYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+        }
+        else
+        {
+            m_ui->centerXSpinBox->setEnabled(false);
+            m_ui->centerYSpinBox->setEnabled(false);
+            m_ui->centerXSpinBox->setValue(0);
+            m_ui->centerYSpinBox->setValue(0);
+        }
         blockSignals(false);
     }
     else

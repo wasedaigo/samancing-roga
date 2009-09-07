@@ -114,7 +114,6 @@ QTimelineWidget::QTimelineWidget(AnimationModel* pAnimationModel, QWidget *paren
 
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(onSelectedCellChanged(int, int)));
     connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refreshTimeLine()));
-    connect(this, SIGNAL(enabledChangeds(bool)), this, SLOT(onEnabledChange(bool)));
 }
 
 QTimelineWidget::~QTimelineWidget()

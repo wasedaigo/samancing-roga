@@ -1,6 +1,14 @@
 #include "KeyFrameData.h"
 #include "GLSprite.h"
 
+QString KeyFrameData::tweenAttributeSting[KeyFrameData::TweenAttribute_COUNT] =
+{
+    "positionTween",
+    "rotationTween",
+    "scaleTween",
+    "alphaTween"
+};
+
 QString KeyFrameData::tweenTypeSting[KeyFrameData::eTT_COUNT] =
 {
     "none",
@@ -19,7 +27,7 @@ KeyFrameData::TweenType KeyFrameData::getTweenTypeByString(QString typeString)
             return static_cast<KeyFrameData::TweenType>(i);
         }
     }
-    return eTT_None;
+    return eTT_Fix;
 }
 
 KeyFrameData::KeyFrameData()
