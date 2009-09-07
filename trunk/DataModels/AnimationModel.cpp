@@ -210,7 +210,7 @@ void AnimationModel::setEventText(int frameNo, int index, QString text)
 
 KeyFrame* AnimationModel::getKeyFrame(int lineNo, int frameNo) const
 {
-    if (lineNo < 0 || frameNo < 0){return NULL;}
+    if (lineNo >= MaxLineNo || lineNo < 0 || frameNo < 0){return NULL;}
     for (int i = 0; i < mKeyFrames[lineNo].count(); i++)
     {
         if (mKeyFrames[lineNo][i]->mFrameNo == frameNo)

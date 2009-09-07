@@ -40,6 +40,7 @@ protected:
 
 private:
     void blockSignals(bool block);
+    void readCommand(QString command);
 
     CelModel* mpSelectedCelModel;
     QStandardItemModel* mpTweenModel;

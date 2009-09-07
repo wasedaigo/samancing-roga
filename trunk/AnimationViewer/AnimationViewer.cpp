@@ -223,6 +223,19 @@ void AnimationViewer::onPlayButtonClicked()
     emit playAnimation(false);
 }
 
+void AnimationViewer::readCommand(QString command)
+{
+    QStringList list = command.split(":");
+    if(list.size() >=2)
+    {
+        if(list[0] == "SND")
+        {
+            QString soundName = QString(list[1]);
+            ResourceManager::playSound(soundName);
+        }
+    }
+}
+
 void AnimationViewer::onTick()
 {
     if ( mpAnimationModel->getCurrentKeyFramePosition().mFrameNo == mpAnimationModel->getMaxFrameCount())
@@ -236,6 +249,15 @@ void AnimationViewer::onTick()
     else
     {
         mpAnimationViewerPanel->gotoNextFrame();
+
+        KeyFrame::KeyFramePosition position = mpAnimationModel->getCurrentKeyFramePosition();
+
+        AnimationModel::EventList eventList = mpAnimationModel->getEventList(position.mFrameNo);
+
+        for (int i = 0; i < eventList.mList.count(); i++)
+        {
+            readCommand(eventList.mList[i]);
+        }
     }
 }
 

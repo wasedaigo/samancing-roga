@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QFileInfo>
+#include <QSound>
 #include "DataModels/AnimationModel.h"
 #include "GLSprite.h"
 static QHash<QString, AnimationModel*> sAnimationHash;
@@ -71,3 +72,14 @@ ResourceManager::FileType ResourceManager::getFileType(QString path)
     return FileType_Invalid;
 }
 
+void ResourceManager::playSound(QString path)
+{
+    QString rootPath = QDir::currentPath();
+    QString fullPath = rootPath.append("/").append(SOUND_DIR.path()).append("/").append(path).append(".").append(SOUND_FORMAT);
+
+    QSound *sound = new QSound(fullPath);
+    if (sound->isAvailable()) {
+        sound->play();
+    }
+    delete sound;
+}

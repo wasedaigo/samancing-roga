@@ -5,6 +5,7 @@
 
 #define ANIMATION_FORMAT "ani"
 #define IMAGE_FORMAT "png"
+#define SOUND_FORMAT "wav"
 
 #define ROOT_RESOURCE_DIR QDir(QString("GameResource"))
 #define ANIMATION_DIR QDir(QString("GameResource/Animations"))
@@ -29,6 +30,7 @@ public:
     static void clearAnimationCache();
     static QString getResourcePath(QString path);
     static FileType getFileType(QString path);
+    static void playSound(QString path);
 };
 
 #endif // RESOURCEMANAGER_H
