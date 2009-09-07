@@ -1,6 +1,8 @@
 #include "AnimationModel.h"
 #include <QPixmap>
 #include <QMessageBox>
+#include <QTextStream>
+#include <QFile>
 #include "ResourceManager.h"
 #include "Macros.h"
 #include "json/writer.h"
@@ -972,6 +974,19 @@ bool AnimationModel::saveData()
     saveDir.remove(mOriginalAnimationID.append(".").append(ANIMATION_FORMAT));
     Json::StyledWriter writer;
     std::string outputJson = writer.write(root);
+
+    QFile file(savePath);
+    QString fileData;
+    if ( file.open( QIODevice::WriteOnly ) ) {
+        QTextStream stream( &file );
+        file.write(outputJson.c_str(), outputJson.length());
+        while ( !stream.atEnd() ) {
+            fileData = stream.readAll();
+        }
+        file.close();
+    }
+    std::string inputJson = fileData.toStdString();
+
     std::ofstream ofs;
     ofs.open(savePath.toStdString().c_str());
     ofs << outputJson << std::endl;
@@ -992,8 +1007,16 @@ bool AnimationModel::loadData(QString path)
     Json::Value root;
     Json::Reader reader;
 
-    std::ifstream ifs(path.toStdString().c_str());
-    std::string inputJson((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+    QFile file(path);
+    QString fileData;
+    if ( file.open( QIODevice::ReadOnly ) ) {
+        QTextStream stream( &file );
+        while ( !stream.atEnd() ) {
+            fileData = stream.readAll();
+        }
+        file.close();
+    }
+    std::string inputJson = fileData.toStdString();
 
     //std::string json_doc = readInputFile(path);
     if(!reader.parse(inputJson, root))
@@ -1014,9 +1037,8 @@ bool AnimationModel::loadData(QString path)
     mOriginalAnimationID = fileInfo.baseName();
     setAnimationID(mOriginalAnimationID);
 
-    // save animation name
-    setAnimationName(QString::fromStdString(root["name"].asString()));
-    root["name"] = mAnimationName.toStdString();
+    // load animation name
+    setAnimationName(QString::fromStdString(root["name"].asString()).toUtf8());
 
     Json::Value& lines = root["keyframes"];
 
