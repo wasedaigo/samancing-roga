@@ -136,10 +136,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         glSprite->render(QPoint(0, 0), painter,AnimationModel::getTargetSprite());
         painter.translate(-centerPoint.x(), -centerPoint.y());
 
-        QPoint spriteRenderPoint = QPoint(
-            centerPoint.x() - (int)glSprite->mSpriteDescriptor.mCenter.mX,
-            centerPoint.y() - (int)glSprite->mSpriteDescriptor.mCenter.mY
-        );
+        QPoint spriteRenderPoint = centerPoint - glSprite->mSpriteDescriptor.center();
 
         // Don't render when playing the animation
         if (!mIsAnimationPlaying)
@@ -191,8 +188,8 @@ void AnimationViewerPanel::renderCenterPointSprite(const GLSprite* pGlSprite, co
         // render center point
         GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
         QPointF offset = QPointF(
-                (pGlSprite->mSpriteDescriptor.mPosition.mX + pGlSprite->mSpriteDescriptor.mCenter.mX),
-                (pGlSprite->mSpriteDescriptor.mPosition.mY + pGlSprite->mSpriteDescriptor.mCenter.mY)
+                (pGlSprite->mSpriteDescriptor.mPosition.mX + pGlSprite->mSpriteDescriptor.center().x()),
+                (pGlSprite->mSpriteDescriptor.mPosition.mY + pGlSprite->mSpriteDescriptor.center().y())
         );
 
         QPoint centerPointCenterPoint = centerPoint + offset.toPoint();
@@ -290,8 +287,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
 
     QPointF pt2 = QPointF(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX, mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY);
     if(mpAnimationModel->getTargetSprite()->contains(
-            relativePressedPosition,
-            pt2.toPoint()
+            relativePressedPosition
        )
     )
     {
@@ -307,9 +303,7 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
             const GLSprite* glSprite = (GLSprite*)*iter;
             if (glSprite->isSelectable() &&
                 glSprite->contains(
-                        relativePressedPosition,
-                        QPointF(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX, mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY).toPoint()
-                   )
+                        relativePressedPosition                   )
                 )
             {
                 mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
@@ -405,8 +399,11 @@ void AnimationViewerPanel::setCenterPoint(QMouseEvent *event)
     if (pKeyFrameData && pKeyFrameData->mSpriteDescriptor.isImage())
     {
         QPoint centerPoint = getCenterPoint();
-        mpSelectedCelModel->setCenterX((int)(event->x() - centerPoint.x() - pKeyFrameData->mSpriteDescriptor.mPosition.mX + pKeyFrameData->mSpriteDescriptor.mCenter.mX));
-        mpSelectedCelModel->setCenterY((int)(event->y() - centerPoint.y() - pKeyFrameData->mSpriteDescriptor.mPosition.mY + pKeyFrameData->mSpriteDescriptor.mCenter.mY));
+        float centerX = (event->x() - centerPoint.x() - pKeyFrameData->mSpriteDescriptor.mPosition.mX + pKeyFrameData->mSpriteDescriptor.mCenter.mX);
+        float centerY = (int)(event->y() - centerPoint.y() - pKeyFrameData->mSpriteDescriptor.mPosition.mY + pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+
+        mpSelectedCelModel->setCenterX(centerX);// / pKeyFrameData->mSpriteDescriptor.textureCenter().x());
+        mpSelectedCelModel->setCenterY(centerY);// / pKeyFrameData->mSpriteDescriptor.textureCenter().y());
     }
 }
 
