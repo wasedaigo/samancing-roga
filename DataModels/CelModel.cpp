@@ -51,6 +51,7 @@ SETSLOT(SpriteDescriptor.mScale.mX, ScaleX, scaleX, double, float);
 SETSLOT(SpriteDescriptor.mScale.mY, ScaleY, scaleY, double, float);
 
 SETSLOT(SpriteDescriptor.mAlpha, Alpha, alpha, double, float);
+SETSLOT(SpriteDescriptor.mPriority, Priority, priority, double, float);
 
 void CelModel::setCenterX(int value)
 {

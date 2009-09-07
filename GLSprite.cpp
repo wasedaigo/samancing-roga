@@ -59,7 +59,7 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mFrameNo = 0;
 
     spriteDescriptor.mAlpha = 1.0;
-
+    spriteDescriptor.mPriority = 0.5;
     spriteDescriptor.mPosition.mX = 0;
     spriteDescriptor.mPosition.mY = 0;
 

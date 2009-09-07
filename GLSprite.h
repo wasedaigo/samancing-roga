@@ -69,6 +69,7 @@ public:
         int mRotation;
 
         float mAlpha;
+        float mPriority;
 
         // Sub animation data
         int mFrameNo; // frameNo for sub animation
