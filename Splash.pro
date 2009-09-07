@@ -22,3 +22,4 @@ HEADERS += mainwindow.h \
     ResourceManager.h
 FORMS += mainwindow.ui
 RESOURCES += ui.qrc
+RC_FILE = Splash.rc

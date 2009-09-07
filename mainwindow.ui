@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>Splash</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="ui.qrc">
+    <normaloff>:/resource/splash.ico</normaloff>:/resource/splash.ico</iconset>
+  </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
@@ -187,15 +191,6 @@
                   <bool>true</bool>
                  </attribute>
                  <attribute name="verticalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>true</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
                  <column/>
