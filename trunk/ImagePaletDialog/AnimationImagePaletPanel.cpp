@@ -73,7 +73,7 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
                     const GLSprite* glSprite = (GLSprite*)*iter;
 
                     painter.translate(centerPoint.x(), centerPoint.y());
-                    glSprite->render(QPoint(0, 0), painter, mpAnimationModel->getTargetSprite());
+                    glSprite->render(QPoint(0, 0), painter, mpAnimationModel->getTargetSprite(), true);
                     painter.translate(-centerPoint.x(), -centerPoint.y());
 
                     iter++;

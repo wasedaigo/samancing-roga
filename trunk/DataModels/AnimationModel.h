@@ -89,11 +89,15 @@ public:
     bool loadData(QString path);
     QString getLoadedAnimationPath() const;
 
+    // event command
+    void executeCommand(int frameNo);
+
     // public member variables
     QRect mSelectedPaletTextureSrcRect;
 
     const QWidget* mpParent;
 private:
+    void readCommand(QString command);
     QString mAnimationName;
     QString mAnimationDirectory;
     QString mAnimationID;

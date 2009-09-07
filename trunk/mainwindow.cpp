@@ -177,6 +177,7 @@ void MainWindow::onAddEventButtonClicked()
     mpAnimationModel->addEvent(position.mFrameNo);
 
     refreshEventList();
+    mpAnimationModel->tellTimeLineToRefresh();
 }
 
 void MainWindow::onRemoveEventButtonClicked()
@@ -194,6 +195,7 @@ void MainWindow::onRemoveEventButtonClicked()
     }
 
     refreshEventList();
+    mpAnimationModel->tellTimeLineToRefresh();
 }
 
 void MainWindow::onEventEdited(int row, int column)
@@ -218,7 +220,6 @@ void MainWindow::refreshEventList()
         ui->eventTableWidget->insertRow(0);
         ui->eventTableWidget->setItem(0, 0, new QTableWidgetItem(QString(eventList[i]), Qt::EditRole));
     }
-    mpAnimationModel->tellTimeLineToRefresh();
 }
 
 void MainWindow::onAddAnimationButtonClicked()

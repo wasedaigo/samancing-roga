@@ -220,7 +220,9 @@ void AnimationViewer::onPlayButtonClicked()
     mSelectedKeyFramePosition = mpAnimationModel->getCurrentKeyFramePosition();
     mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, 0);
     blockSignals(true);
+
     emit playAnimation(false);
+    mpAnimationViewerPanel->refresh();
 }
 
 void AnimationViewer::readCommand(QString command)
@@ -248,16 +250,8 @@ void AnimationViewer::onTick()
     }
     else
     {
+        // mobe to next frame
         mpAnimationViewerPanel->gotoNextFrame();
-
-        KeyFrame::KeyFramePosition position = mpAnimationModel->getCurrentKeyFramePosition();
-
-        AnimationModel::EventList eventList = mpAnimationModel->getEventList(position.mFrameNo);
-
-        for (int i = 0; i < eventList.mList.count(); i++)
-        {
-            readCommand(eventList.mList[i]);
-        }
     }
 }
 
