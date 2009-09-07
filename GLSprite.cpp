@@ -33,6 +33,7 @@ QString GLSprite::facingOptionTypeSting[GLSprite::FacingOptionType_COUNT] =
     "faceToMov"
 };
 
+
 GLSprite::FacingOptionType GLSprite::getFacingOptionTypeByString(QString typeString)
 {
     for (int i = 0; i < eBT_COUNT; i++)
@@ -55,26 +56,19 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mBlur = 0;
     spriteDescriptor.mCenter.mX = 0;
     spriteDescriptor.mCenter.mY = 0;
-    spriteDescriptor.mCenter.mZ = 0;
     spriteDescriptor.mFrameNo = 0;
 
     spriteDescriptor.mAlpha = 1.0;
 
     spriteDescriptor.mPosition.mX = 0;
     spriteDescriptor.mPosition.mY = 0;
-    spriteDescriptor.mPosition.mZ = 0;
 
-    spriteDescriptor.mRotation.mX = 0;
-    spriteDescriptor.mRotation.mY = 0;
-    spriteDescriptor.mRotation.mZ = 0;
+    spriteDescriptor.mRotation = 0;
 
     spriteDescriptor.mScale.mX = 1.0f;
     spriteDescriptor.mScale.mY = 1.0f;
 
-    spriteDescriptor.mTextureSrcRect.mX = 0;
-    spriteDescriptor.mTextureSrcRect.mY = 0;
-    spriteDescriptor.mTextureSrcRect.mWidth = 0;
-    spriteDescriptor.mTextureSrcRect.mHeight = 0;
+    spriteDescriptor.mTextureSrcRect = QRect(0, 0, 0, 0);
 
     return spriteDescriptor;
 }
@@ -157,12 +151,7 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
 //    painter.setMatrix((getWorldMatrix()).inverted(), false);
 
     // Get source texture rectangle (Not used for sub animation)
-    QRect srcRect(
-            (int)mSpriteDescriptor.mTextureSrcRect.mX,
-            (int)mSpriteDescriptor.mTextureSrcRect.mY,
-            (int)mSpriteDescriptor.mTextureSrcRect.mWidth,
-            (int)mSpriteDescriptor.mTextureSrcRect.mHeight
-    );
+    QRect srcRect = mSpriteDescriptor.mTextureSrcRect;
 
     // Where it actually render the iamge
     QPointF dstPoint = QPointF(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) + offset;
@@ -224,7 +213,7 @@ QTransform GLSprite::getTransform() const
 {
     QTransform transform = QTransform();
     transform.translate(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
-    transform.rotate(mSpriteDescriptor.mRotation.mX);
+    transform.rotate(mSpriteDescriptor.mRotation);
     transform.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
 
     return transform;
@@ -254,8 +243,8 @@ QRect GLSprite::getRect() const
     return QRect(
         (int)mSpriteDescriptor.mPosition.mX,
         (int)mSpriteDescriptor.mPosition.mY,
-        (int)mSpriteDescriptor.mTextureSrcRect.mWidth,
-        (int)mSpriteDescriptor.mTextureSrcRect.mHeight
+        (int)mSpriteDescriptor.mTextureSrcRect.width(),
+        (int)mSpriteDescriptor.mTextureSrcRect.height()
     );
 }
 

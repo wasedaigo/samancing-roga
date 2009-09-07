@@ -36,6 +36,7 @@ public:
     bool hasTween() const;
     bool allAttributesNone() const;
 
+    static QString tweenAttributeSting[TweenAttribute_COUNT];
     static QString tweenTypeSting[eTT_COUNT];
     static TweenType getTweenTypeByString(QString typeString);
 };

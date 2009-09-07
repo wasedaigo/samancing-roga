@@ -90,7 +90,7 @@ public:
     QString getLoadedAnimationPath() const;
 
     // public member variables
-    GLSprite::Rect mSelectedPaletTextureSrcRect;
+    QRect mSelectedPaletTextureSrcRect;
 
     const QWidget* mpParent;
 private:

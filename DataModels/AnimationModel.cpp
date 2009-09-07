@@ -11,7 +11,7 @@
 #include <math.h>
 
 #define PI 3.14159265358979323846
-#define DEFAULT_SELECTION_RECT GLSprite::Rect(0, 0, 32, 32);
+#define DEFAULT_SELECTION_RECT QRect(0, 0, 32, 32);
 
 static bool sIsNesting = false;
 
@@ -95,10 +95,9 @@ void AnimationModel::setup()
         spTargetPixmap = new QPixmap(":/resource/target.png");
         GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
 
-        spriteDescriptor.mTextureSrcRect.mWidth = 32;
-        spriteDescriptor.mTextureSrcRect.mHeight = 32;
-        spriteDescriptor.mCenter.mX = 16;
-        spriteDescriptor.mCenter.mY = 16;
+        spriteDescriptor.mTextureSrcRect = DEFAULT_SELECTION_RECT;
+        spriteDescriptor.mCenter.mX = 0;
+        spriteDescriptor.mCenter.mY = 0;
         spriteDescriptor.mPosition.mX = -100;
 
         spTargetSprite = new GLSprite(NULL, NULL, -1, spriteDescriptor, false, spTargetPixmap);
@@ -109,10 +108,10 @@ void AnimationModel::setup()
     {
         spCenterPointPixmap = new QPixmap(":/resource/center_point.png");
         GLSprite::SpriteDescriptor spriteDescriptor = GLSprite::makeDefaultSpriteDescriptor();
-        spriteDescriptor.mTextureSrcRect.mWidth = 8;
-        spriteDescriptor.mTextureSrcRect.mHeight = 8;
-        spriteDescriptor.mCenter.mX = 4;
-        spriteDescriptor.mCenter.mY = 4;
+        spriteDescriptor.mTextureSrcRect.setWidth(8);
+        spriteDescriptor.mTextureSrcRect.setHeight(8);
+        spriteDescriptor.mCenter.mX = 0;
+        spriteDescriptor.mCenter.mY = 0;
 
         spCenterPointSprite = new GLSprite(NULL, NULL, -1, spriteDescriptor, false, spCenterPointPixmap);
     }
@@ -338,8 +337,6 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2
         KeyFrameData* pKeyframeData = new KeyFrameData();
         pKeyframeData->mSpriteDescriptor.mPosition = position;
         pKeyframeData->mSpriteDescriptor.mTextureSrcRect = mSelectedPaletTextureSrcRect;
-        pKeyframeData->mSpriteDescriptor.mCenter.mX = mSelectedPaletTextureSrcRect.mWidth / 2;
-        pKeyframeData->mSpriteDescriptor.mCenter.mY = mSelectedPaletTextureSrcRect.mHeight / 2;
         pKeyframeData->mSpriteDescriptor.mSourcePath = mSelectedSourcePath;
 
         KeyFrame* pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyframeData);
@@ -524,7 +521,7 @@ void AnimationModel::tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, 
             Tween(tweenType, startDescriptor.mPosition.mY, endDescriptor.mPosition.mY, spriteDescriptor.mPosition.mY, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_rotation:
-            Tween(tweenType, startDescriptor.mRotation.mX, endDescriptor.mRotation.mX, spriteDescriptor.mRotation.mX, frameNo, startFrameNo, endFrameNo);
+            Tween(tweenType, startDescriptor.mRotation, endDescriptor.mRotation, spriteDescriptor.mRotation, frameNo, startFrameNo, endFrameNo);
             break;
         case KeyFrameData::TweenAttribute_scale:
             Tween(tweenType, startDescriptor.mScale.mX, endDescriptor.mScale.mX, spriteDescriptor.mScale.mX, frameNo, startFrameNo, endFrameNo);
@@ -601,14 +598,14 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                 // In order to face to correct direction, it needs to calculate the position first
                 copyTweenedAttribute(parentGLSprite, tempSpriteDescriptor, lineNo, frameNo - 1, KeyFrameData::TweenAttribute_position);
                 copyTweenedAttribute(parentGLSprite, tempSpriteDescriptor, lineNo, frameNo - 1, KeyFrameData::TweenAttribute_rotation);
-                spriteDescriptor.mRotation.mX = tempSpriteDescriptor.mRotation.mX;
+                spriteDescriptor.mRotation = tempSpriteDescriptor.mRotation;
                 int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
-                spriteDescriptor.mRotation.mX += angleOffset;
+                spriteDescriptor.mRotation += angleOffset;
             }
             else
             {
                 int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
-                spriteDescriptor.mRotation.mX += angleOffset;
+                spriteDescriptor.mRotation += angleOffset;
             }
        }
        break;
@@ -659,7 +656,7 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                     float dy = targetPoint.y() - point.y();
 
                     int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
-                    spriteDescriptor.mRotation.mX += angleOffset;
+                    spriteDescriptor.mRotation += angleOffset;
                 }
 
                 // delete all temporaly generated Sprites.
@@ -826,10 +823,13 @@ bool AnimationModel::saveData()
     Json::Value root;
 
     // save animation name
-    root["name"] = mAnimationName.toStdString();
+    if (mAnimationName.toStdString() != "")
+    {
+        root["name"] = mAnimationName.toStdString();
+    }
 
     // save keyframes
-    Json::Value& keyframesData = root["keyframes"];
+    Json::Value keyframesData;
     for (int i = 0; i < MaxLineNo; i++)
     {
         //if no data exists in this line, ignore it.
@@ -849,48 +849,84 @@ bool AnimationModel::saveData()
             {
                 KeyFrameData* pKeyFrameData = keyframe->mpKeyFrameData;
                 keyframeData["sourcePath"] = pKeyFrameData->mSpriteDescriptor.mSourcePath.toStdString();
-                keyframeData["blur"] = pKeyFrameData->mSpriteDescriptor.mBlur;
-                keyframeData["facingOption"] = GLSprite::facingOptionTypeSting[pKeyFrameData->mSpriteDescriptor.mFacingOptionType].toStdString();
-                keyframeData["relativeToTarget"] = pKeyFrameData->mSpriteDescriptor.mRelativeToTarget;
 
-                Json::Value textureRect;
-                textureRect[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX;
-                textureRect[1] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY;
-                textureRect[2] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth;
-                textureRect[3] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight;
-                keyframeData["textureRect"] = textureRect;
+                if (pKeyFrameData->mSpriteDescriptor.mBlur > 0)
+                {
+                    keyframeData["blur"] = pKeyFrameData->mSpriteDescriptor.mBlur;
+                }
 
-                keyframeData["blendType"] = GLSprite::blendTypeSting[pKeyFrameData->mSpriteDescriptor.mBlendType].toStdString();
+                if (pKeyFrameData->mSpriteDescriptor.mFacingOptionType != GLSprite::FacingOptionType_none)
+                {
+                    keyframeData["facingOption"] = GLSprite::facingOptionTypeSting[pKeyFrameData->mSpriteDescriptor.mFacingOptionType].toStdString();
+                }
 
-                Json::Value centerPoint;
-                centerPoint[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mCenter.mX;
-                centerPoint[1] = pKeyFrameData->mSpriteDescriptor.mCenter.mY;
-                keyframeData["center"] = centerPoint;
+                if (pKeyFrameData->mSpriteDescriptor.mRelativeToTarget)
+                {
+                    keyframeData["relativeToTarget"] = pKeyFrameData->mSpriteDescriptor.mRelativeToTarget;
+                }
 
-                Json::Value scale;
-                scale[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mScale.mX;
-                scale[1] = pKeyFrameData->mSpriteDescriptor.mScale.mY;
-                keyframeData["scale"] = scale;
+                if (ResourceManager::getFileType(pKeyFrameData->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Image)
+                {
+                    QPixmap* pixmap = getPixmap(pKeyFrameData->mSpriteDescriptor.mSourcePath);
 
-                Json::Value position;
-                position[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mPosition.mX;
-                position[1] = pKeyFrameData->mSpriteDescriptor.mPosition.mY;
-                position[2] = pKeyFrameData->mSpriteDescriptor.mPosition.mZ;
-                keyframeData["position"] = position;
+                    if (pixmap->rect() != pKeyFrameData->mSpriteDescriptor.mTextureSrcRect)
+                    {
+                        Json::Value textureRect;
+                        textureRect[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.x();
+                        textureRect[1] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.y();
+                        textureRect[2] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.width();
+                        textureRect[3] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.height();
+                        keyframeData["textureRect"] = textureRect;
+                    }
+                }
 
-                Json::Value rotation;
-                rotation[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mRotation.mX;
-                rotation[1] = pKeyFrameData->mSpriteDescriptor.mRotation.mY;
-                rotation[2] = pKeyFrameData->mSpriteDescriptor.mRotation.mZ;
-                keyframeData["rotation"] = rotation;
+                if (pKeyFrameData->mSpriteDescriptor.mBlendType != GLSprite::eBT_Alpha)
+                {
+                    keyframeData["blendType"] = GLSprite::blendTypeSting[pKeyFrameData->mSpriteDescriptor.mBlendType].toStdString();
+                }
 
-                keyframeData["alpha"] = pKeyFrameData->mSpriteDescriptor.mAlpha;
+                if (pKeyFrameData->mSpriteDescriptor.mCenter != QPoint(0, 0))
+                {
+                    Json::Value centerPoint;
+                    centerPoint[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mCenter.mX;
+                    centerPoint[1] = pKeyFrameData->mSpriteDescriptor.mCenter.mY;
+                    keyframeData["center"] = centerPoint;
+                }
 
-                keyframeData["alphaTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha]].toStdString();
-                keyframeData["positionTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position]].toStdString();
-                keyframeData["rotationTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]].toStdString();
-                keyframeData["scaleTween"] = KeyFrameData::tweenTypeSting[ pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale]].toStdString();
-                keyframeData["isEmpty"] = false;
+                 if (pKeyFrameData->mSpriteDescriptor.mScale != QPoint(1, 1))
+                 {
+                    Json::Value scale;
+                    scale[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mScale.mX;
+                    scale[1] = pKeyFrameData->mSpriteDescriptor.mScale.mY;
+                    keyframeData["scale"] = scale;
+                 }
+
+                 if (pKeyFrameData->mSpriteDescriptor.mPosition != QPoint(0, 0))
+                 {
+                    Json::Value position;
+                    position[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mPosition.mX;
+                    position[1] = pKeyFrameData->mSpriteDescriptor.mPosition.mY;
+                    keyframeData["position"] = position;
+                 }
+
+                 if (pKeyFrameData->mSpriteDescriptor.mRotation != 0)
+                 {
+                    keyframeData["rotation"] = pKeyFrameData->mSpriteDescriptor.mRotation;
+                 }
+
+                 if (pKeyFrameData->mSpriteDescriptor.mAlpha < 1)
+                 {
+                    keyframeData["alpha"] = pKeyFrameData->mSpriteDescriptor.mAlpha;
+                }
+
+
+                for (int k = 0; k < KeyFrameData::TweenAttribute_COUNT; k++)
+                {
+                    if (pKeyFrameData->mTweenTypes[k] != KeyFrameData::eTT_Fix)
+                    {
+                        keyframeData[KeyFrameData::tweenAttributeSting[k].toStdString()] = KeyFrameData::tweenTypeSting[pKeyFrameData->mTweenTypes[k]].toStdString();
+                    }
+                }
             }
             else
             {
@@ -901,21 +937,29 @@ bool AnimationModel::saveData()
         }
     }
 
-    // Write event data
-    Json::Value events;
-    for(QHash<int, AnimationModel::EventList>::iterator iter = mEvents.begin() ; mEvents.end() != iter ; iter++)
+    if (!keyframesData.empty())
     {
-        int lineNo = iter.key();
-        AnimationModel::EventList eventList = static_cast<AnimationModel::EventList>(*iter);
-        Json::Value list;
-        for (int i = 0; i < eventList.mList.count(); i++)
-        {
-            list[static_cast<unsigned int>(i)] = eventList.mList[i].toStdString();
-        }
-
-        events[QString::number(lineNo).toStdString()] = list;
+        root["keyframes"] = keyframesData;
     }
-    root["events"] = events;
+
+    // Write event data
+    if(mEvents.count() > 0)
+    {
+        Json::Value events;
+        for(QHash<int, AnimationModel::EventList>::iterator iter = mEvents.begin() ; mEvents.end() != iter ; iter++)
+        {
+            int lineNo = iter.key();
+            AnimationModel::EventList eventList = static_cast<AnimationModel::EventList>(*iter);
+            Json::Value list;
+            for (int i = 0; i < eventList.mList.count(); i++)
+            {
+                list[static_cast<unsigned int>(i)] = eventList.mList[i].toStdString();
+            }
+
+            events[QString::number(lineNo).toStdString()] = list;
+        }
+        root["events"] = events;
+    }
 
     saveDir.remove(mOriginalAnimationID.append(".").append(ANIMATION_FORMAT));
     Json::StyledWriter writer;
@@ -983,39 +1027,86 @@ bool AnimationModel::loadData(QString path)
             if (!keyframe["isEmpty"].asBool())
             {
                 KeyFrameData* pKeyFrameData = new KeyFrameData();
-                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_alpha] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["alphaTween"].asString()));
-                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["positionTween"].asString()));
-                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["rotationTween"].asString()));
-                pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe["scaleTween"].asString()));
 
-                pKeyFrameData->mSpriteDescriptor.mBlur = keyframe["blur"].asBool();
+                // Tween valid data
+                for (int k = 0; k < KeyFrameData::TweenAttribute_COUNT; k++)
+                {
+                    if (keyframe[KeyFrameData::tweenAttributeSting[k].toStdString()].isString())
+                    {
+                        pKeyFrameData->mTweenTypes[k] = KeyFrameData::getTweenTypeByString(QString::fromStdString(keyframe[KeyFrameData::tweenAttributeSting[k].toStdString()].asString()));
+                    }
+                }
+
+                if (keyframe["blur"].isInt())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mBlur = keyframe["blur"].asInt();
+                }
                 pKeyFrameData->mSpriteDescriptor.mFacingOptionType = GLSprite::getFacingOptionTypeByString(QString::fromStdString(keyframe["facingOption"].asString()));
 
-                pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
+                if (keyframe["relativeToTarget"].isBool())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
+                }
 
                 pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());
-                pKeyFrameData->mSpriteDescriptor.mBlendType = GLSprite::getBlendTypeByString(QString::fromStdString(keyframe["blendType"].asString()));
 
-                pKeyFrameData->mSpriteDescriptor.mAlpha = keyframe["alpha"].asDouble();
+                // Blend
+                if (keyframe["blendType"].isString())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mBlendType = GLSprite::getBlendTypeByString(QString::fromStdString(keyframe["blendType"].asString()));
+                }
 
-                pKeyFrameData->mSpriteDescriptor.mPosition.mX = keyframe["position"][static_cast<unsigned int>(0)].asInt();
-                pKeyFrameData->mSpriteDescriptor.mPosition.mY = keyframe["position"][1].asInt();
-                pKeyFrameData->mSpriteDescriptor.mPosition.mZ = keyframe["position"][2].asInt();
+                // Alpha
+                if (keyframe["alpha"].isNumeric())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mAlpha = keyframe["alpha"].asDouble();
+                }
 
-                pKeyFrameData->mSpriteDescriptor.mRotation.mX = keyframe["rotation"][static_cast<unsigned int>(0)].asInt();
-                pKeyFrameData->mSpriteDescriptor.mRotation.mY = keyframe["rotation"][1].asInt();
-                pKeyFrameData->mSpriteDescriptor.mRotation.mZ = keyframe["rotation"][2].asInt();
+                // Save position data
+                if (!keyframe["position"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mPosition.mX = keyframe["position"][static_cast<unsigned int>(0)].asInt();
+                    pKeyFrameData->mSpriteDescriptor.mPosition.mY = keyframe["position"][1].asInt();
+                }
 
-                pKeyFrameData->mSpriteDescriptor.mScale.mX = keyframe["scale"][static_cast<unsigned int>(0)].asDouble();
-                pKeyFrameData->mSpriteDescriptor.mScale.mY = keyframe["scale"][1].asDouble();
+                if (!keyframe["rotation"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mRotation = keyframe["rotation"].asInt();
+                }
 
-                pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asInt();
-                pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asInt();
+                if (!keyframe["scale"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mScale.mX = keyframe["scale"][static_cast<unsigned int>(0)].asDouble();
+                    pKeyFrameData->mSpriteDescriptor.mScale.mY = keyframe["scale"][1].asDouble();
+                }
 
-                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mX = keyframe["textureRect"][static_cast<unsigned int>(0)].asInt();
-                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mY = keyframe["textureRect"][1].asInt();
-                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mWidth = keyframe["textureRect"][2].asInt();
-                pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.mHeight = keyframe["textureRect"][3].asInt();
+                if (!keyframe["center"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asInt();
+                    pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asInt();
+                }
+
+                if (!keyframe["textureRect"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mTextureSrcRect = QRect(
+                            keyframe["textureRect"][static_cast<unsigned int>(0)].asInt(),
+                            keyframe["textureRect"][1].asInt(),
+                            keyframe["textureRect"][2].asInt(),
+                            keyframe["textureRect"][3].asInt()
+                            );
+                }
+                else
+                {
+                    if (ResourceManager::getFileType(pKeyFrameData->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Image)
+                    {
+                        QPixmap* pixmap = getPixmap(pKeyFrameData->mSpriteDescriptor.mSourcePath);
+                        pKeyFrameData->mSpriteDescriptor.mTextureSrcRect = pixmap->rect();
+                    }
+                    else
+                    {
+                        pKeyFrameData->mSpriteDescriptor.mTextureSrcRect = DEFAULT_SELECTION_RECT;
+                    }
+                }
 
                 pKeyFrame = new KeyFrame(lineNo, frameNo, pKeyFrameData);
             }
@@ -1029,18 +1120,21 @@ bool AnimationModel::loadData(QString path)
 
 
     Json::Value& events = root["events"];
-    for(Json::Value::iterator iter = events.begin() ; events.end() != iter ; iter++)
+    if (!events.isNull())
     {
-        // Get frameNo for the event and add to hash
-        const char* c_str = iter.memberName();
-        int frameNo = atoi(c_str);
-        mEvents.insert(frameNo, EventList());
-
-        // add event from event list
-        Json::Value& eventList = *iter;
-        for (unsigned int i = 0; i < eventList.size(); i++)
+        for(Json::Value::iterator iter = events.begin() ; events.end() != iter ; iter++)
         {
-            mEvents[frameNo].mList.push_back(QString::fromStdString(eventList[i].asString()));
+            // Get frameNo for the event and add to hash
+            const char* c_str = iter.memberName();
+            int frameNo = atoi(c_str);
+            mEvents.insert(frameNo, EventList());
+
+            // add event from event list
+            Json::Value& eventList = *iter;
+            for (unsigned int i = 0; i < eventList.size(); i++)
+            {
+                mEvents[frameNo].mList.push_back(QString::fromStdString(eventList[i].asString()));
+            }
         }
     }
     // event data

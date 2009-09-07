@@ -205,10 +205,7 @@ void AnimationImagePaletPanel::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mCanvasType == CanvasType_Image)
     {
-        mpAnimationModel->mSelectedPaletTextureSrcRect.mX = mSelectedRect.x();
-        mpAnimationModel->mSelectedPaletTextureSrcRect.mY = mSelectedRect.y();
-        mpAnimationModel->mSelectedPaletTextureSrcRect.mWidth = mSelectedRect.width();
-        mpAnimationModel->mSelectedPaletTextureSrcRect.mHeight = mSelectedRect.height();
+        mpAnimationModel->mSelectedPaletTextureSrcRect = mSelectedRect;
         mPressed = false;
     }
 }

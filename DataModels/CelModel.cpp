@@ -39,16 +39,13 @@ SETSLOT(SpriteDescriptor.mRelativeToTarget, RelativeToTarget, relativeToTarget, 
 SETSLOT(SpriteDescriptor.mFacingOptionType, FacingOptionType, facingOptionType, int, GLSprite::FacingOptionType);
 SETSLOT(SpriteDescriptor.mBlur, Blur, blur, int, int);
 
-SETSLOT(SpriteDescriptor.mTextureSrcRect, TextureSrcRect, textureSrcRect, GLSprite::Rect, GLSprite::Rect);
+SETSLOT(SpriteDescriptor.mTextureSrcRect, TextureSrcRect, textureSrcRect, QRect, QRect);
 SETSLOT(SpriteDescriptor.mBlendType, BlendType, blendType, int, GLSprite::BlendType);
 
 SETSLOT(SpriteDescriptor.mPosition.mX, PositionX, positionX, int, int);
 SETSLOT(SpriteDescriptor.mPosition.mY, PositionY, positionY, int, int);
-SETSLOT(SpriteDescriptor.mPosition.mZ, PositionZ, positionZ, int, int);
 
-SETSLOT(SpriteDescriptor.mRotation.mX, RotationX, rotationX, int, int);
-SETSLOT(SpriteDescriptor.mRotation.mY, RotationY, rotationY, int, int);
-SETSLOT(SpriteDescriptor.mRotation.mZ, RotationZ, rotationZ, int, int);
+SETSLOT(SpriteDescriptor.mRotation, Rotation, rotation, int, int);
 
 SETSLOT(SpriteDescriptor.mScale.mX, ScaleX, scaleX, double, float);
 SETSLOT(SpriteDescriptor.mScale.mY, ScaleY, scaleY, double, float);
@@ -82,17 +79,7 @@ void CelModel::setCenterY(int value)
     }
 }
 
-void CelModel::setCenterZ(int value)
-{
-    int delta = (int)mpKeyFrameData->mSpriteDescriptor.mCenter.mZ != value;
-     if(delta != 0)
-    {
-        mpKeyFrameData->mSpriteDescriptor.mCenter.mZ = value;
-        emit centerZChanged(value);
-    }
-}
-
-void CelModel::setSourceTexture(QString path, GLSprite::Rect rect)
+void CelModel::setSourceTexture(QString path, QRect rect)
 {
     if (mpKeyFrameData->mSpriteDescriptor.mSourcePath != path || mpKeyFrameData->mSpriteDescriptor.mTextureSrcRect != rect)
     {

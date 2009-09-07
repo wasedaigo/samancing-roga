@@ -15,8 +15,8 @@ public:
     CelModel();
 
 public slots:
-    void setSourceTexture(QString path, GLSprite::Rect rect);
-    void setTextureSrcRect(GLSprite::Rect value);
+    void setSourceTexture(QString path, QRect rect);
+    void setTextureSrcRect(QRect value);
 
     void setBlendType(int index);
     void setRelativeToTarget(bool value);
@@ -25,16 +25,12 @@ public slots:
 
     void setCenterX(int value);
     void setCenterY(int value);
-    void setCenterZ(int value);
 
     void setPositionX(int value);
     void setPositionY(int value);
-    void setPositionZ(int value);
     void setPositionTweenType(int index);
 
-    void setRotationX(int value);
-    void setRotationY(int value);
-    void setRotationZ(int value);
+    void setRotation(int value);
     void setRotationTweenType(int index);
 
     void setScaleX(double value);
@@ -45,9 +41,9 @@ public slots:
     void setAlphaTweenType(int index);
 
 signals:
-    void sourceTextureChanged(QString path, GLSprite::Rect rect);
+    void sourceTextureChanged(QString path, QRect rect);
 
-    void textureSrcRectChanged(GLSprite::Rect value);
+    void textureSrcRectChanged(QRect value);
 
     void blendTypeChanged(int value);
     void relativeToTargetChanged(bool value);
@@ -56,16 +52,13 @@ signals:
 
     void centerXChanged(int value);
     void centerYChanged(int value);
-    void centerZChanged(int value);
 
     void positionXChanged(int value);
     void positionYChanged(int value);
     void positionZChanged(int value);
     void positionTweenTypeChanged(int value);
 
-    void rotationXChanged(int value);
-    void rotationYChanged(int value);
-    void rotationZChanged(int value);
+    void rotationChanged(int value);
     void rotationTweenTypeChanged(int index);
 
     void scaleXChanged(double value);
