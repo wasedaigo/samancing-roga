@@ -7,8 +7,6 @@
 #include "Macros.h"
 #include "json/writer.h"
 #include "json/reader.h"
-#include <fstream>
-#include <sstream>
 #include "KeyFrameData.h"
 #include <math.h>
 
@@ -985,13 +983,6 @@ bool AnimationModel::saveData()
         }
         file.close();
     }
-    std::string inputJson = fileData.toStdString();
-
-    std::ofstream ofs;
-    ofs.open(savePath.toStdString().c_str());
-    ofs << outputJson << std::endl;
-
-    ofs.close();
 
     mOriginalAnimationID = mAnimationID;
     emit fileSaved(QModelIndex());
