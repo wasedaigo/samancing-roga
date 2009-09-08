@@ -52,7 +52,7 @@ void ImagePaletDialog::onSelectionChanged(const QItemSelection& item1, const QIt
     QString path = mSourceFileTreeViewModel.filePath(index);
     QString rootPath = QDir::currentPath();
     rootPath.append("/");
-    rootPath.append(ROOT_RESOURCE_DIR.path());
+    rootPath.append(ROOT_RESOURCE_DIR.path()).append("/");
 
     // we don't want to store absolute path
     path.replace(rootPath, "", Qt::CaseInsensitive);
