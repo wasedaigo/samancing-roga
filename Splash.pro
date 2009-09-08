@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
     GLSprite.cpp \
-    ResourceManager.cpp
+    ResourceManager.cpp \
+    EmittedAnimation.cpp
 HEADERS += mainwindow.h \
     GLSprite.h \
     Macros.h \
-    ResourceManager.h
+    ResourceManager.h \
+    EmittedAnimation.h
 FORMS += mainwindow.ui
 RESOURCES += ui.qrc
 RC_FILE = Splash.rc

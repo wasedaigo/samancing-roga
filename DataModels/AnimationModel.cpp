@@ -868,6 +868,11 @@ bool AnimationModel::saveData()
                     keyframeData["relativeToTarget"] = pKeyFrameData->mSpriteDescriptor.mRelativeToTarget;
                 }
 
+                if (pKeyFrameData->mSpriteDescriptor.mEmitter)
+                {
+                    keyframeData["emitter"] = pKeyFrameData->mSpriteDescriptor.mEmitter;
+                }
+
                 if (ResourceManager::getFileType(pKeyFrameData->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Image)
                 {
                     QPixmap* pixmap = getPixmap(pKeyFrameData->mSpriteDescriptor.mSourcePath);
@@ -907,8 +912,8 @@ bool AnimationModel::saveData()
                  if (pKeyFrameData->mSpriteDescriptor.mPosition != QPoint(0, 0))
                  {
                     Json::Value position;
-                    position[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mPosition.mX;
-                    position[1] = pKeyFrameData->mSpriteDescriptor.mPosition.mY;
+                    position[static_cast<unsigned int>(0)] = static_cast<int>(pKeyFrameData->mSpriteDescriptor.mPosition.mX);
+                    position[1] = static_cast<int>(pKeyFrameData->mSpriteDescriptor.mPosition.mY);
                     keyframeData["position"] = position;
                  }
 
@@ -1067,6 +1072,11 @@ bool AnimationModel::loadData(QString path)
                 if (keyframe["relativeToTarget"].isBool())
                 {
                     pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
+                }
+
+                if (keyframe["emitter"].isBool())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mEmitter = keyframe["emitter"].asBool();
                 }
 
                 pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());

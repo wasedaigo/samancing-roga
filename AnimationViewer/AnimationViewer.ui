@@ -454,6 +454,13 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QCheckBox" name="emitterCheckBox">
+             <property name="text">
+              <string>Emitter</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -480,75 +487,6 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <layout class="QHBoxLayout" name="AnimationControls">
-          <item>
-           <widget class="QGroupBox" name="horizontalGroupBox_2">
-            <property name="title">
-             <string>SnapToGrid</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QCheckBox" name="snapGridCheckBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="spinBoxGridX">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>x</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="spinBoxGridY">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="horizontalGroupBox_2">
-            <property name="title">
-             <string>Option</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QCheckBox" name="checkBox">
-               <property name="text">
-                <string>OnionSkin</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
          <layout class="QHBoxLayout" name="animationControlBox">
           <item>
            <widget class="QToolButton" name="saveAnimationButton">
@@ -556,7 +494,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
             </property>
             <property name="iconSize">
@@ -573,7 +511,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/palette.png</normaloff>:/resource/palette.png</iconset>
             </property>
             <property name="iconSize">
@@ -590,7 +528,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/play.png</normaloff>:/resource/play.png</iconset>
             </property>
             <property name="iconSize">
@@ -641,8 +579,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../ui.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

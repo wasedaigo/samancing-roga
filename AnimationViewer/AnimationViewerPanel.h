@@ -2,8 +2,9 @@
 #define AnimationViewerPanel_H
 
 #include <QWidget>
+#include "DataModels/AnimationModel.h"
+#include "EmittedAnimation.h"
 
-class AnimationModel;
 class CelModel;
 class GLSprite;
 class KeyFrame;
@@ -20,7 +21,6 @@ public:
     bool isAnimationPlaying() const;
     void stopAnimation();
     void gotoNextFrame();
-
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -47,6 +47,7 @@ private:
     void setCenterPoint(QMouseEvent *event);
     void renderCross(QPainter& painter);
     void renderCelSprites(const QPoint& centerPoint, QPainter& painter);
+    void renderCelBox(QPainter& painter, const GLSprite* glSprite, QPoint spriteRenderPoint);
     void renderCenterPointSprite(const GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter);
     void renderTargetSprite(const QPoint& centerPoint, QPainter& painter);
     void clearSprites();
@@ -64,6 +65,7 @@ private:
     bool mIsAnimationPlaying;
     bool mCelGrabbed;
     bool mTargetGrabbed;
+    QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::MaxLineNo];
 };
 
 #endif // AnimationViewerPanel_H

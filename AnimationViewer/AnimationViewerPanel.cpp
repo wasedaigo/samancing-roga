@@ -1,5 +1,4 @@
 #include "AnimationViewerPanel.h"
-#include "DataModels/AnimationModel.h"
 #include "DataModels/CelModel.h"
 #include "DataModels/KeyFrame.h"
 #include "DataModels/KeyFrameData.h"
@@ -50,6 +49,10 @@ void AnimationViewerPanel::playAnimation()
 
 void AnimationViewerPanel::stopAnimation()
 {
+    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    {
+        while (!mEmittedAnimationList[lineNo].empty()) { delete mEmittedAnimationList[lineNo].takeFirst();}
+    }
     mIsAnimationPlaying = false;
 }
 
@@ -173,59 +176,82 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         mpAnimationModel->executeCommand(currentPosition.mFrameNo);
     }
 
-    QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
-    while (iter != mGlSpriteList.end())
+    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
     {
-        const GLSprite* glSprite = (GLSprite*)*iter;
+        QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
+        const GLSprite* glSprite = NULL;
+        while (iter != mGlSpriteList.end())
+        {
+            const GLSprite* tglSprite = (GLSprite*)*iter;
+            if (tglSprite->mLineNo == lineNo)
+            {
+                glSprite = tglSprite;
+                break;
+            }
+            iter++;
+        }
 
         // render sprite
         painter.translate(centerPoint.x(), centerPoint.y());
-        glSprite->render(QPoint(0, 0), painter,AnimationModel::getTargetSprite(), mIsAnimationPlaying);
+        if (glSprite)
+        {
+            glSprite->render(QPoint(0, 0), painter,AnimationModel::getTargetSprite(), mIsAnimationPlaying, mEmittedAnimationList);
+        }
+
+        if (mIsAnimationPlaying)
+        {
+            for (int i = 0; i < mEmittedAnimationList[lineNo].count(); i++)
+            {
+                mEmittedAnimationList[lineNo][i]->update(painter, mEmittedAnimationList);
+            }
+        }
         painter.translate(-centerPoint.x(), -centerPoint.y());
 
-        QPoint spriteRenderPoint = centerPoint - glSprite->mSpriteDescriptor.center();
-
-        // Don't render when playing the animation
-        if (!mIsAnimationPlaying)
+        if (glSprite && !mIsAnimationPlaying)
         {
-            if (!glSprite->isSelectable())
-            {
-                // unselectable cel
-                painter.setPen(QColor(100, 100, 200));
-                painter.setOpacity(0.5);
-            }
-            else if (glSprite->mID == currentPosition.mLineNo)
-            {
-                renderCenterPointSprite(glSprite, spriteRenderPoint, painter);
-                // Cel selecte color
-                painter.setPen(Qt::yellow);
-                painter.setOpacity(1.0);
-            }
-            else
-            {
-                // unselected cel
-                painter.setPen(Qt::white);
-                painter.setOpacity(0.5);
-            }
-
-            // Draw image border rectanble
-            // Calculate draw position and draw
-            QRect rect = glSprite->getRect();
-            rect.translate(spriteRenderPoint);
-            painter.drawRect(rect);
-
-            // Draw Text
-            painter.drawText(QRect(
-                                    spriteRenderPoint.x() + (int)glSprite->mSpriteDescriptor.mPosition.mX,
-                                    spriteRenderPoint.y() + (int)glSprite->mSpriteDescriptor.mPosition.mY,
-                                    16,
-                                    16
-                                   ),
-                             Qt::AlignCenter, QString("%0").arg(glSprite->mID + 1));
-            }
-
-        iter++;
+            renderCelBox(painter, glSprite, centerPoint - glSprite->mSpriteDescriptor.center());
+        }
     }
+}
+
+void AnimationViewerPanel::renderCelBox(QPainter& painter, const GLSprite* glSprite, QPoint spriteRenderPoint)
+{
+   KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+
+    if (!glSprite->isSelectable())
+    {
+        // unselectable cel
+        painter.setPen(QColor(100, 100, 200));
+        painter.setOpacity(0.5);
+    }
+    else if (glSprite->mID == currentPosition.mLineNo)
+    {
+        renderCenterPointSprite(glSprite, spriteRenderPoint, painter);
+        // Cel selecte color
+        painter.setPen(Qt::yellow);
+        painter.setOpacity(1.0);
+    }
+    else
+    {
+        // unselected cel
+        painter.setPen(Qt::white);
+        painter.setOpacity(0.5);
+    }
+
+    // Draw image border rectanble
+    // Calculate draw position and draw
+    QRect rect = glSprite->getRect();
+    rect.translate(spriteRenderPoint);
+    painter.drawRect(rect);
+
+    // Draw Text
+    painter.drawText(QRect(
+                            spriteRenderPoint.x() + (int)glSprite->mSpriteDescriptor.mPosition.mX,
+                            spriteRenderPoint.y() + (int)glSprite->mSpriteDescriptor.mPosition.mY,
+                            16,
+                            16
+                           ),
+                     Qt::AlignCenter, QString("%0").arg(glSprite->mID + 1));
 }
 
 void AnimationViewerPanel::renderCenterPointSprite(const GLSprite* pGlSprite, const QPoint& centerPoint, QPainter& painter)
@@ -242,7 +268,7 @@ void AnimationViewerPanel::renderCenterPointSprite(const GLSprite* pGlSprite, co
         QPoint centerPointCenterPoint = centerPoint + offset.toPoint();
 
         painter.translate(centerPointCenterPoint.x(), centerPointCenterPoint.y());
-        centerPointSprite->render(QPoint(0, 0), painter, AnimationModel::getTargetSprite(), false);
+        centerPointSprite->render(QPoint(0, 0), painter, AnimationModel::getTargetSprite(), false, mEmittedAnimationList);
         painter.translate(-centerPointCenterPoint.x(), -centerPointCenterPoint.y());
     }
 }
@@ -252,7 +278,7 @@ void AnimationViewerPanel::renderTargetSprite(const QPoint& centerPoint, QPainte
     painter.setOpacity(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mAlpha);
 
     painter.translate(centerPoint.x(), centerPoint.y());
-    mpAnimationModel->getTargetSprite()->render(QPoint(0, 0), painter, NULL, false);
+    mpAnimationModel->getTargetSprite()->render(QPoint(0, 0), painter, NULL, false, mEmittedAnimationList);
     painter.translate(-centerPoint.x(), -centerPoint.y());
 }
 
