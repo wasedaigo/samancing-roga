@@ -4,12 +4,13 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QList>
+#include "DataModels/AnimationModel.h"
 
-class AnimationModel;
 class GLSprite;
 class QPaintEvent;
 class QPixmap;
 class QTimer;
+class EmittedAnimation;
 class AnimationImagePaletPanel : public QWidget
 {
     Q_OBJECT
@@ -42,6 +43,7 @@ private slots:
 
 private:
     QPoint getSnappedPosition(int x, int y);
+    void resetAnimation();
 
     QRect mSelectedRect;
     AnimationModel* mpAnimationModel;
@@ -56,6 +58,8 @@ private:
     AnimationModel* mpPlayingAnimationModel;
     QTimer* mpAnimationPlayTimer;
     int mAnimationFrameNo;
+
+    QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::MaxLineNo];
 };
 
 #endif // ANIMATIONIMAGEPALETPANEL_H

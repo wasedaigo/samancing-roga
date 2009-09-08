@@ -40,7 +40,6 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     mpAnimationViewerPanel->setMinimumHeight(320);
     m_ui->animationViewerContainer->addWidget(mpAnimationViewerPanel);
 
-
     // connect Cel model and controls
     connect(m_ui->alphaSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setAlpha(double)));
     connect(m_ui->alphaTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setAlphaTweenType(int)));
@@ -65,6 +64,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setFacingOptionType(int)));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
+    connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setEmitter(bool)));
+
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setBlur(int)));
 
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterX(int)));
@@ -93,6 +94,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
+
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -140,6 +143,7 @@ void AnimationViewer::blockSignals(bool block)
     m_ui->rotationXSpinBox->blockSignals(block);
     m_ui->blurSpinBox->blockSignals(block);
     m_ui->relativeToTargetCheckBox->blockSignals(block);
+    m_ui->emitterCheckBox->blockSignals(block);
     m_ui->facingOptionCombobox->blockSignals(block);
     m_ui->blendTypeComboBox->blockSignals(block);
     m_ui->centerXSpinBox->blockSignals(block);
@@ -167,23 +171,34 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
         m_ui->blurSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mBlur);
         m_ui->relativeToTargetCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mRelativeToTarget);
+
         m_ui->facingOptionCombobox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mFacingOptionType);
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
 
 
         if (pKeyFrameData->mSpriteDescriptor.isImage())
         {
+            // Check box
             m_ui->centerXSpinBox->setEnabled(true);
             m_ui->centerYSpinBox->setEnabled(true);
             m_ui->centerXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mX);
             m_ui->centerYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+
+            // Emitter
+            m_ui->emitterCheckBox->setEnabled(false);
+            m_ui->emitterCheckBox->setChecked(false);
         }
         else
         {
+            // Check box
             m_ui->centerXSpinBox->setEnabled(false);
             m_ui->centerYSpinBox->setEnabled(false);
             m_ui->centerXSpinBox->setValue(0);
             m_ui->centerYSpinBox->setValue(0);
+
+            // Emitter
+            m_ui->emitterCheckBox->setEnabled(true);
+            m_ui->emitterCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mEmitter);
         }
         blockSignals(false);
     }
@@ -215,13 +230,12 @@ void AnimationViewer::onTweenTypeChanged(int tweenType)
 void AnimationViewer::onPlayButtonClicked()
 {
     mpAnimationPlayTimer->start();
-    mpAnimationViewerPanel->playAnimation();
     mpAnimationModel->getCurrentKeyFramePosition();
     mSelectedKeyFramePosition = mpAnimationModel->getCurrentKeyFramePosition();
     mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, 0);
     blockSignals(true);
-
     emit playAnimation(false);
+    mpAnimationViewerPanel->playAnimation();
     mpAnimationViewerPanel->refresh();
 }
 

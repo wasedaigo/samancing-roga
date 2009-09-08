@@ -18,6 +18,7 @@ public slots:
     void setSourceTexture(QString path, QRect rect);
     void setTextureSrcRect(QRect value);
 
+    void setEmitter(bool isEmitter);
     void setBlendType(int index);
     void setRelativeToTarget(bool value);
     void setFacingOptionType(int value);
@@ -44,8 +45,8 @@ public slots:
 
 signals:
     void sourceTextureChanged(QString path, QRect rect);
-
     void textureSrcRectChanged(QRect value);
+    void emitterChanged(bool isEmitter);
 
     void blendTypeChanged(int value);
     void relativeToTargetChanged(bool value);

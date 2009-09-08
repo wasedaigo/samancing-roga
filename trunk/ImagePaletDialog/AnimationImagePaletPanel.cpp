@@ -1,5 +1,4 @@
 #include "AnimationImagePaletpanel.h"
-#include "DataModels/AnimationModel.h"
 #include "ResourceManager.h"
 #include "GLSprite.h"
 #include <QPainter>
@@ -67,16 +66,32 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
         case CanvasType_Animation:
             {
                 QPoint centerPoint = QPoint((width()) / 2, (height()) / 2);
-                QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
-                while (iter != mGlSpriteList.end())
+                for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
                 {
-                    const GLSprite* glSprite = (GLSprite*)*iter;
+                    QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
+                    const GLSprite* glSprite = NULL;
+                    while (iter != mGlSpriteList.end())
+                    {
+                        const GLSprite* tglSprite = (GLSprite*)*iter;
+                        if (tglSprite->mLineNo == lineNo)
+                        {
+                            glSprite = tglSprite;
+                            break;
+                        }
+                        iter++;
+                    }
 
                     painter.translate(centerPoint.x(), centerPoint.y());
-                    glSprite->render(QPoint(0, 0), painter, mpAnimationModel->getTargetSprite(), true);
-                    painter.translate(-centerPoint.x(), -centerPoint.y());
+                    if (glSprite)
+                    {
+                        glSprite->render(QPoint(0, 0), painter, mpAnimationModel->getTargetSprite(), true, mEmittedAnimationList);
+                    }
 
-                    iter++;
+                    for (int i = 0; i < mEmittedAnimationList[lineNo].count(); i++)
+                    {
+                        mEmittedAnimationList[lineNo][i]->update(painter, mEmittedAnimationList);
+                    }
+                    painter.translate(-centerPoint.x(), -centerPoint.y());
                 }
             }
             break;
@@ -123,6 +138,7 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
 
 void AnimationImagePaletPanel::closeEvent(QCloseEvent *event)
 {
+    resetAnimation();
     mpAnimationPlayTimer->stop();
 }
 
@@ -210,6 +226,15 @@ void AnimationImagePaletPanel::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+void AnimationImagePaletPanel::resetAnimation()
+{
+    mAnimationFrameNo = 0;
+    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    {
+        while (!mEmittedAnimationList[lineNo].empty()) { delete mEmittedAnimationList[lineNo].takeFirst();}
+    }
+}
+
 void AnimationImagePaletPanel::onTick()
 {
     // Don't play an animation without any frames
@@ -221,7 +246,7 @@ void AnimationImagePaletPanel::onTick()
         // Loop animation
         if(mAnimationFrameNo >= mpPlayingAnimationModel->getMaxFrameCount())
         {
-            mAnimationFrameNo = 0;
+            resetAnimation();
         }
 
         // Delete previous generated sprites

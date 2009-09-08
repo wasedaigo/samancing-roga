@@ -4,6 +4,7 @@
 #include <QMatrix>
 #include "DataModels/KeyFrame.h"
 #include "ResourceManager.h"
+#include "EmittedAnimation.h"
 
 class QPainter;
 class QPoint;
@@ -74,8 +75,12 @@ public:
         // Sub animation data
         int mFrameNo; // frameNo for sub animation
 
+        // tell whether this is an emitter of subanimation (valid only this sprite is sub animation
+        bool mEmitter;
+
         void operator=(SpriteDescriptor spriteDescriptor)
         {
+            mEmitter = spriteDescriptor.mEmitter;
             mSourcePath = spriteDescriptor.mSourcePath;
             mRelativeToTarget = spriteDescriptor.mRelativeToTarget;
             mFacingOptionType = spriteDescriptor.mFacingOptionType;
@@ -90,6 +95,7 @@ public:
             mRotation = spriteDescriptor.mRotation;
         }
 
+        QTransform mOptionalTransform;
         QTransform getTransform() const
         {
             QTransform transform;
@@ -97,7 +103,7 @@ public:
             transform.rotate(mRotation);
             transform.scale(mScale.mX, mScale.mY);
 
-            return transform;
+            return mOptionalTransform * transform;
         }
 
         bool isImage() const
@@ -130,11 +136,10 @@ public:
     const GLSprite* getParentSprite() const;
     const GLSprite* getRootSprite() const;
     QTransform getTransform() const;
-    QMatrix getCombinedMatrix() const;
     QList<KeyFrame::KeyFramePosition> getNodePath() const;
 
     bool isSelectable() const;
-    void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isSoundPlaying) const;
+    void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isPlaying, QList<EmittedAnimation*>* emittedAnimationList) const;
     QRect getRect() const;
     bool contains(QPoint point) const;
     QTransform getCombinedTransform() const;

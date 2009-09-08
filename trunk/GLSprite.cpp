@@ -7,6 +7,7 @@
 #include "DataModels/KeyFrame.h"
 #include "ResourceManager.h"
 
+
 bool GLSprite::priorityLessThan(const GLSprite* pItem1, const GLSprite* pItem2)
 {
     return pItem1->mSpriteDescriptor.mPriority < pItem2->mSpriteDescriptor.mPriority;
@@ -37,7 +38,6 @@ QString GLSprite::facingOptionTypeSting[GLSprite::FacingOptionType_COUNT] =
     "lookAtTarget",
     "faceToMov"
 };
-
 
 GLSprite::FacingOptionType GLSprite::getFacingOptionTypeByString(QString typeString)
 {
@@ -72,6 +72,8 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
 
     spriteDescriptor.mScale.mX = 1.0f;
     spriteDescriptor.mScale.mY = 1.0f;
+
+    spriteDescriptor.mEmitter = false;
 
     spriteDescriptor.mTextureSrcRect = QRect(0, 0, 0, 0);
 
@@ -136,7 +138,7 @@ bool GLSprite::isSelectable() const
     return mIsSelectable;
 }
 
-void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isSoundPlaying) const
+void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isPlaying, QList<EmittedAnimation*>* emittedAnimationList) const
 {
     QPointF spritePosition = QPointF(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
     QPointF spriteRenderPoint = spritePosition;
@@ -178,17 +180,35 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
                 {
                     if (pAnimationModel->getMaxFrameCount() > 0)
                     {
-                        int subFrameNo = mSpriteDescriptor.mFrameNo % pAnimationModel->getMaxFrameCount();
-                        if (isSoundPlaying)
+                        int subFrameNo = 0;
+                        // Emitted Animation Should be always start from frame 0
+                        // Non-emitted animation needs to know in what frameNo they are
+                        if (!mSpriteDescriptor.mEmitter)
+                        {
+                            subFrameNo = mSpriteDescriptor.mFrameNo % pAnimationModel->getMaxFrameCount();
+                        }
+
+                        // If the sprite has emitter option, emit new animation process
+                        if (mSpriteDescriptor.mEmitter && isPlaying)
+                        {
+                            emittedAnimationList[mLineNo].push_back(new EmittedAnimation(pAnimationModel, this));
+                        }
+                        else
+                        {
+                            QList<const GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(this, subFrameNo);
+                            for (int i = 0; i < glSpriteList.count(); i++)
+                            {
+                                glSpriteList[i]->render(QPoint(0, 0), painter, pTargetSprite, isPlaying, emittedAnimationList);
+                            }
+                            // Remove glsprites, they are not going to be used anymore.
+                            while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
+                        }
+
+                        // Execute Event Command
+                        if (isPlaying)
                         {
                             pAnimationModel->executeCommand(subFrameNo);
                         }
-                        QList<const GLSprite*> glSpriteList = pAnimationModel->createGLSpriteListAt(this, subFrameNo);
-                        for (int i = 0; i < glSpriteList.count(); i++)
-                        {
-                            glSpriteList[i]->render(QPoint(0, 0), painter, pTargetSprite, isSoundPlaying);
-                        }
-                        while (!glSpriteList.empty()) { delete glSpriteList.takeFirst();}
                     }
                 }
 
@@ -216,12 +236,7 @@ const GLSprite* GLSprite::getRootSprite() const
 
 QTransform GLSprite::getTransform() const
 {
-    QTransform transform = QTransform();
-    transform.translate(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
-    transform.rotate(mSpriteDescriptor.mRotation);
-    transform.scale(mSpriteDescriptor.mScale.mX, mSpriteDescriptor.mScale.mY);
-
-    return transform;
+    return mSpriteDescriptor.getTransform();
 }
 
 QTransform GLSprite::getCombinedTransform() const
