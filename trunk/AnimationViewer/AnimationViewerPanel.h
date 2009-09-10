@@ -1,7 +1,7 @@
 #ifndef AnimationViewerPanel_H
 #define AnimationViewerPanel_H
 
-#include <QWidget>
+#include <QGLWidget>
 #include "DataModels/AnimationModel.h"
 #include "EmittedAnimation.h"
 
@@ -9,7 +9,7 @@ class CelModel;
 class GLSprite;
 class KeyFrame;
 class KeyFrameData;
-class AnimationViewerPanel : public QWidget
+class AnimationViewerPanel : public QGLWidget
 {
 Q_OBJECT
 public:

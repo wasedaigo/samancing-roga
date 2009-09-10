@@ -1,7 +1,7 @@
 #ifndef ANIMATIONIMAGEPALETPANEL_H
 #define ANIMATIONIMAGEPALETPANEL_H
 
-#include <QWidget>
+#include <QGLWidget>
 #include <QPixmap>
 #include <QList>
 #include "DataModels/AnimationModel.h"
@@ -11,7 +11,7 @@ class QPaintEvent;
 class QPixmap;
 class QTimer;
 class EmittedAnimation;
-class AnimationImagePaletPanel : public QWidget
+class AnimationImagePaletPanel : public QGLWidget
 {
     Q_OBJECT
 

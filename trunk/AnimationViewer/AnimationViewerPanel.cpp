@@ -15,7 +15,7 @@
 #define TARGET_SCREEN_HEIGHT 240
 
 AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAnimationModel, CelModel* const pSelectedCelModel)
-        : QWidget(parent),
+        : QGLWidget(parent),
           mpAnimationModel(pAnimationModel),
           mCurrentFrameNo(),
           mClearColor(Qt::black),
