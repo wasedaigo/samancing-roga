@@ -28,7 +28,7 @@ KeyFrameData::TweenType KeyFrameData::getTweenTypeByString(QString typeString)
             return static_cast<KeyFrameData::TweenType>(i);
         }
     }
-    return eTT_Fix;
+    return eTT_None;
 }
 
 KeyFrameData::KeyFrameData()
@@ -37,7 +37,7 @@ KeyFrameData::KeyFrameData()
 
     for (int i = 0; i < TweenAttribute_COUNT; i++)
     {
-        mTweenTypes[i] = eTT_Fix;
+        mTweenTypes[i] = eTT_None;
     }
 }
 

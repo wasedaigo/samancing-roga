@@ -952,7 +952,7 @@ bool AnimationModel::saveData()
 
                 for (int k = 0; k < KeyFrameData::TweenAttribute_COUNT; k++)
                 {
-                    if (pKeyFrameData->mTweenTypes[k] != KeyFrameData::eTT_Fix)
+                    if (pKeyFrameData->mTweenTypes[k] != KeyFrameData::eTT_None)
                     {
                         keyframeData[KeyFrameData::tweenAttributeSting[k].toStdString()] = KeyFrameData::tweenTypeSting[pKeyFrameData->mTweenTypes[k]].toStdString();
                     }
