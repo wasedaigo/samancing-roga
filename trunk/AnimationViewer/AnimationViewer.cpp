@@ -260,11 +260,14 @@ void AnimationViewer::onPlayButtonClicked()
 
 void AnimationViewer::stopAnimation()
 {
-    mpAnimationViewerPanel->stopAnimation();
-    mpAnimationPlayTimer->stop();
-    emit playAnimation(true);
-    blockSignals(false);
-    mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, mSelectedKeyFramePosition.mFrameNo);
+    if (mpAnimationViewerPanel->isAnimationPlaying())
+        {
+        mpAnimationViewerPanel->stopAnimation();
+        mpAnimationPlayTimer->stop();
+        emit playAnimation(true);
+        blockSignals(false);
+        mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, mSelectedKeyFramePosition.mFrameNo);
+    }
 }
 
 void AnimationViewer::onTick()

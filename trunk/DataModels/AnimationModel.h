@@ -32,6 +32,8 @@ public:
     static GLSprite* getCenterPointSprite();
 
     AnimationModel(QWidget* parent);
+    AnimationModel(QWidget* parent, QString animationDir, QString animationID);
+
     ~AnimationModel();
     
     void setup();
@@ -92,6 +94,8 @@ public:
     // event command
     void executeCommand(int frameNo);
 
+    void createEmptyAnimation(QString path);
+
     // public member variables
     QRect mSelectedPaletTextureSrcRect;
 
@@ -133,7 +137,7 @@ signals:
 
     void refreshTimeLine();
     void animationLoaded();
-    void fileSaved(QModelIndex);
+    void fileChanged();
     void selectedKeyFramePositionChanged(int lineNo, int frameNo);
 };
 

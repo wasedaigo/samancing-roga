@@ -9,5 +9,6 @@
         <file>resource/palette.png</file>
         <file>resource/play.png</file>
         <file>resource/splash.ico</file>
+        <file>resource/refresh.png</file>
     </qresource>
 </RCC>
