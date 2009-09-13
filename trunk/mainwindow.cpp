@@ -240,11 +240,14 @@ void MainWindow::refreshEventList()
 void MainWindow::onAddAnimationButtonClicked()
 {
     QModelIndexList indexes = ui->animationTreeView->selectionModel()->selectedIndexes();
-    QModelIndex index = indexes.takeFirst();
+    if (indexes.count() > 0)
+    {
+        QModelIndex index = indexes.takeFirst();
 
-    QString path = mAnimationTreeViewModel.filePath(index);
+        QString path = mAnimationTreeViewModel.filePath(index);
 
-    mpAnimationModel->createEmptyAnimation(path);
+        mpAnimationModel->createEmptyAnimation(path);
+    }
 }
 
 void MainWindow::onRemoveAnimationButtonClicked()
@@ -261,13 +264,6 @@ void MainWindow::onRemoveAnimationButtonClicked()
     }
 }
 
-
-/* -------------------------------------------------------------------
-
- Image palet choice button control
-
----------------------------------------------------------------------*/
-
 void MainWindow::onPaletButtonClicked()
 {
    if (mpDialog->isHidden())
@@ -277,11 +273,6 @@ void MainWindow::onPaletButtonClicked()
     }
 }
 
-/* -------------------------------------------------------------------
-
- Animation Panel Control
-
----------------------------------------------------------------------*/
 void MainWindow::refreshTree()
 {
     mAnimationTreeViewModel.refresh(QModelIndex());
