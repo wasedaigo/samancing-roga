@@ -135,6 +135,8 @@ public:
     const AnimationModel* getParentAnimationModel() const;
     const GLSprite* getParentSprite() const;
     const GLSprite* getRootSprite() const;
+    float getAbsoluteAlpha() const;
+
     QTransform getTransform() const;
     QList<KeyFrame::KeyFramePosition> getNodePath() const;
 

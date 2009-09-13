@@ -132,7 +132,18 @@ void AnimationViewerPanel::refresh()
             emit celSelected(NULL);
         }
     }
+
     mGlSpriteList = mpAnimationModel->createGLSpriteListAt(NULL, mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
+
+    mRenderSpriteList.append(mGlSpriteList);
+    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    {
+        for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
+        {
+            mRenderSpriteList.push_back(mEmittedAnimationList[lineNo][i]->getSprite());
+        }
+    }
+    qSort(mRenderSpriteList.begin(), mRenderSpriteList.end(), GLSprite::priorityLessThan);
 
     repaint();
 }
@@ -176,20 +187,10 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         mpAnimationModel->executeCommand(currentPosition.mFrameNo);
     }
 
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    QList<const GLSprite*>::Iterator iter = mRenderSpriteList.begin();
+    while (iter != mRenderSpriteList.end())
     {
-        QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
-        const GLSprite* glSprite = NULL;
-        while (iter != mGlSpriteList.end())
-        {
-            const GLSprite* tglSprite = (GLSprite*)*iter;
-            if (tglSprite->mLineNo == lineNo)
-            {
-                glSprite = tglSprite;
-                break;
-            }
-            iter++;
-        }
+        const GLSprite* glSprite = (GLSprite*)*iter;
 
         // render sprite
         painter.translate(centerPoint.x(), centerPoint.y());
@@ -198,18 +199,29 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
             glSprite->render(QPoint(0, 0), painter,AnimationModel::getTargetSprite(), mIsAnimationPlaying, mEmittedAnimationList);
         }
 
-        if (mIsAnimationPlaying)
-        {
-            for (int i = 0; i < mEmittedAnimationList[lineNo].count(); i++)
-            {
-                mEmittedAnimationList[lineNo][i]->update(painter, mEmittedAnimationList);
-            }
-        }
         painter.translate(-centerPoint.x(), -centerPoint.y());
 
         if (glSprite && !mIsAnimationPlaying)
         {
             renderCelBox(painter, glSprite, centerPoint - glSprite->mSpriteDescriptor.center());
+        }
+
+    iter++;
+    }
+
+    if (mIsAnimationPlaying)
+    {
+        // update emitted animations
+        for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+        {
+            for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
+            {
+                mEmittedAnimationList[lineNo][i]->update();
+                if (mEmittedAnimationList[lineNo][i]->isDone())
+                {
+                    mEmittedAnimationList[lineNo].removeAt(i);
+                }
+            }
         }
     }
 }
@@ -288,6 +300,7 @@ void AnimationViewerPanel::clearSprites()
     {
         delete mGlSpriteList.takeFirst();
     }
+    mRenderSpriteList.clear();
 }
 
 /* -------------------------------------------------------------------

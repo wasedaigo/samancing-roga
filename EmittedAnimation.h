@@ -11,7 +11,8 @@ class EmittedAnimation
 public:
     EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite);
     ~EmittedAnimation();
-    void update(QPainter& painter, QList<EmittedAnimation*>* emittedAnimationList);
+    void update();
+    const GLSprite* getSprite() const;
     bool isDone() const;
 private:
     AnimationModel* mpAnimationModel;

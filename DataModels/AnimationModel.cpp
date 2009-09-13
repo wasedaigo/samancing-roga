@@ -417,6 +417,7 @@ void AnimationModel::reduceFrameLength(int lineNo, int frameNo)
 
 void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
 {
+    if (lineNo >= MaxLineNo){return;}
     // Remove frames
     for (int i = endFrameNo; i >= startFrameNo; i--)
     {
@@ -505,9 +506,6 @@ const QList<const GLSprite*> AnimationModel::createGLSpriteListAt(const GLSprite
             glSpriteList.push_back(pGLSprite);
         }
     }
-
-
-    qSort(glSpriteList.begin(), glSpriteList.end(), GLSprite::priorityLessThan);
 
     return glSpriteList;
 }

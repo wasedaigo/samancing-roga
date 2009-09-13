@@ -66,20 +66,13 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
         case CanvasType_Animation:
             {
                 QPoint centerPoint = QPoint((width()) / 2, (height()) / 2);
-                for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+
+                // Render sprites
+                QList<const GLSprite*>::Iterator iter = mRenderSpriteList.begin();
+                while (iter != mRenderSpriteList.end())
                 {
-                    QList<const GLSprite*>::Iterator iter = mGlSpriteList.begin();
-                    const GLSprite* glSprite = NULL;
-                    while (iter != mGlSpriteList.end())
-                    {
-                        const GLSprite* tglSprite = (GLSprite*)*iter;
-                        if (tglSprite->mLineNo == lineNo)
-                        {
-                            glSprite = tglSprite;
-                            break;
-                        }
-                        iter++;
-                    }
+                    const GLSprite* glSprite = (GLSprite*)*iter;
+
 
                     painter.translate(centerPoint.x(), centerPoint.y());
                     if (glSprite)
@@ -87,11 +80,21 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
                         glSprite->render(QPoint(0, 0), painter, mpAnimationModel->getTargetSprite(), true, mEmittedAnimationList);
                     }
 
-                    for (int i = 0; i < mEmittedAnimationList[lineNo].count(); i++)
-                    {
-                        mEmittedAnimationList[lineNo][i]->update(painter, mEmittedAnimationList);
-                    }
                     painter.translate(-centerPoint.x(), -centerPoint.y());
+                    iter++;
+                }
+
+                // update emitted animationlist
+                for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+                {
+                    for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
+                    {
+                        mEmittedAnimationList[lineNo][i]->update();
+                        if (mEmittedAnimationList[lineNo][i]->isDone())
+                        {
+                            mEmittedAnimationList[lineNo].removeAt(i);
+                        }
+                    }
                 }
             }
             break;
@@ -251,9 +254,20 @@ void AnimationImagePaletPanel::onTick()
 
         // Delete previous generated sprites
         while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
+        mRenderSpriteList.clear();
 
         // Set current glsprite list
         mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(NULL, mAnimationFrameNo);
+
+        mRenderSpriteList.append(mGlSpriteList);
+        for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+        {
+            for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
+            {
+                mRenderSpriteList.push_back(mEmittedAnimationList[lineNo][i]->getSprite());
+            }
+        }
+        qSort(mRenderSpriteList.begin(), mRenderSpriteList.end(), GLSprite::priorityLessThan);
 
         repaint();
     }
