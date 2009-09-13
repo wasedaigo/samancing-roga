@@ -23,7 +23,7 @@ void MainWindow::setupConnections()
     connect(ui->removeEventButton, SIGNAL(clicked()), this, SLOT(onRemoveEventButtonClicked()));
     connect(ui->eventTableWidget, SIGNAL(cellChanged(int, int)), this, SLOT(onEventEdited(int, int)));
 
-    // connec Animation Viewer
+    // connect Animation Viewer
     connect(mpAnimationViewer, SIGNAL(playAnimation(bool)), this, SLOT(setEnabled(bool)));
     connect(ui->lineEditAnimationName, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationName(QString)));
     connect(ui->lineEditAnimationID, SIGNAL(textChanged(QString)), mpAnimationModel, SLOT(setAnimationID(QString)));
@@ -33,7 +33,11 @@ void MainWindow::setupConnections()
 
     connect(ui->animationTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
         this, SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
-    connect(mpAnimationModel, SIGNAL(fileSaved(QModelIndex)), &mAnimationTreeViewModel, SLOT(refresh(QModelIndex)));
+    connect(mpAnimationModel, SIGNAL(fileChanged()), this, SLOT(refreshTree()));
+
+    // refresh button clicked
+    connect(ui->treeRefreshButton, SIGNAL(clicked()), this, SLOT(refreshTree()));
+
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refreshEventList()));
 }
 
@@ -235,22 +239,26 @@ void MainWindow::refreshEventList()
 
 void MainWindow::onAddAnimationButtonClicked()
 {
-    QStandardItem* item = new QStandardItem(QString("%0").arg("NO NAME"));
-    item->setEditable(false);
-    mpAnimationListModel->insertRow(0, item);
-    mpAnimationListModel->sort(0, Qt::AscendingOrder);
+    QModelIndexList indexes = ui->animationTreeView->selectionModel()->selectedIndexes();
+    QModelIndex index = indexes.takeFirst();
+
+    QString path = mAnimationTreeViewModel.filePath(index);
+
+    mpAnimationModel->createEmptyAnimation(path);
 }
 
 void MainWindow::onRemoveAnimationButtonClicked()
 {
-//    QModelIndexList list = ui->animationListView->selectionModel()->selectedRows();
-//
-//    QList<QModelIndex>::Iterator iter;
-//    for (iter = list.begin(); iter != list.end(); iter++)
-//    {
-//        QModelIndex modelIndex = (QModelIndex)*iter;
-//        mpAnimationListModel->removeRow(modelIndex.row(), QModelIndex());
-//    }
+    QModelIndexList indexes = ui->animationTreeView->selectionModel()->selectedIndexes();
+    if (indexes.count() > 0)
+    {
+        QModelIndex index = indexes.takeFirst();
+
+        QString path = mAnimationTreeViewModel.filePath(index);
+
+        QFile::remove(path);
+        refreshTree();
+    }
 }
 
 
@@ -274,7 +282,7 @@ void MainWindow::onPaletButtonClicked()
  Animation Panel Control
 
 ---------------------------------------------------------------------*/
-void MainWindow::onAnimationDurationChanged(int duration)
+void MainWindow::refreshTree()
 {
-
+    mAnimationTreeViewModel.refresh(QModelIndex());
 }

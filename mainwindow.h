@@ -30,6 +30,7 @@ public:
 
 public slots:
     void setEnabled(bool enabled);
+    void refreshTree();
 
 private slots:
     // animation list control
@@ -45,7 +46,7 @@ private slots:
     void onAnimationSelected(int index);
 
     // Animation Panel Control
-    void onAnimationDurationChanged(int duration);
+
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
     void refreshEventList();
 

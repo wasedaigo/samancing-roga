@@ -83,6 +83,16 @@ AnimationModel::AnimationModel(QWidget* parent)
     setup();
 }
 
+AnimationModel::AnimationModel(QWidget* parent, QString animationDir, QString animationID)
+    : mpParent(parent),
+      mAnimationName(QString("")),
+      mAnimationDirectory(QString(animationDir)),
+      mAnimationID(QString(animationID)),
+      mOriginalAnimationID(QString(animationID))
+{
+    setup();
+}
+
 void AnimationModel::setup()
 {
     mSelectedSourcePath = "";
@@ -823,6 +833,7 @@ bool AnimationModel::saveData()
     QString rootPath = QDir::currentPath();
     rootPath.append("/");
     rootPath.append(ANIMATION_DIR.path());
+    rootPath.append("/");
 
     // we don't want to store absolute path
     QString saveDirName = rootPath.append(mAnimationDirectory).append("/");
@@ -1007,11 +1018,12 @@ bool AnimationModel::saveData()
     }
 
     mOriginalAnimationID = mAnimationID;
-    emit fileSaved(QModelIndex());
+    emit fileChanged();
 
     return true;
 }
 
+// Load animation file, return true if loading was succeeded
 bool AnimationModel::loadData(QString path)
 {
     clearAllKeyFrames();
@@ -1043,10 +1055,11 @@ bool AnimationModel::loadData(QString path)
     QString rootPath = QDir::currentPath();
     rootPath.append("/");
     rootPath.append(ANIMATION_DIR.path());
+    rootPath.append("/");
 
     QFileInfo fileInfo = QFileInfo(path);
 
-    mAnimationDirectory = fileInfo.absolutePath().replace(rootPath, "");;
+    mAnimationDirectory = fileInfo.absolutePath().replace(rootPath, "");
     mOriginalAnimationID = fileInfo.baseName();
     setAnimationID(mOriginalAnimationID);
 
@@ -1228,5 +1241,43 @@ void AnimationModel::readCommand(QString command)
             QString soundName = QString(list[1]);
             ResourceManager::playSound(soundName);
         }
+    }
+}
+
+void AnimationModel::createEmptyAnimation(QString path)
+{
+    // Get path without directory info & extension
+    QString rootPath = QDir::currentPath();
+    rootPath.append("/");
+    rootPath.append(ANIMATION_DIR.path());
+    rootPath.append("/");
+
+    QString dir = path;
+    dir.replace(rootPath, "");
+
+    // You cannot add file to the root
+    if (dir != "")
+    {
+        // Get unique animation ID
+        QString tempID = "new_animation%0";
+        QString newID = "";
+        int index = 0;
+        while (true)
+        {
+            newID = tempID.arg(index);
+            QString checkPath = path;
+            checkPath.append("/").append(newID).append(".").append(ANIMATION_FORMAT);
+            if (!QFile::exists(checkPath))
+            {
+                break;
+            }
+            index++;
+        }
+
+        AnimationModel* pAnimation = new AnimationModel(NULL, dir, newID);
+        pAnimation->saveData();
+        delete pAnimation;
+
+        emit fileChanged();
     }
 }
