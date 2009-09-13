@@ -8,8 +8,10 @@ EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSpri
           mCounter(0)
 {
     GLSprite::SpriteDescriptor spriteDescriptor = pParentGLSprite->mSpriteDescriptor;
+
     // Kinda hacky. I couldn't decompose transformation to each attribute
     spriteDescriptor.mOptionalTransform = pParentGLSprite->getParentTransform();
+
     // This will emit under world coordinate, therefore the priority needs to be come from its root
     spriteDescriptor.mPriority = pParentGLSprite->getRootSprite()->mSpriteDescriptor.mPriority;
     spriteDescriptor.mAlpha = pParentGLSprite->getAbsoluteAlpha() * spriteDescriptor.mAlpha;
