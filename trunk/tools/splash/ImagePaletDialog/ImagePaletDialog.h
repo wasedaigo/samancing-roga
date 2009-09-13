@@ -24,6 +24,7 @@ private slots:
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
 protected:
     void changeEvent(QEvent *e);
+    void showEvent(QShowEvent *event);
 
 private:
 

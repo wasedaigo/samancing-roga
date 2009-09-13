@@ -44,6 +44,12 @@ ImagePaletDialog::~ImagePaletDialog()
     delete m_ui;
 }
 
+void ImagePaletDialog::showEvent(QShowEvent *event)
+{
+    mSourceFileTreeViewModel.refresh(QModelIndex());
+}
+
+
 void ImagePaletDialog::onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2)
 {
     QModelIndexList indexes = item1.indexes();
