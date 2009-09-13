@@ -55,6 +55,7 @@ private:
     CanvasType mCanvasType;
 
     QList<const GLSprite*> mGlSpriteList;
+    QList<const GLSprite*> mRenderSpriteList;
     AnimationModel* mpPlayingAnimationModel;
     QTimer* mpAnimationPlayTimer;
     int mAnimationFrameNo;

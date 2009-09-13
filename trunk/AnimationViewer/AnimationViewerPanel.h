@@ -54,7 +54,7 @@ private:
     void swapSourceTexture();
 
     QList<const GLSprite*> mGlSpriteList;
-
+    QList<const GLSprite*> mRenderSpriteList;
     AnimationModel* mpAnimationModel;
     int mCurrentFrameNo;
     QColor mClearColor;

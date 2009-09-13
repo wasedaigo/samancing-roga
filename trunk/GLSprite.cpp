@@ -234,6 +234,19 @@ const GLSprite* GLSprite::getRootSprite() const
     return pRootSprite;
 }
 
+float GLSprite::getAbsoluteAlpha() const
+{
+    float alpha = mSpriteDescriptor.mAlpha;
+
+    const GLSprite* pSprite = this;
+    while (pSprite = pSprite->getParentSprite())
+    {
+        alpha *= pSprite->mSpriteDescriptor.mAlpha;
+    }
+    return alpha;
+}
+
+
 QTransform GLSprite::getTransform() const
 {
     return mSpriteDescriptor.getTransform();
