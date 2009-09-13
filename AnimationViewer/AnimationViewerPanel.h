@@ -19,12 +19,12 @@ public:
     void selectCel(int celNo);
     void playAnimation();
     bool isAnimationPlaying() const;
+    bool isAnimationExist() const;
     void stopAnimation();
     void gotoNextFrame();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -33,13 +33,15 @@ protected:
 
 public slots:
     void refresh();
+    void setShowAnimationUI(bool showUI);
 
 signals:
     void celSelected(KeyFrameData* pKeyFrameData);
 
 private slots:
     void addNewCel(QPoint& relativePressedPosition);
-    void pickCel(QPoint& relativePressedPosition);
+    bool grabTarget(QPoint& relativePressedPosition);
+    void grabCel(QPoint& relativePressedPosition);
     void timerEvent();
 
 private:
@@ -66,6 +68,7 @@ private:
     bool mCelGrabbed;
     bool mTargetGrabbed;
     QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::MaxLineNo];
+    bool mShowAnimationUI;
 };
 
 #endif // AnimationViewerPanel_H

@@ -19,17 +19,23 @@ Q_OBJECT
 public:
     AnimationViewer(QWidget* parent, AnimationModel* animationModel);
     ~AnimationViewer();
+
     AnimationViewerPanel* mpAnimationViewerPanel;
 
     Ui::AnimationViewer *m_ui;
 
+public slots:
+    void stopAnimation();
+
 private slots:
     void onCelSelected(KeyFrameData* pKeyFrameData);
 
+    void setLoopPlay(bool loop);
     void onSaveAnimationButtonClicked();
 
     void onTweenTypeChanged(int tweenType);
     void onPlayButtonClicked();
+
     void onTick();
 
 signals:
@@ -39,6 +45,7 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
+
     void blockSignals(bool block);
 
     CelModel* mpSelectedCelModel;
@@ -48,6 +55,8 @@ private:
     QTimer* mpAnimationPlayTimer;
     
     KeyFrame::KeyFramePosition mSelectedKeyFramePosition;
+
+    bool mLoop;
 };
 
 #endif // ANIMATIONVIEWER_H

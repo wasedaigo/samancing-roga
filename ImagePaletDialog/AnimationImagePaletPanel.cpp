@@ -25,12 +25,26 @@ AnimationImagePaletPanel::AnimationImagePaletPanel(AnimationModel* pAnimationMod
     mpAnimationPlayTimer->setInterval(30);
     connect(mpAnimationPlayTimer, SIGNAL(timeout()), this, SLOT(onTick()));
     connect(mpAnimationModel, SIGNAL(selectedPaletChanged(QString)), this, SLOT(onAnimationImagePaletChanged(QString)));
+    connect(mpAnimationModel, SIGNAL(animationLoaded()), this, SLOT(reload()));
 }
 
 AnimationImagePaletPanel::~AnimationImagePaletPanel()
 {
     while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
     delete mpAnimationPlayTimer;
+}
+
+bool AnimationImagePaletPanel::isAnimationExist() const
+{
+    bool emittedAnimationExists = false;
+    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    {
+        if (!mEmittedAnimationList[lineNo].empty())
+        {
+            emittedAnimationExists = true;
+        }
+    }
+    return (mAnimationFrameNo < mpPlayingAnimationModel->getMaxFrameCount()) || emittedAnimationExists;
 }
 
 void AnimationImagePaletPanel::setSnapGrid(int gridX, int gridY, bool snapGridCheck)
@@ -139,20 +153,29 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
     }
 }
 
-void AnimationImagePaletPanel::closeEvent(QCloseEvent *event)
+void AnimationImagePaletPanel::hideEvent(QHideEvent *event)
 {
     resetAnimation();
     mpAnimationPlayTimer->stop();
+}
+
+void AnimationImagePaletPanel::reload()
+{
+    if (mpPlayingAnimationModel)
+    {
+        mpPlayingAnimationModel = ResourceManager::getAnimation(mpPlayingAnimationModel->getSelectedSourcePath());
+        resetAnimation();
+    }
 }
 
 void AnimationImagePaletPanel::showEvent(QShowEvent *event)
 {
     if (mCanvasType == CanvasType_Animation)
     {
+        reload();
         mpAnimationPlayTimer->start();
     }
 }
-
 
 QPoint AnimationImagePaletPanel::getSnappedPosition(int x, int y)
 {
@@ -241,34 +264,37 @@ void AnimationImagePaletPanel::resetAnimation()
 void AnimationImagePaletPanel::onTick()
 {
     // Don't play an animation without any frames
-    if (mpPlayingAnimationModel->getMaxFrameCount() > 0)
-    {
-        // goto next frame
-        mAnimationFrameNo++;
-
-        // Loop animation
-        if(mAnimationFrameNo >= mpPlayingAnimationModel->getMaxFrameCount())
+    if (mpPlayingAnimationModel)
         {
-            resetAnimation();
-        }
-
-        // Delete previous generated sprites
-        while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
-        mRenderSpriteList.clear();
-
-        // Set current glsprite list
-        mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(NULL, mAnimationFrameNo);
-
-        mRenderSpriteList.append(mGlSpriteList);
-        for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+        if (mpPlayingAnimationModel->getMaxFrameCount() > 0)
         {
-            for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
+            // goto next frame
+            mAnimationFrameNo++;
+
+            // Loop animation
+            if(!isAnimationExist())
             {
-                mRenderSpriteList.push_back(mEmittedAnimationList[lineNo][i]->getSprite());
+                resetAnimation();
             }
-        }
-        qSort(mRenderSpriteList.begin(), mRenderSpriteList.end(), GLSprite::priorityLessThan);
 
-        repaint();
+            // Delete previous generated sprites
+            while (!mGlSpriteList.empty()) { delete mGlSpriteList.takeFirst(); }
+            mRenderSpriteList.clear();
+
+            // Set current glsprite list
+            mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(NULL, mAnimationFrameNo);
+
+            mRenderSpriteList.append(mGlSpriteList);
+            for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+            {
+                for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
+                {
+                    mRenderSpriteList.push_back(mEmittedAnimationList[lineNo][i]->getSprite());
+                }
+            }
+            qSort(mRenderSpriteList.begin(), mRenderSpriteList.end(), GLSprite::priorityLessThan);
+
+            repaint();
+        }
     }
 }

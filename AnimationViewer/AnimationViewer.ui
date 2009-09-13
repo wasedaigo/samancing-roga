@@ -476,18 +476,34 @@
           </layout>
          </widget>
         </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="verticalGroupBox">
+       <property name="title">
+        <string>Tool option</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>2</number>
+        </property>
         <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QCheckBox" name="showAnimationUICheckBox">
+          <property name="text">
+           <string>Show Animation UI</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="checked">
+           <bool>true</bool>
           </property>
-         </spacer>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="loopPlayCheckbox">
+          <property name="text">
+           <string>Loop Play</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -509,7 +525,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
             </property>
             <property name="iconSize">
@@ -526,7 +542,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/palette.png</normaloff>:/resource/palette.png</iconset>
             </property>
             <property name="iconSize">
@@ -543,7 +559,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/play.png</normaloff>:/resource/play.png</iconset>
             </property>
             <property name="iconSize">
@@ -558,6 +574,19 @@
         </item>
        </layout>
       </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -594,8 +623,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../ui.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

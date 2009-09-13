@@ -1197,6 +1197,7 @@ bool AnimationModel::loadData(QString path)
     mSelectedKeyFramePosition.mLineNo = 0;
 
     emit refreshTimeLine();
+    emit animationLoaded();
     return true;
 }
 

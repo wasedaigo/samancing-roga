@@ -23,7 +23,8 @@ AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAni
           mpSelectedCelModel(pSelectedCelModel),
           mIsAnimationPlaying(false),
           mCelGrabbed(false),
-          mTargetGrabbed(false)
+          mTargetGrabbed(false),
+          mShowAnimationUI(true)
 {
     setAutoFillBackground(false);
 
@@ -40,6 +41,12 @@ AnimationViewerPanel::~AnimationViewerPanel()
 bool AnimationViewerPanel::isAnimationPlaying() const
 {
     return mIsAnimationPlaying;
+}
+
+void AnimationViewerPanel::setShowAnimationUI(bool showUI)
+{
+    mShowAnimationUI = showUI;
+    refresh();
 }
 
 void AnimationViewerPanel::playAnimation()
@@ -66,6 +73,19 @@ void AnimationViewerPanel::gotoNextFrame()
     }
 }
 
+bool AnimationViewerPanel::isAnimationExist() const
+{
+    bool emittedAnimationExists = false;
+    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    {
+        if (!mEmittedAnimationList[lineNo].empty())
+        {
+            emittedAnimationExists = true;
+        }
+    }
+    return (mpAnimationModel->getCurrentKeyFramePosition().mFrameNo < mpAnimationModel->getMaxFrameCount()) || emittedAnimationExists;
+}
+
 void AnimationViewerPanel::resizeEvent(QResizeEvent *event)
 {
 }
@@ -80,28 +100,27 @@ QPoint AnimationViewerPanel::getCenterPoint() const
 
 void AnimationViewerPanel::keyPressEvent (QKeyEvent* e)
 {
-    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
-    switch(e->key())
+    if (!mIsAnimationPlaying)
     {
-        // Delete selected cel
-        case Qt::Key_Delete:
-            mpAnimationModel->clearFrames(currentPosition.mLineNo, currentPosition.mFrameNo, currentPosition.mFrameNo);
-        break;
-    }
-}
-
-void AnimationViewerPanel::keyReleaseEvent (QKeyEvent* e)
-{
-    switch(e->key())
-    {
+        KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+        switch(e->key())
+        {
+            // Delete selected cel
+            case Qt::Key_Delete:
+                mpAnimationModel->clearFrames(currentPosition.mLineNo, currentPosition.mFrameNo, currentPosition.mFrameNo);
+            break;
+        }
     }
 }
 
 static bool refreshed = false;
 void AnimationViewerPanel::refresh()
 {
-    refreshed = true;
-    clearSprites();
+    if (!isAnimationPlaying() || isAnimationExist())
+    {
+        refreshed = true;
+        clearSprites();
+    }
 
     if (!isAnimationPlaying())
     {
@@ -163,9 +182,9 @@ void AnimationViewerPanel::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::NoBrush);
     painter.fillRect(QRect(0, 0, width() - 1, height() - 1), Qt::SolidPattern);
 
-    renderCross(painter);
+    if (mShowAnimationUI) { renderCross(painter); }
     renderCelSprites(centerPoint, painter);
-    renderTargetSprite(centerPoint, painter);
+    if (mShowAnimationUI) { renderTargetSprite(centerPoint, painter);}
 
     painter.end();
 }
@@ -201,7 +220,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 
         painter.translate(-centerPoint.x(), -centerPoint.y());
 
-        if (glSprite && !mIsAnimationPlaying)
+        if (glSprite && !mIsAnimationPlaying && mShowAnimationUI)
         {
             renderCelBox(painter, glSprite, centerPoint - glSprite->mSpriteDescriptor.center());
         }
@@ -330,10 +349,8 @@ void AnimationViewerPanel::selectCel(int lineNo)
     }
 }
 
-void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
+bool AnimationViewerPanel::grabTarget(QPoint& relativePressedPosition)
 {
-
-    QPointF pt2 = QPointF(mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX, mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY);
     if(mpAnimationModel->getTargetSprite()->contains(
             relativePressedPosition
        )
@@ -342,84 +359,94 @@ void AnimationViewerPanel::pickCel(QPoint& relativePressedPosition)
         mSelectedOffset = mpAnimationModel->getTargetSprite()->getRect().topLeft() - relativePressedPosition;
         mTargetGrabbed = true;
     }
-    else
+    return mTargetGrabbed;
+}
+
+void AnimationViewerPanel::grabCel(QPoint& relativePressedPosition)
+{
+    // Select a cel, if mouse has clicked on it
+    for (int i = mGlSpriteList.count() - 1; i >= 0; i--)
     {
-        // Select a cel, if mouse has clicked on it
-        for (int i = mGlSpriteList.count() - 1; i >= 0; i--)
+        const GLSprite* glSprite = mGlSpriteList[i];
+        if (glSprite->isSelectable() &&
+            glSprite->contains(
+                    relativePressedPosition                   )
+            )
         {
-            const GLSprite* glSprite = mGlSpriteList[i];
-            if (glSprite->isSelectable() &&
-                glSprite->contains(
-                        relativePressedPosition                   )
-                )
-            {
-                mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
-                selectCel(glSprite->mID);
-                mCelGrabbed = true;
-                break;
-            }
+            mSelectedOffset = glSprite->getRect().topLeft() - relativePressedPosition;
+            selectCel(glSprite->mID);
+            mCelGrabbed = true;
+            break;
         }
     }
 }
 
 void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 {
-    mCelGrabbed = false;
-    mTargetGrabbed = false;
-
-    // Don't do anything if it is center point mode
-    if (event->modifiers() & Qt::ControlModifier)
-    {
-        setCenterPoint(event);
-        return;
-    }
-
-    KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
-
     this->setFocus();
+
     // Get center point here
     QPoint centerPoint = getCenterPoint();
     // Calculate pressed position relative from center
     QPoint relativePressedPosition = QPoint(event->x(), event->y()) - centerPoint;
 
-    pickCel(relativePressedPosition);
+    mTargetGrabbed  = false;
+    mCelGrabbed = false;
+    grabTarget(relativePressedPosition);
 
-    if(!mCelGrabbed && !mTargetGrabbed)
+    // only for edit mode
+    if (!mIsAnimationPlaying)
     {
-        QString path1 = mpAnimationModel->getLoadedAnimationPath();
-        QString path2 = mpAnimationModel->getSelectedSourcePath();
-      if (mpAnimationModel->getLoadedAnimationPath() == mpAnimationModel->getSelectedSourcePath())
-      {
-          QMessageBox::information(window(), tr("Animation nest error"),
-                 tr("You cannot nest the same animation"));
-      }
-      else
-      {
-        switch(ResourceManager::getFileType(mpAnimationModel->getSelectedSourcePath()))
+        // center point mode
+        if (event->modifiers() & Qt::ControlModifier)
         {
-            case ResourceManager::FileType_Animation:
-            case ResourceManager::FileType_Image:
-                if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
-                {
-                    GLSprite::Point2 pt;
-                    pt.mX = relativePressedPosition.x();
-                    pt.mY = relativePressedPosition.y();
-
-                    mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
-                }
-                else
-                {
-                    if (event->modifiers() & Qt::ShiftModifier)
-                    {
-                        swapSourceTexture();
-                    }
-                }
-            break;
-
-            default:
-            break;
+            setCenterPoint(event);
+            return;
         }
-      }
+
+        if (!mTargetGrabbed)
+        {
+            grabCel(relativePressedPosition);
+        }
+
+        if(!mCelGrabbed && !mTargetGrabbed)
+        {
+            QString path1 = mpAnimationModel->getLoadedAnimationPath();
+            QString path2 = mpAnimationModel->getSelectedSourcePath();
+          if (mpAnimationModel->getLoadedAnimationPath() == mpAnimationModel->getSelectedSourcePath())
+          {
+              QMessageBox::information(window(), tr("Animation nest error"),
+                     tr("You cannot nest the same animation"));
+          }
+          else
+          {
+            KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+            switch(ResourceManager::getFileType(mpAnimationModel->getSelectedSourcePath()))
+            {
+                case ResourceManager::FileType_Animation:
+                case ResourceManager::FileType_Image:
+                    if (mpAnimationModel->getKeyFrameIndex(currentPosition.mLineNo, currentPosition.mFrameNo) == -1)
+                    {
+                        GLSprite::Point2 pt;
+                        pt.mX = relativePressedPosition.x();
+                        pt.mY = relativePressedPosition.y();
+
+                        mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, pt);
+                    }
+                    else
+                    {
+                        if (event->modifiers() & Qt::ShiftModifier)
+                        {
+                            swapSourceTexture();
+                        }
+                    }
+                break;
+
+                default:
+                break;
+            }
+          }
+        }
     }
 }
 
