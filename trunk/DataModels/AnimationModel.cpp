@@ -417,7 +417,6 @@ void AnimationModel::reduceFrameLength(int lineNo, int frameNo)
 
 void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
 {
-    if (lineNo >= MaxLineNo){return;}
     // Remove frames
     for (int i = endFrameNo; i >= startFrameNo; i--)
     {
@@ -622,12 +621,26 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                     pAnimationModel = parentGLSprite->getRootSprite()->getParentAnimationModel();
                 }
                 list.push_back(KeyFrame::KeyFramePosition(lineNo, frameNo));
+
+                // Get next frame in world coordinate
                 for (int i = 0; i < list.count(); i++)
                 {
                     list[i].mFrameNo += 1;
                 }
-
                 const GLSprite* pTargetSprite = pAnimationModel->createGLSpriteAt(NULL, list);
+
+                // If there is no next frame, use previous frame as target
+                bool reverse = false;
+                if (!pTargetSprite)
+                {
+                    // Get previous frame in world coordinate
+                    for (int i = 0; i < list.count(); i++)
+                    {
+                        list[i].mFrameNo -= 2;
+                    }
+                    pTargetSprite = pAnimationModel->createGLSpriteAt(NULL, list);
+                    reverse = true;
+                }
 
                 if (pTargetSprite)
                 {
@@ -655,6 +668,12 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                     // Compare target and current sprite in screen coordinate
                     float dx = targetPoint.x() - point.x();
                     float dy = targetPoint.y() - point.y();
+
+                    if (reverse)
+                    {
+                        dx = point.x() - targetPoint.x();
+                        dy = point.y() - targetPoint.y();
+                    }
 
                     int angleOffset = (int)floor((180 * atan2(dy, dx)) / PI);
                     spriteDescriptor.mRotation += angleOffset;
