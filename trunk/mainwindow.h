@@ -28,6 +28,9 @@ public:
 
     void setEditEnabled(bool enabled);
 
+public slots:
+    void setEnabled(bool enabled);
+
 private slots:
     // animation list control
     void onAddEventButtonClicked();
@@ -46,6 +49,7 @@ private slots:
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
     void refreshEventList();
 
+protected:
 private:
     void setupConnections();
     void setupModels();

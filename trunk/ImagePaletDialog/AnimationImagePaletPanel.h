@@ -34,16 +34,18 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void closeEvent(QCloseEvent *event);
+    void hideEvent(QHideEvent *event);
     void showEvent(QShowEvent  *event);
 
 private slots:
     void onAnimationImagePaletChanged(QString id);
     void onTick();
+    void reload();
 
 private:
     QPoint getSnappedPosition(int x, int y);
     void resetAnimation();
+    bool isAnimationExist() const;
 
     QRect mSelectedRect;
     AnimationModel* mpAnimationModel;

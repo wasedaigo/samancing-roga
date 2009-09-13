@@ -13,7 +13,6 @@
 
 void MainWindow::setupConnections()
 {
-
     connect(mpAnimationViewer->m_ui->showPaletteButton, SIGNAL(clicked()), this, SLOT(onPaletButtonClicked()));
 
     // connect animation list controls
@@ -105,6 +104,18 @@ MainWindow::~MainWindow()
     delete mpAnimationModel;
     delete mpAnimationListModel;
     delete ui;
+}
+
+void MainWindow::setEnabled(bool enabled)
+{
+    ui->eventsGroupdBox->setEnabled(enabled);
+    ui->gridInfoBox->setEnabled(enabled);
+    mpQTimelinePanel->setEnabled(enabled);
+
+    mpAnimationViewer->m_ui->gridCelDataBox->setEnabled(false);
+    ui->addAnimationButton->setEnabled(enabled);
+    ui->removeAnimationButton->setEnabled(enabled);
+    ui->animationTreeView->setEnabled(enabled);
 }
 
 void MainWindow::setEditEnabled(bool enabled)

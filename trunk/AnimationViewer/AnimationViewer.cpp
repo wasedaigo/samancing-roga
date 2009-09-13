@@ -10,7 +10,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
    :QWidget(parent),
     m_ui(new Ui::AnimationViewer),
     mpSelectedCelModel(new CelModel()),
-    mpAnimationModel(animationModel)
+    mpAnimationModel(animationModel),
+    mLoop(false)
 {
     mSelectedKeyFramePosition.mFrameNo = -1;
     mSelectedKeyFramePosition.mLineNo = -1;
@@ -99,12 +100,18 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->showAnimationUICheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowAnimationUI(bool)));
+    connect(m_ui->loopPlayCheckbox, SIGNAL(toggled(bool)), this, SLOT(setLoopPlay(bool)));
 
     // Cel selection
     connect(mpAnimationViewerPanel, SIGNAL(celSelected(KeyFrameData*)), this, SLOT(onCelSelected(KeyFrameData*)));
 
     // connect save button
     connect(m_ui->saveAnimationButton, SIGNAL(clicked()), this, SLOT(onSaveAnimationButtonClicked()));
+    connect(m_ui->saveAnimationButton, SIGNAL(clicked()), this, SLOT(stopAnimation()));
+
+    // connect palet button
+    connect(m_ui->showPaletteButton, SIGNAL(clicked()), this, SLOT(stopAnimation()));
 
     // connect Timer
     connect(m_ui->playAnimationButton, SIGNAL(clicked()), this, SLOT(onPlayButtonClicked()));
@@ -130,6 +137,11 @@ void AnimationViewer::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+void AnimationViewer::setLoopPlay(bool loop)
+{
+    mLoop = loop;
 }
 
 void AnimationViewer::blockSignals(bool block)
@@ -229,30 +241,47 @@ void AnimationViewer::onTweenTypeChanged(int tweenType)
 
 void AnimationViewer::onPlayButtonClicked()
 {
-    mpAnimationPlayTimer->start();
-    mpAnimationModel->getCurrentKeyFramePosition();
-    mSelectedKeyFramePosition = mpAnimationModel->getCurrentKeyFramePosition();
-    mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, 0);
-    blockSignals(true);
-    emit playAnimation(false);
-    mpAnimationViewerPanel->playAnimation();
-    mpAnimationViewerPanel->refresh();
+    if (mpAnimationPlayTimer->isActive())
+    {
+        stopAnimation();
+    }
+    else
+    {
+        mpAnimationPlayTimer->start();
+        mpAnimationModel->getCurrentKeyFramePosition();
+        mSelectedKeyFramePosition = mpAnimationModel->getCurrentKeyFramePosition();
+        mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, 0);
+        blockSignals(true);
+        emit playAnimation(false);
+        mpAnimationViewerPanel->playAnimation();
+        mpAnimationViewerPanel->refresh();
+    }
+}
+
+void AnimationViewer::stopAnimation()
+{
+    mpAnimationViewerPanel->stopAnimation();
+    mpAnimationPlayTimer->stop();
+    emit playAnimation(true);
+    blockSignals(false);
+    mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, mSelectedKeyFramePosition.mFrameNo);
 }
 
 void AnimationViewer::onTick()
 {
-    if ( mpAnimationModel->getCurrentKeyFramePosition().mFrameNo == mpAnimationModel->getMaxFrameCount())
+    if (mpAnimationViewerPanel->isAnimationExist())
     {
-        mpAnimationViewerPanel->stopAnimation();
-        mpAnimationPlayTimer->stop();
-        emit playAnimation(true);
-        blockSignals(false);
-        mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, mSelectedKeyFramePosition.mFrameNo);
+        // move to next frame
+        mpAnimationViewerPanel->gotoNextFrame();
     }
     else
     {
-        // mobe to next frame
-        mpAnimationViewerPanel->gotoNextFrame();
+        stopAnimation();
+    }
+
+    if (!mpAnimationViewerPanel->isAnimationExist() && mLoop)
+    {
+        mpAnimationModel->selectCurrentKeyFramePosition(mSelectedKeyFramePosition.mLineNo, 0);
     }
 }
 

@@ -132,6 +132,7 @@ signals:
     void targetPositionMoved(int x, int y);
 
     void refreshTimeLine();
+    void animationLoaded();
     void fileSaved(QModelIndex);
     void selectedKeyFramePositionChanged(int lineNo, int frameNo);
 };
