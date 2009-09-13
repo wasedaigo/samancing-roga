@@ -440,5 +440,4 @@ void QTimelineWidget::refreshTimeLine()
  {
     mDragging = false;
     setCursor(Qt::ArrowCursor);
-    printf("RELEASE x:%d y:%d \n", mSelectedCelPosition.x(), mSelectedCelPosition.y());
  }
