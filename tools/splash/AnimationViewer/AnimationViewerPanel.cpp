@@ -71,6 +71,10 @@ void AnimationViewerPanel::gotoNextFrame()
     {
        mpAnimationModel->selectCurrentKeyFramePosition(keyframePosition.mLineNo, keyframePosition.mFrameNo + 1);
     }
+    else
+    {
+        refresh();
+    }
 }
 
 bool AnimationViewerPanel::isAnimationExist() const
