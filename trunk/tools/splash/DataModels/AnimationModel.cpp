@@ -1236,7 +1236,7 @@ void AnimationModel::readCommand(QString command)
     QStringList list = command.split(":");
     if(list.size() >=2)
     {
-        if(list[0] == "SND")
+        if(list[0] == "snd")
         {
             QString soundName = QString(list[1]);
             ResourceManager::playSound(soundName);
