@@ -1,0 +1,29 @@
+{
+   "keyframes" : {
+      "0" : [
+         {
+            "alpha" : 0.2000000029802322,
+            "alphaTween" : "linear",
+            "facingOption" : "faceToMov",
+            "frameNo" : 0,
+            "positionTween" : "linear",
+            "rotation" : -135,
+            "rotationTween" : "fix",
+            "sourcePath" : "Images/Battle/Skills/Effect_Slash.png",
+            "textureRect" : [ 192, 0, 64, 80 ]
+         },
+         {
+            "alphaTween" : "fix",
+            "facingOption" : "faceToMov",
+            "frameNo" : 12,
+            "position" : [ 22, -8 ],
+            "positionTween" : "linear",
+            "relativeToTarget" : true,
+            "rotation" : -135,
+            "rotationTween" : "fix",
+            "sourcePath" : "Images/Battle/Skills/Effect_Slash.png",
+            "textureRect" : [ 192, 0, 64, 80 ]
+         }
+      ]
+   }
+}

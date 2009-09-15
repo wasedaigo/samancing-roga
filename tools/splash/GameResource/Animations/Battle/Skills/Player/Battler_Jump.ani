@@ -1,0 +1,43 @@
+{
+   "events" : {
+      "0" : [
+         "snd:Battle/Cloth01",
+         "swaptex:Images/Battle/Skills/Battler_Base.png, character",
+         "hide"
+      ],
+      "27" : [ "show" ]
+   },
+   "keyframes" : {
+      "0" : [
+         {
+            "frameNo" : 0,
+            "sourcePath" : "Images/Battle/Skills/Battler_Base.png",
+            "textureRect" : [ 608, 0, 32, 32 ]
+         },
+         {
+            "frameNo" : 7,
+            "positionTween" : "linear",
+            "sourcePath" : "Images/Battle/Skills/Battler_Base.png",
+            "textureRect" : [ 320, 0, 32, 32 ]
+         },
+         {
+            "frameNo" : 15,
+            "position" : [ 0, -48 ],
+            "positionTween" : "linear",
+            "sourcePath" : "Images/Battle/Skills/Battler_Base.png",
+            "textureRect" : [ 320, 0, 32, 32 ]
+         },
+         {
+            "frameNo" : 23,
+            "positionTween" : "fix",
+            "sourcePath" : "Images/Battle/Skills/Battler_Base.png",
+            "textureRect" : [ 608, 0, 32, 32 ]
+         },
+         {
+            "frameNo" : 27,
+            "sourcePath" : "Images/Battle/Skills/Battler_Base.png",
+            "textureRect" : [ 608, 0, 32, 32 ]
+         }
+      ]
+   }
+}
