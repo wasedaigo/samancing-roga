@@ -1,0 +1,102 @@
+{
+   "keyframes" : {
+      "0" : [
+         {
+            "blendType" : "add",
+            "frameNo" : 0,
+            "positionTween" : "fix",
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 0, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 1,
+            "position" : [ -112, -167 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 64, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 2,
+            "position" : [ -61, -57 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 128, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 3,
+            "position" : [ -124, -100 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 192, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 4,
+            "position" : [ -111, -124 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 256, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 5,
+            "position" : [ -118, -173 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 320, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 6,
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 384, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 7,
+            "position" : [ -55, -111 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 448, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 8,
+            "position" : [ -125, -113 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 512, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 9,
+            "position" : [ -109, -137 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 576, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 10,
+            "position" : [ -167, -113 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 640, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 11,
+            "position" : [ -129, -131 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 704, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 12,
+            "position" : [ -184, -111 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 768, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 13,
+            "position" : [ -110, -121 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 832, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 14,
+            "position" : [ -129, -103 ],
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 896, 0, 64, 64 ]
+         },
+         {
+            "frameNo" : 15,
+            "positionTween" : "fix",
+            "sourcePath" : "Images/Battle/Skills/Heal_Firstaid.png",
+            "textureRect" : [ 960, 0, 64, 64 ]
+         }
+      ]
+   }
+}

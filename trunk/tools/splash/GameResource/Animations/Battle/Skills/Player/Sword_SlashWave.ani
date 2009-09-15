@@ -1,0 +1,54 @@
+{
+   "events" : {
+      "0" : [ "hide" ],
+      "22" : [ "snd:Battle/Arrow02" ],
+      "60" : [ "show" ]
+   },
+   "keyframes" : {
+      "0" : [
+         {
+            "frameNo" : 0,
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Battler_SwordSwing.ani"
+         },
+         {
+            "frameNo" : 32,
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Battler_SwordSwing.ani"
+         },
+         {
+            "frameNo" : 33,
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Battler_Jump.ani"
+         },
+         {
+            "frameNo" : 59,
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Battler_Jump.ani"
+         }
+      ],
+      "1" : [
+         {
+            "emitter" : true,
+            "frameNo" : 22,
+            "position" : [ -8, -3 ],
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Effect_SlashWave.ani"
+         },
+         {
+            "emitter" : true,
+            "frameNo" : 24,
+            "position" : [ -8, -3 ],
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Effect_SlashWave.ani"
+         },
+         {
+            "emitter" : true,
+            "frameNo" : 26,
+            "position" : [ -8, -3 ],
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Effect_SlashWave.ani"
+         }
+      ]
+   }
+}

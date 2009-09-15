@@ -1,0 +1,47 @@
+{
+   "events" : {
+      "0" : [ "SND:Battle/Slash03" ]
+   },
+   "keyframes" : {
+      "0" : [
+         {
+            "alphaTween" : "fix",
+            "emitter" : true,
+            "frameNo" : 0,
+            "position" : [ 11, 7 ],
+            "positionTween" : "fix",
+            "relativeToTarget" : true,
+            "rotationTween" : "fix",
+            "scaleTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Effect_Blood1.ani"
+         }
+      ],
+      "1" : [
+         {
+            "alphaTween" : "fix",
+            "emitter" : true,
+            "frameNo" : 0,
+            "position" : [ 19, 4 ],
+            "positionTween" : "fix",
+            "relativeToTarget" : true,
+            "rotationTween" : "fix",
+            "scaleTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Effect_Blood1.ani"
+         }
+      ],
+      "2" : [
+         {
+            "alphaTween" : "fix",
+            "emitter" : true,
+            "frameNo" : 0,
+            "position" : [ 3, 11 ],
+            "positionTween" : "fix",
+            "relativeToTarget" : true,
+            "rotationTween" : "fix",
+            "scaleTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Effect_Blood1.ani"
+         }
+      ]
+   },
+   "name" : "Monster Bite Attack"
+}

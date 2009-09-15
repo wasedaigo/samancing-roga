@@ -1,0 +1,41 @@
+{
+   "events" : {
+      "7" : [ "SND:Battle/Shield01" ]
+   },
+   "keyframes" : {
+      "0" : [
+         {
+            "alphaTween" : "fix",
+            "color" : [ -1.0, 0.0, 0.0 ],
+            "colorTween" : "fix",
+            "frameNo" : 0,
+            "position" : [ -58, -4 ],
+            "positionTween" : "linear",
+            "relativeToTarget" : true,
+            "rotationTween" : "fix",
+            "scaleTween" : "fix",
+            "sourcePath" : "Images/Battle/Skills/Monster_Attack1.png",
+            "textureRect" : [ 0, 48, 48, 48 ]
+         },
+         {
+            "color" : [ 0.0, 1.0, 0.0 ],
+            "frameNo" : 3,
+            "relativeToTarget" : true,
+            "sourcePath" : "Images/Battle/Skills/Monster_Attack1.png",
+            "textureRect" : [ 48, 48, 48, 48 ]
+         },
+         {
+            "frameNo" : 6,
+            "positionTween" : "linear",
+            "relativeToTarget" : true,
+            "sourcePath" : "Images/Battle/Skills/Monster_Attack1.png",
+            "textureRect" : [ 96, 48, 48, 48 ]
+         },
+         {
+            "frameNo" : 18,
+            "isEmpty" : true
+         }
+      ]
+   },
+   "name" : "Monster Bite Attack"
+}

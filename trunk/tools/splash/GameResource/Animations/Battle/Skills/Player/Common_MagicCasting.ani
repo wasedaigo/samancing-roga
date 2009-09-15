@@ -1,0 +1,102 @@
+{
+   "events" : {
+      "0" : [
+         "snd:Battle/MagicCasting",
+         "swaptex:Images/Battle/Skills/Battler_Base.png, character",
+         "hide"
+      ],
+      "37" : [ "show" ]
+   },
+   "keyframes" : {
+      "0" : [
+         {
+            "frameNo" : 0,
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Battler_MagicCasting.ani"
+         },
+         {
+            "frameNo" : 36,
+            "positionTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Battler_MagicCasting.ani"
+         }
+      ],
+      "1" : [
+         {
+            "alpha" : 0.0,
+            "alphaTween" : "linear",
+            "blendType" : "add",
+            "frameNo" : 0,
+            "position" : [ 0, 13 ],
+            "positionTween" : "fix",
+            "priority" : 0.3000000119209290,
+            "scale" : [ 0.50, 0.2000000029802322 ],
+            "scaleTween" : "linear",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingCircle.ani"
+         },
+         {
+            "alphaTween" : "linear",
+            "blendType" : "add",
+            "frameNo" : 29,
+            "position" : [ 0, 13 ],
+            "priority" : 0.3000000119209290,
+            "scale" : [ 1.0, 0.50 ],
+            "scaleTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingCircle.ani"
+         },
+         {
+            "alpha" : 0.0,
+            "alphaTween" : "fix",
+            "blendType" : "add",
+            "frameNo" : 36,
+            "position" : [ 0, 13 ],
+            "positionTween" : "fix",
+            "priority" : 0.3000000119209290,
+            "scale" : [ 1.0, 0.50 ],
+            "scaleTween" : "fix",
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingCircle.ani"
+         }
+      ],
+      "2" : [
+         {
+            "alpha" : 0.50,
+            "alphaTween" : "fix",
+            "blendType" : "add",
+            "frameNo" : 0,
+            "position" : [ 0, 8 ],
+            "positionTween" : "fix",
+            "priority" : 0.6000000238418579,
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingRingBottom.ani"
+         },
+         {
+            "alpha" : 0.50,
+            "alphaTween" : "linear",
+            "blendType" : "add",
+            "frameNo" : 28,
+            "position" : [ 0, 8 ],
+            "positionTween" : "fix",
+            "priority" : 0.6000000238418579,
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingRingBottom.ani"
+         }
+      ],
+      "3" : [
+         {
+            "alphaTween" : "fix",
+            "blendType" : "add",
+            "frameNo" : 0,
+            "position" : [ 0, 8 ],
+            "positionTween" : "fix",
+            "priority" : 0.4000000059604645,
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingRingTop.ani"
+         },
+         {
+            "alphaTween" : "linear",
+            "blendType" : "add",
+            "frameNo" : 28,
+            "position" : [ 0, 8 ],
+            "positionTween" : "fix",
+            "priority" : 0.4000000059604645,
+            "sourcePath" : "Animations/Battle/Skills/Player/Sub/Magic_CastingRingTop.ani"
+         }
+      ]
+   }
+}
