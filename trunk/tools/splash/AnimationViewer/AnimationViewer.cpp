@@ -28,6 +28,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     m_ui->positionTweenTypeComboBox->setModel(mpTweenModel);
     m_ui->rotationTweenTypeComboBox->setModel(mpTweenModel);
     m_ui->scaleTweenTypeComboBox->setModel(mpTweenModel);
+    m_ui->colorTweenTypeComboBox->setModel(mpTweenModel);
 
     mpAnimationPlayTimer = new QTimer(this);
     mpAnimationPlayTimer->setInterval(30);
@@ -62,6 +63,13 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setRotationTweenType(int)));
     connect(m_ui->rotationTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
 
+    connect(m_ui->colorSpinBoxR, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setColorR(double)));
+    connect(m_ui->colorSpinBoxG, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setColorG(double)));
+    connect(m_ui->colorSpinBoxB, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setColorB(double)));
+
+    connect(m_ui->colorTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setColorTweenType(int)));
+    connect(m_ui->colorTweenTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTweenTypeChanged(int)));
+
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setFacingOptionType(int)));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
@@ -81,6 +89,10 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(mpSelectedCelModel, SIGNAL(scaleYChanged(double)), m_ui->scaleYSpinBox, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(rotationChanged(int)), m_ui->rotationXSpinBox, SLOT(setValue(int)));
 
+    connect(mpSelectedCelModel, SIGNAL(colorRChanged(double)), m_ui->colorSpinBoxR, SLOT(setValue(double)));
+    connect(mpSelectedCelModel, SIGNAL(colorGChanged(double)), m_ui->colorSpinBoxG, SLOT(setValue(double)));
+    connect(mpSelectedCelModel, SIGNAL(colorBChanged(double)), m_ui->colorSpinBoxB, SLOT(setValue(double)));
+
     connect(mpSelectedCelModel, SIGNAL(centerXChanged(int)), m_ui->centerXSpinBox, SLOT(setValue(int)));
     connect(mpSelectedCelModel, SIGNAL(centerYChanged(int)), m_ui->centerYSpinBox, SLOT(setValue(int)));
 
@@ -92,6 +104,10 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->scaleXSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->scaleYSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->rotationXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->colorSpinBoxR, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->colorSpinBoxG, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->colorSpinBoxB, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
+
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -146,6 +162,7 @@ void AnimationViewer::setLoopPlay(bool loop)
 
 void AnimationViewer::blockSignals(bool block)
 {
+
     m_ui->alphaSpinBox->blockSignals(block);
     m_ui->prioritySpinBox->blockSignals(block);
     m_ui->positionXSpinBox->blockSignals(block);
@@ -160,6 +177,9 @@ void AnimationViewer::blockSignals(bool block)
     m_ui->blendTypeComboBox->blockSignals(block);
     m_ui->centerXSpinBox->blockSignals(block);
     m_ui->centerYSpinBox->blockSignals(block);
+    m_ui->colorSpinBoxR->blockSignals(block);
+    m_ui->colorSpinBoxG->blockSignals(block);
+    m_ui->colorSpinBoxB->blockSignals(block);
 }
 
 // Cel selected
@@ -178,6 +198,11 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->positionTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_position]);
         m_ui->scaleXSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mX);
         m_ui->scaleYSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mY);
+
+        m_ui->colorSpinBoxR->setValue((double)pKeyFrameData->mSpriteDescriptor.mColor.mR);
+        m_ui->colorSpinBoxG->setValue((double)pKeyFrameData->mSpriteDescriptor.mColor.mG);
+        m_ui->colorSpinBoxB->setValue((double)pKeyFrameData->mSpriteDescriptor.mColor.mB);
+
         m_ui->scaleTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_scale]);
         m_ui->rotationXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mRotation);
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
@@ -235,6 +260,11 @@ void AnimationViewer::onTweenTypeChanged(int tweenType)
 
     bool rotationTweenEnabled = (m_ui->rotationTweenTypeComboBox->currentIndex() != 0);
     m_ui->rotationXSpinBox->setEnabled(rotationTweenEnabled);
+
+    bool colorTweenEnabled = (m_ui->colorTweenTypeComboBox->currentIndex() != 0);
+    m_ui->colorSpinBoxR->setEnabled(colorTweenEnabled);
+    m_ui->colorSpinBoxG->setEnabled(colorTweenEnabled);
+    m_ui->colorSpinBoxB->setEnabled(colorTweenEnabled);
 
     mpAnimationModel->tellTimeLineToRefresh();
 }

@@ -63,6 +63,10 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mCenter.mY = 0;
     spriteDescriptor.mFrameNo = 0;
 
+    spriteDescriptor.mColor.mR = 0;
+    spriteDescriptor.mColor.mG = 0;
+    spriteDescriptor.mColor.mB = 0;
+
     spriteDescriptor.mAlpha = 1.0;
     spriteDescriptor.mPriority = 0.5;
     spriteDescriptor.mPosition.mX = 0;
@@ -147,7 +151,7 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
     painter.setCompositionMode(sCompositionMode[mSpriteDescriptor.mBlendType]);
 
     // Alpha
-    painter.setOpacity(mSpriteDescriptor.mAlpha);
+    painter.setOpacity(getAbsoluteAlpha());
 
    // Rotation & Scale & translate
     QTransform saveTransform = painter.combinedTransform();
@@ -246,6 +250,20 @@ float GLSprite::getAbsoluteAlpha() const
     return alpha;
 }
 
+// We add up color value from parent and decide final color
+GLSprite::Color GLSprite::getAbsoluteColor() const
+{
+    Color color = mSpriteDescriptor.mColor;
+
+    const GLSprite* pSprite = this;
+    while (pSprite = pSprite->getParentSprite())
+    {
+        color.mR += pSprite->mSpriteDescriptor.mColor.mR;
+        color.mG += pSprite->mSpriteDescriptor.mColor.mG;
+        color.mB += pSprite->mSpriteDescriptor.mColor.mB;
+    }
+    return color;
+}
 
 QTransform GLSprite::getTransform() const
 {

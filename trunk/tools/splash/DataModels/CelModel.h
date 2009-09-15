@@ -41,6 +41,11 @@ public slots:
     void setAlpha(double value);
     void setAlphaTweenType(int index);
 
+    void setColorR(double value);
+    void setColorG(double value);
+    void setColorB(double value);
+    void setColorTweenType(int index);
+
     void setPriority(double value);
 
 signals:
@@ -70,6 +75,11 @@ signals:
 
     void alphaChanged(double value);
     void alphaTweenTypeChanged(float index);
+
+    void colorRChanged(double value);
+    void colorGChanged(double value);
+    void colorBChanged(double value);
+    void colorTweenTypeChanged(int value);
 
     void priorityChanged(double value);
 private:
