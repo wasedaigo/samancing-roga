@@ -24,6 +24,7 @@ public:
       TweenAttribute_rotation,
       TweenAttribute_scale,
       TweenAttribute_alpha,
+      TweenAttribute_color,
 
       TweenAttribute_COUNT
     };

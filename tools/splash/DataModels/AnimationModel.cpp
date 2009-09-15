@@ -387,6 +387,7 @@ void AnimationModel::insertEmptyKeyFrame(int lineNo, int frameNo)
 
 void AnimationModel::addFrameLength(int lineNo, int frameNo, int value)
 {
+    if (lineNo >= MaxLineNo){return;}
     if (value >= 0)
     {
         int index = getPreviousKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
@@ -401,6 +402,7 @@ void AnimationModel::addFrameLength(int lineNo, int frameNo, int value)
 
 void AnimationModel::reduceFrameLength(int lineNo, int frameNo)
 {
+    if (lineNo >= MaxLineNo){return;}
     int endKeyFrameIndex = getNextKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
     
     // If it cannot reduce frame length more, return it
@@ -536,6 +538,11 @@ void AnimationModel::tweenElement(GLSprite::SpriteDescriptor& spriteDescriptor, 
         case KeyFrameData::TweenAttribute_scale:
             Tween(tweenType, startDescriptor.mScale.mX, endDescriptor.mScale.mX, spriteDescriptor.mScale.mX, frameNo, startFrameNo, endFrameNo);
             Tween(tweenType, startDescriptor.mScale.mY, endDescriptor.mScale.mY, spriteDescriptor.mScale.mY, frameNo, startFrameNo, endFrameNo);
+            break;
+        case KeyFrameData::TweenAttribute_color:
+            Tween(tweenType, startDescriptor.mColor.mR, endDescriptor.mColor.mR, spriteDescriptor.mColor.mR, frameNo, startFrameNo, endFrameNo);
+            Tween(tweenType, startDescriptor.mColor.mG, endDescriptor.mColor.mG, spriteDescriptor.mColor.mG, frameNo, startFrameNo, endFrameNo);
+            Tween(tweenType, startDescriptor.mColor.mB, endDescriptor.mColor.mB, spriteDescriptor.mColor.mB, frameNo, startFrameNo, endFrameNo);
             break;
         default:
             break;
@@ -929,14 +936,6 @@ bool AnimationModel::saveData()
                     keyframeData["center"] = centerPoint;
                 }
 
-                 if (pKeyFrameData->mSpriteDescriptor.mScale != QPoint(1, 1))
-                 {
-                    Json::Value scale;
-                    scale[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mScale.mX;
-                    scale[1] = pKeyFrameData->mSpriteDescriptor.mScale.mY;
-                    keyframeData["scale"] = scale;
-                 }
-
                  if (pKeyFrameData->mSpriteDescriptor.mPosition != QPoint(0, 0))
                  {
                     Json::Value position;
@@ -945,9 +944,26 @@ bool AnimationModel::saveData()
                     keyframeData["position"] = position;
                  }
 
+                 if (pKeyFrameData->mSpriteDescriptor.mScale != QPoint(1, 1))
+                 {
+                    Json::Value scale;
+                    scale[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mScale.mX;
+                    scale[1] = pKeyFrameData->mSpriteDescriptor.mScale.mY;
+                    keyframeData["scale"] = scale;
+                 }
+
                  if (pKeyFrameData->mSpriteDescriptor.mRotation != 0)
                  {
                     keyframeData["rotation"] = pKeyFrameData->mSpriteDescriptor.mRotation;
+                 }
+
+                 if (pKeyFrameData->mSpriteDescriptor.mColor != GLSprite::Color(0, 0, 0))
+                 {
+                    Json::Value color;
+                    color[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mColor.mR;
+                    color[1] = pKeyFrameData->mSpriteDescriptor.mColor.mG;
+                    color[2] = pKeyFrameData->mSpriteDescriptor.mColor.mB;
+                    keyframeData["color"] = color;
                  }
 
                  if (pKeyFrameData->mSpriteDescriptor.mPriority != 0.5)
@@ -1145,6 +1161,13 @@ bool AnimationModel::loadData(QString path)
                 {
                     pKeyFrameData->mSpriteDescriptor.mScale.mX = keyframe["scale"][static_cast<unsigned int>(0)].asDouble();
                     pKeyFrameData->mSpriteDescriptor.mScale.mY = keyframe["scale"][1].asDouble();
+                }
+
+                if (!keyframe["color"].isNull())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mColor.mR = keyframe["color"][static_cast<unsigned int>(0)].asDouble();
+                    pKeyFrameData->mSpriteDescriptor.mColor.mG = keyframe["color"][1].asDouble();
+                    pKeyFrameData->mSpriteDescriptor.mColor.mB = keyframe["color"][2].asDouble();
                 }
 
                 if (!keyframe["center"].isNull())

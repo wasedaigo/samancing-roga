@@ -54,6 +54,48 @@ public:
         }
     };
 
+    struct Color
+    {
+        float mR;
+        float mG;
+        float mB;
+
+        void operator=(const Color& color)
+        {
+            mR = color.mR;
+            mG = color.mG;
+            mB = color.mB;
+        }
+
+        bool operator==(const Color& color)
+        {
+            return  (mR == color.mR &&
+                    mG == color.mG &&
+                    mB == color.mB);
+        }
+
+        bool operator!=(const Color& color)
+        {
+            return  !(mR == color.mR &&
+                    mG == color.mG &&
+                    mB == color.mB);
+        }
+     
+        Color ()
+        {
+            mR = 0;
+            mG = 0;
+            mB = 0;
+        }
+        
+        Color (float r, float g, float b)
+        {
+            mR = r;
+            mG = g;
+            mB = b;
+        }
+    };
+
     struct SpriteDescriptor
     {
         QString mSourcePath;
@@ -68,6 +110,8 @@ public:
         Point2 mScale;
         Point2 mPosition;
         int mRotation;
+
+        Color mColor;
 
         float mAlpha;
         float mPriority;
@@ -93,6 +137,7 @@ public:
             mScale = spriteDescriptor.mScale;
             mPosition = spriteDescriptor.mPosition;
             mRotation = spriteDescriptor.mRotation;
+            mColor = spriteDescriptor.mColor;
         }
 
         QTransform mOptionalTransform;
@@ -136,6 +181,7 @@ public:
     const GLSprite* getParentSprite() const;
     const GLSprite* getRootSprite() const;
     float getAbsoluteAlpha() const;
+    Color getAbsoluteColor() const;
 
     QTransform getTransform() const;
     QList<KeyFrame::KeyFramePosition> getNodePath() const;

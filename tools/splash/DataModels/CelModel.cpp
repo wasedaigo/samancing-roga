@@ -34,6 +34,7 @@ SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_position], PositionTweenType, po
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_rotation], RotationTweenType, rotationTweenType, int, KeyFrameData::TweenType);
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_scale], ScaleTweenType, scaleTweenType, int, KeyFrameData::TweenType);
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, KeyFrameData::TweenType);
+SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_color], ColorTweenType, colorTweenType,  int, KeyFrameData::TweenType);
 
 SETSLOT(SpriteDescriptor.mRelativeToTarget, RelativeToTarget, relativeToTarget, bool, bool);
 SETSLOT(SpriteDescriptor.mFacingOptionType, FacingOptionType, facingOptionType, int, GLSprite::FacingOptionType);
@@ -49,6 +50,10 @@ SETSLOT(SpriteDescriptor.mRotation, Rotation, rotation, int, int);
 
 SETSLOT(SpriteDescriptor.mScale.mX, ScaleX, scaleX, double, float);
 SETSLOT(SpriteDescriptor.mScale.mY, ScaleY, scaleY, double, float);
+
+SETSLOT(SpriteDescriptor.mColor.mR, ColorR, colorR, double, float);
+SETSLOT(SpriteDescriptor.mColor.mG, ColorG, colorG, double, float);
+SETSLOT(SpriteDescriptor.mColor.mB, ColorB, colorB, double, float);
 
 SETSLOT(SpriteDescriptor.mAlpha, Alpha, alpha, double, float);
 SETSLOT(SpriteDescriptor.mPriority, Priority, priority, double, float);

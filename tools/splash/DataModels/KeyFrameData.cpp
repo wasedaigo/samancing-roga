@@ -6,7 +6,8 @@ QString KeyFrameData::tweenAttributeSting[KeyFrameData::TweenAttribute_COUNT] =
     "positionTween",
     "rotationTween",
     "scaleTween",
-    "alphaTween"
+    "alphaTween",
+    "colorTween"
 };
 
 QString KeyFrameData::tweenTypeSting[KeyFrameData::eTT_COUNT] =
