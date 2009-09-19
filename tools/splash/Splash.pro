@@ -4,10 +4,10 @@
 include(ImagePaletDialog/ImagePaletDialog.pri)
 include(DataModels/DataModels.pri)
 include(AnimationViewer/AnimationViewer.pri)
-include(Lib/jsoncpp/jsoncpp.pri)
+include(../Shared/jsoncpp/jsoncpp.pri)
 include(Widgets/QTimelineWidget/QTimelineWidget.pri)
 include(Widgets/ResourceTree/ResourceTree.pri)
-INCLUDEPATH += Widgets
+INCLUDEPATH += Widgets ../Shared
 QT += opengl
 QT += xml
 TARGET = Splash
