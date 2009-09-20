@@ -2,15 +2,15 @@
 #define RESOURCEMANAGER_H
 
 #include <QString>
+#include "json/reader.h"
 
 #define ANIMATION_FORMAT "ani"
 #define IMAGE_FORMAT "png"
 #define SOUND_FORMAT "wav"
 
-#define ROOT_RESOURCE_DIR QDir(QString("GameResource"))
-#define ANIMATION_DIR QDir(QString("GameResource/Animations"))
-#define ANIMATION_IMAGE_DIR QDir(QString("GameResource/Images"))
-#define SOUND_DIR QDir(QString("GameResource/Sounds"))
+#define ANIMATION_DIR QDir(QString("Animations"))
+#define ANIMATION_IMAGE_DIR QDir(QString("Images"))
+#define SOUND_DIR QDir(QString("Sounds"))
 
 class AnimationModel;
 class GLSprite;
@@ -31,6 +31,10 @@ public:
     static QString getResourcePath(QString path);
     static FileType getFileType(QString path);
     static void playSound(QString path);
+
+    static std::string getFileData(QString path);
+    static Json::Value loadJsonFile(QString path);
+    static void loadInitFile();
 };
 
 #endif // RESOURCEMANAGER_H

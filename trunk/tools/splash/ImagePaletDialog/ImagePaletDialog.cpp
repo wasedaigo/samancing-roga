@@ -16,10 +16,7 @@ ImagePaletDialog::ImagePaletDialog(QWidget *parent, AnimationModel* pAnimationMo
     mpAnimationImagePaletPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_ui->scrollArea->setWidget(mpAnimationImagePaletPanel);
 
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ROOT_RESOURCE_DIR.path());
-
+    QString rootPath = ResourceManager::getResourcePath("");
     QStringList stringList;
 
     mSourceFileTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
@@ -56,9 +53,8 @@ void ImagePaletDialog::onSelectionChanged(const QItemSelection& item1, const QIt
     QModelIndex index = indexes.takeFirst();
 
     QString path = mSourceFileTreeViewModel.filePath(index);
-    QString rootPath = QDir::currentPath();
+    QString rootPath = ResourceManager::getResourcePath("");
     rootPath.append("/");
-    rootPath.append(ROOT_RESOURCE_DIR.path()).append("/");
 
     // we don't want to store absolute path
     path.replace(rootPath, "", Qt::CaseInsensitive);
