@@ -4,7 +4,7 @@
 #include <QtGui/QMainWindow>
 #include "DataModels/AnimationModel.h"
 #include "QDir.h"
-#include "ImagePaletDialog/SourceFileDirModel.h"
+#include "SourceFileDirModel.h"
 
 class AnimationViewer;
 class ImagePaletDialog;

@@ -1,10 +1,12 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-07-26T15:12:22
 # -------------------------------------------------
+include(../Shared/jsoncpp/jsoncpp.pri)
+include(../Shared/misc/misc.pri)
+
 include(ImagePaletDialog/ImagePaletDialog.pri)
 include(DataModels/DataModels.pri)
 include(AnimationViewer/AnimationViewer.pri)
-include(../Shared/jsoncpp/jsoncpp.pri)
 include(Widgets/QTimelineWidget/QTimelineWidget.pri)
 include(Widgets/ResourceTree/ResourceTree.pri)
 INCLUDEPATH += Widgets ../Shared
