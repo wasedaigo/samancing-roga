@@ -81,7 +81,7 @@
             // MainSplitContainer.Panel1
             // 
             this.MainSplitContainer.Panel1.Controls.Add(this.LeftSplitContainer);
-            this.MainSplitContainer.Size = new System.Drawing.Size(792, 531);
+            this.MainSplitContainer.Size = new System.Drawing.Size(792, 525);
             this.MainSplitContainer.SplitterDistance = 300;
             this.MainSplitContainer.SplitterWidth = 3;
             this.MainSplitContainer.TabIndex = 0;
@@ -102,8 +102,8 @@
             // LeftSplitContainer.Panel2
             // 
             this.LeftSplitContainer.Panel2.Controls.Add(this.MapTreeView);
-            this.LeftSplitContainer.Size = new System.Drawing.Size(300, 531);
-            this.LeftSplitContainer.SplitterDistance = 294;
+            this.LeftSplitContainer.Size = new System.Drawing.Size(300, 525);
+            this.LeftSplitContainer.SplitterDistance = 290;
             this.LeftSplitContainer.SplitterWidth = 3;
             this.LeftSplitContainer.TabIndex = 0;
             // 
@@ -113,9 +113,9 @@
             this.TileSetPaletteToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TileSetPaletteToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.TileSetsToolStripComboBox});
-            this.TileSetPaletteToolStrip.Location = new System.Drawing.Point(0, 265);
+            this.TileSetPaletteToolStrip.Location = new System.Drawing.Point(0, 260);
             this.TileSetPaletteToolStrip.Name = "TileSetPaletteToolStrip";
-            this.TileSetPaletteToolStrip.Size = new System.Drawing.Size(296, 25);
+            this.TileSetPaletteToolStrip.Size = new System.Drawing.Size(296, 26);
             this.TileSetPaletteToolStrip.TabIndex = 1;
             // 
             // TileSetsToolStripComboBox
@@ -123,7 +123,7 @@
             this.TileSetsToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.TileSetsToolStripComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
             this.TileSetsToolStripComboBox.Name = "TileSetsToolStripComboBox";
-            this.TileSetsToolStripComboBox.Size = new System.Drawing.Size(121, 25);
+            this.TileSetsToolStripComboBox.Size = new System.Drawing.Size(121, 26);
             this.TileSetsToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.TileSetsToolStripComboBox_SelectedIndexChanged);
             // 
             // ToolStripContainer
@@ -136,7 +136,7 @@
             // ToolStripContainer.ContentPanel
             // 
             this.ToolStripContainer.ContentPanel.Controls.Add(this.MainSplitContainer);
-            this.ToolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 531);
+            this.ToolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 525);
             this.ToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ToolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.ToolStripContainer.Name = "ToolStripContainer";
@@ -175,7 +175,7 @@
             this.DatabaseToolStripButton});
             this.ToolStrip.Location = new System.Drawing.Point(0, 0);
             this.ToolStrip.Name = "ToolStrip";
-            this.ToolStrip.Size = new System.Drawing.Size(792, 35);
+            this.ToolStrip.Size = new System.Drawing.Size(792, 41);
             this.ToolStrip.Stretch = true;
             this.ToolStrip.TabIndex = 0;
             // 
@@ -184,7 +184,7 @@
             this.NewToolStripButton.Image = global::Shrimp.Properties.Resources.Document;
             this.NewToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.NewToolStripButton.Name = "NewToolStripButton";
-            this.NewToolStripButton.Size = new System.Drawing.Size(31, 32);
+            this.NewToolStripButton.Size = new System.Drawing.Size(38, 38);
             this.NewToolStripButton.Text = "New";
             this.NewToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.NewToolStripButton.Click += new System.EventHandler(this.NewToolStripButton_Click);
@@ -194,7 +194,7 @@
             this.OpenToolStripButton.Image = global::Shrimp.Properties.Resources.FolderOpen;
             this.OpenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.OpenToolStripButton.Name = "OpenToolStripButton";
-            this.OpenToolStripButton.Size = new System.Drawing.Size(35, 32);
+            this.OpenToolStripButton.Size = new System.Drawing.Size(42, 38);
             this.OpenToolStripButton.Text = "Open";
             this.OpenToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.OpenToolStripButton.Click += new System.EventHandler(this.OpenToolStripButton_Click);
@@ -204,7 +204,7 @@
             this.CloseToolStripButton.Image = global::Shrimp.Properties.Resources.Folder;
             this.CloseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.CloseToolStripButton.Name = "CloseToolStripButton";
-            this.CloseToolStripButton.Size = new System.Drawing.Size(38, 32);
+            this.CloseToolStripButton.Size = new System.Drawing.Size(43, 38);
             this.CloseToolStripButton.Text = "Close";
             this.CloseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.CloseToolStripButton.Click += new System.EventHandler(this.CloseToolStripButton_Click);
@@ -214,7 +214,7 @@
             this.SaveToolStripButton.Image = global::Shrimp.Properties.Resources.Disk;
             this.SaveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.SaveToolStripButton.Name = "SaveToolStripButton";
-            this.SaveToolStripButton.Size = new System.Drawing.Size(34, 32);
+            this.SaveToolStripButton.Size = new System.Drawing.Size(41, 38);
             this.SaveToolStripButton.Text = "Save";
             this.SaveToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.SaveToolStripButton.Click += new System.EventHandler(this.SaveToolStripButton_Click);
@@ -222,14 +222,14 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 35);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 41);
             // 
             // UndoToolStripButton
             // 
             this.UndoToolStripButton.Image = global::Shrimp.Properties.Resources.ArrowReturn180Left;
             this.UndoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.UndoToolStripButton.Name = "UndoToolStripButton";
-            this.UndoToolStripButton.Size = new System.Drawing.Size(35, 32);
+            this.UndoToolStripButton.Size = new System.Drawing.Size(42, 38);
             this.UndoToolStripButton.Text = "Undo";
             this.UndoToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.UndoToolStripButton.Click += new System.EventHandler(this.UndoToolStripButton_Click);
@@ -237,14 +237,14 @@
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 35);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 41);
             // 
             // Layer1ToolStripButton
             // 
             this.Layer1ToolStripButton.Image = global::Shrimp.Properties.Resources.Map;
             this.Layer1ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Layer1ToolStripButton.Name = "Layer1ToolStripButton";
-            this.Layer1ToolStripButton.Size = new System.Drawing.Size(47, 32);
+            this.Layer1ToolStripButton.Size = new System.Drawing.Size(56, 38);
             this.Layer1ToolStripButton.Text = "Layer 1";
             this.Layer1ToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
@@ -253,7 +253,7 @@
             this.Layer2ToolStripButton.Image = global::Shrimp.Properties.Resources.Map;
             this.Layer2ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Layer2ToolStripButton.Name = "Layer2ToolStripButton";
-            this.Layer2ToolStripButton.Size = new System.Drawing.Size(47, 32);
+            this.Layer2ToolStripButton.Size = new System.Drawing.Size(56, 38);
             this.Layer2ToolStripButton.Text = "Layer 2";
             this.Layer2ToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
@@ -262,28 +262,28 @@
             this.EventToolStripButton.Image = global::Shrimp.Properties.Resources.Balloons;
             this.EventToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.EventToolStripButton.Name = "EventToolStripButton";
-            this.EventToolStripButton.Size = new System.Drawing.Size(38, 32);
+            this.EventToolStripButton.Size = new System.Drawing.Size(45, 38);
             this.EventToolStripButton.Text = "Event";
             this.EventToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 35);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 41);
             // 
             // PenToolStripButton
             // 
             this.PenToolStripButton.Image = global::Shrimp.Properties.Resources.Pencil;
             this.PenToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.PenToolStripButton.Name = "PenToolStripButton";
-            this.PenToolStripButton.Size = new System.Drawing.Size(28, 32);
+            this.PenToolStripButton.Size = new System.Drawing.Size(33, 38);
             this.PenToolStripButton.Text = "Pen";
             this.PenToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 35);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 41);
             // 
             // Scale1ToolStripButton
             // 
@@ -291,7 +291,7 @@
             this.Scale1ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale1ToolStripButton.Image")));
             this.Scale1ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Scale1ToolStripButton.Name = "Scale1ToolStripButton";
-            this.Scale1ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale1ToolStripButton.Size = new System.Drawing.Size(31, 38);
             this.Scale1ToolStripButton.Text = "1/1";
             // 
             // Scale2ToolStripButton
@@ -300,7 +300,7 @@
             this.Scale2ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale2ToolStripButton.Image")));
             this.Scale2ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Scale2ToolStripButton.Name = "Scale2ToolStripButton";
-            this.Scale2ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale2ToolStripButton.Size = new System.Drawing.Size(31, 38);
             this.Scale2ToolStripButton.Text = "1/2";
             // 
             // Scale4ToolStripButton
@@ -309,7 +309,7 @@
             this.Scale4ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale4ToolStripButton.Image")));
             this.Scale4ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Scale4ToolStripButton.Name = "Scale4ToolStripButton";
-            this.Scale4ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale4ToolStripButton.Size = new System.Drawing.Size(31, 38);
             this.Scale4ToolStripButton.Text = "1/4";
             // 
             // Scale8ToolStripButton
@@ -318,27 +318,27 @@
             this.Scale8ToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("Scale8ToolStripButton.Image")));
             this.Scale8ToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Scale8ToolStripButton.Name = "Scale8ToolStripButton";
-            this.Scale8ToolStripButton.Size = new System.Drawing.Size(27, 32);
+            this.Scale8ToolStripButton.Size = new System.Drawing.Size(31, 38);
             this.Scale8ToolStripButton.Text = "1/8";
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 35);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 41);
             // 
             // DatabaseToolStripButton
             // 
             this.DatabaseToolStripButton.Image = global::Shrimp.Properties.Resources.Database;
             this.DatabaseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.DatabaseToolStripButton.Name = "DatabaseToolStripButton";
-            this.DatabaseToolStripButton.Size = new System.Drawing.Size(57, 32);
+            this.DatabaseToolStripButton.Size = new System.Drawing.Size(67, 38);
             this.DatabaseToolStripButton.Text = "Database";
             this.DatabaseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.DatabaseToolStripButton.Click += new System.EventHandler(this.DatabaseToolStripButton_Click);
             // 
             // OpenFileDialog
             // 
-            this.OpenFileDialog.Filter = "Project File (*.shrp)|*.shrp|All Files (*.*)|*.*";
+            this.OpenFileDialog.Filter = "Project File (*.json)|*.json|All Files (*.*)|*.*";
             // 
             // TileSetPalette
             // 
@@ -347,7 +347,7 @@
             this.TileSetPalette.AutoScroll = true;
             this.TileSetPalette.Location = new System.Drawing.Point(0, 0);
             this.TileSetPalette.Name = "TileSetPalette";
-            this.TileSetPalette.Size = new System.Drawing.Size(100, 109);
+            this.TileSetPalette.Size = new System.Drawing.Size(100, 105);
             this.TileSetPalette.TabIndex = 0;
             this.TileSetPalette.ViewModel = null;
             // 
@@ -364,7 +364,7 @@
             this.MapTreeView.Name = "MapTreeView";
             this.MapTreeView.ShowLines = false;
             this.MapTreeView.ShowRootLines = false;
-            this.MapTreeView.Size = new System.Drawing.Size(296, 230);
+            this.MapTreeView.Size = new System.Drawing.Size(296, 228);
             this.MapTreeView.TabIndex = 0;
             this.MapTreeView.ViewModel = null;
             // 

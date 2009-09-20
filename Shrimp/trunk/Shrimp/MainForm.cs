@@ -347,8 +347,7 @@ namespace Shrimp
             Debug.Assert(!this.ViewModel.IsOpened);
             if (this.OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string directoryPath = Path.GetDirectoryName(this.OpenFileDialog.FileName);
-                this.ViewModel.Open(directoryPath);
+                this.ViewModel.Open(this.OpenFileDialog.FileName);
                 Debug.Assert(this.ViewModel.IsOpened);
                 // Debug.Assert(!this.ViewModel.IsDirty);
             }

@@ -2,7 +2,7 @@
 
 namespace Shrimp
 {
-    internal interface IModelStore
+    /*internal interface IModelStore
     {
         string FilePath { get; }
         void Save(string path);
@@ -10,5 +10,5 @@ namespace Shrimp
         void Clear();
         bool IsDirty { get; }
         event EventHandler IsDirtyChanged;
-    }
+    }*/
 }

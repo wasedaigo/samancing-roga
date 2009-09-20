@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class MapCollectionStore : IModelStore
+    /*internal class MapCollectionStore : IModelStore
     {
         public MapCollectionStore(MapCollection model, string filePath)
         {
@@ -117,5 +117,5 @@ namespace Shrimp
         {
             if (this.IsDirtyChanged != null) { this.IsDirtyChanged(this, e); }
         }
-    }
+    }*/
 }

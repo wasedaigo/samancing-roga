@@ -35,6 +35,7 @@ namespace Shrimp
                     new JProperty("Id", this.Id),
                     new JProperty("Name", this.Name),
                     new JProperty("IsExpanded", this.IsExpanded),
+                    new JProperty("Map", this.Map.ToJson()),
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
@@ -296,9 +297,11 @@ namespace Shrimp
 
         private void AddNodeFromJson(Node parentNode, JObject json)
         {
+            Map map = new Map(this);
+            map.LoadJson(json["Map"]);
             Node node = new Node(json.Value<int>("Id"),
                 json.Value<string>("Name"),
-                new Map(this),
+                map,
                 json.Value<bool>("IsExpanded"));
             parentNode.Children.Add(node);
             node.Parent = parentNode;

@@ -15,21 +15,14 @@ namespace Shrimp
     {
         public ViewModel()
         {
-            this.ProjectStore =
-                new SingleModelStore<Project>(new Project(), "Game.shrp");
-            this.EditorStateStore =
-                new SingleModelStore<EditorState>(new EditorState(this), "EditorState.json");
-            this.MapCollectionStore =
-                new MapCollectionStore(new MapCollection(this), "Data/MapCollection.json");
-            this.TileSetCollectionStore =
-                new SingleModelStore<TileSetCollection>(new TileSetCollection(this), "Data/TileSetCollection.json");
+            this.Project = new Project();
+            this.EditorState = new EditorState(this);
+            this.MapCollection = new MapCollection(this);
+            this.TileSetCollection = new TileSetCollection(this);
 
-            foreach (IModelStore modelStore in this.ModelStores)
+            foreach (IModel modelStore in this.Models)
             {
-                modelStore.IsDirtyChanged += delegate
-                {
-                    this.OnIsDirtyChanged(EventArgs.Empty);
-                };
+                modelStore.Updated += delegate { this.IsDirty = true; };
             }
             this.EditorState.IsUndoableChanged += delegate
             {
@@ -37,38 +30,22 @@ namespace Shrimp
             };
         }
 
-        public Project Project
-        {
-            get { return this.ProjectStore.Model; }
-        }
-        private SingleModelStore<Project> ProjectStore;
+        public Project Project { get; private set; }
 
-        public EditorState EditorState
-        {
-            get { return this.EditorStateStore.Model; }
-        }
-        private SingleModelStore<EditorState> EditorStateStore;
+        public EditorState EditorState{get; private set;}
 
-        public MapCollection MapCollection
-        {
-            get { return this.MapCollectionStore.MapCollection; }
-        }
-        private MapCollectionStore MapCollectionStore;
+        public MapCollection MapCollection { get; private set; }
 
-        public TileSetCollection TileSetCollection
-        {
-            get { return this.TileSetCollectionStore.Model; }
-        }
-        private SingleModelStore<TileSetCollection> TileSetCollectionStore;
+        public TileSetCollection TileSetCollection { get; private set; }
 
-        private IEnumerable<IModelStore> ModelStores
+        private IEnumerable<IModel> Models
         {
             get
             {
-                yield return this.ProjectStore;
-                yield return this.EditorStateStore;
-                yield return this.MapCollectionStore;
-                yield return this.TileSetCollectionStore;
+                yield return this.Project;
+                yield return this.EditorState;
+                yield return this.MapCollection;
+                yield return this.TileSetCollection;
             }
         }
 
@@ -76,9 +53,9 @@ namespace Shrimp
 
         public void New(string directoryPath, string gameTitle)
         {
-            foreach (IModelStore modelStore in this.ModelStores)
+            foreach (IModel model in this.Models)
             {
-                modelStore.Clear();
+                model.Clear();
             }
             this.DirectoryPath = directoryPath;
             Util.CopyDirectory(ProjectTemplatePath, this.DirectoryPath);
@@ -87,6 +64,8 @@ namespace Shrimp
             this.Save();
             this.IsOpened = true;
         }
+
+        private static readonly Encoding UTF8 = new UTF8Encoding(false);
 
         private static string ProjectTemplatePath
         {
@@ -97,33 +76,43 @@ namespace Shrimp
             }
         }
 
-        public void Open(string directoryPath)
+        public void Open(string projectFilePath)
         {
-            this.DirectoryPath = directoryPath;
-            foreach (IModelStore modelStore in this.ModelStores)
+            this.DirectoryPath = Path.GetDirectoryName(projectFilePath);
+            string path = projectFilePath;
+            using (var sr = new StreamReader(path, UTF8))
+            using (var reader = new JsonTextReader(sr))
             {
-                modelStore.Load(this.DirectoryPath);
+                this.LoadJson(JToken.ReadFrom(reader));
             }
+            this.IsDirty = false;
             this.TileSetCollection.AddItemsFromImageFiles();
             this.IsOpened = true;
+            this.IsDirty = false;
         }
 
         public void Close()
         {
-            foreach (IModelStore modelStore in this.ModelStores)
+            foreach (IModel model in this.Models)
             {
-                modelStore.Clear();
+                model.Clear();
             }
+            this.DirectoryPath = null;
             this.IsOpened = false;
+            this.IsDirty = false;
         }
 
         public void Save()
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
-            foreach (IModelStore modelStore in this.ModelStores)
+            string path = Path.Combine(this.DirectoryPath, "Project.json");
+            using (var sw = new StreamWriter(path, false, UTF8))
+            using (var writer = new JsonTextWriter(sw))
             {
-                modelStore.Save(this.DirectoryPath);
+                writer.Formatting = Formatting.Indented;
+                this.ToJson().WriteTo(writer);
             }
+            this.IsDirty = false;
         }
 
         public void Undo()
@@ -153,11 +142,17 @@ namespace Shrimp
 
         public bool IsDirty
         {
-            get
+            get { return this.isDirty; }
+            set
             {
-                return this.ModelStores.Any(m => m.IsDirty);
+                if (this.isDirty != value)
+                {
+                    this.isDirty = value;
+                    this.OnIsDirtyChanged(EventArgs.Empty);
+                }
             }
         }
+        private bool isDirty = false;
         public event EventHandler IsDirtyChanged;
         protected virtual void OnIsDirtyChanged(EventArgs e)
         {
@@ -181,6 +176,40 @@ namespace Shrimp
         {
             string tilesBitmapPath = Path.Combine(this.DirectoryPath, "Graphics/Tiles.png");
             return Bitmap.FromFile(tilesBitmapPath) as Bitmap;
+        }
+
+        private JToken ToJson()
+        {
+            return new JObject(
+                new JProperty("Project", this.Project.ToJson()),
+                new JProperty("EditorState", this.EditorState.ToJson()),
+                new JProperty("MapCollection", this.MapCollection.ToJson()),
+                new JProperty("TileSetCollection", this.TileSetCollection.ToJson()));
+        }
+
+        private void LoadJson(JToken json)
+        {
+            foreach (IModel model in this.Models)
+            {
+                model.Clear();
+            }
+            JToken token;
+            if ((token = json["Project"]) != null)
+            {
+                this.Project.LoadJson(token);
+            }
+            if ((token = json["EditorState"]) != null)
+            {
+                this.EditorState.LoadJson(token);
+            }
+            if ((token = json["MapCollection"]) != null)
+            {
+                this.MapCollection.LoadJson(token);
+            }
+            if ((token = json["TileSetCollection"]) != null)
+            {
+                this.TileSetCollection.LoadJson(token);
+            }
         }
     }
 }

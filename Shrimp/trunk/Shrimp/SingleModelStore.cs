@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class SingleModelStore<T> : IModelStore where T : class, IModel
+    /*internal class SingleModelStore<T> : IModelStore where T : class, IModel
     {
         private static readonly Encoding UTF8 = new UTF8Encoding(false);
 
@@ -95,5 +95,5 @@ namespace Shrimp
             this.Model.Clear();
             this.IsDirty = false;
         }
-    }
+    }*/
 }
