@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 
-#include "ImagePaletDialog/SourceFileDirModel.h"
+#include "SourceFileDirModel.h"
 namespace Ui {
     class ImagePaletDialog;
 }

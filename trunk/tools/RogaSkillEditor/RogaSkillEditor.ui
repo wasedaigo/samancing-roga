@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>901</width>
-    <height>708</height>
+    <width>928</width>
+    <height>715</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,14 +16,71 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QListWidget" name="listWidget">
-      <property name="maximumSize">
-       <size>
-        <width>200</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QListWidget" name="skillListWidget">
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="addSkillButton">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeSkillButton">
+          <property name="minimumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -37,7 +94,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit">
+         <widget class="QLineEdit" name="nameEdit">
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -54,7 +111,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_2"/>
+         <widget class="QLineEdit" name="IDEdit"/>
         </item>
        </layout>
       </item>
@@ -68,7 +125,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QTextEdit" name="textEdit">
+         <widget class="QTextEdit" name="descEdit">
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -82,10 +139,10 @@
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="1" column="2">
-         <widget class="QLineEdit" name="lineEdit_3"/>
+         <widget class="QLineEdit" name="skillAnimationEdit"/>
         </item>
         <item row="2" column="2">
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="castingAnimationEdit"/>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_5">
@@ -102,7 +159,7 @@
          </widget>
         </item>
         <item row="3" column="2">
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QComboBox" name="multiTargetCombox">
           <item>
            <property name="text">
             <string>Aim Target</string>
@@ -132,7 +189,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="6">
+        <item row="1" column="5">
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -144,20 +201,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item row="3" column="3">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Delay</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="spinBox_3"/>
-          </item>
-         </layout>
         </item>
         <item row="5" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -191,11 +234,9 @@
         <attribute name="horizontalHeaderDefaultSectionSize">
          <number>80</number>
         </attribute>
-        <column>
-         <property name="text">
-          <string>ID</string>
-         </property>
-        </column>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>14</number>
+        </attribute>
         <column>
          <property name="text">
           <string>Min</string>
@@ -234,6 +275,59 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QPushButton" name="addSkillDataButton">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeSkillDataButton">
+          <property name="minimumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QGroupBox" name="horizontalGroupBox_5">
         <property name="title">
          <string>Targets</string>
@@ -244,7 +338,7 @@
            <item>
             <widget class="QLabel" name="label_13">
              <property name="text">
-              <string>Group type</string>
+              <string>Target Group Number</string>
              </property>
             </widget>
            </item>
@@ -273,7 +367,7 @@
             <bool>true</bool>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <property name="usesScrollButtons">
             <bool>false</bool>
@@ -311,7 +405,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QComboBox" name="comboBox_4">
+                <widget class="QComboBox" name="OneSelectionTypeComboBox">
                  <item>
                   <property name="text">
                    <string>Single</string>
@@ -346,35 +440,35 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_6">
                 <item row="0" column="0">
-                 <widget class="QCheckBox" name="checkBox_2">
+                 <widget class="QCheckBox" name="OneSelfCheckBox">
                   <property name="text">
                    <string>Self</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QCheckBox" name="checkBox_3">
+                 <widget class="QCheckBox" name="OneAllyCheckBox">
                   <property name="text">
                    <string>Ally</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QCheckBox" name="checkBox_4">
+                 <widget class="QCheckBox" name="OneOpponentCheckBox">
                   <property name="text">
                    <string>Opponent</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
-                 <widget class="QCheckBox" name="checkBox_6">
+                 <widget class="QCheckBox" name="OneAliveCheckBox">
                   <property name="text">
                    <string>Alive</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QCheckBox" name="checkBox_5">
+                 <widget class="QCheckBox" name="OneDeadCheckBox">
                   <property name="text">
                    <string>Dead</string>
                   </property>
@@ -412,7 +506,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QComboBox" name="comboBox_5">
+                <widget class="QComboBox" name="TwoSelectionTypeComboBox">
                  <item>
                   <property name="text">
                    <string>Single</string>
@@ -444,35 +538,35 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_14">
                 <item row="0" column="0">
-                 <widget class="QCheckBox" name="checkBox_37">
+                 <widget class="QCheckBox" name="TwoSelfCheckBox">
                   <property name="text">
                    <string>Self</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
-                 <widget class="QCheckBox" name="checkBox_38">
+                 <widget class="QCheckBox" name="TwoAliveCheckBox">
                   <property name="text">
                    <string>Alive</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QCheckBox" name="checkBox_39">
+                 <widget class="QCheckBox" name="TwoOpponentCheckBox">
                   <property name="text">
                    <string>Opponent</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QCheckBox" name="checkBox_40">
+                 <widget class="QCheckBox" name="TwoAllyCheckBox">
                   <property name="text">
                    <string>Ally</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QCheckBox" name="checkBox_41">
+                 <widget class="QCheckBox" name="TwoDeadCheckBox">
                   <property name="text">
                    <string>Dead</string>
                   </property>
@@ -483,6 +577,23 @@
              </item>
             </layout>
            </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="saveButton">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Save</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -505,17 +616,29 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>901</width>
-     <height>22</height>
+     <width>928</width>
+     <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuDamage_Editor">
+    <property name="title">
+     <string>Option</string>
+    </property>
+    <addaction name="actionDamage_Editor"/>
+   </widget>
+   <addaction name="menuDamage_Editor"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionDamage_Editor">
+   <property name="text">
+    <string>Damage Editor</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
