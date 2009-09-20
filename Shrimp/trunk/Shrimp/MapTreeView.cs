@@ -76,8 +76,9 @@ namespace Shrimp
                     {
                         if (dialog.ShowDialog() == DialogResult.OK)
                         {
-                            newId = this.MapCollection.Add(selectedNodeId, dialog.MapName);
+                            newId = this.MapCollection.Add(selectedNodeId);
                             Map map = this.MapCollection.GetMap(newId);
+                            map.Name = dialog.MapName;
                             map.Width = dialog.MapWidth;
                             map.Height = dialog.MapHeight;
                         }
@@ -149,7 +150,6 @@ namespace Shrimp
                         this.viewModel.MapCollection.NodeAdded -= this.Tree_NodeAdded;
                         this.viewModel.MapCollection.NodeRemoved -= this.Tree_NodeRemoved;
                         this.viewModel.MapCollection.NodeMoved -= this.Tree_NodeMoved;
-                        this.viewModel.MapCollection.NodeNameChanged -= this.Tree_NodeNameChanged;
                     }
                     this.viewModel = value;
                     if (this.viewModel != null)
@@ -158,7 +158,6 @@ namespace Shrimp
                         this.viewModel.MapCollection.NodeAdded += this.Tree_NodeAdded;
                         this.viewModel.MapCollection.NodeRemoved += this.Tree_NodeRemoved;
                         this.viewModel.MapCollection.NodeMoved += this.Tree_NodeMoved;
-                        this.viewModel.MapCollection.NodeNameChanged += this.Tree_NodeNameChanged;
                     }
                     this.Initialize();
                 }
@@ -226,6 +225,11 @@ namespace Shrimp
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
             node.ImageKey = "Document";
             node.Tag = id;
+            Map map;
+            if (this.MapCollection.TryGetMap(id, out map))
+            {
+                map.Updated += Map_Updated;
+            }
             parentNodes.Add(node);
             foreach (int childId in this.MapCollection.GetChildren(id))
             {
@@ -243,6 +247,11 @@ namespace Shrimp
             TreeNode node = new TreeNode(this.MapCollection.GetName(id));
             node.ImageKey = "Document";
             node.Tag = id;
+            Map map;
+            if (this.MapCollection.TryGetMap(id, out map))
+            {
+                map.Updated += Map_Updated;
+            }
             int parentId = this.MapCollection.GetParent(id);
             TreeNode parentNode = this.AllNodes.First(n => (int)n.Tag == parentId);
             parentNode.Nodes.Add(node);
@@ -253,6 +262,8 @@ namespace Shrimp
         private void Tree_NodeRemoved(object sender, NodeEventArgs e)
         {
             int id = e.NodeId;
+            Map map = this.MapCollection.GetMap(id);
+            map.Updated -= Map_Updated;
             this.AllNodes.First(n => (int)n.Tag == id).Remove();
         }
 
@@ -267,11 +278,15 @@ namespace Shrimp
             newParentNode.Expand();
         }
 
-        private void Tree_NodeNameChanged(object sender, NodeEventArgs e)
+        private void Map_Updated(object sender, UpdatedEventArgs e)
         {
-            int id = e.NodeId;
-            string text = this.MapCollection.GetName(id);
-            this.AllNodes.First(n => (int)n.Tag == id).Text = text;
+            if (e.PropertyName == "Name")
+            {
+                Map map = (Map)sender;
+                int id = map.Id;
+                TreeNode node = this.AllNodes.First(n => (int)n.Tag == id);
+                node.Text = map.Name;
+            }
         }
 
         protected override void OnAfterExpand(TreeViewEventArgs e)

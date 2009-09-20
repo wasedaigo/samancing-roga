@@ -38,9 +38,17 @@ namespace Shrimp
 
         public string Name
         {
-            get { return this.MapCollection.GetName(this.Id); }
-            set { this.MapCollection.SetName(this.Id, value); }
+            get { return this.name; }
+            set
+            {
+                if (this.name != value)
+                {
+                    this.name = value;
+                    this.OnUpdated(new UpdatedEventArgs("Name"));
+                }
+            }
         }
+        private string name = "";
 
         public int Width
         {
@@ -246,6 +254,7 @@ namespace Shrimp
                 layerStrings.Add(Convert.ToBase64String(layerBytes));
             }
             return new JObject(
+                new JProperty("Name", this.Name),
                 new JProperty("Width", this.Width),
                 new JProperty("Height", this.Height),
                 new JProperty("Tiles",
@@ -256,6 +265,10 @@ namespace Shrimp
         {
             this.Clear();
             JToken token;
+            if ((token = json["Name"] as JValue) != null)
+            {
+                this.Name = token.Value<string>();
+            }
             if ((token = json["Width"] as JValue) != null)
             {
                 this.Width = token.Value<int>();

@@ -13,18 +13,16 @@ namespace Shrimp
     {
         private class Node
         {
-            public Node(int id, string name, Map map, bool isExpanded)
+            public Node(int id, Map map, bool isExpanded)
             {
                 this.Id = id;
-                this.Name = name;
                 this.Map = map;
                 this.IsExpanded = isExpanded;
                 this.Children = new List<Node>();
             }
 
             public int Id { get; private set; }
-            public virtual string Name { get; set; }
-            public Map Map { get; private set; }
+            public virtual Map Map { get; private set; }
             public bool IsExpanded { get; set; }
             public Node Parent { get; set; }
             public List<Node> Children { get; private set; }
@@ -33,7 +31,6 @@ namespace Shrimp
             {
                 return new JObject(
                     new JProperty("Id", this.Id),
-                    new JProperty("Name", this.Name),
                     new JProperty("IsExpanded", this.IsExpanded),
                     new JProperty("Map", this.Map.ToJson()),
                     new JProperty("Children",
@@ -43,8 +40,8 @@ namespace Shrimp
 
         private abstract class RootNode : Node
         {
-            public RootNode(int id, string name, bool isExpanded)
-                : base(id, name, null, isExpanded)
+            public RootNode(int id, bool isExpanded)
+                : base(id, null, isExpanded)
             {
             }
 
@@ -56,16 +53,24 @@ namespace Shrimp
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
+
+            public override Map Map
+            {
+                get
+                {
+                    throw new InvalidOperationException("RootNode can't have a map");
+                }
+            }
         }
 
         private class ProjectNode : RootNode
         {
-            public ProjectNode(bool isExpanded) : base(0, "Project", isExpanded) { }
+            public ProjectNode(bool isExpanded) : base(0, isExpanded) { }
         }
 
         private class TrashNode : RootNode
         {
-            public TrashNode(bool isExpanded) : base(-1, "Trash", isExpanded) { }
+            public TrashNode(bool isExpanded) : base(-1, isExpanded) { }
         }
 
         public MapCollection(ViewModel viewModel)
@@ -148,26 +153,36 @@ namespace Shrimp
             return node != null;
         }
 
-        public string GetName(int id)
-        {
-            return this.GetNode(id).Name;
-        }
-
-        public void SetName(int id, string name)
-        {
-            this.GetNode(id).Name = name;
-            this.OnNodeNameChanged(new NodeEventArgs(id));
-        }
-
         public Map GetMap(int id)
         {
             return this.GetNode(id).Map;
         }
 
+        public string GetName(int id)
+        {
+            Node node = this.GetNode(id);
+            if (node == this.ProjectNodeInstance)
+            {
+                return "Project";
+            }
+            else if (node == this.TrashNodeInstance)
+            {
+                return "Trash";
+            }
+            else
+            {
+                return node.Map.Name;
+            }
+        }
+
         public bool TryGetMap(int id, out Map map)
         {
-            Node node;
             map = null;
+            if (id == this.ProjectNodeInstance.Id || id == this.TrashNodeInstance.Id)
+            {
+                return false;
+            }
+            Node node;
             if (this.TryGetNode(id, out node))
             {
                 map = node.Map;
@@ -177,7 +192,7 @@ namespace Shrimp
 
         public int GetId(Map map)
         {
-            return this.Nodes.First(n => n.Map == map).Id;
+            return this.Nodes.Where(n => n.Parent != null).First(n => n.Map == map).Id;
         }
 
         public bool IsExpanded(int id)
@@ -205,7 +220,7 @@ namespace Shrimp
             return this.GetNode(id).Children.Select(n => n.Id).ToArray();
         }
 
-        public int Add(int parentId, string name)
+        public int Add(int parentId)
         {
             var ids = this.Nodes.Select(n => n.Id);
             if (!ids.Contains(parentId))
@@ -213,7 +228,7 @@ namespace Shrimp
                 throw new ArgumentException("Invalid id", "parentId");
             }
             int id = Util.GetNewId(this.Nodes.Select(n => n.Id));
-            Node node = new Node(id, name, new Map(this), false);
+            Node node = new Node(id, new Map(this), false);
             node.Parent = this.GetNode(parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
@@ -299,10 +314,7 @@ namespace Shrimp
         {
             Map map = new Map(this);
             map.LoadJson(json["Map"]);
-            Node node = new Node(json.Value<int>("Id"),
-                json.Value<string>("Name"),
-                map,
-                json.Value<bool>("IsExpanded"));
+            Node node = new Node(json.Value<int>("Id"), map, json.Value<bool>("IsExpanded"));
             parentNode.Children.Add(node);
             node.Parent = parentNode;
             foreach (JObject childJson in json["Children"])
@@ -335,13 +347,6 @@ namespace Shrimp
         protected virtual void OnNodeMoved(NodeEventArgs e)
         {
             if (this.NodeMoved != null) { this.NodeMoved(this, e); }
-            this.OnUpdated(new UpdatedEventArgs(null));
-        }
-
-        public event EventHandler<NodeEventArgs> NodeNameChanged;
-        protected virtual void OnNodeNameChanged(NodeEventArgs e)
-        {
-            if (this.NodeNameChanged != null) { this.NodeNameChanged(this, e); }
             this.OnUpdated(new UpdatedEventArgs(null));
         }
     }
