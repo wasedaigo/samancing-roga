@@ -45,7 +45,7 @@ QPixmap* AnimationModel::getPixmap(QString path)
     if (!sSourceImageHash.contains(path))
     {
         QString rootPath = QDir::currentPath();
-        QString fullPath = rootPath.append("/").append(ROOT_RESOURCE_DIR.path()).append("/").append(path);
+        QString fullPath = ResourceManager::getResourcePath(path);
         QFileInfo fileInfo = QFileInfo (fullPath);
 
         if (!fileInfo.isFile()) {return NULL;}

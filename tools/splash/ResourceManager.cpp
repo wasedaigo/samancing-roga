@@ -5,7 +5,11 @@
 #include <QSound>
 #include "DataModels/AnimationModel.h"
 #include "GLSprite.h"
+
+#include <QTextStream>
+
 static QHash<QString, AnimationModel*> sAnimationHash;
+static QString mResourcePath;
 
 ResourceManager::ResourceManager()
 {
@@ -46,10 +50,16 @@ void ResourceManager::clearAnimationCache()
 
 QString ResourceManager::getResourcePath(QString path)
 {
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ROOT_RESOURCE_DIR.path());
-    return rootPath.append("/").append(path);
+    QString rootPath = mResourcePath;
+
+    if (path != "")
+    {
+        return rootPath.append("/").append(path);
+    }
+    else
+    {
+        return rootPath;
+    }
 }
 
 ResourceManager::FileType ResourceManager::getFileType(QString path)
@@ -77,7 +87,7 @@ ResourceManager::FileType ResourceManager::getFileType(QString path)
 // Play sound
 void ResourceManager::playSound(QString path)
 {
-    QString rootPath = QDir::currentPath();
+    QString rootPath = mResourcePath;
     QString fullPath = rootPath.append("/").append(SOUND_DIR.path()).append("/").append(path).append(".").append(SOUND_FORMAT);
 
     QSound *sound = new QSound(fullPath);
@@ -85,4 +95,38 @@ void ResourceManager::playSound(QString path)
         sound->play();
     }
     delete sound;
+}
+
+std::string ResourceManager::getFileData(QString path)
+{
+    // Get json file data
+    QFile file(path);
+    QString fileData;
+    if ( file.open( QIODevice::ReadOnly ) ) {
+        QTextStream stream( &file );
+        while ( !stream.atEnd() ) {
+            fileData = stream.readAll();
+        }
+        file.close();
+    }
+    return fileData.toStdString();
+}
+
+Json::Value ResourceManager::loadJsonFile(QString path)
+{
+    std::string inputJson = getFileData(path);
+
+    Json::Reader reader;
+    Json::Value root;
+    if(!reader.parse(inputJson, root))
+    {
+        printf("json parse error");
+    }
+    return root;
+}
+
+void ResourceManager::loadInitFile()
+{
+    Json::Value root = loadJsonFile(QDir::currentPath().append("/").append("init.json"));
+    mResourcePath = QString::fromStdString(root["resourcePath"].asString());
 }

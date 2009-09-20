@@ -53,9 +53,7 @@ void MainWindow::setupUIModels()
     mAnimationTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
     mAnimationTreeViewModel.setReadOnly(true);
 
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ANIMATION_DIR.path());
+    QString rootPath = ResourceManager::getResourcePath(ANIMATION_DIR.path());
 
     ui->animationTreeView->setAutoScroll(true);
     ui->animationTreeView->setModel(&mAnimationTreeViewModel);
@@ -91,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow)
 {
+    ResourceManager::loadInitFile();
     loadConfigFile();
     setupModels();
     setupUI();
