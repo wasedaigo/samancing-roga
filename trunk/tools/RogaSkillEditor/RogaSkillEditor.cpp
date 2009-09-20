@@ -7,11 +7,12 @@
 
 #define SKILL_FORMAT ".skl"
 
-static QString damageFields[] = {"min", "max", "random", "hit", "critical", "attr", "damagedef"};
+#define DAMAGE_FIELD_COUNT 7
+static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "random", "hit", "critical", "attr", "damagedef"};
 static int getIndexOfDamageField(QString key)
 {
     int num = 0;
-    for (int i = 0; i < damageFields[0].count(); i++)
+    for (int i = 0; i < DAMAGE_FIELD_COUNT; i++)
     {
         if (key == damageFields[i])
         {
@@ -23,11 +24,12 @@ static int getIndexOfDamageField(QString key)
     return num;
 }
 
-static QString targetSelectionType[] = {"single", "side", "all", "field"};
+#define TARGET_SELECTION_TYPE_COUNT 4
+static QString targetSelectionType[TARGET_SELECTION_TYPE_COUNT] = {"single", "side", "all", "field"};
 static int getIndexOfTargetSelectionType(QString key)
 {
     int num = 0;
-    for (int i = 0; i < targetSelectionType[0].count(); i++)
+    for (int i = 0; i < TARGET_SELECTION_TYPE_COUNT; i++)
     {
         if (key == targetSelectionType[i])
         {
@@ -460,7 +462,9 @@ void RogaSkillEditor::loadSkillData()
                 {
                     QString key = QString::fromStdString(iter.key().asString());
                     int index = getIndexOfDamageField(key);
-                    m_ui->tableWidget->setItem(index, m_ui->tableWidget->rowCount() - 1, new QTableWidgetItem(key));
+                    std::string str = ((Json::Value)(*iter)).asString();
+                    QString data = QString::fromStdString(str);
+                    m_ui->tableWidget->setItem(m_ui->tableWidget->rowCount() - 1, index, new QTableWidgetItem(data));
                 }
             }
         }
