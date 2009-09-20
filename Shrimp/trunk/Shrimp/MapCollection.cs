@@ -36,13 +36,22 @@ namespace Shrimp
                     new JProperty("Children",
                         new JArray(this.Children.Select(n => n.ToJson()))));
             }
+
+            public virtual string Name
+            {
+                get
+                {
+                    return this.Map.Name;
+                }
+            }
         }
 
         private abstract class RootNode : Node
         {
-            public RootNode(int id, bool isExpanded)
+            public RootNode(int id, string name, bool isExpanded)
                 : base(id, null, isExpanded)
             {
+                this.name = name;
             }
 
             public override JToken ToJson()
@@ -61,16 +70,22 @@ namespace Shrimp
                     throw new InvalidOperationException("RootNode can't have a map");
                 }
             }
+
+            public override string Name
+            {
+                get { return this.name; }
+            }
+            private string name;
         }
 
         private class ProjectNode : RootNode
         {
-            public ProjectNode(bool isExpanded) : base(0, isExpanded) { }
+            public ProjectNode(bool isExpanded) : base(0, "Project", isExpanded) { }
         }
 
         private class TrashNode : RootNode
         {
-            public TrashNode(bool isExpanded) : base(-1, isExpanded) { }
+            public TrashNode(bool isExpanded) : base(-1, "Trash", isExpanded) { }
         }
 
         public MapCollection(ViewModel viewModel)
@@ -160,30 +175,14 @@ namespace Shrimp
 
         public string GetName(int id)
         {
-            Node node = this.GetNode(id);
-            if (node == this.ProjectNodeInstance)
-            {
-                return "Project";
-            }
-            else if (node == this.TrashNodeInstance)
-            {
-                return "Trash";
-            }
-            else
-            {
-                return node.Map.Name;
-            }
+            return this.GetNode(id).Name;
         }
 
         public bool TryGetMap(int id, out Map map)
         {
             map = null;
-            if (id == this.ProjectNodeInstance.Id || id == this.TrashNodeInstance.Id)
-            {
-                return false;
-            }
             Node node;
-            if (this.TryGetNode(id, out node))
+            if (this.TryGetNode(id, out node) && node.Parent != null)
             {
                 map = node.Map;
             }
