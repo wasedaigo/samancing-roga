@@ -50,7 +50,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../Shared/ui.qrc">
             <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
           </property>
          </widget>
@@ -73,7 +73,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../Shared/ui.qrc">
             <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
           </property>
          </widget>
@@ -297,7 +297,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../Shared/ui.qrc">
             <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
           </property>
          </widget>
@@ -320,7 +320,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../Shared/ui.qrc">
             <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
           </property>
          </widget>
@@ -591,7 +591,7 @@
             <string>Save</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../Shared/ui.qrc">
              <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
            </property>
           </widget>
@@ -617,30 +617,15 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>928</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuDamage_Editor">
-    <property name="title">
-     <string>Option</string>
-    </property>
-    <addaction name="actionDamage_Editor"/>
-   </widget>
-   <addaction name="menuDamage_Editor"/>
-  </widget>
   <action name="actionDamage_Editor">
    <property name="text">
     <string>Damage Editor</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../Shared/ui.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>AOECheckBox</sender>
