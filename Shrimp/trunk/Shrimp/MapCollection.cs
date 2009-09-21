@@ -39,10 +39,7 @@ namespace Shrimp
 
             public virtual string Name
             {
-                get
-                {
-                    return this.Map.Name;
-                }
+                get { return this.Map.Name; }
             }
         }
 

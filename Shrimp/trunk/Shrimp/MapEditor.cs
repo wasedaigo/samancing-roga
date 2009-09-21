@@ -362,11 +362,11 @@ namespace Shrimp
                     }
                     else
                     {
-                        SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                         if ((e.Button & MouseButtons.Left) != 0)
                         {
                             if (this.TempCommands != null)
                             {
+                                SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                                 int layer = 0;
                                 switch (this.EditorState.LayerMode)
                                 {
@@ -392,16 +392,13 @@ namespace Shrimp
                                 this.Update();
                             }
                         }
-                        else
+                        else if (this.EditorState.LayerMode != LayerMode.Event)
                         {
-                            if (this.EditorState.LayerMode != LayerMode.Event)
+                            if (previousFrameRect != this.FrameRect)
                             {
-                                if (previousFrameRect != this.FrameRect)
-                                {
-                                    this.Invalidate(previousFrameRect);
-                                    this.Invalidate(this.FrameRect);
-                                    this.Update();
-                                }
+                                this.Invalidate(previousFrameRect);
+                                this.Invalidate(this.FrameRect);
+                                this.Update();
                             }
                         }
                     }
