@@ -524,11 +524,6 @@ namespace Shrimp
         protected override void OnLayout(LayoutEventArgs e)
         {
             base.OnLayout(e);
-            /*if (this.EditorState != null && this.EditorState.LayerMode != LayerMode.Event)
-            {
-                this.CursorTileX = -1;
-                this.CursorTileY = -1;
-            }*/
             this.AdjustScrollBars();
             if (this.HOffscreen != IntPtr.Zero)
             {
