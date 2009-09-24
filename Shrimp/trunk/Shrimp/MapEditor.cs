@@ -265,7 +265,7 @@ namespace Shrimp
         private int RenderingTileStartX = 0;
         private int RenderingTileStartY = 0;
 
-        private List<ICommand> TempCommands;
+        private List<ICommand> TempCommands = new List<ICommand>();
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -285,7 +285,7 @@ namespace Shrimp
                 Math.Min(Math.Max(mousePosition.X / this.GridSize, 0), this.Map.Width - 1);
             this.CursorTileY =
                 Math.Min(Math.Max(mousePosition.Y / this.GridSize, 0), this.Map.Height - 1);
-            this.TempCommands = new List<ICommand>();
+            this.TempCommands.Clear();
             if (this.EditorState.LayerMode != LayerMode.Event)
             {
                 if ((e.Button & MouseButtons.Left) != 0)
@@ -333,12 +333,9 @@ namespace Shrimp
             base.OnMouseMove(e);
             if (this.EditorState.LayerMode != LayerMode.Event)
             {
-                Rectangle previousFrameRect = this.PreviousFrameRect;
                 if (this.Map != null)
                 {
                     Point offset = this.EditorState.GetMapOffset(this.Map.Id);
-                    previousFrameRect.X += -this.MapOffsetWhenFrameRectSaved.X + offset.X;
-                    previousFrameRect.Y += -this.MapOffsetWhenFrameRectSaved.Y + offset.Y;
                     Point mousePosition = new Point
                     {
                         X = e.X - offset.X,
@@ -348,23 +345,11 @@ namespace Shrimp
                         Math.Min(Math.Max(mousePosition.X / this.GridSize, 0), this.Map.Width - 1);
                     this.CursorTileY =
                         Math.Min(Math.Max(mousePosition.Y / this.GridSize, 0), this.Map.Height - 1);
-                    if (this.IsPickingTiles)
-                    {
-                        if ((e.Button & MouseButtons.Right) != 0)
-                        {
-                            if (previousFrameRect != this.FrameRect)
-                            {
-                                this.Invalidate(previousFrameRect);
-                                this.Invalidate(this.FrameRect);
-                                this.Update();
-                            }
-                        }
-                    }
-                    else
+                    if (!this.IsPickingTiles)
                     {
                         if ((e.Button & MouseButtons.Left) != 0)
                         {
-                            if (this.TempCommands != null)
+                            if (0 < this.TempCommands.Count)
                             {
                                 SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
                                 int layer = 0;
@@ -376,33 +361,21 @@ namespace Shrimp
                                 }
                                 int x = this.CursorTileX + this.CursorOffsetX;
                                 int y = this.CursorTileY + this.CursorOffsetY;
-                                if (previousFrameRect != this.FrameRect)
-                                {
-                                    this.Invalidate(previousFrameRect);
-                                }
                                 Command command = this.Map.CreateSettingTilesCommand(
                                     layer, x, y, selectedTiles,
                                     x - this.RenderingTileStartX, y - this.RenderingTileStartY);
                                 command.Do();
                                 this.TempCommands.Add(command);
-                                if (previousFrameRect != this.FrameRect)
-                                {
-                                    this.Invalidate(this.FrameRect);
-                                }
-                                this.Update();
-                            }
-                        }
-                        else if (this.EditorState.LayerMode != LayerMode.Event)
-                        {
-                            if (previousFrameRect != this.FrameRect)
-                            {
-                                this.Invalidate(previousFrameRect);
-                                this.Invalidate(this.FrameRect);
-                                this.Update();
                             }
                         }
                     }
                 }
+            }
+            if (this.PreviousFrameRect != this.FrameRect)
+            {
+                this.Invalidate(this.PreviousFrameRect);
+                this.Invalidate(this.FrameRect);
+                this.Update();
             }
             this.PreviousFrameRect = this.FrameRect;
             if (this.Map != null)
@@ -458,9 +431,9 @@ namespace Shrimp
                     }
                     this.IsPickingTiles = false;
                 }
-                if (this.TempCommands != null)
+                if (0 < this.TempCommands.Count)
                 {
-                    IEnumerable<ICommand> commands = this.TempCommands;
+                    IEnumerable<ICommand> commands = this.TempCommands.ToArray();
                     var command = new Command();
                     command.Done += delegate
                     {
@@ -476,7 +449,7 @@ namespace Shrimp
                         this.Update();
                     };
                     this.EditorState.AddCommand(command);
-                    this.TempCommands = null;
+                    this.TempCommands.Clear();
                 }
             }
         }
@@ -551,6 +524,11 @@ namespace Shrimp
         protected override void OnLayout(LayoutEventArgs e)
         {
             base.OnLayout(e);
+            /*if (this.EditorState != null && this.EditorState.LayerMode != LayerMode.Event)
+            {
+                this.CursorTileX = -1;
+                this.CursorTileY = -1;
+            }*/
             this.AdjustScrollBars();
             if (this.HOffscreen != IntPtr.Zero)
             {
