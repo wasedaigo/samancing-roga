@@ -41,6 +41,23 @@ static int getIndexOfTargetSelectionType(QString key)
     return num;
 }
 
+#define MULTI_TARGET_TYPE_COUNT 4
+static QString multiTargetType[MULTI_TARGET_TYPE_COUNT] = {"aimTarget", "aimGrid", "chain", "drain"};
+static int getIndexOfMultiTargetType(QString key)
+{
+    int num = 0;
+    for (int i = 0; i < MULTI_TARGET_TYPE_COUNT; i++)
+    {
+        if (key == multiTargetType[i])
+        {
+            num = i;
+            break;
+        }
+    }
+
+    return num;
+}
+
 RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::RogaSkillEditor),
@@ -310,7 +327,7 @@ void RogaSkillEditor::saveSkillData()
         mSkillDataRoot[skillID]["desc"] = m_ui->descEdit->toPlainText().toStdString();
         mSkillDataRoot[skillID]["castingAnimation"] = m_ui->castingAnimationEdit->text().toStdString();
         mSkillDataRoot[skillID]["skillAnimation"] = m_ui->skillAnimationEdit->text().toStdString();
-
+        mSkillDataRoot[skillID]["multiTargetType"] = multiTargetType[m_ui->multiTargetCombox->currentIndex()].toStdString();
         if(m_ui->AOECheckBox->isChecked())
         {
             mSkillDataRoot[skillID]["AOEValue"] = m_ui->AOESpinBox->value();
@@ -379,6 +396,11 @@ void RogaSkillEditor::loadSkillData()
             if(!skillData["skillAnimation"].isNull())
             {
                  m_ui->skillAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["skillAnimation"].asString()));
+            }
+
+            if(!skillData["multiTargetType"].isNull())
+            {
+                 m_ui->multiTargetCombox->setCurrentIndex(getIndexOfMultiTargetType(QString::fromStdString(mSkillDataRoot[skillID]["multiTargetType"].asString())));
             }
 
             if(!skillData["AOEValue"].isNull())
