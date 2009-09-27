@@ -837,10 +837,7 @@ void AnimationModel::tellTimeLineToRefresh()
 bool AnimationModel::saveData()
 {
     // Get path with directory info
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ANIMATION_DIR.path());
-    rootPath.append("/");
+    QString rootPath = ResourceManager::getResourcePath(ANIMATION_DIR.path());
 
     // we don't want to store absolute path
     QString saveDirName = rootPath.append(mAnimationDirectory).append("/");
@@ -1068,10 +1065,7 @@ bool AnimationModel::loadData(QString path)
     }
 
     // Get path without directory info & extension
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ANIMATION_DIR.path());
-    rootPath.append("/");
+    QString rootPath = ResourceManager::getResourcePath(ANIMATION_DIR.path());
 
     QFileInfo fileInfo = QFileInfo(path);
 
@@ -1240,7 +1234,7 @@ bool AnimationModel::loadData(QString path)
 QString AnimationModel::getLoadedAnimationPath() const
 {
     QString path = mAnimationDirectory;
-    return path.append("/Animations/").append(mAnimationID).append(".").append(ANIMATION_FORMAT);
+    return path.append("/").append(ANIMATION_DIR.path()).append("/").append(mAnimationID).append(".").append(ANIMATION_FORMAT);
 }
 
 
@@ -1270,10 +1264,7 @@ void AnimationModel::readCommand(QString command)
 void AnimationModel::createEmptyAnimation(QString path)
 {
     // Get path without directory info & extension
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ANIMATION_DIR.path());
-    rootPath.append("/");
+    QString rootPath = ResourceManager::getResourcePath(ANIMATION_DIR.path());
 
     QString dir = path;
     dir.replace(rootPath, "");
