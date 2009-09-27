@@ -104,7 +104,7 @@ namespace Shrimp
                 EditorState editorState = (EditorState)s;
                 if (e.Property == editorState.GetProperty(_ => _.MapId))
                 {
-                    this.SelectedMapIdChanged();
+                    this.MapIdChanged();
                 }
                 else if (e.Property == editorState.GetProperty(_ => _.SelectedTileSetIds))
                 {
@@ -212,7 +212,7 @@ namespace Shrimp
             this.IsDirtyChanged();
             this.IsUndoableChanged();
             this.GameTitleChanged();
-            this.SelectedMapIdChanged();
+            this.MapIdChanged();
             this.SelectedTileSetIdsChanged();
             this.LayerModeChanged();
             this.DrawingModeChanged();
@@ -244,7 +244,7 @@ namespace Shrimp
             }
         }
 
-        private void SelectedMapIdChanged()
+        private void MapIdChanged()
         {
             this.AdjustTileSetsToolStripComboBox();
             this.TileSetsToolStripComboBox.Enabled =
