@@ -108,10 +108,7 @@ namespace Shrimp
                 }
                 else if (e.Property == editorState.GetProperty(_ => _.SelectedTileSetIds))
                 {
-                    if (e.ItemId == editorState.MapId)
-                    {
-                        this.SelectedTileSetIdsChanged();
-                    }
+                    this.SelectedTileSetIdsChanged();
                 }
                 else if (e.Property == editorState.GetProperty(_ => _.LayerMode))
                 {

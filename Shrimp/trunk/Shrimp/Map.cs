@@ -191,7 +191,7 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), 0, null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), null, region));
                 }
             };
             command.Undone += delegate
@@ -217,7 +217,7 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), 0, null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), null, region));
                 }
             };
             return command;
