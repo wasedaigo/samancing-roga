@@ -22,7 +22,7 @@ namespace Shrimp
                 if (this.gameTitle != value)
                 {
                     this.gameTitle = value;
-                    this.OnUpdated(new UpdatedEventArgs("GameTitle"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.GameTitle)));
                 }
             }
         }

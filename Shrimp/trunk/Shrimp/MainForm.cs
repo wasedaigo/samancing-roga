@@ -93,21 +93,39 @@ namespace Shrimp
             };
             this.ViewModel.Project.Updated += (s, e) =>
             {
-                switch (e.PropertyName)
+                Project project = (Project)s;
+                if (e.Property == project.GetProperty(x => x.GameTitle))
                 {
-                case "GameTitle":
                     this.GameTitleChanged();
-                    break;
                 }
             };
             this.ViewModel.EditorState.Updated += (s, e) =>
             {
-                switch (e.PropertyName)
+                EditorState editorState = (EditorState)s;
+                if (e.Property == editorState.GetProperty(x => x.SelectedMapId))
                 {
-                case "SelectedMapId":
                     this.SelectedMapIdChanged();
-                    break;
-                case "SelectedTileSetIds":
+                }
+                else if (e.Property == editorState.GetProperty(x => x.SelectedTileSetId))
+                {
+                    if (e.ItemId == this.ViewModel.EditorState.SelectedMapId)
+                    {
+                        this.SelectedTileSetIdsChanged();
+                    }
+                }
+                else if (e.Property == editorState.GetProperty(x => x.LayerMode))
+                {
+                    this.LayerModeChanged();
+                }
+                else if (e.Property == editorState.GetProperty(x => x.DrawingMode))
+                {
+                    this.DrawingModeChanged();
+                }
+                else if (e.Property == editorState.GetProperty(x => x.ScaleMode))
+                {
+                    this.ScaleModeChanged();
+                }
+                /*case "SelectedTileSetIds":
                     if (e.ItemId == this.ViewModel.EditorState.SelectedMapId)
                     {
                         this.SelectedTileSetIdsChanged();
@@ -122,7 +140,7 @@ namespace Shrimp
                 case "ScaleMode":
                     this.ScaleModeChanged();
                     break;
-                }
+                }*/
             };
             this.MapTreeView.ViewModel = this.ViewModel;
             this.MapEditor.ViewModel = this.ViewModel;

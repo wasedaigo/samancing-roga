@@ -44,7 +44,7 @@ namespace Shrimp
                 if (this.name != value)
                 {
                     this.name = value;
-                    this.OnUpdated(new UpdatedEventArgs("Name"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.Name)));
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace Shrimp
                     }
                     this.width = value;
                     Debug.Assert(this.Layers.All(l => l.Count == this.Width * this.Height));
-                    this.OnUpdated(new UpdatedEventArgs("Width"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.Width)));
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace Shrimp
                     }
                     this.height = value;
                     Debug.Assert(this.Layers.All(l => l.Count == this.Width * this.Height));
-                    this.OnUpdated(new UpdatedEventArgs("Height"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.Height)));
                 }
             }
         }
@@ -191,7 +191,7 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs("Tiles", 0, null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(m => m.Tiles), 0, null, region));
                 }
             };
             command.Undone += delegate
@@ -217,10 +217,19 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs("Tiles", 0, null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(m => m.Tiles), 0, null, region));
                 }
             };
             return command;
+        }
+
+        public object Tiles
+        {
+            get
+            {
+                // TODO
+                throw new InvalidOperationException("Dummy property");
+            }
         }
 
         public override void Clear()

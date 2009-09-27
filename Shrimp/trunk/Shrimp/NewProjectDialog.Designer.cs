@@ -99,10 +99,6 @@
             this.BasePathTextBox.TabIndex = 0;
             this.BasePathTextBox.TextChanged += new System.EventHandler(this.BasePathTextBox_TextChanged);
             // 
-            // FolderBrowserDialog
-            // 
-            this.FolderBrowserDialog.ShowNewFolderButton = false;
-            // 
             // ErrorProvider
             // 
             this.ErrorProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;

@@ -70,23 +70,26 @@ namespace Shrimp
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
-            switch (e.PropertyName)
+            EditorState editorState = (EditorState)sender;
+            if (e.Property == editorState.GetProperty(x => x.SelectedMapId))
             {
-            case "SelectedMapId":
                 this.SelectedMapIdChanged();
-                break;
-            case "LayerMode":
+            }
+            else if (e.Property == editorState.GetProperty(x => x.LayerMode))
+            {
                 this.Invalidate();
                 this.UpdateOffscreen();
                 this.Update();
-                break;
-            case "ScaleMode":
+            }
+            else if (e.Property == editorState.GetProperty(x => x.ScaleMode))
+            {
                 this.AdjustScrollBars();
                 this.Invalidate();
                 this.UpdateOffscreen();
                 this.Update();               
-                break;
-            case "MapOffsets":
+            }
+            else if (e.Property == editorState.GetProperty(x => x.MapOffsets))
+            {
                 if (this.Map != null && e.ItemId == this.Map.Id)
                 {
                     this.AdjustScrollBars();
@@ -119,14 +122,14 @@ namespace Shrimp
                         NativeMethods.SW_INVALIDATE);
                     this.Update();
                 }
-                break;
-            case "SelectedTiles":
+            }
+            else if (e.Property == editorState.GetProperty(x => x.SelectedTiles))
+            {
                 if (this.EditorState.SelectedTiles.SelectedTilesType != SelectedTilesType.Picker)
                 {
                     this.CursorOffsetX = 0;
                     this.CursorOffsetY = 0;
                 }
-                break;
             }
         }
 
@@ -177,16 +180,17 @@ namespace Shrimp
 
         private void Map_Updated(object sender, UpdatedEventArgs e)
         {
-            switch (e.PropertyName)
+            Map map = (Map)sender;
+            if (e.Property == map.GetProperty(x => x.Width) ||
+                e.Property == map.GetProperty(x => x.Height))
             {
-            case "Width":
-            case "Height":
                 this.AdjustScrollBars();
                 this.Invalidate();
                 this.UpdateOffscreen();
                 this.Update();
-                break;
-            case "Tiles":
+            }
+            else if (e.Property == map.GetProperty(x => x.Tiles))
+            {
                 Rectangle updatedTilesRect = (Rectangle)e.Bounds;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                 Rectangle updatedRect = new Rectangle
@@ -199,7 +203,6 @@ namespace Shrimp
                 this.Invalidate(updatedRect);
                 this.UpdateOffscreen(updatedRect);
                 this.Update();
-                break;
             }
         }
 

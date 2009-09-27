@@ -280,9 +280,9 @@ namespace Shrimp
 
         private void Map_Updated(object sender, UpdatedEventArgs e)
         {
-            if (e.PropertyName == "Name")
+            Map map = (Map)sender;
+            if (e.Property == map.GetProperty(x => x.Name))
             {
-                Map map = (Map)sender;
                 int id = map.Id;
                 TreeNode node = this.AllNodes.First(n => (int)n.Tag == id);
                 node.Text = map.Name;

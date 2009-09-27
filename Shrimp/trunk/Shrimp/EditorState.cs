@@ -29,13 +29,19 @@ namespace Shrimp
         Scale8,
     }
 
+    internal enum TileSetMode
+    {
+        Normal,
+        Passage,
+    }
+
     internal enum SelectedTilesType
     {
         Single,
         Rectangle,
         Picker,
     }
-
+    
     internal class SelectedTiles
     {
         public static SelectedTiles Single(Tile tile)
@@ -121,7 +127,7 @@ namespace Shrimp
                 if (this.selectedMapId != value)
                 {
                     this.selectedMapId = value;
-                    this.OnUpdated(new UpdatedEventArgs("SelectedMapId"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.SelectedMapId)));
                     this.Commands.Clear();
                     this.OnIsUndoableChanged(EventArgs.Empty);
                 }
@@ -131,24 +137,33 @@ namespace Shrimp
 
         public Point GetMapOffset(int id)
         {
-            if (!this.MapOffsets.ContainsKey(id))
+            if (!this.mapOffsets.ContainsKey(id))
             {
-                this.MapOffsets.Add(id, new Point(0, 0));
+                this.mapOffsets.Add(id, new Point(0, 0));
             }
-            return this.MapOffsets[id];
+            return this.mapOffsets[id];
         }
         public void SetMapOffset(int id, Point point)
         {
-            if (this.MapOffsets[id] != point)
+            if (this.mapOffsets[id] != point)
             {
                 point.X = Math.Min(point.X, 0);
                 point.Y = Math.Min(point.Y, 0);
-                Point previousValue = this.MapOffsets[id];
-                this.MapOffsets[id] = point;
-                this.OnUpdated(new UpdatedEventArgs("MapOffsets", id, previousValue, null));
+                Point previousValue = this.mapOffsets[id];
+                this.mapOffsets[id] = point;
+                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.mapOffsets), id, previousValue, null));
             }
         }
-        private Dictionary<int, Point> MapOffsets = new Dictionary<int, Point>();
+        private Dictionary<int, Point> mapOffsets = new Dictionary<int, Point>();
+
+        public object MapOffsets
+        {
+            get
+            {
+                // TODO
+                throw new InvalidOperationException("Dummy property");
+            }
+        }
 
         public int GetSelectedTileSetId(int mapId)
         {
@@ -156,19 +171,19 @@ namespace Shrimp
             {
                 return -1;
             }
-            if (!this.SelectedTileSetIds.ContainsKey(mapId))
+            if (!this.selectedTileSetIds.ContainsKey(mapId))
             {
                 if (0 < this.ViewModel.TileSetCollection.ItemCount)
                 {
                     int minId = this.ViewModel.TileSetCollection.ItemIds.Min();
-                    this.SelectedTileSetIds.Add(mapId, minId);
+                    this.selectedTileSetIds.Add(mapId, minId);
                 }
                 else
                 {
-                    this.SelectedTileSetIds.Add(mapId, 0);
+                    this.selectedTileSetIds.Add(mapId, 0);
                 }
             }
-            return this.SelectedTileSetIds[mapId];
+            return this.selectedTileSetIds[mapId];
         }
         public void SetSelectedTileSetId(int mapId, int tileSetId)
         {
@@ -176,14 +191,23 @@ namespace Shrimp
             {
                 throw new ArgumentException("Invalid map ID", "mapId");
             }
-            if (this.SelectedTileSetIds[mapId] != tileSetId)
+            if (this.selectedTileSetIds[mapId] != tileSetId)
             {
-                int previousValue = this.SelectedTileSetIds[mapId];
-                this.SelectedTileSetIds[mapId] = tileSetId;
-                this.OnUpdated(new UpdatedEventArgs("SelectedTileSetIds", mapId, previousValue, null));
+                int previousValue = this.selectedTileSetIds[mapId];
+                this.selectedTileSetIds[mapId] = tileSetId;
+                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.SelectedTileSetIds), mapId, previousValue, null));
             }
         }
-        private Dictionary<int, int> SelectedTileSetIds = new Dictionary<int, int>();
+        private Dictionary<int, int> selectedTileSetIds = new Dictionary<int, int>();
+
+        public object SelectedTileSetIds
+        {
+            get
+            {
+                // TODO
+                throw new InvalidOperationException("Dummy property");
+            }
+        }
 
         public LayerMode LayerMode
         {
@@ -193,7 +217,7 @@ namespace Shrimp
                 if (this.layerMode != value)
                 {
                     this.layerMode = value;
-                    this.OnUpdated(new UpdatedEventArgs("LayerMode"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.LayerMode)));
                 }
             }
         }
@@ -207,7 +231,7 @@ namespace Shrimp
                 if (this.drawingMode != value)
                 {
                     this.drawingMode = value;
-                    this.OnUpdated(new UpdatedEventArgs("DrawingMode"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.DrawingMode)));
                 }
             }
         }
@@ -221,11 +245,25 @@ namespace Shrimp
                 if (this.scaleMode != value)
                 {
                     this.scaleMode = value;
-                    this.OnUpdated(new UpdatedEventArgs("ScaleMode"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.ScaleMode)));
                 }
             }
         }
         private ScaleMode scaleMode;
+
+        public TileSetMode TileSetMode
+        {
+            get { return this.tileSetMode; }
+            set
+            {
+                if (this.tileSetMode != value)
+                {
+                    this.tileSetMode = value;
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.TileSetMode)));
+                }
+            }
+        }
+        private TileSetMode tileSetMode = TileSetMode.Normal;
 
         public TileSet SelectedTileSet
         {
@@ -260,7 +298,7 @@ namespace Shrimp
                 if (this.selectedTiles != value)
                 {
                     this.selectedTiles = value;
-                    this.OnUpdated(new UpdatedEventArgs("SelectedTiles"));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.SelectedTiles)));
                 }
             }
         }
@@ -269,8 +307,8 @@ namespace Shrimp
         public override void Clear()
         {
             this.SelectedMapId = 0;
-            this.MapOffsets.Clear();
-            this.SelectedTileSetIds.Clear();
+            this.mapOffsets.Clear();
+            this.selectedTileSetIds.Clear();
             this.DrawingMode = DrawingMode.Pen;
             this.SelectedTiles = SelectedTiles.Single(new Tile
             {
@@ -313,13 +351,13 @@ namespace Shrimp
                 new JProperty("SelectedMapId", this.SelectedMapId),
                 new JProperty("MapOffsets",
                     new JArray(
-                        from p in this.MapOffsets
+                        from p in this.mapOffsets
                         select new JObject(
                             new JProperty("MapId", p.Key),
                             new JProperty("Offset", new JArray(p.Value.X, p.Value.Y))))),
                 new JProperty("SelectedTileSetIds",
                     new JArray(
-                        from p in this.SelectedTileSetIds
+                        from p in this.selectedTileSetIds
                         select new JObject(
                             new JProperty("MapId", p.Key),
                             new JProperty("TileSetId", p.Value)))),
@@ -345,7 +383,7 @@ namespace Shrimp
                         X = jOffset[0],
                         Y = jOffset[1],
                     };
-                    this.MapOffsets.Add(id, point);
+                    this.mapOffsets.Add(id, point);
                 }
             }
             if ((token = json["SelectedTileSetIds"]) != null)
@@ -354,7 +392,7 @@ namespace Shrimp
                 {
                     int mapId = j.Value<int>("MapId");
                     int tileSetId = j.Value<int>("TileSetId");
-                    this.SelectedTileSetIds[mapId] = tileSetId;
+                    this.selectedTileSetIds[mapId] = tileSetId;
                 }
             }
             if ((token = json["ScaleMode"]) != null)

@@ -18,7 +18,8 @@ namespace Shrimp
             this.InitializeComponent();
             string myDocumentPath =
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string defaultPath = Path.Combine(myDocumentPath, "ShrimpProjects");
+            //string defaultPath = Path.Combine(myDocumentPath, "ShrimpProjects");
+            string defaultPath = myDocumentPath;
             this.BasePathTextBox.Text = defaultPath;
             this.ValidateValues();
         }

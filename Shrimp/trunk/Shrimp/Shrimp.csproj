@@ -181,6 +181,7 @@
     <Content Include="Readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\traffic_light.png" />
     <None Include="Resources\arrow_return_180_left.png" />
     <None Include="Resources\balloons.png" />
     <None Include="Resources\map.png" />

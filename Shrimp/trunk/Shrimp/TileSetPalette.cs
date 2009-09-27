@@ -111,15 +111,15 @@ namespace Shrimp
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
-            switch (e.PropertyName)
+            EditorState editorState = (EditorState)sender;
+            if (e.Property == editorState.GetProperty(x => x.SelectedMapId) ||
+                e.Property == editorState.GetProperty(x => x.SelectedTileSetIds))
             {
-            case "SelectedMapId":
-            case "SelectedTileSetIds":
                 this.TileSet = this.EditorState.SelectedTileSet;
-                break;
-            case "SelectedTiles":
+            }
+            else if (e.Property == editorState.GetProperty(x => x.SelectedTiles))
+            {
                 this.Invalidate();
-                break;
             }
         }
 

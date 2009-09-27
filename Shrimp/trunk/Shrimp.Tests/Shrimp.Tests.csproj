@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MapTest.cs" />
+    <Compile Include="ModelTest.cs" />
     <Compile Include="TileTest.cs" />
   </ItemGroup>
   <ItemGroup>
