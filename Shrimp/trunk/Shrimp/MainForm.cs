@@ -94,7 +94,7 @@ namespace Shrimp
             this.ViewModel.Project.Updated += (s, e) =>
             {
                 Project project = (Project)s;
-                if (e.Property == project.GetProperty(x => x.GameTitle))
+                if (e.Property == project.GetProperty(_ => _.GameTitle))
                 {
                     this.GameTitleChanged();
                 }
@@ -102,45 +102,29 @@ namespace Shrimp
             this.ViewModel.EditorState.Updated += (s, e) =>
             {
                 EditorState editorState = (EditorState)s;
-                if (e.Property == editorState.GetProperty(x => x.SelectedMapId))
+                if (e.Property == editorState.GetProperty(_ => _.SelectedMapId))
                 {
                     this.SelectedMapIdChanged();
                 }
-                else if (e.Property == editorState.GetProperty(x => x.SelectedTileSetId))
+                else if (e.Property == editorState.GetProperty(_ => _.SelectedTileSetId))
                 {
                     if (e.ItemId == this.ViewModel.EditorState.SelectedMapId)
                     {
                         this.SelectedTileSetIdsChanged();
                     }
                 }
-                else if (e.Property == editorState.GetProperty(x => x.LayerMode))
+                else if (e.Property == editorState.GetProperty(_ => _.LayerMode))
                 {
                     this.LayerModeChanged();
                 }
-                else if (e.Property == editorState.GetProperty(x => x.DrawingMode))
+                else if (e.Property == editorState.GetProperty(_ => _.DrawingMode))
                 {
                     this.DrawingModeChanged();
                 }
-                else if (e.Property == editorState.GetProperty(x => x.ScaleMode))
+                else if (e.Property == editorState.GetProperty(_ => _.ScaleMode))
                 {
                     this.ScaleModeChanged();
                 }
-                /*case "SelectedTileSetIds":
-                    if (e.ItemId == this.ViewModel.EditorState.SelectedMapId)
-                    {
-                        this.SelectedTileSetIdsChanged();
-                    }
-                    break;
-                case "LayerMode":
-                    this.LayerModeChanged();
-                    break;
-                case "DrawingMode":
-                    this.DrawingModeChanged();
-                    break;
-                case "ScaleMode":
-                    this.ScaleModeChanged();
-                    break;
-                }*/
             };
             this.MapTreeView.ViewModel = this.ViewModel;
             this.MapEditor.ViewModel = this.ViewModel;

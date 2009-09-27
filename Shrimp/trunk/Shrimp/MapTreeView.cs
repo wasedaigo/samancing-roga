@@ -281,7 +281,7 @@ namespace Shrimp
         private void Map_Updated(object sender, UpdatedEventArgs e)
         {
             Map map = (Map)sender;
-            if (e.Property == map.GetProperty(x => x.Name))
+            if (e.Property == map.GetProperty(_ => _.Name))
             {
                 int id = map.Id;
                 TreeNode node = this.AllNodes.First(n => (int)n.Tag == id);

@@ -42,7 +42,7 @@ namespace Shrimp.Tests
         {
             FooModel model1 = new FooModel("foo1");
             FooModel model2 = new FooModel("foo2");
-            Assert.IsTrue(model1.GetProperty(x => x.Foo) == model2.GetProperty(x => x.Foo));
+            Assert.IsTrue(model1.GetProperty(_ => _.Foo) == model2.GetProperty(_ => _.Foo));
         }
     }
 }

@@ -40,9 +40,9 @@ namespace Shrimp
         public object Bounds { get; private set; }
     }
 
-    internal static class ObjectExtensions
+    internal static class IModelExtensions
     {
-        public static PropertyInfo GetProperty<T, TResult>(this T obj, Expression<Func<T, TResult>> expr)
+        public static PropertyInfo GetProperty<T, TResult>(this T obj, Expression<Func<T, TResult>> expr) where T : IModel
         {
             return (PropertyInfo)((MemberExpression)(expr.Body)).Member;
         }

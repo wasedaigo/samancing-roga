@@ -44,7 +44,7 @@ namespace Shrimp
                 if (this.name != value)
                 {
                     this.name = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.Name)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Name)));
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace Shrimp
                     }
                     this.width = value;
                     Debug.Assert(this.Layers.All(l => l.Count == this.Width * this.Height));
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.Width)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Width)));
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace Shrimp
                     }
                     this.height = value;
                     Debug.Assert(this.Layers.All(l => l.Count == this.Width * this.Height));
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.Height)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Height)));
                 }
             }
         }
@@ -191,7 +191,7 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(m => m.Tiles), 0, null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), 0, null, region));
                 }
             };
             command.Undone += delegate
@@ -217,18 +217,23 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(m => m.Tiles), 0, null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), 0, null, region));
                 }
             };
             return command;
         }
 
-        public object Tiles
+        public IEnumerable<Tile> Tiles
         {
             get
             {
-                // TODO
-                throw new InvalidOperationException("Dummy property");
+                foreach (List<Tile> layer in this.Layers)
+                {
+                    foreach (Tile tile in layer)
+                    {
+                        yield return tile;
+                    }
+                }
             }
         }
 

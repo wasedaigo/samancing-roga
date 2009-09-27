@@ -71,24 +71,24 @@ namespace Shrimp
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
             EditorState editorState = (EditorState)sender;
-            if (e.Property == editorState.GetProperty(x => x.SelectedMapId))
+            if (e.Property == editorState.GetProperty(_ => _.SelectedMapId))
             {
                 this.SelectedMapIdChanged();
             }
-            else if (e.Property == editorState.GetProperty(x => x.LayerMode))
+            else if (e.Property == editorState.GetProperty(_ => _.LayerMode))
             {
                 this.Invalidate();
                 this.UpdateOffscreen();
                 this.Update();
             }
-            else if (e.Property == editorState.GetProperty(x => x.ScaleMode))
+            else if (e.Property == editorState.GetProperty(_ => _.ScaleMode))
             {
                 this.AdjustScrollBars();
                 this.Invalidate();
                 this.UpdateOffscreen();
                 this.Update();               
             }
-            else if (e.Property == editorState.GetProperty(x => x.MapOffsets))
+            else if (e.Property == editorState.GetProperty(_ => _.MapOffsets))
             {
                 if (this.Map != null && e.ItemId == this.Map.Id)
                 {
@@ -123,7 +123,7 @@ namespace Shrimp
                     this.Update();
                 }
             }
-            else if (e.Property == editorState.GetProperty(x => x.SelectedTiles))
+            else if (e.Property == editorState.GetProperty(_ => _.SelectedTiles))
             {
                 if (this.EditorState.SelectedTiles.SelectedTilesType != SelectedTilesType.Picker)
                 {
@@ -181,15 +181,15 @@ namespace Shrimp
         private void Map_Updated(object sender, UpdatedEventArgs e)
         {
             Map map = (Map)sender;
-            if (e.Property == map.GetProperty(x => x.Width) ||
-                e.Property == map.GetProperty(x => x.Height))
+            if (e.Property == map.GetProperty(_ => _.Width) ||
+                e.Property == map.GetProperty(_ => _.Height))
             {
                 this.AdjustScrollBars();
                 this.Invalidate();
                 this.UpdateOffscreen();
                 this.Update();
             }
-            else if (e.Property == map.GetProperty(x => x.Tiles))
+            else if (e.Property == map.GetProperty(_ => _.Tiles))
             {
                 Rectangle updatedTilesRect = (Rectangle)e.Bounds;
                 Point offset = this.EditorState.GetMapOffset(this.Map.Id);

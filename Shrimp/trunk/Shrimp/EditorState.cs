@@ -127,7 +127,7 @@ namespace Shrimp
                 if (this.selectedMapId != value)
                 {
                     this.selectedMapId = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.SelectedMapId)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.SelectedMapId)));
                     this.Commands.Clear();
                     this.OnIsUndoableChanged(EventArgs.Empty);
                 }
@@ -151,7 +151,7 @@ namespace Shrimp
                 point.Y = Math.Min(point.Y, 0);
                 Point previousValue = this.mapOffsets[id];
                 this.mapOffsets[id] = point;
-                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.mapOffsets), id, previousValue, null));
+                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.MapOffsets), id, previousValue, null));
             }
         }
         private Dictionary<int, Point> mapOffsets = new Dictionary<int, Point>();
@@ -195,7 +195,7 @@ namespace Shrimp
             {
                 int previousValue = this.selectedTileSetIds[mapId];
                 this.selectedTileSetIds[mapId] = tileSetId;
-                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.SelectedTileSetIds), mapId, previousValue, null));
+                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.SelectedTileSetIds), mapId, previousValue, null));
             }
         }
         private Dictionary<int, int> selectedTileSetIds = new Dictionary<int, int>();
@@ -217,7 +217,7 @@ namespace Shrimp
                 if (this.layerMode != value)
                 {
                     this.layerMode = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.LayerMode)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.LayerMode)));
                 }
             }
         }
@@ -231,7 +231,7 @@ namespace Shrimp
                 if (this.drawingMode != value)
                 {
                     this.drawingMode = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.DrawingMode)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.DrawingMode)));
                 }
             }
         }
@@ -245,7 +245,7 @@ namespace Shrimp
                 if (this.scaleMode != value)
                 {
                     this.scaleMode = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.ScaleMode)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.ScaleMode)));
                 }
             }
         }
@@ -259,7 +259,7 @@ namespace Shrimp
                 if (this.tileSetMode != value)
                 {
                     this.tileSetMode = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.TileSetMode)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TileSetMode)));
                 }
             }
         }
@@ -298,7 +298,7 @@ namespace Shrimp
                 if (this.selectedTiles != value)
                 {
                     this.selectedTiles = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.SelectedTiles)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.SelectedTiles)));
                 }
             }
         }

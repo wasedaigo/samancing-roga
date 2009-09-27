@@ -51,7 +51,7 @@ namespace Shrimp
                     {
                         this.OriginalBitmap = null;
                     }
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.ImageFileName)));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.ImageFileName)));
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace Shrimp
             {
                 TilePassageType previousValue = this.TilePassageTypes[tile];
                 this.TilePassageTypes[tile] = tilePassageType;
-                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(x => x.TilePassageTypes), tile, previousValue, null));
+                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TilePassageTypes), tile, previousValue, null));
             }
         }
         private TilePassageType[] TilePassageTypes;
