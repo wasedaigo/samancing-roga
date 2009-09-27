@@ -331,9 +331,9 @@ namespace Shrimp
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (this.EditorState.LayerMode != LayerMode.Event)
+            if (this.Map != null)
             {
-                if (this.Map != null)
+                if (this.EditorState.LayerMode != LayerMode.Event)
                 {
                     Point offset = this.EditorState.GetMapOffset(this.Map.Id);
                     Point mousePosition = new Point

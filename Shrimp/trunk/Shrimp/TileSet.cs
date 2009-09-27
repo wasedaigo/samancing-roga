@@ -40,10 +40,12 @@ namespace Shrimp
                         bitmap.Dispose();
                     }
                     this.Bitmaps.Clear();
+                    this.TilePassageTypes = null;
                     this.imageFileName = value;
                     if (this.imageFileName != null)
                     {
                         this.OriginalBitmap = new Bitmap(this.ImageFileFullPath);
+                        this.TilePassageTypes = new TilePassageType[this.Width * this.Height];
                     }
                     else
                     {
@@ -123,6 +125,23 @@ namespace Shrimp
             }
         }
 
+        public TilePassageType GetTilePassageType(int tile)
+        {
+            return this.TilePassageTypes[tile];
+        }
+
+        public void SetTilePassageType(int tile, TilePassageType tilePassageType)
+        {
+            if (this.TilePassageTypes[tile] != tilePassageType)
+            {
+                TilePassageType previousValue = this.TilePassageTypes[tile];
+                this.TilePassageTypes[tile] = tilePassageType;
+                this.OnUpdated(new UpdatedEventArgs("TilePassageType", tile, previousValue, null));
+            }
+        }
+
+        private TilePassageType[] TilePassageTypes;
+
         public override void Clear()
         {
             this.ImageFileName = null;
@@ -131,13 +150,37 @@ namespace Shrimp
         public override JToken ToJson()
         {
             return new JObject(
-                new JProperty("ImageFileName", this.ImageFileName));
+                new JProperty("ImageFileName", this.ImageFileName),
+                new JProperty("TilePassageTypes", this.TilePassageTypes.Cast<int>().ToArray()));
         }
 
         public override void LoadJson(JToken json)
         {
             this.Clear();
-            this.ImageFileName = json.Value<string>("ImageFileName");
+            JToken token;
+            if ((token = json["ImageFileName"]) != null)
+            {
+                this.ImageFileName = token.Value<string>();
+            }
+            if (this.TilePassageTypes != null)
+            {
+                if ((token = json["TilePassageTypes"]) != null)
+                {
+                    TilePassageType[] newTilePassageTypes = token.Values<int>().Cast<TilePassageType>().ToArray();
+                    for (int i = 0; i < this.TilePassageTypes.Length; i++)
+                    {
+                        this.SetTilePassageType(i, newTilePassageTypes[i]);
+                    }
+                }
+            }
         }
+    }
+
+    internal enum TilePassageType
+    {
+        Passable,
+        Impassable,
+        Wall,
+        Ceil,
     }
 }

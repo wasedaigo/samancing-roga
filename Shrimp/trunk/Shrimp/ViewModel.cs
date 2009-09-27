@@ -106,11 +106,12 @@ namespace Shrimp
         {
             Debug.Assert(Directory.Exists(this.DirectoryPath));
             string path = Path.Combine(this.DirectoryPath, "Project.json");
+            JToken token = this.ToJson();
             using (var sw = new StreamWriter(path, false, UTF8))
             using (var writer = new JsonTextWriter(sw))
             {
                 writer.Formatting = Formatting.Indented;
-                this.ToJson().WriteTo(writer);
+                token.WriteTo(writer);
             }
             this.IsDirty = false;
         }
