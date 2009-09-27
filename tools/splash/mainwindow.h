@@ -57,7 +57,6 @@ private:
     void setupUIModels();
     void setupUI();
     void loadAnimationData(int index);
-    void loadConfigFile();
 
 
     Ui::MainWindow *ui;

@@ -8,7 +8,7 @@
 #define IMAGE_FORMAT "png"
 #define SOUND_FORMAT "wav"
 
-#define ANIMATION_DIR QDir(QString("Animations"))
+#define ANIMATION_DIR QDir(QString("GameData/Animations"))
 #define ANIMATION_IMAGE_DIR QDir(QString("Images"))
 #define SOUND_DIR QDir(QString("Sounds"))
 

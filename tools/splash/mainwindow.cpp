@@ -80,17 +80,11 @@ void MainWindow::setupUI()
     //mpResourceTree->read(rootPath);
 }
 
-void MainWindow::loadConfigFile()
-{
-
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow)
 {
     ResourceManager::loadInitFile();
-    loadConfigFile();
     setupModels();
     setupUI();
 
