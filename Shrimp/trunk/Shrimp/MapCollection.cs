@@ -62,10 +62,7 @@ namespace Shrimp
 
             public override Map Map
             {
-                get
-                {
-                    throw new InvalidOperationException("RootNode can't have a map");
-                }
+                get { return null; }
             }
 
             public override string Name

@@ -47,14 +47,10 @@ namespace Shrimp
                     this.viewModel = value;
                     if (this.viewModel != null)
                     {
-                        this.Map = this.viewModel.EditorState.SelectedMap;
                         this.viewModel.IsOpenedChanged += this.ViewModel_IsOpenedChanged;
                         this.viewModel.EditorState.Updated += this.EditorState_Updated;
                     }
-                    else
-                    {
-                        this.Map = null;
-                    }
+                    this.Map = this.viewModel.EditorState.Map;
                 }
             }
         }
@@ -62,18 +58,15 @@ namespace Shrimp
 
         private void ViewModel_IsOpenedChanged(object sender, EventArgs e)
         {
-            if (this.ViewModel.IsOpened)
-            {
-                this.SelectedMapIdChanged();
-            }
+            this.Map = this.EditorState.Map;
         }
 
         private void EditorState_Updated(object sender, UpdatedEventArgs e)
         {
             EditorState editorState = (EditorState)sender;
-            if (e.Property == editorState.GetProperty(_ => _.SelectedMapId))
+            if (e.Property == editorState.GetProperty(_ => _.MapId))
             {
-                this.SelectedMapIdChanged();
+                this.Map = editorState.Map;
             }
             else if (e.Property == editorState.GetProperty(_ => _.LayerMode))
             {
@@ -90,7 +83,8 @@ namespace Shrimp
             }
             else if (e.Property == editorState.GetProperty(_ => _.MapOffsets))
             {
-                if (this.Map != null && e.ItemId == this.Map.Id)
+                // TODO
+                if (this.Map != null)
                 {
                     this.AdjustScrollBars();
                     Point offset = this.EditorState.GetMapOffset(this.Map.Id);
@@ -171,11 +165,6 @@ namespace Shrimp
                     return null;
                 }
             }
-        }
-
-        private void SelectedMapIdChanged()
-        {
-            this.Map = this.EditorState.SelectedMap;
         }
 
         private void Map_Updated(object sender, UpdatedEventArgs e)

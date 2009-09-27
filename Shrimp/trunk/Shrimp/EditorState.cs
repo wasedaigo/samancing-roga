@@ -103,12 +103,12 @@ namespace Shrimp
 
         public ViewModel ViewModel { get; private set; }
 
-        public Map SelectedMap
+        public Map Map
         {
             get
             {
                 Map map;
-                if (this.ViewModel.MapCollection.TryGetMap(this.SelectedMapId, out map))
+                if (this.ViewModel.MapCollection.TryGetMap(this.MapId, out map))
                 {
                     return map;
                 }
@@ -119,21 +119,21 @@ namespace Shrimp
             }
         }
 
-        public int SelectedMapId
+        public int MapId
         {
-            get { return this.selectedMapId; }
+            get { return this.mapId; }
             set
             {
-                if (this.selectedMapId != value)
+                if (this.mapId != value)
                 {
-                    this.selectedMapId = value;
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.SelectedMapId)));
+                    this.mapId = value;
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.MapId)));
                     this.Commands.Clear();
                     this.OnIsUndoableChanged(EventArgs.Empty);
                 }
             }
         }
-        private int selectedMapId;
+        private int mapId;
 
         public Point GetMapOffset(int id)
         {
@@ -285,8 +285,7 @@ namespace Shrimp
         {
             get
             {
-                int mapId = this.SelectedMapId;
-                return this.GetSelectedTileSetId(mapId);
+                return this.GetSelectedTileSetId(this.MapId);
             }
         }
 
@@ -306,7 +305,7 @@ namespace Shrimp
 
         public override void Clear()
         {
-            this.SelectedMapId = 0;
+            this.MapId = 0;
             this.mapOffsets.Clear();
             this.selectedTileSetIds.Clear();
             this.DrawingMode = DrawingMode.Pen;
@@ -348,7 +347,7 @@ namespace Shrimp
         public override JToken ToJson()
         {
             return new JObject(
-                new JProperty("SelectedMapId", this.SelectedMapId),
+                new JProperty("MapId", this.MapId),
                 new JProperty("MapOffsets",
                     new JArray(
                         from p in this.mapOffsets
@@ -368,9 +367,9 @@ namespace Shrimp
         {
             this.Clear();
             JToken token;
-            if ((token = json["SelectedMapId"]) != null)
+            if ((token = json["MapId"]) != null)
             {
-                this.SelectedMapId = token.Value<int>();
+                this.MapId = token.Value<int>();
             }
             if ((token = json["MapOffsets"]) != null)
             {

@@ -102,13 +102,13 @@ namespace Shrimp
             this.ViewModel.EditorState.Updated += (s, e) =>
             {
                 EditorState editorState = (EditorState)s;
-                if (e.Property == editorState.GetProperty(_ => _.SelectedMapId))
+                if (e.Property == editorState.GetProperty(_ => _.MapId))
                 {
                     this.SelectedMapIdChanged();
                 }
-                else if (e.Property == editorState.GetProperty(_ => _.SelectedTileSetId))
+                else if (e.Property == editorState.GetProperty(_ => _.SelectedTileSetIds))
                 {
-                    if (e.ItemId == this.ViewModel.EditorState.SelectedMapId)
+                    if (e.ItemId == editorState.MapId)
                     {
                         this.SelectedTileSetIdsChanged();
                     }
@@ -251,7 +251,7 @@ namespace Shrimp
         {
             this.AdjustTileSetsToolStripComboBox();
             this.TileSetsToolStripComboBox.Enabled =
-                this.ViewModel.EditorState.SelectedMap != null;
+                this.ViewModel.EditorState.Map != null;
         }
 
         private void SelectedTileSetIdsChanged()
@@ -395,7 +395,7 @@ namespace Shrimp
         {
             Debug.Assert(this.ViewModel.IsOpened);
             Debug.Assert(this.ViewModel.IsUndoable);
-            Debug.Assert(this.ViewModel.EditorState.SelectedMap != null);
+            Debug.Assert(this.ViewModel.EditorState.Map != null);
             this.ViewModel.Undo();
             Debug.Assert(this.ViewModel.IsOpened);
         }
@@ -412,7 +412,7 @@ namespace Shrimp
             int selectedIndex = this.TileSetsToolStripComboBox.SelectedIndex;
             if (selectedIndex != -1)
             {
-                Map map = this.ViewModel.EditorState.SelectedMap;
+                Map map = this.ViewModel.EditorState.Map;
                 if (map != null)
                 {
                     int mapId = map.Id;

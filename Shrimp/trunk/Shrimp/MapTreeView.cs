@@ -212,7 +212,7 @@ namespace Shrimp
             }
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.ProjectNodeId).ImageKey = "Folder";
             this.AllNodes.First(n => (int)n.Tag == this.MapCollection.TrashNodeId).ImageKey = "Bin";
-            int selectedId = this.EditorState.SelectedMapId;
+            int selectedId = this.EditorState.MapId;
             TreeNode selectedNode = this.AllNodes.FirstOrDefault(n => (int)n.Tag == selectedId);
             if (selectedNode != null)
             {
@@ -306,7 +306,7 @@ namespace Shrimp
         protected override void OnAfterSelect(TreeViewEventArgs e)
         {
             base.OnAfterSelect(e);
-            this.EditorState.SelectedMapId = (int)this.SelectedNode.Tag;
+            this.EditorState.MapId = (int)this.SelectedNode.Tag;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
