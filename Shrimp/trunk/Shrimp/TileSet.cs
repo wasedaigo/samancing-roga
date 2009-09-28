@@ -134,9 +134,8 @@ namespace Shrimp
         {
             if (this.TilePassageTypes[tile] != tilePassageType)
             {
-                TilePassageType previousValue = this.TilePassageTypes[tile];
                 this.TilePassageTypes[tile] = tilePassageType;
-                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TilePassageTypes), previousValue, null));
+                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TilePassageTypes), null));
             }
         }
         private TilePassageType[] TilePassageTypes;

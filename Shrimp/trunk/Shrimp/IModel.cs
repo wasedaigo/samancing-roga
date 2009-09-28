@@ -22,19 +22,17 @@ namespace Shrimp
     internal class UpdatedEventArgs : EventArgs
     {
         public UpdatedEventArgs(PropertyInfo property)
-            : this(property, null, null)
+            : this(property, null)
         {
         }
 
-        public UpdatedEventArgs(PropertyInfo property, object previousValue, object bounds)
+        public UpdatedEventArgs(PropertyInfo property, object bounds)
         {
             this.Property = property;
-            this.PreviousValue = previousValue;
             this.Bounds = bounds;
         }
 
         public PropertyInfo Property { get; private set; }
-        public object PreviousValue { get; private set; }
         public object Bounds { get; private set; }
     }
 

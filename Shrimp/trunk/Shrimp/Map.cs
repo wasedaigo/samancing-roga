@@ -59,7 +59,7 @@ namespace Shrimp
                 {
                     if (value < MinWidth || MaxWidth < value)
                     {
-                        throw new ArgumentOutOfRangeException("Width");
+                        throw new ArgumentOutOfRangeException(this.GetProperty(_ => _.Width).Name);
                     }
                     if (this.width < value)
                     {
@@ -99,7 +99,7 @@ namespace Shrimp
                 {
                     if (value < MinHeight || MaxHeight < value)
                     {
-                        throw new ArgumentOutOfRangeException("Height");
+                        throw new ArgumentOutOfRangeException(this.GetProperty(_ => _.Height).Name);
                     }
                     if (this.height < value)
                     {
@@ -191,7 +191,7 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), region));
                 }
             };
             command.Undone += delegate
@@ -217,7 +217,7 @@ namespace Shrimp
                 }
                 if (isChanged)
                 {
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), null, region));
+                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.Tiles), region));
                 }
             };
             return command;
@@ -227,6 +227,7 @@ namespace Shrimp
         {
             get
             {
+                // TODO
                 foreach (List<Tile> layer in this.Layers)
                 {
                     foreach (Tile tile in layer)
