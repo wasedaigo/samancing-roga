@@ -724,6 +724,9 @@ bool AnimationModel::copyTweenedAttribute(const GLSprite* pParentGLSprite, GLSpr
         KeyFrame* pStartKeyFrame = mKeyFrames[lineNo][startIndex];
         KeyFrame* pEndKeyFrame = mKeyFrames[lineNo][endIndex];
 
+        // Let's skip empty frames
+        if (!pStartKeyFrame->mpKeyFrameData || !pStartKeyFrame->mpKeyFrameData){return false;}
+
         GLSprite::SpriteDescriptor startDescriptor = pStartKeyFrame->mpKeyFrameData->mSpriteDescriptor;
         setFinalAlpha(pParentGLSprite, startDescriptor);
         setFinalPosition(pParentGLSprite, startDescriptor);
