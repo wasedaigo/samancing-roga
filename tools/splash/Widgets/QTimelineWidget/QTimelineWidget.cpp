@@ -138,7 +138,7 @@ void QTimelineWidget::copyFrame()
     KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
     KeyFrame* pKeyFrame = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
 
-    if (pKeyFrame->mpKeyFrameData)
+    if (pKeyFrame && pKeyFrame->mpKeyFrameData)
     {
         delete mpCopyKeyFrameData;
         mpCopyKeyFrameData = new KeyFrameData(*pKeyFrame->mpKeyFrameData);
