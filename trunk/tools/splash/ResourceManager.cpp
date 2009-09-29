@@ -8,8 +8,13 @@
 
 #include <QTextStream>
 
+#include <irrKlang.h>
+using namespace irrklang;
+
 static QHash<QString, AnimationModel*> sAnimationHash;
 static QString mResourcePath;
+
+static ISoundEngine* engine = createIrrKlangDevice();
 
 ResourceManager::ResourceManager()
 {
@@ -88,13 +93,9 @@ ResourceManager::FileType ResourceManager::getFileType(QString path)
 void ResourceManager::playSound(QString path)
 {
     QString rootPath = mResourcePath;
-    QString fullPath = rootPath.append("/").append(SOUND_DIR.path()).append("/").append(path).append(".").append(SOUND_FORMAT);
+    QString fullPath = getResourcePath(SOUND_DIR.path()).append("/").append(path).append(".").append(SOUND_FORMAT);
 
-    QSound *sound = new QSound(fullPath);
-    if (sound->isAvailable()) {
-        sound->play();
-    }
-    delete sound;
+    engine->play2D(fullPath.toStdString().c_str(), false);
 }
 
 std::string ResourceManager::getFileData(QString path)
