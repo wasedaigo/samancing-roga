@@ -6,7 +6,7 @@
 
 #define ANIMATION_FORMAT "ani"
 #define IMAGE_FORMAT "png"
-#define SOUND_FORMAT "wav"
+#define SOUND_FORMAT "ogg"
 
 #define ANIMATION_DIR QDir(QString("GameData/Animations"))
 #define ANIMATION_IMAGE_DIR QDir(QString("Images"))

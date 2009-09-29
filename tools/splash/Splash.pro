@@ -3,6 +3,7 @@
 # -------------------------------------------------
 include(../Shared/jsoncpp/jsoncpp.pri)
 include(../Shared/misc/misc.pri)
+include(../Shared/irrKlang/irrKlang.pri)
 
 include(ImagePaletDialog/ImagePaletDialog.pri)
 include(DataModels/DataModels.pri)
