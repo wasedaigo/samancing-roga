@@ -15,7 +15,6 @@ public:
     const GLSprite* getSprite() const;
     bool isDone() const;
 private:
-    AnimationModel* mpAnimationModel;
     GLSprite* mpGLSprite;
     int mCounter;
 };

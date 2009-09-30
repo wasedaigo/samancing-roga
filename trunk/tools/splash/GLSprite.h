@@ -174,7 +174,7 @@ public:
     static SpriteDescriptor makeDefaultSpriteDescriptor();
     static bool priorityLessThan(const GLSprite* pItem1, const GLSprite* pItem2);
 
-    GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo);
+    GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, bool emitted);
     GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
     const AnimationModel* getParentAnimationModel() const;
@@ -184,6 +184,7 @@ public:
     Color getAbsoluteColor() const;
 
     QTransform getTransform() const;
+    bool isEmitted() const;
     QList<KeyFrame::KeyFramePosition> getNodePath() const;
 
     bool isSelectable() const;
@@ -207,5 +208,6 @@ private:
     bool mIsSelectable;
     QPixmap* mpPixmap;
     QTransform mParentTransform;
+    bool mEmitted;
 };
 #endif // GLSPRITE_H

@@ -91,7 +91,7 @@ static QPainter::CompositionMode sCompositionMode[GLSprite::eBT_COUNT] =
     QPainter::CompositionMode_SourceOver
 };
 
-GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo)
+GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, bool emitted)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(lineNo),
@@ -99,9 +99,11 @@ GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationMo
           mpParentGLSprite(pGLSprite),
           mpParentAnimationModel(pAnimationModel),
           mIsSelectable(selectable),
-          mpPixmap(NULL)
+          mpPixmap(NULL),
+          mEmitted(emitted)
 
 {
+    mEmitted = emitted;
 }
 
 //
@@ -113,7 +115,8 @@ GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationMo
           mpParentGLSprite(pGLSprite),
           mpParentAnimationModel(pAnimationModel),
           mIsSelectable(selectable),
-          mpPixmap(pPixmap)
+          mpPixmap(pPixmap),
+          mEmitted(false)
 {
 }
 
@@ -275,17 +278,29 @@ QTransform GLSprite::getCombinedTransform() const
     return getParentTransform() * getTransform();
 }
 
+bool GLSprite::isEmitted() const
+{
+    return mEmitted;
+}
+
 QList<KeyFrame::KeyFramePosition> GLSprite::getNodePath() const
 {
     QList<KeyFrame::KeyFramePosition> list;
     list.push_front(KeyFrame::KeyFramePosition(mLineNo, mFrameNo));
 
+    bool isRootEmitted = false;
     const GLSprite* pSprite = this;
     while(pSprite = pSprite->getParentSprite())
     {
+        isRootEmitted = pSprite->isEmitted();
         list.push_front(KeyFrame::KeyFramePosition(pSprite->mLineNo, pSprite->mFrameNo));
     }
 
+    // if this is an emitted animation, we don't need the root node!
+    if (isRootEmitted)
+    {
+        list.pop_front();
+    }
     return list;
 }
 

@@ -4,8 +4,7 @@
 #include <QTransform>
 
 EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite)
-        : mpAnimationModel(pAnimationModel),
-          mCounter(0)
+   :       mCounter(0)
 {
     GLSprite::SpriteDescriptor spriteDescriptor = pParentGLSprite->mSpriteDescriptor;
 
@@ -17,7 +16,7 @@ EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSpri
     spriteDescriptor.mAlpha = pParentGLSprite->getAbsoluteAlpha() * spriteDescriptor.mAlpha;
 
     spriteDescriptor.mEmitter = false;
-    mpGLSprite = new GLSprite(NULL, pAnimationModel, 0, spriteDescriptor, false, 0, 0);
+    mpGLSprite = new GLSprite(NULL, pAnimationModel, 0, spriteDescriptor, false, 0, 0, true);
 }
 
 EmittedAnimation::~EmittedAnimation()

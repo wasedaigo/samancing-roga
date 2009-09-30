@@ -24,7 +24,7 @@ AnimationModel* ResourceManager::getAnimation(QString path)
 {
     if(!sAnimationHash.contains(path))
     {
-        AnimationModel* pAnimationModel = new AnimationModel(NULL);
+        AnimationModel* pAnimationModel = new AnimationModel((QWidget*)NULL);
 
         if (pAnimationModel->loadData(ResourceManager::getResourcePath(path)))
         {
