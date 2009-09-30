@@ -482,19 +482,30 @@ void AnimationModel::setSelectedSourcePath(QString path)
 }
 
 // Tween Related Stuff
-const GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, int frameNo, int lineNo) const
+GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, int frameNo, int lineNo) const
 {
-    const GLSprite* pGLSprite = tweenFrame(parentGLSprite, lineNo, frameNo);
+    GLSprite* pGLSprite = tweenFrame(parentGLSprite, lineNo, frameNo);
     return pGLSprite;
 }
 
-const GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, QList<KeyFrame::KeyFramePosition>nodePath) const
+GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, QList<KeyFrame::KeyFramePosition>nodePath) const
 {
-    const GLSprite* pGLSprite = parentGLSprite;
+
+    GLSprite* pGLSprite = NULL;
     const AnimationModel* pAnimationModel = this;
     for (int i = 0; i < nodePath.count(); i++)
     {
         pGLSprite = pAnimationModel->createGLSpriteAt(pGLSprite, nodePath[i].mFrameNo, nodePath[i].mLineNo);
+
+        // If we have a parent, apply transformation to its children
+        if (parentGLSprite)
+        {
+            pGLSprite->mSpriteDescriptor.mOptionalTransform = parentGLSprite->mSpriteDescriptor.getTransform();
+            pGLSprite->mSpriteDescriptor.mPriority = parentGLSprite->getRootSprite()->mSpriteDescriptor.mPriority;
+            pGLSprite->mSpriteDescriptor.mAlpha *= parentGLSprite->getAbsoluteAlpha();
+            parentGLSprite = NULL;
+        }
+
         if (!pGLSprite) {return NULL;}
         if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
         {
@@ -632,10 +643,12 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
            {
                 const AnimationModel* pAnimationModel = this;
                 QList<KeyFrame::KeyFramePosition> list;
+                const GLSprite* pRootSprite = NULL;
                 if (parentGLSprite)
                 {
                     list = parentGLSprite->getNodePath();
-                    pAnimationModel = parentGLSprite->getRootSprite()->getParentAnimationModel();
+                    pRootSprite = parentGLSprite->getRootSprite();
+                    pAnimationModel = pRootSprite->getParentAnimationModel();
                 }
                 list.push_back(KeyFrame::KeyFramePosition(lineNo, frameNo));
 
@@ -644,7 +657,16 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                 {
                     list[i].mFrameNo += 1;
                 }
-                const GLSprite* pTargetSprite = pAnimationModel->createGLSpriteAt(NULL, list);
+                const GLSprite* pTargetSprite = NULL;
+                if (pRootSprite && pRootSprite->isEmitted())
+                {
+                    pTargetSprite = pAnimationModel->createGLSpriteAt(pRootSprite, list);
+                }
+                else
+                {
+                    pTargetSprite = pAnimationModel->createGLSpriteAt(NULL, list);
+                }
+
 
                 // If there is no next frame, use previous frame as target
                 bool reverse = false;
@@ -809,7 +831,7 @@ GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo,
     }
 
     bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
-    return new GLSprite(parentGLSprite, this, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo);
+    return new GLSprite(parentGLSprite, this, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, false);
 }
 
 KeyFrame::KeyFramePosition AnimationModel::getCurrentKeyFramePosition()

@@ -254,6 +254,7 @@ void AnimationImagePaletPanel::mouseReleaseEvent(QMouseEvent *event)
 
 void AnimationImagePaletPanel::resetAnimation()
 {
+    mRenderSpriteList.clear();
     mAnimationFrameNo = 0;
     for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
     {
