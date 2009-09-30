@@ -148,7 +148,7 @@ public:
             transform.rotate(mRotation);
             transform.scale(mScale.mX, mScale.mY);
 
-            return mOptionalTransform * transform;
+            return transform * mOptionalTransform;
         }
 
         bool isImage() const
