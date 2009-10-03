@@ -167,16 +167,6 @@ void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSele
             setEditEnabled(false);
         }
     }
-
-//    QString rootPath = QDir::currentPath();
-//    rootPath.append("/");
-//    rootPath.append(ANIMATION_DIR.path());
-//
-//    mpAnimationModel->loadData();
-//    // we don't want to store absolute path
-//    path.replace(rootPath, "", Qt::CaseInsensitive);
-//
-//    mpAnimationModel->setSelectedSourcePath(path);
 }
 
 void MainWindow::onAddEventButtonClicked()
