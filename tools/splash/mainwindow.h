@@ -49,6 +49,7 @@ private slots:
 
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
     void refreshEventList();
+    void setWorkingDirectory();
 
 protected:
 private:

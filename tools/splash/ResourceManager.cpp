@@ -5,7 +5,7 @@
 #include <QSound>
 #include "DataModels/AnimationModel.h"
 #include "GLSprite.h"
-
+#include "FileLoader.h"
 #include <QTextStream>
 
 #include <irrKlang.h>
@@ -98,36 +98,14 @@ void ResourceManager::playSound(QString path)
     engine->play2D(fullPath.toStdString().c_str(), false);
 }
 
-std::string ResourceManager::getFileData(QString path)
+QString ResourceManager::loadWorkingDirectory()
 {
-    // Get json file data
-    QFile file(path);
-    QString fileData;
-    if ( file.open( QIODevice::ReadOnly ) ) {
-        QTextStream stream( &file );
-        while ( !stream.atEnd() ) {
-            fileData = stream.readAll();
-        }
-        file.close();
-    }
-    return fileData.toStdString();
+    mResourcePath = FileLoader::getInitpath();
+    return mResourcePath;
 }
 
-Json::Value ResourceManager::loadJsonFile(QString path)
+void ResourceManager::setWorkingDirectory(QString newDirectory)
 {
-    std::string inputJson = getFileData(path);
-
-    Json::Reader reader;
-    Json::Value root;
-    if(!reader.parse(inputJson, root))
-    {
-        printf("json parse error");
-    }
-    return root;
-}
-
-void ResourceManager::loadInitFile()
-{
-    Json::Value root = loadJsonFile(QDir::currentPath().append("/").append("init.json"));
-    mResourcePath = QString::fromStdString(root["resourcePath"].asString());
+    mResourcePath = newDirectory;
+    FileLoader::saveInitFile(mResourcePath);
 }

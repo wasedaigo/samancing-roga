@@ -20,7 +20,7 @@
    <string>Splash</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="ui.qrc">
+   <iconset>
     <normaloff>:/resource/splash.ico</normaloff>:/resource/splash.ico</iconset>
   </property>
   <property name="locale">
@@ -73,7 +73,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="ui.qrc">
+           <iconset>
             <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
           </property>
          </widget>
@@ -87,7 +87,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="ui.qrc">
+           <iconset>
             <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
           </property>
          </widget>
@@ -104,7 +104,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="ui.qrc">
+           <iconset>
             <normaloff>:/resource/refresh.png</normaloff>:/resource/refresh.png</iconset>
           </property>
          </widget>
@@ -239,7 +239,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="ui.qrc">
+                    <iconset>
                      <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
                    </property>
                   </widget>
@@ -250,7 +250,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="ui.qrc">
+                    <iconset>
                      <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
                    </property>
                   </widget>
@@ -290,6 +290,23 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>694</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionSet_Working_Directory"/>
+   </widget>
+   <addaction name="menuSettings"/>
+  </widget>
   <action name="actionOpenFile">
    <property name="icon">
     <iconset>
@@ -308,10 +325,13 @@
     <string>NewProject</string>
    </property>
   </action>
+  <action name="actionSet_Working_Directory">
+   <property name="text">
+    <string>Set Working Directory</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="ui.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

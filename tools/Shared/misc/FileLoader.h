@@ -13,7 +13,6 @@ public:
 
     static void save(QString filePath, Json::Value root);
     static Json::Value load(QString filePath);
-    static void init();
     static QString getInitpath();
     static void saveInitFile(QString targetpath);
 };
