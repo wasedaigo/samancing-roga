@@ -4,8 +4,9 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QCloseEvent>
+#include <QFileDialog>
 
-#define SKILL_FORMAT ".skl"
+#include "FileLoader.h"
 
 #define DAMAGE_FIELD_COUNT 7
 static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "random", "hit", "critical", "attr", "damagedef"};
@@ -67,7 +68,7 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     mSkillTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
     mSkillTreeViewModel.setReadOnly(true);
 
-    loadInitFile();
+    init();
     refreshSkillList();
 
 
@@ -76,10 +77,18 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
 
     connect(m_ui->addSkillButton, SIGNAL(clicked()), this, SLOT(onAddSkillButtonClicked()));
     connect(m_ui->removeSkillButton, SIGNAL(clicked()), this, SLOT(onRemoveSkillButtonClicked()));
-    connect(m_ui->saveButton, SIGNAL(clicked()), this, SLOT(onSaveSkillButtonClicked()));
+
     connect(m_ui->addSkillDataButton, SIGNAL(clicked()), this, SLOT(onAddSkillDataButtonClicked()));
     connect(m_ui->removeSkillDataButton, SIGNAL(clicked()), this, SLOT(onRemoveSkillDataButtonClicked()));
     connect(m_ui->skillListWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(onSkillSelected(QModelIndex)));
+
+    connect(m_ui->actionNew, SIGNAL(triggered()), this, SLOT(onNewSelected()));
+    connect(m_ui->actionOpen, SIGNAL(triggered()), this, SLOT(onOpenSelected()));
+    connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveSelected()));
+    connect(m_ui->actionSave_As, SIGNAL(triggered()), this, SLOT(onSaveAsSelected()));
+
+    // setup short cuts
+    m_ui->actionSave->setShortcut(QKeySequence("Ctrl+s"));
 
     refreshTabControl();
     m_ui->skillListWidget->setCurrentRow(0);
@@ -91,51 +100,11 @@ RogaSkillEditor::~RogaSkillEditor()
     delete m_ui;
 }
 
-std::string RogaSkillEditor::getFileData(QString path)
+// First time function
+void RogaSkillEditor::init()
 {
-    // Get json file data
-    QFile file(path);
-    QString fileData;
-    if ( file.open( QIODevice::ReadOnly ) ) {
-        QTextStream stream( &file );
-        while ( !stream.atEnd() ) {
-            fileData = stream.readAll();
-        }
-        file.close();
-    }
-    return fileData.toStdString();
-}
-
-Json::Value RogaSkillEditor::loadJsonFile(QString path)
-{
-    std::string inputJson = getFileData(path);
-
-    Json::Reader reader;
-    Json::Value root;
-    if(!reader.parse(inputJson, root))
-    {
-        printf("json parse error");
-    }
-    return root;
-}
-
-void RogaSkillEditor::loadInitFile()
-{
-    Json::Value root = loadJsonFile(QDir::currentPath().append("/").append("init.json"));
-    mSkillDataPath = QString::fromStdString(root["skillResourcePath"].asString());
-    mSkillDataRoot = loadJsonFile(mSkillDataPath);
-}
-
-void RogaSkillEditor::changeEvent(QEvent *e)
-{
-    QMainWindow::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        m_ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+    QString initPath = FileLoader::getInitpath();
+    load(initPath);
 }
 
 void RogaSkillEditor::refreshSkillList()
@@ -155,13 +124,6 @@ void RogaSkillEditor::refreshSkillList()
     }
     m_ui->skillListWidget->setCurrentRow(index);
 }
-
-void RogaSkillEditor::addEmptySkillData()
-{
-    //QModelIndexList indexes = m_ui->skillListWidget->addItem();
-}
-
-
 
 void RogaSkillEditor::closeEvent(QCloseEvent *event)
 {
@@ -196,8 +158,7 @@ void RogaSkillEditor::onAddSkillButtonClicked()
         index++;
     }
     mSkillDataRoot[newID.toStdString()] = "null";
-
-    saveToFile();
+    refreshSkillList();
 }
 
 void RogaSkillEditor::onRemoveSkillButtonClicked()
@@ -240,6 +201,8 @@ void RogaSkillEditor::skillLoad(int row)
 
 void RogaSkillEditor::onSkillSelected(QModelIndex index)
 {
+    saveSkillData();
+
     QModelIndexList indexes = m_ui->skillListWidget->selectionModel()->selectedIndexes();
     if (indexes.count() > 0)
     {
@@ -248,11 +211,6 @@ void RogaSkillEditor::onSkillSelected(QModelIndex index)
 
         loadSkillData();
     }
-}
-
-void RogaSkillEditor::onSaveSkillButtonClicked()
-{
-    saveSkillData();
 }
 
 void RogaSkillEditor::clearUI()
@@ -286,21 +244,6 @@ void RogaSkillEditor::clearUI()
     m_ui->TwoAllyCheckBox->setChecked(false);
 }
 
-void RogaSkillEditor::saveToFile()
-{
-    // Save to file
-    Json::StyledWriter writer;
-    std::string outputJson = writer.write(mSkillDataRoot);
-
-    QFile file(mSkillDataPath);
-    if ( file.open( QIODevice::WriteOnly ) ) {
-        QTextStream stream( &file );
-        file.write(outputJson.c_str(), outputJson.length());
-        file.close();
-    }
-
-    refreshSkillList();
-}
 void RogaSkillEditor::saveSkillData()
 {
     // Save Data
@@ -366,8 +309,6 @@ void RogaSkillEditor::saveSkillData()
             }
         }
     }
-
-    saveToFile();
 }
 
 void RogaSkillEditor::loadSkillData()
@@ -376,119 +317,185 @@ void RogaSkillEditor::loadSkillData()
 
     m_ui->IDEdit->setText(mSelectedID);
     std::string skillID = mSelectedID.toStdString();
-    if (!mSkillDataRoot[skillID].isNull())
+    if (mSkillDataRoot.isMember(skillID))
     {
-        Json::Value& skillData = mSkillDataRoot[skillID];
-        if(skillData.isObject())
+        if (!mSkillDataRoot[skillID].isNull())
         {
-            if(!skillData["name"].isNull())
+            Json::Value& skillData = mSkillDataRoot[skillID];
+            if(skillData.isObject())
             {
-                 m_ui->nameEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["name"].asString()));
-            }
-            if(!skillData["desc"].isNull())
-            {
-                 m_ui->descEdit->setPlainText(QString::fromStdString(mSkillDataRoot[skillID]["desc"].asString()));
-            }
-            if(!skillData["castingAnimation"].isNull())
-            {
-                 m_ui->castingAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["castingAnimation"].asString()));
-            }
-            if(!skillData["skillAnimation"].isNull())
-            {
-                 m_ui->skillAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["skillAnimation"].asString()));
-            }
+                if(!skillData["name"].isNull())
+                {
+                     m_ui->nameEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["name"].asString()));
+                }
+                if(!skillData["desc"].isNull())
+                {
+                     m_ui->descEdit->setPlainText(QString::fromStdString(mSkillDataRoot[skillID]["desc"].asString()));
+                }
+                if(!skillData["castingAnimation"].isNull())
+                {
+                     m_ui->castingAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["castingAnimation"].asString()));
+                }
+                if(!skillData["skillAnimation"].isNull())
+                {
+                     m_ui->skillAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["skillAnimation"].asString()));
+                }
 
-            if(!skillData["multiTargetType"].isNull())
-            {
-                 m_ui->multiTargetCombox->setCurrentIndex(getIndexOfMultiTargetType(QString::fromStdString(mSkillDataRoot[skillID]["multiTargetType"].asString())));
-            }
+                if(!skillData["multiTargetType"].isNull())
+                {
+                     m_ui->multiTargetCombox->setCurrentIndex(getIndexOfMultiTargetType(QString::fromStdString(mSkillDataRoot[skillID]["multiTargetType"].asString())));
+                }
 
-            if(!skillData["AOEValue"].isNull())
-            {
-                m_ui->AOECheckBox->setChecked(true);
-                m_ui->AOESpinBox->setValue(mSkillDataRoot[skillID]["AOEValue"].asInt());
-            }
+                if(!skillData["AOEValue"].isNull())
+                {
+                    m_ui->AOECheckBox->setChecked(true);
+                    m_ui->AOESpinBox->setValue(mSkillDataRoot[skillID]["AOEValue"].asInt());
+                }
 
-            if(!skillData["TargetDataOne"].isNull())
-            {
-                // radio group 1
-                Json::Value targetOne = mSkillDataRoot[skillID]["TargetDataOne"];
-                if (!targetOne["targetSelectionType"].isNull())
+                if(!skillData["TargetDataOne"].isNull())
                 {
-                    m_ui->OneSelectionTypeComboBox->setCurrentIndex(getIndexOfTargetSelectionType(QString::fromStdString(targetOne["targetSelectionType"].asString())));
+                    // radio group 1
+                    Json::Value targetOne = mSkillDataRoot[skillID]["TargetDataOne"];
+                    if (!targetOne["targetSelectionType"].isNull())
+                    {
+                        m_ui->OneSelectionTypeComboBox->setCurrentIndex(getIndexOfTargetSelectionType(QString::fromStdString(targetOne["targetSelectionType"].asString())));
+                    }
+                    if (!targetOne["aliveCheck"].isNull())
+                    {
+                        m_ui->OneAliveCheckBox->setChecked(targetOne["aliveCheck"].asBool());
+                    }
+                    if (!targetOne["deadCheck"].isNull())
+                    {
+                        m_ui->OneDeadCheckBox->setChecked(targetOne["deadCheck"].asBool());
+                    }
+                    if (!targetOne["selfCheck"].isNull())
+                    {
+                        m_ui->OneSelfCheckBox->setChecked(targetOne["selfCheck"].asBool());
+                    }
+                    if (!targetOne["opponentCheck"].isNull())
+                    {
+                        m_ui->OneOpponentCheckBox->setChecked(targetOne["opponentCheck"].asBool());
+                    }
+                    if (!targetOne["allyCheck"].isNull())
+                    {
+                        m_ui->OneAllyCheckBox->setChecked(targetOne["allyCheck"].asBool());
+                    }
                 }
-                if (!targetOne["aliveCheck"].isNull())
-                {
-                    m_ui->OneAliveCheckBox->setChecked(targetOne["aliveCheck"].asBool());
-                }
-                if (!targetOne["deadCheck"].isNull())
-                {
-                    m_ui->OneDeadCheckBox->setChecked(targetOne["deadCheck"].asBool());
-                }
-                if (!targetOne["selfCheck"].isNull())
-                {
-                    m_ui->OneSelfCheckBox->setChecked(targetOne["selfCheck"].asBool());
-                }
-                if (!targetOne["opponentCheck"].isNull())
-                {
-                    m_ui->OneOpponentCheckBox->setChecked(targetOne["opponentCheck"].asBool());
-                }
-                if (!targetOne["allyCheck"].isNull())
-                {
-                    m_ui->OneAllyCheckBox->setChecked(targetOne["allyCheck"].asBool());
-                }
-            }
 
-            if(!skillData["TargetDataTwo"].isNull())
-            {
-                m_ui->radioButtonTwo->setChecked(true);
-                // radio group 2
-                Json::Value targetTwo = mSkillDataRoot[skillID]["TargetDataTwo"];
-                if (!targetTwo["targetSelectionType"].isNull())
+                if(!skillData["TargetDataTwo"].isNull())
                 {
-                    m_ui->TwoSelectionTypeComboBox->setCurrentIndex(getIndexOfTargetSelectionType(QString::fromStdString(targetTwo["targetSelectionType"].asString())));
+                    m_ui->radioButtonTwo->setChecked(true);
+                    // radio group 2
+                    Json::Value targetTwo = mSkillDataRoot[skillID]["TargetDataTwo"];
+                    if (!targetTwo["targetSelectionType"].isNull())
+                    {
+                        m_ui->TwoSelectionTypeComboBox->setCurrentIndex(getIndexOfTargetSelectionType(QString::fromStdString(targetTwo["targetSelectionType"].asString())));
+                    }
+                    if (!targetTwo["aliveCheck"].isNull())
+                    {
+                        m_ui->TwoAliveCheckBox->setChecked(targetTwo["aliveCheck"].asBool());
+                    }
+                    if (!targetTwo["deadCheck"].isNull())
+                    {
+                        m_ui->TwoDeadCheckBox->setChecked(targetTwo["deadCheck"].asBool());
+                    }
+                    if (!targetTwo["selfCheck"].isNull())
+                    {
+                        m_ui->TwoSelfCheckBox->setChecked(targetTwo["selfCheck"].asBool());
+                    }
+                    if (!targetTwo["opponentCheck"].isNull())
+                    {
+                        m_ui->TwoOpponentCheckBox->setChecked(targetTwo["opponentCheck"].asBool());
+                    }
+                    if (!targetTwo["allyCheck"].isNull())
+                    {
+                        m_ui->TwoAllyCheckBox->setChecked(targetTwo["allyCheck"].asBool());
+                    }
                 }
-                if (!targetTwo["aliveCheck"].isNull())
-                {
-                    m_ui->TwoAliveCheckBox->setChecked(targetTwo["aliveCheck"].asBool());
-                }
-                if (!targetTwo["deadCheck"].isNull())
-                {
-                    m_ui->TwoDeadCheckBox->setChecked(targetTwo["deadCheck"].asBool());
-                }
-                if (!targetTwo["selfCheck"].isNull())
-                {
-                    m_ui->TwoSelfCheckBox->setChecked(targetTwo["selfCheck"].asBool());
-                }
-                if (!targetTwo["opponentCheck"].isNull())
-                {
-                    m_ui->TwoOpponentCheckBox->setChecked(targetTwo["opponentCheck"].asBool());
-                }
-                if (!targetTwo["allyCheck"].isNull())
-                {
-                    m_ui->TwoAllyCheckBox->setChecked(targetTwo["allyCheck"].asBool());
-                }
-            }
 
-            Json::Value& damages = mSkillDataRoot[skillID]["Damages"];
-            for (unsigned int i = 0; i < damages.size(); i++)
-            {
-                Json::Value& skillData = damages[static_cast<int>(i)];
-                Json::ValueIterator iter;
-
-                // add a row to the bottom
-                m_ui->tableWidget->insertRow(m_ui->tableWidget->rowCount());
-
-                // set data to the bottom row
-                for (iter = skillData.begin(); iter != skillData.end(); iter++)
+                Json::Value& damages = mSkillDataRoot[skillID]["Damages"];
+                for (unsigned int i = 0; i < damages.size(); i++)
                 {
-                    QString key = QString::fromStdString(iter.key().asString());
-                    int index = getIndexOfDamageField(key);
-                    std::string str = ((Json::Value)(*iter)).asString();
-                    QString data = QString::fromStdString(str);
-                    m_ui->tableWidget->setItem(m_ui->tableWidget->rowCount() - 1, index, new QTableWidgetItem(data));
+                    Json::Value& skillData = damages[static_cast<int>(i)];
+                    Json::ValueIterator iter;
+
+                    // add a row to the bottom
+                    m_ui->tableWidget->insertRow(m_ui->tableWidget->rowCount());
+
+                    // set data to the bottom row
+                    for (iter = skillData.begin(); iter != skillData.end(); iter++)
+                    {
+                        QString key = QString::fromStdString(iter.key().asString());
+                        int index = getIndexOfDamageField(key);
+                        std::string str = ((Json::Value)(*iter)).asString();
+                        QString data = QString::fromStdString(str);
+                        m_ui->tableWidget->setItem(m_ui->tableWidget->rowCount() - 1, index, new QTableWidgetItem(data));
+                    }
                 }
             }
         }
     }
+}
+
+void RogaSkillEditor::onNewSelected()
+{
+    m_ui->skillListWidget->clear();
+    mSkillDataRoot.clear();
+    mSkillDataPath = "";
+}
+
+void RogaSkillEditor::onSaveAsSelected()
+{
+    QString filePath = QFileDialog::getSaveFileName
+                (
+                    this,
+                    tr("Save"),
+                    mSkillDataPath,
+                    tr("Sprites (*.skl)")
+                );
+
+    save(filePath);
+}
+
+void RogaSkillEditor::onSaveSelected()
+{
+    if (mSkillDataPath != "")
+    {
+        save(mSkillDataPath);
+    }
+    else
+    {
+        onSaveAsSelected();
+    }
+}
+
+void RogaSkillEditor::onOpenSelected()
+{
+    QString filePath = QFileDialog::getOpenFileName
+                (
+                    this,
+                    tr("Open"),
+                    "",
+                    tr("Sprites (*.skl)")
+                );
+
+    if (filePath!= "")
+    {
+        load(filePath);
+    }
+}
+
+void RogaSkillEditor::save(QString filePath)
+{
+    saveSkillData();
+    FileLoader::save(filePath, mSkillDataRoot);
+}
+
+void RogaSkillEditor::load(QString filePath)
+{
+    mSkillDataRoot = FileLoader::load(filePath);
+    mSkillDataPath = filePath;
+    loadSkillData();
+
+    refreshSkillList();
 }

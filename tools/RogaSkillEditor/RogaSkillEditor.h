@@ -17,34 +17,32 @@ public:
     ~RogaSkillEditor();
 
 protected:
-    void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
-
 
 private slots:
     void onAddSkillDataButtonClicked();
     void onRemoveSkillDataButtonClicked();
     void onAddSkillButtonClicked();
     void onRemoveSkillButtonClicked();
-    void onSaveSkillButtonClicked();
     void refreshTabControl();
     void onSkillSelected(QModelIndex index);
 
+    void onNewSelected();
+    void onSaveAsSelected();
+    void onSaveSelected();
+    void onOpenSelected();
+
 private:
-    std::string RogaSkillEditor::getFileData(QString path);
+    void init();
 
-    Json::Value RogaSkillEditor::loadJsonFile(QString path);
-    void loadInitFile();
     void refreshSkillList();
-
-    void addEmptySkillData();
-
     void clearUI();
 
     void skillLoad(int row);
     void saveSkillData();
     void loadSkillData();
-    void saveToFile();
+    void save(QString filePath);
+    void load(QString filePath);
 
     Ui::RogaSkillEditor *m_ui;
     SourceFileDirModel mSkillTreeViewModel;
