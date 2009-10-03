@@ -125,13 +125,16 @@ Json::Value SpriteData::exportData() const
     {
         SpriteDef spDef = static_cast<SpriteDef>(iter.value());
 
-        Json::Value& spriteNode = sprites[spDef.mImageID.toStdString()];
+        QFileInfo fileInfo = QFileInfo(spDef.mImageID);
+        if(fileInfo.suffix() == "png")
+        {
+            Json::Value& spriteNode = sprites[spDef.mImageID.toStdString()];
 
-        spriteNode["gridX"] = spDef.mGridX;
-        spriteNode["gridY"] = spDef.mGridY;
-        spriteNode["centerX"] = spDef.mCenterX;
-        spriteNode["centerY"] = spDef.mCenterY;
-
+            spriteNode["gridX"] = spDef.mGridX;
+            spriteNode["gridY"] = spDef.mGridY;
+            spriteNode["centerX"] = spDef.mCenterX;
+            spriteNode["centerY"] = spDef.mCenterY;
+        }
         iter++;
     }
 

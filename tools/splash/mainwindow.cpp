@@ -71,13 +71,6 @@ void MainWindow::setupUI()
     mpQTimelinePanel = new QTimelinePanel(mpAnimationModel, this);
     mpQTimelinePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     ui->timelineContainer->addWidget(mpQTimelinePanel);
-
-    QString rootPath = QDir::currentPath();
-    rootPath.append("/");
-    rootPath.append(ANIMATION_DIR.path());
-    rootPath.append("/test.ani");
-
-    //mpResourceTree->read(rootPath);
 }
 
 MainWindow::MainWindow(QWidget *parent)

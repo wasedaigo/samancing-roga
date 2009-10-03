@@ -34,19 +34,21 @@ private slots:
     void onSetResourceDirSelected();
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
     void onUpdateSpritesSelected();
+    void anyDataChanged();
 
 private:
     void init();
+
+    void blockWidgetSignals(bool block);
 
     void load(QString filePath);
     void save(QString filePath);
     void resetResourceDirectory();
 
     Ui::SpriteEditor *m_ui;
-
     SpriteData mSpriteData;
-
     SourceFileDirModel mResourceTreeViewModel;
+    bool mChanged;
 };
 
 #endif // SpriteEditor_H
