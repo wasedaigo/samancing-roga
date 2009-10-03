@@ -32,9 +32,8 @@ public:
     static FileType getFileType(QString path);
     static void playSound(QString path);
 
-    static std::string getFileData(QString path);
-    static Json::Value loadJsonFile(QString path);
-    static void loadInitFile();
+    static QString loadWorkingDirectory();
+    static void setWorkingDirectory(QString newDirectory);
 };
 
 #endif // RESOURCEMANAGER_H

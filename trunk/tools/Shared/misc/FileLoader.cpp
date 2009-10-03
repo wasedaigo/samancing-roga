@@ -66,12 +66,6 @@ Json::Value FileLoader::load(QString filePath)
     return root;
 }
 
-void FileLoader::init()
-{
-    QString initPath = getInitpath();
-    load(initPath);
-}
-
 QString FileLoader::getInitpath()
 {
     QFileInfo initFileInfo = QFileInfo(QDir::currentPath(), QString("init.json"));

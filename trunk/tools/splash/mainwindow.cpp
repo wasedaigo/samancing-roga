@@ -8,12 +8,16 @@
 #include "QStandardItemModel.h"
 #include "QTimelineWidget/QTimelinePanel.h"
 #include <QDirModel>
+#include <QFileDialog>
 #include "ResourceTree/ResourceTree.h"
 #include "AnimationViewer/AnimationViewerPanel.h"
 
 void MainWindow::setupConnections()
 {
     connect(mpAnimationViewer->m_ui->showPaletteButton, SIGNAL(clicked()), this, SLOT(onPaletButtonClicked()));
+
+    //Menu action
+    connect(ui->actionSet_Working_Directory, SIGNAL(triggered()), this, SLOT(setWorkingDirectory()));
 
     // connect animation list controls
     connect(ui->addAnimationButton, SIGNAL(clicked()), this, SLOT(onAddAnimationButtonClicked()));
@@ -77,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow)
 {
-    ResourceManager::loadInitFile();
+    ResourceManager::loadWorkingDirectory();
     setupModels();
     setupUI();
 
@@ -252,4 +256,19 @@ void MainWindow::onPaletButtonClicked()
 void MainWindow::refreshTree()
 {
     mAnimationTreeViewModel.refresh(QModelIndex());
+}
+
+void MainWindow::setWorkingDirectory()
+{
+    QString newDirectory = QFileDialog::getExistingDirectory
+                    (
+                        this,
+                        tr("Open"),
+                        ""
+                    );
+
+    ResourceManager::setWorkingDirectory(newDirectory);
+
+    QString rootPath = ResourceManager::getResourcePath(ANIMATION_DIR.path());
+    ui->animationTreeView->setRootIndex(mAnimationTreeViewModel.index(rootPath) );
 }
