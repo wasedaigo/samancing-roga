@@ -212,7 +212,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="AOESpinBox">
+           <widget class="QComboBox" name="AOEComboBox">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -245,11 +245,6 @@
         <column>
          <property name="text">
           <string>Max</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Random</string>
          </property>
         </column>
         <column>
@@ -579,6 +574,23 @@
            </widget>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="applyButton">
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Apply</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../Shared/ui.qrc">
+             <normaloff>:/resource/play.png</normaloff>:/resource/play.png</iconset>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -654,7 +666,7 @@
   <connection>
    <sender>AOECheckBox</sender>
    <signal>clicked(bool)</signal>
-   <receiver>AOESpinBox</receiver>
+   <receiver>AOEComboBox</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -662,8 +674,8 @@
      <y>278</y>
     </hint>
     <hint type="destinationlabel">
-     <x>361</x>
-     <y>278</y>
+     <x>608</x>
+     <y>215</y>
     </hint>
    </hints>
   </connection>

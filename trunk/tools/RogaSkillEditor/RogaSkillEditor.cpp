@@ -8,8 +8,8 @@
 
 #include "FileLoader.h"
 
-#define DAMAGE_FIELD_COUNT 7
-static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "random", "hit", "critical", "attr", "damagedef"};
+#define DAMAGE_FIELD_COUNT 6
+static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "hit", "critical", "attr", "damagedef"};
 static int getIndexOfDamageField(QString key)
 {
     int num = 0;
@@ -59,17 +59,38 @@ static int getIndexOfMultiTargetType(QString key)
     return num;
 }
 
+#define AOE_TYPE_COUNT 4
+static QString AOETypes[AOE_TYPE_COUNT] = {"One Tile", "One Row", "One Column", "Cross"};
+static int getIndexOfAOEType(QString key)
+{
+    int num = 0;
+    for (int i = 0; i < AOE_TYPE_COUNT; i++)
+    {
+        if (key == AOETypes[i])
+        {
+            num = i;
+            break;
+        }
+    }
+
+    return num;
+}
+
 RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::RogaSkillEditor),
-    mSelectedID(QString(""))
+    mSelectedID(QString("")),
+    mChanged(false)
 {
     m_ui->setupUi(this);
-    mSkillTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-    mSkillTreeViewModel.setReadOnly(true);
 
     init();
     refreshSkillList();
+
+    for (int i = 0; i < AOE_TYPE_COUNT; i++)
+    {
+        m_ui->AOEComboBox->addItem(AOETypes[i]);
+    }
 
 
     connect(m_ui->radioButtonOne, SIGNAL(clicked(bool)), this, SLOT(refreshTabControl()));
@@ -81,7 +102,7 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     connect(m_ui->addSkillDataButton, SIGNAL(clicked()), this, SLOT(onAddSkillDataButtonClicked()));
     connect(m_ui->removeSkillDataButton, SIGNAL(clicked()), this, SLOT(onRemoveSkillDataButtonClicked()));
     connect(m_ui->skillListWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(onSkillSelected(QModelIndex)));
-
+    connect(m_ui->applyButton, SIGNAL(clicked()), this, SLOT(onApplyButtonClicked()));
     connect(m_ui->actionNew, SIGNAL(triggered()), this, SLOT(onNewSelected()));
     connect(m_ui->actionOpen, SIGNAL(triggered()), this, SLOT(onOpenSelected()));
     connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveSelected()));
@@ -123,18 +144,33 @@ void RogaSkillEditor::refreshSkillList()
         i++;
     }
     m_ui->skillListWidget->setCurrentRow(index);
+    skillLoad(0);
 }
 
 void RogaSkillEditor::closeEvent(QCloseEvent *event)
 {
     // Save before quit
-    if (true)
+    if (mChanged)
     {
-        event->accept();
+        int r = QMessageBox::warning(this,
+                    tr("Mail Editor"),
+                    tr("Do you want to save the draft "
+                       "before closing?"),
+                     QMessageBox::Save
+                     | QMessageBox::No
+                     | QMessageBox::Cancel);
+        if (r == QMessageBox::Save) {
+            save(mSkillDataPath);
+            event->accept();
+        } else if (r == QMessageBox::No) {
+            event->accept();
+        } else {
+            event->ignore();
+        }
     }
     else
     {
-        event->ignore();
+        event->accept();
     }
 }
 
@@ -166,9 +202,9 @@ void RogaSkillEditor::onRemoveSkillButtonClicked()
     QModelIndexList indexes = m_ui->skillListWidget->selectionModel()->selectedIndexes();
     if (indexes.count() > 0)
     {
-        QVariant data = m_ui->skillListWidget->selectedItems().takeFirst()->data(Qt::DisplayRole);
-        QString filename = data.toString();
-        mSkillDataRoot.removeMember(filename.toStdString());
+        QVariant data = m_ui->skillListWidget->selectedItems().first()->data(Qt::DisplayRole);
+        QString key = data.toString();
+        mSkillDataRoot.removeMember(key.toStdString());
         refreshSkillList();
     }
 }
@@ -183,7 +219,7 @@ void RogaSkillEditor::onRemoveSkillDataButtonClicked()
     QModelIndexList indexes = m_ui->tableWidget->selectionModel()->selectedIndexes();
     if (indexes.count() > 0)
     {
-        QModelIndex index = indexes.takeFirst();
+        QModelIndex index = indexes.first();
         m_ui->tableWidget->model()->removeRow(index.row(), QModelIndex());
     }
 }
@@ -201,12 +237,10 @@ void RogaSkillEditor::skillLoad(int row)
 
 void RogaSkillEditor::onSkillSelected(QModelIndex index)
 {
-    saveSkillData();
-
     QModelIndexList indexes = m_ui->skillListWidget->selectionModel()->selectedIndexes();
     if (indexes.count() > 0)
     {
-        QVariant data = m_ui->skillListWidget->selectedItems().takeFirst()->data(Qt::DisplayRole);
+        QVariant data = m_ui->skillListWidget->selectedItems().first()->data(Qt::DisplayRole);
         mSelectedID = data.toString();
 
         loadSkillData();
@@ -222,7 +256,8 @@ void RogaSkillEditor::clearUI()
     m_ui->skillAnimationEdit->setText("");
     m_ui->multiTargetCombox->setCurrentIndex(0);
     m_ui->AOECheckBox->setChecked(false);
-    m_ui->AOESpinBox->setValue(0);
+    m_ui->AOEComboBox->setCurrentIndex(0);
+
     m_ui->radioButtonOne->setChecked(true);
     for(int i = m_ui->tableWidget->rowCount() - 1; i >=0; i--)
     {
@@ -244,71 +279,78 @@ void RogaSkillEditor::clearUI()
     m_ui->TwoAllyCheckBox->setChecked(false);
 }
 
-void RogaSkillEditor::saveSkillData()
+bool RogaSkillEditor::saveSkillData()
 {
     // Save Data
-    QString newID =  m_ui->IDEdit->text();
-    if (mSelectedID != "" && newID != "")
+    if (mSkillDataRoot.isMember(mSelectedID.toStdString()))
     {
-        if (newID != mSelectedID && !mSkillDataRoot[newID.toStdString()].isNull())
+        QString newID =  m_ui->IDEdit->text();
+        if (newID != "")
         {
-            QMessageBox::information(window(), tr("File already exists"),
-                                 tr("The ID already exists, please use different ID."));
-            return;
-        }
-
-        // Remove old member
-        mSkillDataRoot.removeMember(mSelectedID.toStdString());
-
-        // Set new ID
-        mSelectedID = newID;
-
-        // Save new data
-        std::string skillID = mSelectedID.toStdString();
-        mSkillDataRoot.removeMember(skillID);
-        mSkillDataRoot[skillID]["name"] = m_ui->nameEdit->text().toStdString();
-        mSkillDataRoot[skillID]["desc"] = m_ui->descEdit->toPlainText().toStdString();
-        mSkillDataRoot[skillID]["castingAnimation"] = m_ui->castingAnimationEdit->text().toStdString();
-        mSkillDataRoot[skillID]["skillAnimation"] = m_ui->skillAnimationEdit->text().toStdString();
-        mSkillDataRoot[skillID]["multiTargetType"] = multiTargetType[m_ui->multiTargetCombox->currentIndex()].toStdString();
-        if(m_ui->AOECheckBox->isChecked())
-        {
-            mSkillDataRoot[skillID]["AOEValue"] = m_ui->AOESpinBox->value();
-        }
-
-        // radio group 1
-        mSkillDataRoot[skillID]["TargetDataOne"]["targetSelectionType"] = targetSelectionType[m_ui->OneSelectionTypeComboBox->currentIndex()].toStdString();
-        mSkillDataRoot[skillID]["TargetDataOne"]["aliveCheck"] = m_ui->OneAliveCheckBox->isChecked();
-        mSkillDataRoot[skillID]["TargetDataOne"]["deadCheck"] = m_ui->OneDeadCheckBox->isChecked();
-        mSkillDataRoot[skillID]["TargetDataOne"]["selfCheck"] = m_ui->OneSelfCheckBox->isChecked();
-        mSkillDataRoot[skillID]["TargetDataOne"]["opponentCheck"] = m_ui->OneOpponentCheckBox->isChecked();
-        mSkillDataRoot[skillID]["TargetDataOne"]["allyCheck"] = m_ui->OneAllyCheckBox->isChecked();
-
-        if (!m_ui->radioButtonOne->isChecked())
-        {
-            // radio group 2
-            mSkillDataRoot[skillID]["TargetDataTwo"]["targetSelectionType"] = targetSelectionType[m_ui->TwoSelectionTypeComboBox->currentIndex()].toStdString();
-            mSkillDataRoot[skillID]["TargetDataTwo"]["aliveCheck"] = m_ui->TwoAliveCheckBox->isChecked();
-            mSkillDataRoot[skillID]["TargetDataTwo"]["deadCheck"] = m_ui->TwoDeadCheckBox->isChecked();
-            mSkillDataRoot[skillID]["TargetDataTwo"]["selfCheck"] = m_ui->TwoSelfCheckBox->isChecked();
-            mSkillDataRoot[skillID]["TargetDataTwo"]["opponentCheck"] = m_ui->TwoOpponentCheckBox->isChecked();
-            mSkillDataRoot[skillID]["TargetDataTwo"]["allyCheck"] = m_ui->TwoAllyCheckBox->isChecked();
-        }
-
-        Json::Value& damages = mSkillDataRoot[skillID]["Damages"];
-        for (int i = 0; i < m_ui->tableWidget->rowCount(); i++)
-        {
-            for (int j = 0; j < m_ui->tableWidget->columnCount(); j++)
+            if (newID != mSelectedID && !mSkillDataRoot[newID.toStdString()].isNull())
             {
-                QTableWidgetItem* pWidgetItem = m_ui->tableWidget->item(i, j);
-                if (pWidgetItem)
+                QMessageBox::information(window(), tr("File already exists"),
+                                     tr("The ID already exists, please use different ID."));
+                return false;
+            }
+
+            // Remove old member
+            mSkillDataRoot.removeMember(mSelectedID.toStdString());
+
+            // Set new ID
+            mSelectedID = newID;
+
+            // Save new data
+            std::string skillID = mSelectedID.toStdString();
+            mSkillDataRoot.removeMember(skillID);
+            mSkillDataRoot[skillID]["name"] = m_ui->nameEdit->text().toStdString();
+            mSkillDataRoot[skillID]["desc"] = m_ui->descEdit->toPlainText().toStdString();
+            mSkillDataRoot[skillID]["castingAnimation"] = m_ui->castingAnimationEdit->text().toStdString();
+            mSkillDataRoot[skillID]["skillAnimation"] = m_ui->skillAnimationEdit->text().toStdString();
+            mSkillDataRoot[skillID]["multiTargetType"] = multiTargetType[m_ui->multiTargetCombox->currentIndex()].toStdString();
+            if(m_ui->AOECheckBox->isChecked())
+            {
+                mSkillDataRoot[skillID]["AOEValue"] = AOETypes[m_ui->AOEComboBox->currentIndex()].toStdString();
+            }
+
+            // radio group 1
+            mSkillDataRoot[skillID]["TargetDataOne"]["targetSelectionType"] = targetSelectionType[m_ui->OneSelectionTypeComboBox->currentIndex()].toStdString();
+            mSkillDataRoot[skillID]["TargetDataOne"]["aliveCheck"] = m_ui->OneAliveCheckBox->isChecked();
+            mSkillDataRoot[skillID]["TargetDataOne"]["deadCheck"] = m_ui->OneDeadCheckBox->isChecked();
+            mSkillDataRoot[skillID]["TargetDataOne"]["selfCheck"] = m_ui->OneSelfCheckBox->isChecked();
+            mSkillDataRoot[skillID]["TargetDataOne"]["opponentCheck"] = m_ui->OneOpponentCheckBox->isChecked();
+            mSkillDataRoot[skillID]["TargetDataOne"]["allyCheck"] = m_ui->OneAllyCheckBox->isChecked();
+
+            if (!m_ui->radioButtonOne->isChecked())
+            {
+                // radio group 2
+                mSkillDataRoot[skillID]["TargetDataTwo"]["targetSelectionType"] = targetSelectionType[m_ui->TwoSelectionTypeComboBox->currentIndex()].toStdString();
+                mSkillDataRoot[skillID]["TargetDataTwo"]["aliveCheck"] = m_ui->TwoAliveCheckBox->isChecked();
+                mSkillDataRoot[skillID]["TargetDataTwo"]["deadCheck"] = m_ui->TwoDeadCheckBox->isChecked();
+                mSkillDataRoot[skillID]["TargetDataTwo"]["selfCheck"] = m_ui->TwoSelfCheckBox->isChecked();
+                mSkillDataRoot[skillID]["TargetDataTwo"]["opponentCheck"] = m_ui->TwoOpponentCheckBox->isChecked();
+                mSkillDataRoot[skillID]["TargetDataTwo"]["allyCheck"] = m_ui->TwoAllyCheckBox->isChecked();
+            }
+
+            Json::Value& damages = mSkillDataRoot[skillID]["Damages"];
+            for (int i = 0; i < m_ui->tableWidget->rowCount(); i++)
+            {
+                for (int j = 0; j < m_ui->tableWidget->columnCount(); j++)
                 {
-                    QVariant data = pWidgetItem->data(Qt::EditRole);
-                    damages[static_cast<int>(i)][damageFields[j].toStdString()] = data.toString().toStdString();
+                    QTableWidgetItem* pWidgetItem = m_ui->tableWidget->item(i, j);
+                    if (pWidgetItem)
+                    {
+                        QVariant data = pWidgetItem->data(Qt::EditRole);
+                        damages[static_cast<int>(i)][damageFields[j].toStdString()] = data.toString().toStdString();
+                    }
                 }
             }
+
+            return true;
         }
     }
+
+    return false;
 }
 
 void RogaSkillEditor::loadSkillData()
@@ -349,7 +391,13 @@ void RogaSkillEditor::loadSkillData()
                 if(!skillData["AOEValue"].isNull())
                 {
                     m_ui->AOECheckBox->setChecked(true);
-                    m_ui->AOESpinBox->setValue(mSkillDataRoot[skillID]["AOEValue"].asInt());
+                    m_ui->AOEComboBox->setEnabled(true);
+                    m_ui->AOEComboBox->setCurrentIndex(getIndexOfAOEType(QString::fromStdString(mSkillDataRoot[skillID]["AOEValue"].asString())));
+                }
+                else
+                {
+                    m_ui->AOECheckBox->setChecked(false);
+                    m_ui->AOEComboBox->setEnabled(false);
                 }
 
                 if(!skillData["TargetDataOne"].isNull())
@@ -437,6 +485,15 @@ void RogaSkillEditor::loadSkillData()
     }
 }
 
+void RogaSkillEditor::onApplyButtonClicked()
+{
+    if (saveSkillData())
+    {
+        mChanged = true;
+        m_ui->skillListWidget->selectedItems().first()->setData(Qt::DisplayRole, QString(m_ui->IDEdit->text()));
+    }
+}
+
 void RogaSkillEditor::onNewSelected()
 {
     m_ui->skillListWidget->clear();
@@ -475,7 +532,7 @@ void RogaSkillEditor::onOpenSelected()
                 (
                     this,
                     tr("Open"),
-                    "",
+                    mSkillDataPath,
                     tr("Sprites (*.skl)")
                 );
 
@@ -487,8 +544,12 @@ void RogaSkillEditor::onOpenSelected()
 
 void RogaSkillEditor::save(QString filePath)
 {
-    saveSkillData();
-    FileLoader::save(filePath, mSkillDataRoot);
+    if (filePath != "")
+    {
+        saveSkillData();
+        FileLoader::save(filePath, mSkillDataRoot);
+        mChanged = false;
+    }
 }
 
 void RogaSkillEditor::load(QString filePath)

@@ -2,9 +2,9 @@
 #define ROGASKILLEDITOR_H
 
 #include <QtGui/QMainWindow>
-#include "SourceFileDirModel.h"
 #include "json/reader.h"
 #include "json/writer.h"
+#include <QModelIndex>
 
 namespace Ui {
     class RogaSkillEditor;
@@ -27,6 +27,7 @@ private slots:
     void refreshTabControl();
     void onSkillSelected(QModelIndex index);
 
+    void onApplyButtonClicked();
     void onNewSelected();
     void onSaveAsSelected();
     void onSaveSelected();
@@ -39,16 +40,18 @@ private:
     void clearUI();
 
     void skillLoad(int row);
-    void saveSkillData();
+    bool saveSkillData();
     void loadSkillData();
     void save(QString filePath);
     void load(QString filePath);
 
     Ui::RogaSkillEditor *m_ui;
-    SourceFileDirModel mSkillTreeViewModel;
+
     QString mSkillDataPath;
     QString mSelectedID;
     Json::Value mSkillDataRoot;
+
+    bool mChanged;
 };
 
 #endif // ROGASKILLEDITOR_H
