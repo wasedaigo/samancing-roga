@@ -115,7 +115,10 @@ void SpriteEditor::onOpenSelected()
                     tr("Sprites (*.sp)")
                 );
 
-    load(filePath);
+    if (filePath!= "")
+    {
+        load(filePath);
+    }
 }
 
 void SpriteEditor::onSetResourceDirSelected()
