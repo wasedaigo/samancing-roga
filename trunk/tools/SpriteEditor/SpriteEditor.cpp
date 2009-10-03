@@ -14,16 +14,25 @@
 #include <QFileDialog>
 #include <QItemSelection>
 #include <QDirIterator>
+#include <QMessageBox>
 
 SpriteEditor::SpriteEditor(QWidget *parent) :
     QMainWindow(parent),
-    m_ui(new Ui::SpriteEditor)
+    m_ui(new Ui::SpriteEditor),
+    mChanged(false)
 {
     m_ui->setupUi(this);
 
     m_ui->infoBox->setEnabled(false);
 
     // Set up tree view model
+
+// TODO: filter files via its extension
+//    QDir::Filters filters;
+//    QStringList nameFilters;
+//    nameFilters.append("*.png");
+//    mResourceTreeViewModel.setNameFilters(nameFilters);
+
     mResourceTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
     mResourceTreeViewModel.setReadOnly(true);
     m_ui->resourceTreeView->setAutoScroll(true);
@@ -47,15 +56,20 @@ SpriteEditor::SpriteEditor(QWidget *parent) :
 
     connect(m_ui->gridXSpinBox, SIGNAL(valueChanged(int)), mpImageViewer, SLOT(setGridX(int)));
     connect(m_ui->gridXSpinBox, SIGNAL(valueChanged(int)), &mSpriteData, SLOT(setGridX(int)));
+    connect(m_ui->gridXSpinBox, SIGNAL(valueChanged(int)), this, SLOT(anyDataChanged()));
 
     connect(m_ui->gridYSpinBox, SIGNAL(valueChanged(int)), mpImageViewer, SLOT(setGridY(int)));
     connect(m_ui->gridYSpinBox, SIGNAL(valueChanged(int)), &mSpriteData, SLOT(setGridY(int)));
+    connect(m_ui->gridYSpinBox, SIGNAL(valueChanged(int)), this, SLOT(anyDataChanged()));
 
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpImageViewer, SLOT(setCenterX(int)));
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), &mSpriteData, SLOT(setCenterX(int)));
+    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), this, SLOT(anyDataChanged()));
 
     connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpImageViewer, SLOT(setCenterY(int)));
     connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), &mSpriteData, SLOT(setCenterY(int)));
+    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), this, SLOT(anyDataChanged()));
+
 
     connect(mpImageViewer, SIGNAL(gridXChange(int)), m_ui->gridXSpinBox, SLOT(setValue(int)));
     connect(mpImageViewer, SIGNAL(gridYChange(int)), m_ui->gridYSpinBox, SLOT(setValue(int)));
@@ -75,24 +89,47 @@ SpriteEditor::~SpriteEditor()
     delete m_ui;
 }
 
+void SpriteEditor::blockWidgetSignals(bool block)
+{
+    m_ui->gridXSpinBox->blockSignals(block);
+    m_ui->gridYSpinBox->blockSignals(block);
+    m_ui->centerXSpinBox->blockSignals(block);
+    m_ui->centerYSpinBox->blockSignals(block);
+}
+
 // First time function
 void SpriteEditor::init()
 {
     QString initPath = FileLoader::getInitpath();
     load(initPath);
+    mChanged = false;
 }
 
 // Quit event
 void SpriteEditor::closeEvent(QCloseEvent *event)
 {
     // Save before quit
-    if (true)
+    if (mChanged)
     {
-        event->accept();
+        int r = QMessageBox::warning(this,
+                    tr("Sprite Editor"),
+                    tr("Do you want to save the project "
+                       "before closing?"),
+                     QMessageBox::Save
+                     | QMessageBox::No
+                     | QMessageBox::Cancel);
+        if (r == QMessageBox::Save) {
+            save(mSpriteData.mFilePath);
+            event->accept();
+        } else if (r == QMessageBox::No) {
+            event->accept();
+        } else {
+            event->ignore();
+        }
     }
     else
     {
-        event->ignore();
+        event->accept();
     }
 }
 
@@ -182,6 +219,8 @@ void SpriteEditor::onUpdateSpritesSelected()
 
             mSpriteData.loadKey(relativeFilepath);
         }
+
+        mChanged = true;
     }
 }
 
@@ -203,18 +242,29 @@ void SpriteEditor::onSelectionChanged(const QItemSelection& item1, const QItemSe
         QString imagePath = mSpriteData.mResourceDirPath;
         imagePath.append("/").append(mSpriteData.getSelectedImageID());
 
+        blockWidgetSignals(true);
         mpImageViewer->setGridX(mSpriteData.getGridX());
         mpImageViewer->setGridY(mSpriteData.getGridY());
         mpImageViewer->setCenterX(mSpriteData.getCenterX());
         mpImageViewer->setCenterY(mSpriteData.getCenterY());
         mpImageViewer->setImage(imagePath);
+        blockWidgetSignals(false);
     }
+}
+
+void SpriteEditor::anyDataChanged()
+{
+    mChanged = true;
 }
 
 // I/O functions
 void SpriteEditor::save(QString filePath)
 {
-    FileLoader::save(filePath, mSpriteData.exportData());
+    if (filePath != "")
+    {
+        FileLoader::save(filePath, mSpriteData.exportData());
+        mChanged = false;
+    }
 }
 
 void SpriteEditor::load(QString filePath)

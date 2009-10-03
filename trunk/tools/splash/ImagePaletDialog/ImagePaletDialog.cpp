@@ -17,7 +17,6 @@ ImagePaletDialog::ImagePaletDialog(QWidget *parent, AnimationModel* pAnimationMo
     m_ui->scrollArea->setWidget(mpAnimationImagePaletPanel);
 
     QString rootPath = ResourceManager::getResourcePath("");
-    QStringList stringList;
 
     mSourceFileTreeViewModel.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
     mSourceFileTreeViewModel.setReadOnly(true);
