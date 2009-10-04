@@ -1,5 +1,6 @@
 #include "GLSprite.h"
 
+#include "Macros.h"
 #include <math.h>
 #include <QPixmap>
 #include <QPainter>
@@ -7,6 +8,9 @@
 #include "DataModels/KeyFrame.h"
 #include "ResourceManager.h"
 
+static uint tempColorTable[256];
+
+static QImage tempImage32 = QImage(256, 256, QImage::Format_ARGB32);
 
 bool GLSprite::priorityLessThan(const GLSprite* pItem1, const GLSprite* pItem2)
 {
@@ -145,6 +149,93 @@ bool GLSprite::isSelectable() const
     return mIsSelectable;
 }
 
+void GLSprite::renderColored8(QPainter& painter, QImage* pImage, const QPointF& dstPoint, const QRect& srcRect, Color color) const
+{
+    int dR = (int)(255 * color.mR);
+    int dG = (int)(255 * color.mG);
+    int dB = (int)(255 * color.mB);
+
+    QVector<QRgb> colors = pImage->colorTable();
+    for (int i = 1; i < pImage->numColors() ; i++)
+    {
+        tempColorTable[i] = colors[i];
+        QRgb rgb = colors[i];
+        int r = CLIP((int)(qRed(rgb) + dR), 0, 255);
+        int g = CLIP((int)(qGreen(rgb) + dG), 0, 255);
+        int b = CLIP((int)(qBlue(rgb) + dB), 0, 255);
+
+        colors[i] = qRgb(r, g, b);
+    }
+    pImage->setColorTable(colors);
+
+    painter.drawImage(dstPoint, *pImage, srcRect);
+    for (int i = 1; i < pImage->numColors() ; i++)
+    {
+        colors[i] = tempColorTable[i];
+    }
+    pImage->setColorTable(colors);
+
+    // set color table back
+}
+
+void GLSprite::renderColored32(QPainter& painter, QImage* pImage, const QPointF& dstPoint, const QRect& srcRect, Color color) const
+{
+    int dR = (int)(255 * color.mR);
+    int dG = (int)(255 * color.mG);
+    int dB = (int)(255 * color.mB);
+
+    QPainter tempPainter32(&tempImage32);
+    QRect tempRect = QRect(0, 0, srcRect.width(), srcRect.height());
+    tempPainter32.setCompositionMode(QPainter::CompositionMode_Source);
+    tempPainter32.drawImage(tempRect, *pImage, srcRect);
+    tempPainter32.end();
+
+    for (int y = 0; y < srcRect.height(); y++)
+    {
+        uint* row = (uint *)tempImage32.scanLine(y);
+        for (int x = 0; x < srcRect.width(); x++)
+        {
+            uint *p = row + x;
+            int r = CLIP((int)(qRed(*p) + dR), 0, 255);
+            int g = CLIP((int)(qGreen(*p) + dG), 0, 255);
+            int b = CLIP((int)(qBlue(*p) + dB), 0, 255);
+
+            *p = qRgba(r, g, b, qAlpha(*p));
+        }
+    }
+
+    painter.drawImage(dstPoint, tempImage32, tempRect);
+}
+
+// This is very slow implementation of color transformation
+// It needs to be switched to OpenGL base if we want to have the best performance.
+bool GLSprite::renderColored(QPainter& painter, const QPointF& dstPoint, const QRect& srcRect) const
+{
+    Color color = getAbsoluteColor();
+    if (color.isZero())
+    {
+        return false;
+    }
+
+    // Change Color
+    QImage* pImage = ResourceManager::getImage(mSpriteDescriptor.mSourcePath);
+
+    switch(pImage->format())
+    {
+        case (QImage::Format_Indexed8):
+            renderColored8(painter, pImage, dstPoint, srcRect, color);
+            return true;
+
+        case (QImage::Format_ARGB32):
+            renderColored32(painter, pImage, dstPoint, srcRect, color);
+            return true;
+        default:
+            break;
+    }
+
+    return false;
+}
+
 void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isPlaying, QList<EmittedAnimation*>* emittedAnimationList) const
 {
     QPointF spritePosition = QPointF(mSpriteDescriptor.mPosition.mX, mSpriteDescriptor.mPosition.mY);
@@ -177,9 +268,14 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
          switch(ResourceManager::getFileType(sourcePath))
          {
             case ResourceManager::FileType_Image:
-                pQPixmap = AnimationModel::getPixmap(mSpriteDescriptor.mSourcePath);
-                painter.drawPixmap(dstPoint, *pQPixmap, srcRect);
+                bool rendered = renderColored(painter, dstPoint, srcRect);
+                if (!rendered)
+                {
+                    QImage* pImage = ResourceManager::getImage(mSpriteDescriptor.mSourcePath);
+                    painter.drawImage(dstPoint, *pImage, srcRect);
+                }
                 break;
+
             case ResourceManager::FileType_Animation:
                 // Render Subanimation
                 AnimationModel* pAnimationModel = ResourceManager::getAnimation(sourcePath);
@@ -253,7 +349,6 @@ float GLSprite::getAbsoluteAlpha() const
     return alpha;
 }
 
-// We add up color value from parent and decide final color
 GLSprite::Color GLSprite::getAbsoluteColor() const
 {
     Color color = mSpriteDescriptor.mColor;
@@ -265,6 +360,10 @@ GLSprite::Color GLSprite::getAbsoluteColor() const
         color.mG += pSprite->mSpriteDescriptor.mColor.mG;
         color.mB += pSprite->mSpriteDescriptor.mColor.mB;
     }
+    color.mR = CLIP(color.mR, -1, 1);
+    color.mG = CLIP(color.mG, -1, 1);
+    color.mB = CLIP(color.mB, -1, 1);
+
     return color;
 }
 

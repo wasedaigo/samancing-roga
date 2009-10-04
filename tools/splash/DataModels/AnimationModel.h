@@ -27,7 +27,6 @@ public:
         QList<QString> mList;
     };
 
-    static QPixmap* getPixmap(QString path);
     static GLSprite* getTargetSprite();
     static GLSprite* getCenterPointSprite();
 

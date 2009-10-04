@@ -199,6 +199,7 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->scaleXSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mX);
         m_ui->scaleYSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mScale.mY);
 
+        m_ui->colorTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_color]);
         m_ui->colorSpinBoxR->setValue((double)pKeyFrameData->mSpriteDescriptor.mColor.mR);
         m_ui->colorSpinBoxG->setValue((double)pKeyFrameData->mSpriteDescriptor.mColor.mG);
         m_ui->colorSpinBoxB->setValue((double)pKeyFrameData->mSpriteDescriptor.mColor.mB);

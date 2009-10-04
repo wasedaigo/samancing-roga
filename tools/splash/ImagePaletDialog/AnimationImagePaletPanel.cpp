@@ -64,10 +64,10 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
     switch(mCanvasType)
     {
         case CanvasType_Image:
-            const QPixmap* pPixmap = AnimationModel::getPixmap(mpAnimationModel->getSelectedSourcePath());
-            if (pPixmap)
+            const QImage* pImage = ResourceManager::getImage(mpAnimationModel->getSelectedSourcePath());
+            if (pImage)
             {
-                painter.drawPixmap(0, 0, *pPixmap);
+                painter.drawImage(0, 0, *pImage);
             }
             painter.setPen(Qt::white);
             painter.drawRect(mSelectedRect);
@@ -125,8 +125,8 @@ void AnimationImagePaletPanel::onAnimationImagePaletChanged(QString path)
     {
         case ResourceManager::FileType_Image:
             {
-                const QPixmap* pPixmap = AnimationModel::getPixmap(path);
-                setFixedSize(pPixmap->width(), pPixmap->height());
+                const QImage* pImage = ResourceManager::getImage(path, true); // recache
+                setFixedSize(pImage->width(), pImage->height());
 
                 mCanvasType = CanvasType_Image;
                 this->repaint();

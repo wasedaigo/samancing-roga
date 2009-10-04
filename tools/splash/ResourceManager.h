@@ -15,6 +15,8 @@
 class AnimationModel;
 class GLSprite;
 class QWidget;
+class QImage;
+
 class ResourceManager
 {
 public:
@@ -26,6 +28,8 @@ public:
     };
     ResourceManager();
 
+    static QImage* getImage(QString path, bool recache = false);
+    static void clearImageCache();
     static AnimationModel* getAnimation(QString path);
     static void clearAnimationCache();
     static QString getResourcePath(QString path);

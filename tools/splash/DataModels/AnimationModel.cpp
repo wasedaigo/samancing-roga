@@ -34,34 +34,11 @@ field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
 }
 ////
 
-static QHash<QString, QPixmap*> sSourceImageHash;
 static QPixmap* spTargetPixmap = NULL;
 static GLSprite* spTargetSprite = NULL;
 static QPixmap* spCenterPointPixmap = NULL;
 static GLSprite* spCenterPointSprite = NULL;
 
-QPixmap* AnimationModel::getPixmap(QString path)
-{
-    if (!sSourceImageHash.contains(path))
-    {
-        QString rootPath = QDir::currentPath();
-        QString fullPath = ResourceManager::getResourcePath(path);
-        QFileInfo fileInfo = QFileInfo (fullPath);
-
-        if (!fileInfo.isFile()) {return NULL;}
-        try
-        {
-            sSourceImageHash.insert(path, new QPixmap(fullPath));
-        }
-        catch(char *str)
-        {
-            printf("File:%s couldn't be loaded.", str);
-            return NULL;
-        }
-    };
-
-    return sSourceImageHash[path];
-}
 
 GLSprite* AnimationModel::getTargetSprite()
 {
@@ -158,17 +135,6 @@ void AnimationModel::setAnimationID(QString id)
         mAnimationID = id;
         emit animationIDChanged(id);
     }
-}
-
-void AnimationModel::clearPixmapHash()
-{
-    QHash<QString, QPixmap*>::Iterator iter = sSourceImageHash.begin();
-    while(iter != sSourceImageHash.end())
-    {
-        delete iter.value();
-        iter++;
-    }
-    sSourceImageHash.clear();
 }
 
 int AnimationModel::getMaxFrameCount(int lineNo) const
@@ -785,7 +751,6 @@ bool AnimationModel::copyTweenedAttribute(const GLSprite* pParentGLSprite, GLSpr
     return tweenFound;
 }
 
-
 // Return true if it find a cel to tween, if not return false;
 GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo, int frameNo) const
 {
@@ -804,6 +769,7 @@ GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo,
     if (!pBaseKeyFrameData) {return NULL;} // empty keyframe
 
     GLSprite::SpriteDescriptor baseSpriteDescriptor = pBaseKeyFrameData->mSpriteDescriptor;
+
     setFinalAlpha(parentGLSprite, baseSpriteDescriptor);
     setFinalPosition(parentGLSprite, baseSpriteDescriptor);
 
@@ -932,9 +898,9 @@ bool AnimationModel::saveData()
 
                 if (ResourceManager::getFileType(pKeyFrameData->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Image)
                 {
-                    QPixmap* pixmap = getPixmap(pKeyFrameData->mSpriteDescriptor.mSourcePath);
+                    QImage* pImage = ResourceManager::getImage(pKeyFrameData->mSpriteDescriptor.mSourcePath);
 
-                    if (pixmap->rect() != pKeyFrameData->mSpriteDescriptor.mTextureSrcRect)
+                    if (pImage->rect() != pKeyFrameData->mSpriteDescriptor.mTextureSrcRect)
                     {
                         Json::Value textureRect;
                         textureRect[static_cast<unsigned int>(0)] = pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.x();
@@ -1208,8 +1174,8 @@ bool AnimationModel::loadData(QString path)
                 {
                     if (ResourceManager::getFileType(pKeyFrameData->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Image)
                     {
-                        QPixmap* pixmap = getPixmap(pKeyFrameData->mSpriteDescriptor.mSourcePath);
-                        pKeyFrameData->mSpriteDescriptor.mTextureSrcRect = pixmap->rect();
+                        QImage* pImage = ResourceManager::getImage(pKeyFrameData->mSpriteDescriptor.mSourcePath);
+                        pKeyFrameData->mSpriteDescriptor.mTextureSrcRect = pImage->rect();
                     }
                     else
                     {
