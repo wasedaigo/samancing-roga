@@ -7,10 +7,12 @@
 #include "GLSprite.h"
 #include "FileLoader.h"
 #include <QTextStream>
+#include <QImage>
 
 #include <irrKlang.h>
 using namespace irrklang;
 
+static QHash<QString, QImage*> sSourceImageHash;
 static QHash<QString, AnimationModel*> sAnimationHash;
 static QString mResourcePath;
 
@@ -18,6 +20,47 @@ static ISoundEngine* engine = createIrrKlangDevice();
 
 ResourceManager::ResourceManager()
 {
+}
+
+
+QImage* ResourceManager::getImage(QString path, bool recache)
+{
+    if (recache && sSourceImageHash.contains(path))
+    {
+        delete sSourceImageHash[path];
+        sSourceImageHash.remove(path);
+    }
+
+    if (!sSourceImageHash.contains(path))
+    {
+        QString fullPath = getResourcePath(path);
+        QFileInfo fileInfo = QFileInfo (fullPath);
+
+        if (!fileInfo.isFile()) {return NULL;}
+        try
+        {
+            sSourceImageHash.insert(path, new QImage(fullPath));
+        }
+        catch(char *str)
+        {
+            printf("File:%s couldn't be loaded.", str);
+            return NULL;
+        }
+    };
+
+    return sSourceImageHash[path];
+}
+
+
+void ResourceManager::clearImageCache()
+{
+    QHash<QString, QImage*>::Iterator iter = sSourceImageHash.begin();
+    while(iter != sSourceImageHash.end())
+    {
+        delete iter.value();
+        iter++;
+    }
+    sSourceImageHash.clear();
 }
 
 AnimationModel* ResourceManager::getAnimation(QString path)
@@ -75,8 +118,8 @@ ResourceManager::FileType ResourceManager::getFileType(QString path)
     // Load Image
     if (suffix.compare(IMAGE_FORMAT, Qt::CaseInsensitive) == 0)
     {
-        const QPixmap* pPixmap = AnimationModel::getPixmap(path);
-        if (pPixmap)
+        const QImage* pImage = ResourceManager::getImage(path);
+        if (pImage)
         {
             return FileType_Image;
         }

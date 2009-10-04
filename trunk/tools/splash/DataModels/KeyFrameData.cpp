@@ -58,6 +58,9 @@ void KeyFrameData::copyAttribute(KeyFrameData::TweenAttribute tweenAttribute, Ke
         case TweenAttribute_alpha:
             mSpriteDescriptor.mAlpha = item->mSpriteDescriptor.mAlpha;
         break;
+        case TweenAttribute_color:
+            mSpriteDescriptor.mColor = item->mSpriteDescriptor.mColor;
+        break;
         default:
         break;
     }

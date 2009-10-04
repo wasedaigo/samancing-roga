@@ -60,6 +60,11 @@ public:
         float mG;
         float mB;
 
+        bool isZero() const
+        {
+            return mR == 0 && mG == 0 && mB == 0;
+        }
+
         void operator=(const Color& color)
         {
             mR = color.mR;
@@ -188,6 +193,10 @@ public:
     QList<KeyFrame::KeyFramePosition> getNodePath() const;
 
     bool isSelectable() const;
+
+    void renderColored8(QPainter& painter, QImage* pImage, const QPointF& dstPoint, const QRect& srcRect, Color color) const;
+    void renderColored32(QPainter& painter, QImage* pImage, const QPointF& dstPoint, const QRect& srcRect, Color color) const;
+    bool renderColored(QPainter& painter, const QPointF& dstPoint, const QRect& srcRect) const;
     void render(QPoint offset, QPainter& painter, const GLSprite* pTargetSprite, bool isPlaying, QList<EmittedAnimation*>* emittedAnimationList) const;
     QRect getRect() const;
     bool contains(QPoint point) const;
