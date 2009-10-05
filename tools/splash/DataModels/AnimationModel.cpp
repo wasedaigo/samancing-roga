@@ -10,7 +10,6 @@
 #include "KeyFrameData.h"
 #include <math.h>
 
-#define PI 3.14159265358979323846
 #define DEFAULT_SELECTION_RECT QRect(0, 0, 32, 32);
 
 static bool sIsNesting = false;
@@ -450,29 +449,39 @@ void AnimationModel::setSelectedSourcePath(QString path)
 // Tween Related Stuff
 GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, int frameNo, int lineNo) const
 {
-    GLSprite* pGLSprite = tweenFrame(parentGLSprite, lineNo, frameNo);
-    return pGLSprite;
+    return tweenFrame(parentGLSprite, lineNo, frameNo);
 }
 
+// currently parentGLSprite is used only for emitted animation
+// currently this method is only used for facetodir option, which needs future frame to compare
 GLSprite* AnimationModel::createGLSpriteAt(const GLSprite* parentGLSprite, QList<KeyFrame::KeyFramePosition>nodePath) const
 {
-
     GLSprite* pGLSprite = NULL;
     const AnimationModel* pAnimationModel = this;
     for (int i = 0; i < nodePath.count(); i++)
     {
         pGLSprite = pAnimationModel->createGLSpriteAt(pGLSprite, nodePath[i].mFrameNo, nodePath[i].mLineNo);
+        if (!pGLSprite) {return NULL;}
 
         // If we have a parent, apply transformation to its children
         if (parentGLSprite)
         {
+            // Note: Might be wrong!
+            // We just assign the speed, we really don't care subanimation's state..
+            // I don't care too much about this, since this only effects faceToDir option..
+            if (parentGLSprite->mSpeedX != 0  || parentGLSprite->mSpeedY != 0 )
+            {
+                pGLSprite->mSpriteDescriptor.mPosition.mX = parentGLSprite->mSpeedX;
+                pGLSprite->mSpriteDescriptor.mPosition.mY = parentGLSprite->mSpeedY;
+            }
+
             pGLSprite->mSpriteDescriptor.mOptionalTransform = parentGLSprite->mSpriteDescriptor.getTransform();
             pGLSprite->mSpriteDescriptor.mPriority = parentGLSprite->getRootSprite()->mSpriteDescriptor.mPriority;
             pGLSprite->mSpriteDescriptor.mAlpha *= parentGLSprite->getAbsoluteAlpha();
+
             parentGLSprite = NULL;
         }
 
-        if (!pGLSprite) {return NULL;}
         if (ResourceManager::getFileType(pGLSprite->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Animation)
         {
             pAnimationModel = ResourceManager::getAnimation(pGLSprite->mSpriteDescriptor.mSourcePath);
@@ -633,7 +642,6 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                     pTargetSprite = pAnimationModel->createGLSpriteAt(NULL, list);
                 }
 
-
                 // If there is no next frame, use previous frame as target
                 bool reverse = false;
                 if (!pTargetSprite)
@@ -658,6 +666,7 @@ void AnimationModel::setFinalRotation(const GLSprite* parentGLSprite, int lineNo
                     }
                     else
                     {
+                        // The use of spTargetSprite is very tricky, it is nothing to do with target sprite position
                         point = point * (spTargetSprite->getCombinedTransform() * spTargetSprite->getTransform().inverted());
                     }
                     // Transform target position to screen coordinate
@@ -716,6 +725,7 @@ bool AnimationModel::copyTweenedAttribute(const GLSprite* pParentGLSprite, GLSpr
         if (!pStartKeyFrame->mpKeyFrameData || !pStartKeyFrame->mpKeyFrameData){return false;}
 
         GLSprite::SpriteDescriptor startDescriptor = pStartKeyFrame->mpKeyFrameData->mSpriteDescriptor;
+
         setFinalAlpha(pParentGLSprite, startDescriptor);
         setFinalPosition(pParentGLSprite, startDescriptor);
 
@@ -733,7 +743,6 @@ bool AnimationModel::copyTweenedAttribute(const GLSprite* pParentGLSprite, GLSpr
 
         tweenElement(spriteDescriptor, tweenAttribute, pStartKeyFrame->mpKeyFrameData->mTweenTypes[tweenAttribute], startDescriptor, endDescriptor, lineNo, frameNo, pStartKeyFrame->mFrameNo, pEndKeyFrame->mFrameNo);
 
-        
         if(tweenAttribute == KeyFrameData::TweenAttribute_rotation)
         {
             setFinalRotation(pParentGLSprite, lineNo, frameNo, spriteDescriptor);
@@ -797,7 +806,7 @@ GLSprite* AnimationModel::tweenFrame(const GLSprite* parentGLSprite, int lineNo,
     }
 
     bool isTweenCel  = (pBaseKeyFrame->mFrameNo == frameNo);
-    return new GLSprite(parentGLSprite, this, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, false);
+    return new GLSprite(parentGLSprite, this, lineNo, baseSpriteDescriptor, isTweenCel, lineNo, frameNo, false, 0, 0);
 }
 
 KeyFrame::KeyFramePosition AnimationModel::getCurrentKeyFramePosition()
@@ -894,6 +903,10 @@ bool AnimationModel::saveData()
                 if (pKeyFrameData->mSpriteDescriptor.mEmitter)
                 {
                     keyframeData["emitter"] = pKeyFrameData->mSpriteDescriptor.mEmitter;
+                    keyframeData["minEmitSpeed"] = pKeyFrameData->mSpriteDescriptor.mMinEmitSpeed;
+                    keyframeData["maxEmitSpeed"] = pKeyFrameData->mSpriteDescriptor.mMaxEmitSpeed;
+                    keyframeData["minEmitAngle"] = pKeyFrameData->mSpriteDescriptor.mMinEmitAngle;
+                    keyframeData["maxEmitAngle"] = pKeyFrameData->mSpriteDescriptor.mMaxEmitAngle;
                 }
 
                 if (ResourceManager::getFileType(pKeyFrameData->mSpriteDescriptor.mSourcePath) == ResourceManager::FileType_Image)
@@ -1108,6 +1121,22 @@ bool AnimationModel::loadData(QString path)
                 if (keyframe["emitter"].isBool())
                 {
                     pKeyFrameData->mSpriteDescriptor.mEmitter = keyframe["emitter"].asBool();
+                    if (keyframe["minEmitSpeed"].isDouble())
+                    {
+                        pKeyFrameData->mSpriteDescriptor.mMinEmitSpeed = keyframe["minEmitSpeed"].asDouble();
+                    }
+                    if (keyframe["maxEmitSpeed"].isDouble())
+                    {
+                        pKeyFrameData->mSpriteDescriptor.mMaxEmitSpeed = keyframe["maxEmitSpeed"].asDouble();
+                    }
+                    if (keyframe["minEmitAngle"].isInt())
+                    {
+                        pKeyFrameData->mSpriteDescriptor.mMinEmitAngle = keyframe["minEmitAngle"].asInt();
+                    }
+                    if (keyframe["maxEmitAngle"].isInt())
+                    {
+                        pKeyFrameData->mSpriteDescriptor.mMaxEmitAngle = keyframe["maxEmitAngle"].asInt();
+                    }
                 }
 
                 pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());

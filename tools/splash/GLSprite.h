@@ -127,6 +127,11 @@ public:
         // tell whether this is an emitter of subanimation (valid only this sprite is sub animation
         bool mEmitter;
 
+        float mMinEmitSpeed;
+        float mMaxEmitSpeed;
+        int mMinEmitAngle;
+        int mMaxEmitAngle;
+
         void operator=(SpriteDescriptor spriteDescriptor)
         {
             mEmitter = spriteDescriptor.mEmitter;
@@ -143,6 +148,11 @@ public:
             mPosition = spriteDescriptor.mPosition;
             mRotation = spriteDescriptor.mRotation;
             mColor = spriteDescriptor.mColor;
+
+            mMinEmitSpeed = spriteDescriptor.mMinEmitSpeed;
+            mMaxEmitSpeed = spriteDescriptor.mMaxEmitSpeed;
+            mMinEmitAngle = spriteDescriptor.mMinEmitAngle;
+            mMaxEmitAngle = spriteDescriptor.mMaxEmitAngle;
         }
 
         QTransform mOptionalTransform;
@@ -179,7 +189,7 @@ public:
     static SpriteDescriptor makeDefaultSpriteDescriptor();
     static bool priorityLessThan(const GLSprite* pItem1, const GLSprite* pItem2);
 
-    GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, bool emitted);
+    GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id,  const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, bool emitted, float dx, float dy);
     GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, QPixmap* pPixmap);
 
     const AnimationModel* getParentAnimationModel() const;
@@ -209,6 +219,8 @@ public:
     const int mLineNo;
     const int mFrameNo;
 
+    const float mSpeedX;
+    const float mSpeedY;
 private:
 
     const GLSprite* mpParentGLSprite;

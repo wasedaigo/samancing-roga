@@ -2,6 +2,7 @@
 
 #include "Macros.h"
 #include <math.h>
+#include <QGlobal.h>
 #include <QPixmap>
 #include <QPainter>
 #include "DataModels/AnimationModel.h"
@@ -82,6 +83,10 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mScale.mY = 1.0f;
 
     spriteDescriptor.mEmitter = false;
+    spriteDescriptor.mMinEmitSpeed = 0;
+    spriteDescriptor.mMaxEmitSpeed = 0;
+    spriteDescriptor.mMinEmitAngle = 0;
+    spriteDescriptor.mMaxEmitAngle = 0;
 
     spriteDescriptor.mTextureSrcRect = QRect(0, 0, 0, 0);
 
@@ -95,11 +100,13 @@ static QPainter::CompositionMode sCompositionMode[GLSprite::eBT_COUNT] =
     QPainter::CompositionMode_SourceOver
 };
 
-GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, bool emitted)
+GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationModel, const int& id, const SpriteDescriptor& spriteDescriptor, bool selectable, int lineNo, int frameNo, bool emitted, float speedX, float speedY)
         : mID(id),
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(lineNo),
           mFrameNo(frameNo),
+          mSpeedX(speedX),
+          mSpeedY(speedY),
           mpParentGLSprite(pGLSprite),
           mpParentAnimationModel(pAnimationModel),
           mIsSelectable(selectable),
@@ -116,6 +123,8 @@ GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationMo
           mSpriteDescriptor(spriteDescriptor),
           mLineNo(0),
           mFrameNo(0),
+          mSpeedX(0),
+          mSpeedY(0),
           mpParentGLSprite(pGLSprite),
           mpParentAnimationModel(pAnimationModel),
           mIsSelectable(selectable),
@@ -294,7 +303,10 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
                         // If the sprite has emitter option, emit new animation process
                         if (mSpriteDescriptor.mEmitter && isPlaying)
                         {
-                            emittedAnimationList[mLineNo].push_back(new EmittedAnimation(pAnimationModel, this));
+                            float speed = randFloat(mSpriteDescriptor.mMinEmitSpeed, mSpriteDescriptor.mMaxEmitSpeed);
+                            int angle = randInt(mSpriteDescriptor.mMinEmitAngle, mSpriteDescriptor.mMaxEmitAngle);
+
+                            emittedAnimationList[mLineNo].push_back(new EmittedAnimation(pAnimationModel, this, speed, angle));
                         }
                         else
                         {

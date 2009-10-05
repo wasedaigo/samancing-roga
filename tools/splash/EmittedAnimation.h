@@ -9,7 +9,7 @@ class AnimationModel;
 class EmittedAnimation
 {
 public:
-    EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite);
+    EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite, float speed, int angle);
     ~EmittedAnimation();
     void update();
     const GLSprite* getSprite() const;
