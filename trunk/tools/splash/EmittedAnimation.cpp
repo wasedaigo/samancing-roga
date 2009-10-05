@@ -2,10 +2,18 @@
 #include "GLSprite.h"
 #include "DataModels/AnimationModel.h"
 #include <QTransform>
+#include "Macros.h"
+#include <cmath>
 
-EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite)
+EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite, float speed, int angle)
    :       mCounter(0)
 {
+    float dx = cos(-angle * PI / 180.0);
+    float dy = sin(-angle * PI / 180.0);
+
+    float speedX = speed * dx /std::fabs(dx) + std::fabs(dy);
+    float speedY = speed * dy /std::fabs(dx) + std::fabs(dy);
+
     GLSprite::SpriteDescriptor spriteDescriptor = pParentGLSprite->mSpriteDescriptor;
 
     // Kinda hacky. I couldn't decompose transformation to each attribute
@@ -16,7 +24,7 @@ EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSpri
     spriteDescriptor.mAlpha = pParentGLSprite->getAbsoluteAlpha() * spriteDescriptor.mAlpha;
 
     spriteDescriptor.mEmitter = false;
-    mpGLSprite = new GLSprite(NULL, pAnimationModel, 0, spriteDescriptor, false, 0, 0, true);
+    mpGLSprite = new GLSprite(NULL, pAnimationModel, 0, spriteDescriptor, false, 0, 0, true, speedX, speedY);
 }
 
 EmittedAnimation::~EmittedAnimation()
@@ -29,6 +37,11 @@ void EmittedAnimation::update()
     if (mCounter < mpGLSprite->getParentAnimationModel()->getMaxFrameCount())
     {
         mpGLSprite->mSpriteDescriptor.mFrameNo = mCounter;
+       
+       // Move Sprite if velocity was specified
+        mpGLSprite->mSpriteDescriptor.mPosition.mX += mpGLSprite->mSpeedX;
+        mpGLSprite->mSpriteDescriptor.mPosition.mY += mpGLSprite->mSpeedY;
+
         mCounter++;
     }
 }

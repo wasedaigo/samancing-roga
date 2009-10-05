@@ -19,6 +19,12 @@ public slots:
     void setTextureSrcRect(QRect value);
 
     void setEmitter(bool isEmitter);
+
+    void setMinEmitSpeed(double value);
+    void setMaxEmitSpeed(double value);
+    void setMinEmitAngle(int value);
+    void setMaxEmitAngle(int value);
+
     void setBlendType(int index);
     void setRelativeToTarget(bool value);
     void setFacingOptionType(int value);
@@ -52,6 +58,10 @@ signals:
     void sourceTextureChanged(QString path, QRect rect);
     void textureSrcRectChanged(QRect value);
     void emitterChanged(bool isEmitter);
+    void minEmitSpeedChanged(double value);
+    void maxEmitSpeedChanged(double value);
+    void minEmitAngleChanged(int value);
+    void maxEmitAngleChanged(int value);
 
     void blendTypeChanged(int value);
     void relativeToTargetChanged(bool value);

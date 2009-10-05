@@ -58,6 +58,10 @@ SETSLOT(SpriteDescriptor.mColor.mB, ColorB, colorB, double, float);
 SETSLOT(SpriteDescriptor.mAlpha, Alpha, alpha, double, float);
 SETSLOT(SpriteDescriptor.mPriority, Priority, priority, double, float);
 SETSLOT(SpriteDescriptor.mEmitter, Emitter, emitter, bool, bool);
+SETSLOT(SpriteDescriptor.mMinEmitSpeed, MinEmitSpeed, minEmitSpeed, double, float);
+SETSLOT(SpriteDescriptor.mMaxEmitSpeed, MaxEmitSpeed, maxEmitSpeed, double, float);
+SETSLOT(SpriteDescriptor.mMinEmitAngle, MinEmitAngle, minEmitAngle, int, int);
+SETSLOT(SpriteDescriptor.mMaxEmitAngle, MaxEmitAngle, maxEmitAngle, int, int);
 
 void CelModel::setCenterX(int value)
 {

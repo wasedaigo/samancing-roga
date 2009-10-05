@@ -73,7 +73,12 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setFacingOptionType(int)));
     connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
+
     connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setEmitter(bool)));
+    connect(m_ui->minEmitSpeedSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setMinEmitSpeed(double)));
+    connect(m_ui->maxEmitSpeedSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setMaxEmitSpeed(double)));
+    connect(m_ui->minEmitAngleSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setMinEmitAngle(int)));
+    connect(m_ui->maxEmitAngleSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setMaxEmitAngle(int)));
 
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setBlur(int)));
 
@@ -180,6 +185,11 @@ void AnimationViewer::blockSignals(bool block)
     m_ui->colorSpinBoxR->blockSignals(block);
     m_ui->colorSpinBoxG->blockSignals(block);
     m_ui->colorSpinBoxB->blockSignals(block);
+
+    m_ui->minEmitSpeedSpinBox->blockSignals(block);
+    m_ui->maxEmitSpeedSpinBox->blockSignals(block);
+    m_ui->minEmitAngleSpinBox->blockSignals(block);
+    m_ui->maxEmitAngleSpinBox->blockSignals(block);
 }
 
 // Cel selected
@@ -214,6 +224,11 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
 
 
+        m_ui->minEmitSpeedSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mMinEmitSpeed);
+        m_ui->maxEmitSpeedSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mMaxEmitSpeed);
+        m_ui->minEmitAngleSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mMinEmitAngle);
+        m_ui->maxEmitAngleSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mMaxEmitAngle);
+
         if (pKeyFrameData->mSpriteDescriptor.isImage())
         {
             // Check box
@@ -225,6 +240,7 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
             // Emitter
             m_ui->emitterCheckBox->setEnabled(false);
             m_ui->emitterCheckBox->setChecked(false);
+            m_ui->emitLayout->setEnabled(false);
         }
         else
         {
@@ -237,6 +253,7 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
             // Emitter
             m_ui->emitterCheckBox->setEnabled(true);
             m_ui->emitterCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mEmitter);
+            m_ui->emitLayout->setEnabled(true);
         }
         blockSignals(false);
     }
