@@ -4,7 +4,44 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 
+static Json::Value optionalData;
 
+// private
+void FileLoader::loadOptionData()
+{
+    Json::Value root = getInitData();
+    optionalData = root["option"];
+}
+
+Json::Value FileLoader::getInitData()
+{
+    QFileInfo initFileInfo = QFileInfo(QDir::currentPath(), QString("init.json"));
+    QString filePath = initFileInfo.absoluteFilePath();
+
+    return loadJsonFile(filePath);
+}
+
+void FileLoader::saveInitFile(QString targetpath, Json::Value newOptionalData)
+{
+    QFileInfo initFileInfo = QFileInfo(QDir::currentPath(), QString("init.json"));
+    QString filePath = initFileInfo.absoluteFilePath();
+
+    Json::StyledWriter writer;
+    Json::Value data;
+    data["initFilePath"] = targetpath.toStdString();
+    data["option"] = newOptionalData;
+    std::string outputJson = writer.write(data);
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream( &file );
+        file.write(outputJson.c_str(), outputJson.length());
+        file.close();
+    }
+}
+
+// public
 std::string FileLoader::getFileData(QString path)
 {
     // Get json file data
@@ -35,6 +72,11 @@ Json::Value FileLoader::loadJsonFile(QString path)
     return root;
 }
 
+void FileLoader::saveInitOptionData(QString filePath, Json::Value newOptionalData)
+{
+    saveInitFile(filePath, optionalData);
+}
+
 void FileLoader::save(QString filePath, Json::Value root)
 {
     // Save to file
@@ -49,7 +91,7 @@ void FileLoader::save(QString filePath, Json::Value root)
         file.close();
     }
 
-    saveInitFile(filePath);
+    saveInitFile(filePath, optionalData);
 }
 
 Json::Value FileLoader::load(QString filePath)
@@ -60,17 +102,22 @@ Json::Value FileLoader::load(QString filePath)
     {
         // load succeeded
         // update initfile
-        saveInitFile(filePath);
+        saveInitFile(filePath, optionalData);
     }
 
     return root;
 }
 
+Json::Value FileLoader::getInitOptionData()
+{
+    loadOptionData();
+    return optionalData;
+}
+
+// Get starting path
 QString FileLoader::getInitpath()
 {
-    QFileInfo initFileInfo = QFileInfo(QDir::currentPath(), QString("init.json"));
-    QString filePath = initFileInfo.absoluteFilePath();
-    Json::Value root = loadJsonFile(filePath);
+    Json::Value root = getInitData();
 
     if (root.empty())
     {
@@ -79,24 +126,5 @@ QString FileLoader::getInitpath()
     else
     {
         return QString::fromStdString(root["initFilePath"].asString());
-    }
-}
-
-void FileLoader::saveInitFile(QString targetpath)
-{
-    QFileInfo initFileInfo = QFileInfo(QDir::currentPath(), QString("init.json"));
-    QString filePath = initFileInfo.absoluteFilePath();
-
-    Json::StyledWriter writer;
-    Json::Value data;
-    data["initFilePath"] = targetpath.toStdString();
-    std::string outputJson = writer.write(data);
-
-    QFile file(filePath);
-    if (file.open(QIODevice::WriteOnly))
-    {
-        QTextStream stream( &file );
-        file.write(outputJson.c_str(), outputJson.length());
-        file.close();
     }
 }
