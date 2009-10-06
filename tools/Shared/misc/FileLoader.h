@@ -11,10 +11,17 @@ public:
     static std::string getFileData(QString path);
     static Json::Value loadJsonFile(QString path);
 
+    static void saveInitOptionData(QString filePath, Json::Value newOptionalData);
     static void save(QString filePath, Json::Value root);
     static Json::Value load(QString filePath);
+    static Json::Value getInitOptionData();
     static QString getInitpath();
-    static void saveInitFile(QString targetpath);
+
+
+private:
+    static void loadOptionData();
+    static void saveInitFile(QString targetpath, Json::Value newOptionalData);
+    static Json::Value getInitData();
 };
 
 #endif // FILELOADER_H
