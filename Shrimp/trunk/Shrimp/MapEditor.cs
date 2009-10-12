@@ -83,43 +83,44 @@ namespace Shrimp
             }
             else if (e.Property == editorState.GetProperty(_ => _.MapOffsets))
             {
-                if (this.Map != null)
+                if (this.Map == null)
                 {
-                    this.AdjustScrollBars();
-                    int mapId = this.Map.Id;
-                    Point offset = this.EditorState.GetMapOffset(mapId);
-                    if (!this.PreviousMapOffsets.ContainsKey(mapId))
-                    {
-                        this.PreviousMapOffsets.Add(mapId, Point.Empty);
-                    }
-                    int dx = offset.X - this.PreviousMapOffsets[mapId].X;
-                    int dy = offset.Y - this.PreviousMapOffsets[mapId].Y;
-                    if (dx != 0)
-                    {
-                        this.UpdateOffscreen(new Rectangle
-                        {
-                            X = (0 < dx) ? this.OffscreenSize.Width - dx : 0,
-                            Y = 0,
-                            Width = Math.Abs(dx),
-                            Height = this.OffscreenSize.Height,
-                        });
-                    }
-                    if (dy != 0)
-                    {
-                        this.UpdateOffscreen(new Rectangle
-                        {
-                            X = 0,
-                            Y = (0 < dy) ? this.OffscreenSize.Height - dy : 0,
-                            Width = this.OffscreenSize.Width,
-                            Height = Math.Abs(dy),
-                        });
-                    }
-                    NativeMethods.ScrollWindowEx(this.Handle, dx, dy,
-                        IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero,
-                        NativeMethods.SW_INVALIDATE);
-                    this.Update();
-                    this.PreviousMapOffsets[mapId] = offset;
+                    return;
                 }
+                this.AdjustScrollBars();
+                int mapId = this.Map.Id;
+                Point offset = this.EditorState.GetMapOffset(mapId);
+                if (!this.PreviousMapOffsets.ContainsKey(mapId))
+                {
+                    this.PreviousMapOffsets.Add(mapId, Point.Empty);
+                }
+                int dx = offset.X - this.PreviousMapOffsets[mapId].X;
+                int dy = offset.Y - this.PreviousMapOffsets[mapId].Y;
+                if (dx != 0)
+                {
+                    this.UpdateOffscreen(new Rectangle
+                    {
+                        X = (0 < dx) ? this.OffscreenSize.Width - dx : 0,
+                        Y = 0,
+                        Width = Math.Abs(dx),
+                        Height = this.OffscreenSize.Height,
+                    });
+                }
+                if (dy != 0)
+                {
+                    this.UpdateOffscreen(new Rectangle
+                    {
+                        X = 0,
+                        Y = (0 < dy) ? this.OffscreenSize.Height - dy : 0,
+                        Width = this.OffscreenSize.Width,
+                        Height = Math.Abs(dy),
+                    });
+                }
+                NativeMethods.ScrollWindowEx(this.Handle, dx, dy,
+                    IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero,
+                    NativeMethods.SW_INVALIDATE);
+                this.Update();
+                this.PreviousMapOffsets[mapId] = offset;
             }
             else if (e.Property == editorState.GetProperty(_ => _.SelectedTiles))
             {
@@ -139,6 +140,7 @@ namespace Shrimp
             {
                 if (this.map != value)
                 {
+                    this.PreviousFrameRect = Rectangle.Empty;
                     if (this.map != null)
                     {
                         this.map.Updated -= this.Map_Updated;
