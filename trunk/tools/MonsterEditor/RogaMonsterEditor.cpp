@@ -13,9 +13,9 @@
 #include "FileLoader.h"
 
 // Size of one face icon
-#define FACE_ICON_WIDTH 48
-#define FACE_ICON_HEIGHT 72
-#define FACE_ICON_PATH "UI/UI_Faces.png"
+#define FACE_ICON_WIDTH 56
+#define FACE_ICON_HEIGHT 80
+#define FACE_ICON_PATH "Images/UI/UI_Faces.png"
 
 #define EQUIP_SKILL_FIELD_COUNT 2
 static QString equipSkillFields[EQUIP_SKILL_FIELD_COUNT] = {"SkillID", "count"};

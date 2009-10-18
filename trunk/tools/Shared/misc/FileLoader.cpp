@@ -74,6 +74,7 @@ Json::Value FileLoader::loadJsonFile(QString path)
 
 void FileLoader::saveInitOptionData(QString filePath, Json::Value newOptionalData)
 {
+    optionalData = newOptionalData;
     saveInitFile(filePath, optionalData);
 }
 
