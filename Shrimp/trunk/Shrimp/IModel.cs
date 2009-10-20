@@ -21,6 +21,11 @@ namespace Shrimp
 
     internal class UpdatedEventArgs : EventArgs
     {
+        public UpdatedEventArgs()
+            : this(null)
+        {
+        }
+
         public UpdatedEventArgs(string property)
             : this(property, null)
         {

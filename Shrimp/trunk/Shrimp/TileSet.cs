@@ -45,7 +45,7 @@ namespace Shrimp
                     if (this.imageFileName != null)
                     {
                         this.OriginalBitmap = new Bitmap(this.ImageFileFullPath);
-                        this.TilePassageTypes = new TilePassageType[this.Width * this.Height];
+                        this.TilePassageTypes = new ObservedArray<TilePassageType>(this.Width * this.Height);
                     }
                     else
                     {
@@ -125,7 +125,7 @@ namespace Shrimp
             }
         }
 
-        public TilePassageType GetTilePassageType(int tile)
+        /*public TilePassageType GetTilePassageType(int tile)
         {
             return this.TilePassageTypes[tile];
         }
@@ -138,18 +138,18 @@ namespace Shrimp
                 this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TilePassageTypes), null));
             }
         }
-        private TilePassageType[] TilePassageTypes;
+        private TilePassageType[] TilePassageTypes;*/
+        public ObservedArray<TilePassageType> TilePassageTypes { get; private set; }
 
         public override void Clear()
         {
-            this.ImageFileName = null;
         }
 
         public override JToken ToJson()
         {
             return new JObject(
                 new JProperty("ImageFileName", this.ImageFileName),
-                new JProperty("TilePassageTypes", this.TilePassageTypes.Cast<int>().ToArray()));
+                new JProperty("TilePassageTypes", this.TilePassageTypes.ToJson()));
         }
 
         public override void LoadJson(JToken json)
@@ -164,11 +164,7 @@ namespace Shrimp
             {
                 if ((token = json["TilePassageTypes"]) != null)
                 {
-                    TilePassageType[] newTilePassageTypes = token.Values<int>().Cast<TilePassageType>().ToArray();
-                    for (int i = 0; i < this.TilePassageTypes.Length; i++)
-                    {
-                        this.SetTilePassageType(i, newTilePassageTypes[i]);
-                    }
+                    this.TilePassageTypes.LoadJson(token);
                 }
             }
         }
