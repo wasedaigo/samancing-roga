@@ -89,6 +89,7 @@
       <DependentUpon>MapEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Model.cs" />
+    <Compile Include="ObservedArray.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="MapTreeView.cs">
       <SubType>Component</SubType>

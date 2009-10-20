@@ -21,26 +21,26 @@ namespace Shrimp
 
     internal class UpdatedEventArgs : EventArgs
     {
-        public UpdatedEventArgs(PropertyInfo property)
+        public UpdatedEventArgs(string property)
             : this(property, null)
         {
         }
 
-        public UpdatedEventArgs(PropertyInfo property, object bounds)
+        public UpdatedEventArgs(string property, object bounds)
         {
             this.Property = property;
             this.Bounds = bounds;
         }
 
-        public PropertyInfo Property { get; private set; }
+        public string Property { get; private set; }
         public object Bounds { get; private set; }
     }
 
     internal static class IModelExtensions
     {
-        public static PropertyInfo GetProperty<T, TResult>(this T obj, Expression<Func<T, TResult>> expr) where T : IModel
+        public static string GetProperty<T, TResult>(this T obj, Expression<Func<T, TResult>> expr) where T : IModel
         {
-            return (PropertyInfo)((MemberExpression)(expr.Body)).Member;
+            return ((MemberExpression)(expr.Body)).Member.Name;
         }
     }
 }

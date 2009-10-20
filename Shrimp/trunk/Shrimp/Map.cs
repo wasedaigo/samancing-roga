@@ -59,7 +59,7 @@ namespace Shrimp
                 {
                     if (value < MinWidth || MaxWidth < value)
                     {
-                        throw new ArgumentOutOfRangeException(this.GetProperty(_ => _.Width).Name);
+                        throw new ArgumentOutOfRangeException(this.GetProperty(_ => _.Width));
                     }
                     if (this.width < value)
                     {
@@ -99,7 +99,7 @@ namespace Shrimp
                 {
                     if (value < MinHeight || MaxHeight < value)
                     {
-                        throw new ArgumentOutOfRangeException(this.GetProperty(_ => _.Height).Name);
+                        throw new ArgumentOutOfRangeException(this.GetProperty(_ => _.Height));
                     }
                     if (this.height < value)
                     {
