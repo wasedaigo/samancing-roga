@@ -5,6 +5,7 @@
 #include "json/reader.h"
 #include "json/writer.h"
 #include <QModelIndex>
+#include <QStandardItemModel>
 
 namespace Ui {
     class RogaSkillEditor;
@@ -47,6 +48,7 @@ private:
 
     Ui::RogaSkillEditor *m_ui;
 
+    QStandardItemModel* mpImmunityRateTypeModel;
     QString mSkillDataPath;
     QString mSelectedID;
     Json::Value mSkillDataRoot;

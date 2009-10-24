@@ -8,6 +8,37 @@
 
 #include "FileLoader.h"
 
+#define SKILL_DATA_DIRECTORY QString("GameData/Animations/Battle/Skills/")
+
+enum ImmunityRate
+{
+    ImmunityRate_SuperWeak,
+    ImmunityRate_Weak,
+    ImmunityRate_None,
+    ImmunityRate_Resist,
+    ImmunityRate_Invulnerable,
+    ImmunityRate_Absorb,
+
+    ImmunityRate_COUNT
+};
+
+static int immunityRate[ImmunityRate_COUNT] = {-250, -100, 0, 50, 100, 200};
+static QString immunityRateType[ImmunityRate_COUNT] = {"Super weak", "Weak", "None", "Resist", "Invulnerable", "Absorb"};
+static int getIndexOfImmunityRateType(QString key)
+{
+    int num = 0;
+    for (int i = 0; i < ImmunityRate_COUNT; i++)
+    {
+        if (key == immunityRateType[i])
+        {
+            num = i;
+            break;
+        }
+    }
+
+    return num;
+}
+
 #define DAMAGE_FIELD_COUNT 6
 static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "hit", "critical", "attr", "damagedef"};
 static int getIndexOfDamageField(QString key)
@@ -60,7 +91,7 @@ static int getIndexOfMultiTargetType(QString key)
 }
 
 #define AOE_TYPE_COUNT 4
-static QString AOETypes[AOE_TYPE_COUNT] = {"One Tile", "One Row", "One Column", "Cross"};
+static QString AOETypes[AOE_TYPE_COUNT] = {"OneTile", "OneRow", "OneColumn", "Cross"};
 static int getIndexOfAOEType(QString key)
 {
     int num = 0;
@@ -108,6 +139,16 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveSelected()));
     connect(m_ui->actionSave_As, SIGNAL(triggered()), this, SLOT(onSaveAsSelected()));
 
+    // Setup Immunity Comboboxes
+    mpImmunityRateTypeModel = new QStandardItemModel();
+    for (int i = 0; i < ImmunityRate_COUNT; i++)
+    {
+        mpImmunityRateTypeModel->appendRow(new QStandardItem(immunityRateType[i]));
+    }
+
+    m_ui->undeadCombobox->setModel(mpImmunityRateTypeModel);
+    m_ui->undeadCombobox->setCurrentIndex(ImmunityRate_None);
+
     // setup short cuts
     m_ui->actionSave->setShortcut(QKeySequence("Ctrl+s"));
 
@@ -118,6 +159,7 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
 
 RogaSkillEditor::~RogaSkillEditor()
 {
+    delete mpImmunityRateTypeModel;
     delete m_ui;
 }
 
@@ -305,8 +347,9 @@ bool RogaSkillEditor::saveSkillData()
             mSkillDataRoot.removeMember(skillID);
             mSkillDataRoot[skillID]["name"] = m_ui->nameEdit->text().toStdString();
             mSkillDataRoot[skillID]["desc"] = m_ui->descEdit->toPlainText().toStdString();
-            mSkillDataRoot[skillID]["castingAnimation"] = m_ui->castingAnimationEdit->text().toStdString();
-            mSkillDataRoot[skillID]["skillAnimation"] = m_ui->skillAnimationEdit->text().toStdString();
+            mSkillDataRoot[skillID]["castingAnimation"] = SKILL_DATA_DIRECTORY.append(m_ui->castingAnimationEdit->text()).toStdString();
+            mSkillDataRoot[skillID]["skillAnimation"] = SKILL_DATA_DIRECTORY.append(m_ui->skillAnimationEdit->text()).toStdString();
+
             mSkillDataRoot[skillID]["multiTargetType"] = multiTargetType[m_ui->multiTargetCombox->currentIndex()].toStdString();
             if(m_ui->AOECheckBox->isChecked())
             {
@@ -376,11 +419,15 @@ void RogaSkillEditor::loadSkillData()
                 }
                 if(!skillData["castingAnimation"].isNull())
                 {
-                     m_ui->castingAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["castingAnimation"].asString()));
+                    QString str = QString::fromStdString(mSkillDataRoot[skillID]["castingAnimation"].asString());
+                    str.replace(SKILL_DATA_DIRECTORY, "");
+                    m_ui->castingAnimationEdit->setText(str);
                 }
                 if(!skillData["skillAnimation"].isNull())
                 {
-                     m_ui->skillAnimationEdit->setText(QString::fromStdString(mSkillDataRoot[skillID]["skillAnimation"].asString()));
+                    QString str = QString::fromStdString(mSkillDataRoot[skillID]["skillAnimation"].asString());
+                    str.replace(SKILL_DATA_DIRECTORY, "");
+                    m_ui->skillAnimationEdit->setText(str);
                 }
 
                 if(!skillData["multiTargetType"].isNull())

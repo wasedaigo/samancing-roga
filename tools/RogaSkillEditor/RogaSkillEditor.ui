@@ -137,28 +137,39 @@
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="skillAnimationEdit"/>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="castingAnimationEdit"/>
-        </item>
-        <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
            <string>Skill Animation</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item>
+         <widget class="QLineEdit" name="skillAnimationEdit"/>
+        </item>
+        <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>Casting Animation</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="2">
+        <item>
+         <widget class="QLineEdit" name="castingAnimationEdit"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Multi-Target Animation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QComboBox" name="multiTargetCombox">
           <item>
            <property name="text">
@@ -182,43 +193,19 @@
           </item>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_6">
+        <item>
+         <widget class="QCheckBox" name="AOECheckBox">
           <property name="text">
-           <string>Multi-Target Animation</string>
+           <string>Area of Effect</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="5">
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item>
+         <widget class="QComboBox" name="AOEComboBox">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="5" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QCheckBox" name="AOECheckBox">
-            <property name="text">
-             <string>Area of Effect</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="AOEComboBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         </widget>
         </item>
        </layout>
       </item>
@@ -321,6 +308,211 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gridGroupBox">
+        <property name="title">
+         <string>Immunity(%)</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Undead</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="undeadCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Human</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="humanCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Rizard</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="rizardCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <item>
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>Beast</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="beastCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <item>
+            <widget class="QLabel" name="label_18">
+             <property name="text">
+              <string>Ground</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="groundCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <item>
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Wind</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="windCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_18">
+           <item>
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>Fly</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="flyCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
+           <item>
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>Fire</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="fireCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
+           <item>
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>Water</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="waterCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_21">
+           <item>
+            <widget class="QLabel" name="label_23">
+             <property name="text">
+              <string>Earth</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="earthCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_22">
+           <item>
+            <widget class="QLabel" name="label_24">
+             <property name="text">
+              <string>Slash</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="slashCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_23">
+           <item>
+            <widget class="QLabel" name="label_25">
+             <property name="text">
+              <string>Pierce</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="pierceCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_24">
+           <item>
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>Blunt</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="bluntCombobox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="4">
+          <layout class="QHBoxLayout" name="horizontalLayout_26">
+           <item>
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>Plant</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="plantCombobox"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <widget class="QGroupBox" name="horizontalGroupBox_5">
