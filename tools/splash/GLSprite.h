@@ -105,7 +105,7 @@ public:
     {
         QString mSourcePath;
 
-        bool mRelativeToTarget;
+        int mPositionType;
         FacingOptionType mFacingOptionType;
         int mBlur;
         QRect mTextureSrcRect; // only valid when it is not a child animation
@@ -136,7 +136,7 @@ public:
         {
             mEmitter = spriteDescriptor.mEmitter;
             mSourcePath = spriteDescriptor.mSourcePath;
-            mRelativeToTarget = spriteDescriptor.mRelativeToTarget;
+            mPositionType = spriteDescriptor.mPositionType;
             mFacingOptionType = spriteDescriptor.mFacingOptionType;
             mBlur = spriteDescriptor.mBlur;
             mAlpha = spriteDescriptor.mAlpha;

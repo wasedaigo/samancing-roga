@@ -30,6 +30,13 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     m_ui->scaleTweenTypeComboBox->setModel(mpTweenModel);
     m_ui->colorTweenTypeComboBox->setModel(mpTweenModel);
 
+    // Set Position types
+    mpPositionTypeModel = new QStandardItemModel();
+    mpPositionTypeModel->appendRow(new QStandardItem(QString("none")));
+    mpPositionTypeModel->appendRow(new QStandardItem(QString("RelToTarget")));
+    mpPositionTypeModel->appendRow(new QStandardItem(QString("RelToTargetOrigin")));
+    m_ui->positionTypeComboBox->setModel(mpPositionTypeModel);
+
     mpAnimationPlayTimer = new QTimer(this);
     mpAnimationPlayTimer->setInterval(30);
 
@@ -72,7 +79,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
 
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setFacingOptionType(int)));
-    connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setRelativeToTarget(bool)));
+    connect(m_ui->positionTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setPositionType(int)));
 
     connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setEmitter(bool)));
     connect(m_ui->minEmitSpeedSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setMinEmitSpeed(double)));
@@ -115,7 +122,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
 
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
-    connect(m_ui->relativeToTargetCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->positionTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
 
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -141,6 +148,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
 
 AnimationViewer::~AnimationViewer()
 {
+    delete mpPositionTypeModel;
     delete mpTweenModel;
     mpAnimationPlayTimer->stop();
     delete mpAnimationPlayTimer;
@@ -176,7 +184,7 @@ void AnimationViewer::blockSignals(bool block)
     m_ui->scaleYSpinBox->blockSignals(block);
     m_ui->rotationXSpinBox->blockSignals(block);
     m_ui->blurSpinBox->blockSignals(block);
-    m_ui->relativeToTargetCheckBox->blockSignals(block);
+    m_ui->positionTypeComboBox->blockSignals(block);
     m_ui->emitterCheckBox->blockSignals(block);
     m_ui->facingOptionCombobox->blockSignals(block);
     m_ui->blendTypeComboBox->blockSignals(block);
@@ -218,7 +226,7 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->rotationXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mRotation);
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
         m_ui->blurSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mBlur);
-        m_ui->relativeToTargetCheckBox->setChecked(pKeyFrameData->mSpriteDescriptor.mRelativeToTarget);
+        m_ui->positionTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mPositionType);
 
         m_ui->facingOptionCombobox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mFacingOptionType);
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);

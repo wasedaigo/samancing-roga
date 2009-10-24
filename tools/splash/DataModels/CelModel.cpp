@@ -36,7 +36,7 @@ SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_scale], ScaleTweenType, scaleTwe
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, KeyFrameData::TweenType);
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_color], ColorTweenType, colorTweenType,  int, KeyFrameData::TweenType);
 
-SETSLOT(SpriteDescriptor.mRelativeToTarget, RelativeToTarget, relativeToTarget, bool, bool);
+SETSLOT(SpriteDescriptor.mPositionType, PositionType, positionType, int, int);
 SETSLOT(SpriteDescriptor.mFacingOptionType, FacingOptionType, facingOptionType, int, GLSprite::FacingOptionType);
 SETSLOT(SpriteDescriptor.mBlur, Blur, blur, int, int);
 

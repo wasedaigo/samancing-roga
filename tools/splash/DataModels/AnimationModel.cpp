@@ -548,7 +548,7 @@ void AnimationModel::setFinalAlpha(const GLSprite* parentGLSprite, GLSprite::Spr
 
 void AnimationModel::setFinalPosition(const GLSprite* parentGLSprite, GLSprite::SpriteDescriptor& spriteDescriptor) const
 {
-    if(spriteDescriptor.mRelativeToTarget)
+    if(spriteDescriptor.mPositionType != KeyFrameData::PositionType_None)
     {
         // Transform current position based on target point
         QPoint point = QPointF(spriteDescriptor.mPosition.mX, spriteDescriptor.mPosition.mY).toPoint();
@@ -895,9 +895,9 @@ bool AnimationModel::saveData()
                     keyframeData["facingOption"] = GLSprite::facingOptionTypeSting[pKeyFrameData->mSpriteDescriptor.mFacingOptionType].toStdString();
                 }
 
-                if (pKeyFrameData->mSpriteDescriptor.mRelativeToTarget)
+                if (pKeyFrameData->mSpriteDescriptor.mPositionType != KeyFrameData::PositionType_None)
                 {
-                    keyframeData["relativeToTarget"] = pKeyFrameData->mSpriteDescriptor.mRelativeToTarget;
+                    keyframeData["positionType"] = KeyFrameData::positionTypeString[pKeyFrameData->mSpriteDescriptor.mPositionType].toStdString();
                 }
 
                 if (pKeyFrameData->mSpriteDescriptor.mEmitter)
@@ -1113,9 +1113,9 @@ bool AnimationModel::loadData(QString path)
                 }
                 pKeyFrameData->mSpriteDescriptor.mFacingOptionType = GLSprite::getFacingOptionTypeByString(QString::fromStdString(keyframe["facingOption"].asString()));
 
-                if (keyframe["relativeToTarget"].isBool())
+                if (keyframe["positionType"].isString())
                 {
-                    pKeyFrameData->mSpriteDescriptor.mRelativeToTarget = keyframe["relativeToTarget"].asBool();
+                    pKeyFrameData->mSpriteDescriptor.mPositionType = KeyFrameData::getPositionTypeByString(QString::fromStdString(keyframe["positionType"].asString()));
                 }
 
                 if (keyframe["emitter"].isBool())

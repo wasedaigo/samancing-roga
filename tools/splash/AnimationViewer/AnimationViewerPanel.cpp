@@ -500,7 +500,7 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
         // Move cel if it is selected
         if (pKeyFrameData)
         {
-            if (pKeyFrameData->mSpriteDescriptor.mRelativeToTarget)
+            if (pKeyFrameData->mSpriteDescriptor.mPositionType != KeyFrameData::PositionType_None)
             {
                 newPosX -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
                 newPosY -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;

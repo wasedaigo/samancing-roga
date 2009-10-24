@@ -49,6 +49,7 @@ private:
     void blockSignals(bool block);
 
     CelModel* mpSelectedCelModel;
+    QStandardItemModel* mpPositionTypeModel;
     QStandardItemModel* mpTweenModel;
 
     AnimationModel* mpAnimationModel;

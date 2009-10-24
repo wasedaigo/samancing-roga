@@ -600,9 +600,19 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QCheckBox" name="relativeToTargetCheckBox">
+              <widget class="QLabel" name="label_9">
                <property name="text">
-                <string>Relative to Target</string>
+                <string>Position Type</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="positionTypeComboBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
               </widget>
              </item>
@@ -763,7 +773,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../ui.qrc">
               <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
             </property>
             <property name="iconSize">
@@ -780,7 +790,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../ui.qrc">
               <normaloff>:/resource/palette.png</normaloff>:/resource/palette.png</iconset>
             </property>
             <property name="iconSize">
@@ -797,7 +807,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../ui.qrc">
               <normaloff>:/resource/play.png</normaloff>:/resource/play.png</iconset>
             </property>
             <property name="iconSize">
@@ -861,6 +871,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../ui.qrc"/>
+ </resources>
  <connections/>
 </ui>

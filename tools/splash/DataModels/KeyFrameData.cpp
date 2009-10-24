@@ -1,6 +1,25 @@
 #include "KeyFrameData.h"
 #include "GLSprite.h"
 
+QString KeyFrameData::positionTypeString[KeyFrameData::PositionType_COUNT] =
+{
+    "none",
+    "relativeToTarget",
+    "relativeToTargetOrigin"
+};
+
+KeyFrameData::PositionType KeyFrameData::getPositionTypeByString(QString typeString)
+{
+    for (int i = 0; i < PositionType_COUNT; i++)
+    {
+        if (typeString == positionTypeString[i])
+        {
+            return static_cast<KeyFrameData::PositionType>(i);
+        }
+    }
+    return PositionType_None;
+}
+
 QString KeyFrameData::tweenAttributeSting[KeyFrameData::TweenAttribute_COUNT] =
 {
     "positionTween",
