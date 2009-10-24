@@ -150,5 +150,5 @@ QString ResourceManager::loadWorkingDirectory()
 void ResourceManager::setWorkingDirectory(QString newDirectory)
 {
     mResourcePath = newDirectory;
-    FileLoader::saveInitFile(mResourcePath);
+    FileLoader::saveInitData(mResourcePath);
 }

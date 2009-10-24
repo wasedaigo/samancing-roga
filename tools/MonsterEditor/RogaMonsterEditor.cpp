@@ -13,8 +13,8 @@
 #include "FileLoader.h"
 
 // Size of one face icon
-#define FACE_ICON_WIDTH 56
-#define FACE_ICON_HEIGHT 80
+#define FACE_ICON_WIDTH 32
+#define FACE_ICON_HEIGHT 48
 #define FACE_ICON_PATH "Images/UI/UI_Faces.png"
 
 #define EQUIP_SKILL_FIELD_COUNT 2
@@ -507,9 +507,9 @@ void RogaMonsterEditor::save(QString filePath)
         mMonsterDataRoot["faceIconHeight"] = FACE_ICON_HEIGHT;
         mMonsterDataRoot["faceIconPath"] = FACE_ICON_PATH;
 
-        Json::Value initData;
-        initData["resourceDirPath"] = mResourceDirPath.toStdString();
-        FileLoader::saveInitOptionData(filePath, initData);
+        Json::Value optionalData;
+        optionalData["resourceDirPath"] = mResourceDirPath.toStdString();
+        FileLoader::saveInitData(filePath, optionalData);
         FileLoader::save(filePath, mMonsterDataRoot);
         mChanged = false;
     }
