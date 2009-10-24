@@ -319,6 +319,10 @@ void RogaSkillEditor::clearUI()
     m_ui->TwoSelfCheckBox->setChecked(false);
     m_ui->TwoOpponentCheckBox->setChecked(false);
     m_ui->TwoAllyCheckBox->setChecked(false);
+
+    m_ui->chainableCheckbox->setChecked(false);
+    m_ui->chainStartFrameCombobox->setValue(0);
+    m_ui->chainDurationCombobox->setValue(0);
 }
 
 bool RogaSkillEditor::saveSkillData()
@@ -356,6 +360,9 @@ bool RogaSkillEditor::saveSkillData()
                 mSkillDataRoot[skillID]["AOEValue"] = AOETypes[m_ui->AOEComboBox->currentIndex()].toStdString();
             }
 
+            mSkillDataRoot[skillID]["chainable"] = m_ui->chainableCheckbox->isChecked();
+            mSkillDataRoot[skillID]["chainStartFrame"] = m_ui->chainStartFrameCombobox->value();
+            mSkillDataRoot[skillID]["chainDuration"] = m_ui->chainDurationCombobox->value();
             // radio group 1
             mSkillDataRoot[skillID]["TargetDataOne"]["targetSelectionType"] = targetSelectionType[m_ui->OneSelectionTypeComboBox->currentIndex()].toStdString();
             mSkillDataRoot[skillID]["TargetDataOne"]["aliveCheck"] = m_ui->OneAliveCheckBox->isChecked();
@@ -445,6 +452,18 @@ void RogaSkillEditor::loadSkillData()
                 {
                     m_ui->AOECheckBox->setChecked(false);
                     m_ui->AOEComboBox->setEnabled(false);
+                }
+                if(skillData["chainable"].isBool())
+                {
+                    m_ui->chainableCheckbox->setChecked(skillData["chainable"].asBool());
+                }
+                if(skillData["chainStartFrame"].isInt())
+                {
+                    m_ui->chainStartFrameCombobox->setValue(skillData["chainStartFrame"].asInt());
+                }
+                if(skillData["chainDuration"].isInt())
+                {
+                    m_ui->chainDurationCombobox->setValue(skillData["chainDuration"].asInt());
                 }
 
                 if(!skillData["TargetDataOne"].isNull())
