@@ -4,7 +4,17 @@
 #include "GLSprite.h"
 class KeyFrameData
 {
-public:   
+public:
+
+    enum PositionType
+    {
+        PositionType_None,
+        PositionType_RelativeToTarget,
+        PositionType_RelativeToTargetOrigin,
+
+        PositionType_COUNT
+    };
+
     enum TweenType
     {
         eTT_None,
@@ -37,8 +47,11 @@ public:
     bool hasTween() const;
     bool allAttributesNone() const;
 
+    static QString positionTypeString[PositionType_COUNT];
     static QString tweenAttributeSting[TweenAttribute_COUNT];
     static QString tweenTypeSting[eTT_COUNT];
+
+    static PositionType getPositionTypeByString(QString typeString);
     static TweenType getTweenTypeByString(QString typeString);
 };
 

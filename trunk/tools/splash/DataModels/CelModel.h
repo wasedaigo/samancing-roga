@@ -26,7 +26,7 @@ public slots:
     void setMaxEmitAngle(int value);
 
     void setBlendType(int index);
-    void setRelativeToTarget(bool value);
+    void setPositionType(int value);
     void setFacingOptionType(int value);
     void setBlur(int value);
 
@@ -64,7 +64,7 @@ signals:
     void maxEmitAngleChanged(int value);
 
     void blendTypeChanged(int value);
-    void relativeToTargetChanged(bool value);
+    void positionTypeChanged(int value);
     void facingOptionTypeChanged(int value);
     void blurChanged(int value);
 
