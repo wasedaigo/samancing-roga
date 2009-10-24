@@ -72,7 +72,14 @@ Json::Value FileLoader::loadJsonFile(QString path)
     return root;
 }
 
-void FileLoader::saveInitOptionData(QString filePath, Json::Value newOptionalData)
+void FileLoader::saveInitData(QString filePath)
+{
+    Json::Value emptyValue;
+    optionalData = emptyValue;
+    saveInitFile(filePath, optionalData);
+}
+
+void FileLoader::saveInitData(QString filePath, Json::Value newOptionalData)
 {
     optionalData = newOptionalData;
     saveInitFile(filePath, optionalData);
