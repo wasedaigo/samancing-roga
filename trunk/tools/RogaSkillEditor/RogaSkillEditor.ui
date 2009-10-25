@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>928</width>
-    <height>715</height>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -205,6 +205,41 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Skill Type</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="skillTypeCombobox"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>Pose Type</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="poseTypeCombobox">
+          <item>
+           <property name="text">
+            <string>Attack</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Casting</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>

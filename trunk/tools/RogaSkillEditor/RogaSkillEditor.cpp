@@ -10,6 +10,73 @@
 
 #define SKILL_DATA_DIRECTORY QString("GameData/Animations/Battle/Skills/")
 
+//Pose Type setting
+enum PoseType
+{
+    PoseType_Attack,
+    PoseType_Magic,
+    PoseType_COUNT
+};
+
+// Immunity setting
+static QString poseTypeString[PoseType_COUNT] = {
+    "Attack", "Magic"
+    };
+
+static PoseType getPoseTypeFromString(QString key)
+{
+    for (int i = 0; i < PoseType_COUNT; i++)
+    {
+        if (key == poseTypeString[i])
+        {
+            return (PoseType)i;
+        }
+    }
+
+    return PoseType_Attack;
+}
+
+//Skill Type setting
+enum SkillType
+{
+    SkillType_Knife,
+    SkillType_Sword,
+    SkillType_Rapier,
+    SkillType_Spear,
+    SkillType_Mace,
+    SkillType_Axe,
+    SkillType_Bow,
+    SkillType_Shield,
+    SkillType_Wind,
+    SkillType_Fire,
+    SkillType_Thunder,
+    SkillType_Earth,
+    SkillType_Ice,
+    SkillType_Water,
+    SkilLType_Monster,
+
+    SkillType_COUNT
+};
+
+// Immunity setting
+static QString skillTypeString[SkillType_COUNT] = {
+    "Knife", "Sword", "Rapier", "Spear", "Mace", "Axe", "Bow", "Shield", "Wind", "Fire", "Thunder", "Earth", "Ice", "Water", "Monster"
+    };
+
+static SkillType getSkillTypeFromString(QString key)
+{
+    for (int i = 0; i < SkillType_COUNT; i++)
+    {
+        if (key == skillTypeString[i])
+        {
+            return (SkillType)i;
+        }
+    }
+
+    return SkillType_Knife;
+}
+
+// Immunity setting
 enum ImmunityRate
 {
     ImmunityRate_SuperWeak,
@@ -139,6 +206,15 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveSelected()));
     connect(m_ui->actionSave_As, SIGNAL(triggered()), this, SLOT(onSaveAsSelected()));
 
+    // Setup Skill Type combobox
+
+    mpSkillTypeModel = new QStandardItemModel();
+    for (int i = 0; i < SkillType_COUNT; i++)
+    {
+        mpSkillTypeModel->appendRow(new QStandardItem(skillTypeString[i]));
+    }
+    m_ui->skillTypeCombobox->setModel(mpSkillTypeModel);
+
     // Setup Immunity Comboboxes
     mpImmunityRateTypeModel = new QStandardItemModel();
     for (int i = 0; i < ImmunityRate_COUNT; i++)
@@ -159,6 +235,7 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
 
 RogaSkillEditor::~RogaSkillEditor()
 {
+    delete mpSkillTypeModel;
     delete mpImmunityRateTypeModel;
     delete m_ui;
 }
@@ -323,6 +400,9 @@ void RogaSkillEditor::clearUI()
     m_ui->chainableCheckbox->setChecked(false);
     m_ui->chainStartFrameCombobox->setValue(0);
     m_ui->chainDurationCombobox->setValue(0);
+
+    m_ui->skillTypeCombobox->setCurrentIndex(0);
+    m_ui->poseTypeCombobox->setCurrentIndex(0);
 }
 
 bool RogaSkillEditor::saveSkillData()
@@ -363,6 +443,11 @@ bool RogaSkillEditor::saveSkillData()
             mSkillDataRoot[skillID]["chainable"] = m_ui->chainableCheckbox->isChecked();
             mSkillDataRoot[skillID]["chainStartFrame"] = m_ui->chainStartFrameCombobox->value();
             mSkillDataRoot[skillID]["chainDuration"] = m_ui->chainDurationCombobox->value();
+
+
+            mSkillDataRoot[skillID]["poseType"] = poseTypeString[m_ui->poseTypeCombobox->currentIndex()].toStdString();
+            mSkillDataRoot[skillID]["skillType"] = skillTypeString[m_ui->skillTypeCombobox->currentIndex()].toStdString();
+
             // radio group 1
             mSkillDataRoot[skillID]["TargetDataOne"]["targetSelectionType"] = targetSelectionType[m_ui->OneSelectionTypeComboBox->currentIndex()].toStdString();
             mSkillDataRoot[skillID]["TargetDataOne"]["aliveCheck"] = m_ui->OneAliveCheckBox->isChecked();
@@ -464,6 +549,16 @@ void RogaSkillEditor::loadSkillData()
                 if(skillData["chainDuration"].isInt())
                 {
                     m_ui->chainDurationCombobox->setValue(skillData["chainDuration"].asInt());
+                }
+
+                if(skillData["poseType"].isString())
+                {
+                    m_ui->poseTypeCombobox->setCurrentIndex((int)getPoseTypeFromString(QString::fromStdString(skillData["poseType"].asString())));
+                }
+
+                if(skillData["skillType"].isString())
+                {
+                    m_ui->skillTypeCombobox->setCurrentIndex((int)getSkillTypeFromString(QString::fromStdString(skillData["skillType"].asString())));
                 }
 
                 if(!skillData["TargetDataOne"].isNull())
