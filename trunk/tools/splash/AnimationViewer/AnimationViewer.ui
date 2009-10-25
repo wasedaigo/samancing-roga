@@ -621,6 +621,51 @@
           </layout>
          </widget>
         </item>
+        <item>
+         <widget class="QGroupBox" name="verticalGroupBox">
+          <property name="title">
+           <string>Special</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QLabel" name="label2_2">
+               <property name="text">
+                <string>SwapTo</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="swapTargetComboBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <item>
+                <property name="text">
+                 <string>None</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Battler</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Weapon</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>

@@ -1,6 +1,26 @@
 #include "KeyFrameData.h"
 #include "GLSprite.h"
 
+QString KeyFrameData::swapTargetTypeString[KeyFrameData::SwapTargetType_COUNT] =
+{
+    "none",
+    "character",
+    "weapon"
+};
+
+KeyFrameData::SwapTargetType KeyFrameData::getSwapTargetTypeByString(QString typeString)
+{
+    for (int i = 0; i < SwapTargetType_COUNT; i++)
+    {
+        if (typeString == swapTargetTypeString[i])
+        {
+            return static_cast<KeyFrameData::SwapTargetType>(i);
+        }
+    }
+    return SwapTargetType_None;
+}
+
+
 QString KeyFrameData::positionTypeString[KeyFrameData::PositionType_COUNT] =
 {
     "none",
@@ -59,6 +79,7 @@ KeyFrameData::KeyFrameData()
     {
         mTweenTypes[i] = eTT_None;
     }
+    mSwapTargetType = SwapTargetType_None;
 }
 
 void KeyFrameData::copyAttribute(KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* item)
