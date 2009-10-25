@@ -5,6 +5,15 @@
 class KeyFrameData
 {
 public:
+    enum SwapTargetType
+    {
+        SwapTargetType_None,
+        SwapTargetType_Character,
+        SwapTargetType_Weapon,
+
+        SwapTargetType_COUNT
+    };
+
 
     enum PositionType
     {
@@ -42,15 +51,18 @@ public:
     KeyFrameData();
 
     GLSprite::SpriteDescriptor mSpriteDescriptor;
+    SwapTargetType mSwapTargetType;
     TweenType mTweenTypes[TweenAttribute_COUNT];
     void copyAttribute(TweenAttribute tweenAttribute, KeyFrameData* item);
     bool hasTween() const;
     bool allAttributesNone() const;
 
+    static QString swapTargetTypeString[SwapTargetType_COUNT];
     static QString positionTypeString[PositionType_COUNT];
     static QString tweenAttributeSting[TweenAttribute_COUNT];
     static QString tweenTypeSting[eTT_COUNT];
 
+    static SwapTargetType getSwapTargetTypeByString(QString typeString);
     static PositionType getPositionTypeByString(QString typeString);
     static TweenType getTweenTypeByString(QString typeString);
 };

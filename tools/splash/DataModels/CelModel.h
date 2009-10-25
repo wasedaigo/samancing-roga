@@ -54,6 +54,8 @@ public slots:
 
     void setPriority(double value);
 
+    void setSwapTargetType(int value);
+
 signals:
     void sourceTextureChanged(QString path, QRect rect);
     void textureSrcRectChanged(QRect value);
@@ -92,6 +94,9 @@ signals:
     void colorTweenTypeChanged(int value);
 
     void priorityChanged(double value);
+
+    void swapTargetTypeChanged(int value);
+
 private:
     KeyFrameData* mpKeyFrameData;
 };

@@ -924,6 +924,12 @@ bool AnimationModel::saveData()
                     }
                 }
 
+                // Swap Target Type
+                if (pKeyFrameData->mSwapTargetType != KeyFrameData::SwapTargetType_None)
+                {
+                    keyframeData["swapTargetType"] = KeyFrameData::swapTargetTypeString[pKeyFrameData->mSwapTargetType].toStdString();
+                }
+
                 if (pKeyFrameData->mSpriteDescriptor.mBlendType != GLSprite::eBT_Alpha)
                 {
                     keyframeData["blendType"] = GLSprite::blendTypeSting[pKeyFrameData->mSpriteDescriptor.mBlendType].toStdString();
@@ -1140,6 +1146,12 @@ bool AnimationModel::loadData(QString path)
                 }
 
                 pKeyFrameData->mSpriteDescriptor.mSourcePath = QString::fromStdString(keyframe["sourcePath"].asString());
+
+                // Swap Target Type
+                if (keyframe["swapTargetType"].isString())
+                {
+                    pKeyFrameData->mSwapTargetType = KeyFrameData::getSwapTargetTypeByString(QString::fromStdString(keyframe["swapTargetType"].asString()));
+                }
 
                 // Blend
                 if (keyframe["blendType"].isString())
