@@ -40,12 +40,12 @@ namespace Shrimp
                         bitmap.Dispose();
                     }
                     this.Bitmaps.Clear();
-                    this.TilePassageTypes = null;
+                    this.SetTilePassageTypes(null);
                     this.imageFileName = value;
                     if (this.imageFileName != null)
                     {
                         this.OriginalBitmap = new Bitmap(this.ImageFileFullPath);
-                        this.TilePassageTypes = new ObservedArray<TilePassageType>(this.Width * this.Height);
+                        this.SetTilePassageTypes(new ObservedArray<TilePassageType>(this.Width * this.Height));
                     }
                     else
                     {
@@ -125,31 +125,46 @@ namespace Shrimp
             }
         }
 
-        /*public TilePassageType GetTilePassageType(int tile)
+        public IIndexable<TilePassageType> TilePassageTypes
         {
-            return this.TilePassageTypes[tile];
+            get { return this.tilePassageTypes; }
         }
-
-        public void SetTilePassageType(int tile, TilePassageType tilePassageType)
+        private ObservedArray<TilePassageType> GetTilePassageTypes()
         {
-            if (this.TilePassageTypes[tile] != tilePassageType)
+            return this.tilePassageTypes;
+        }
+        private void SetTilePassageTypes(ObservedArray<TilePassageType> tilePassageTypes)
+        {
+            if (this.tilePassageTypes != tilePassageTypes)
             {
-                this.TilePassageTypes[tile] = tilePassageType;
-                this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TilePassageTypes), null));
+                if (this.tilePassageTypes != null)
+                {
+                    this.tilePassageTypes.Updated -= this.TilePassageTypes_Updated;
+                }
+                this.tilePassageTypes = tilePassageTypes;
+                if (this.tilePassageTypes != null)
+                {
+                    this.tilePassageTypes.Updated += this.TilePassageTypes_Updated;
+                }
             }
         }
-        private TilePassageType[] TilePassageTypes;*/
-        public ObservedArray<TilePassageType> TilePassageTypes { get; private set; }
+        private ObservedArray<TilePassageType> tilePassageTypes;
+
+        protected void TilePassageTypes_Updated(object sender, UpdatedEventArgs e)
+        {
+            this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.TilePassageTypes), e));
+        }
 
         public override void Clear()
         {
+            this.ImageFileName = null;
         }
 
         public override JToken ToJson()
         {
             return new JObject(
                 new JProperty("ImageFileName", this.ImageFileName),
-                new JProperty("TilePassageTypes", this.TilePassageTypes.ToJson()));
+                new JProperty("TilePassageTypes", this.GetTilePassageTypes().ToJson()));
         }
 
         public override void LoadJson(JToken json)
@@ -164,7 +179,7 @@ namespace Shrimp
             {
                 if ((token = json["TilePassageTypes"]) != null)
                 {
-                    this.TilePassageTypes.LoadJson(token);
+                    this.GetTilePassageTypes().LoadJson(token);
                 }
             }
         }

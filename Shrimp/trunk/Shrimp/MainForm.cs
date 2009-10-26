@@ -122,6 +122,10 @@ namespace Shrimp
                 {
                     this.ScaleModeChanged();
                 }
+                else if (e.Property == editorState.GetProperty(_ => _.TileSetMode))
+                {
+                    this.TileSetModeChanged();
+                }
             };
             this.MapTreeView.ViewModel = this.ViewModel;
             this.MapEditor.ViewModel = this.ViewModel;
@@ -208,6 +212,7 @@ namespace Shrimp
             this.DatabaseToolStripButton.Enabled = isOpened;
             this.TileSetPalette.Enabled = isOpened;
             this.TileSetPaletteToolStrip.Enabled = isOpened;
+            this.PassageToolStripButton.Enabled = isOpened;
 
             this.IsDirtyChanged();
             this.IsUndoableChanged();
@@ -217,6 +222,7 @@ namespace Shrimp
             this.LayerModeChanged();
             this.DrawingModeChanged();
             this.ScaleModeChanged();
+            this.TileSetModeChanged();
 
             // To prevent the map editor from being edited wrongly
             Application.DoEvents();
@@ -326,6 +332,19 @@ namespace Shrimp
             }
         }
 
+        private void TileSetModeChanged()
+        {
+            if (this.ViewModel.IsOpened)
+            {
+                this.PassageToolStripButton.Checked =
+                    (this.ViewModel.EditorState.TileSetMode == TileSetMode.Passage);
+            }
+            else
+            {
+                this.PassageToolStripButton.Checked = false;
+            }
+        }
+
         private void NewToolStripButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(!this.ViewModel.IsOpened);
@@ -402,6 +421,19 @@ namespace Shrimp
             Debug.Assert(this.ViewModel.IsOpened);
             this.DatabaseDialog.ShowDialog();
             Debug.Assert(this.ViewModel.IsOpened);
+        }
+
+        private void PassageToolStripButton_Click(object sender, EventArgs e)
+        {
+            switch (this.ViewModel.EditorState.TileSetMode)
+            {
+            case TileSetMode.Normal:
+                this.ViewModel.EditorState.TileSetMode = TileSetMode.Passage;
+                break;
+            case TileSetMode.Passage:
+                this.ViewModel.EditorState.TileSetMode = TileSetMode.Normal;
+                break;
+            }
         }
 
         private void TileSetsToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)

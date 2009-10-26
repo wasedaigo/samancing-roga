@@ -27,10 +27,17 @@ namespace Shrimp
         }
 
         public UpdatedEventArgs(string property)
-            : this(property, null)
         {
+            this.Property = property;
         }
 
+        public UpdatedEventArgs(string property, UpdatedEventArgs innerUpdatedEventArgs)
+        {
+            this.Property = property;
+            this.InnerUpdatedEventArgs = innerUpdatedEventArgs;
+        }
+
+        // TODO: Remove this method
         public UpdatedEventArgs(string property, object bounds)
         {
             this.Property = property;
@@ -39,6 +46,7 @@ namespace Shrimp
 
         public string Property { get; private set; }
         public object Bounds { get; private set; }
+        public UpdatedEventArgs InnerUpdatedEventArgs { get; private set; }
     }
 
     internal static class IModelExtensions

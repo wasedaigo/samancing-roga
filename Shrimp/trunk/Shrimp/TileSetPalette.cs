@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Shrimp
@@ -121,6 +122,10 @@ namespace Shrimp
             {
                 this.Invalidate();
             }
+            else if (e.Property == editorState.GetProperty(_ => _.TileSetMode))
+            {
+                this.Invalidate();
+            }
         }
 
         private TileSet TileSet
@@ -146,10 +151,36 @@ namespace Shrimp
         }
         private TileSet tileSet;
 
-        private void TileSet_Updated(object sender, EventArgs e)
+        private void TileSet_Updated(object sender, UpdatedEventArgs e)
         {
             this.AdjustSize();
-            this.Invalidate();
+            if (e.Property == this.TileSet.GetProperty(_ => _.TilePassageTypes))
+            {
+                UpdatedEventArgs e2 = e.InnerUpdatedEventArgs;
+                if (e2 != null && e2.Property != null)
+                {
+                    Match match = Regex.Match(e2.Property, @"^Index(\d+)$");
+                    if (match.Success)
+                    {
+                        int tileId = int.Parse(match.Groups[1].Value);
+                        this.Invalidate(new Rectangle
+                        {
+                            X = this.AutoScrollPosition.X + (tileId % Util.PaletteHorizontalCount) * Util.PaletteGridSize,
+                            Y = this.AutoScrollPosition.Y + (tileId / Util.PaletteHorizontalCount) * Util.PaletteGridSize,
+                            Width = Util.PaletteGridSize,
+                            Height = Util.PaletteGridSize,
+                        });
+                    }
+                }
+                else
+                {
+                    this.Invalidate();
+                }
+            }
+            else
+            {
+                this.Invalidate();
+            }
         }
 
         private void AdjustSize()
@@ -207,16 +238,64 @@ namespace Shrimp
                 Math.Min(Math.Max(point.Y / Util.PaletteGridSize, 0), this.TileSet.Height - 1);
             int tileId = this.SelectedTileStartY * Util.PaletteHorizontalCount
                 + this.SelectedTileStartX;
-            this.EditorState.SelectedTiles = SelectedTiles.Single(new Tile
+            switch (this.EditorState.TileSetMode)
             {
-                TileSetId = (short)this.EditorState.SelectedTileSetId,
-                TileId = (short)tileId,
-            });
+            case TileSetMode.Normal:
+                this.EditorState.SelectedTiles = SelectedTiles.Single(new Tile
+                {
+                    TileSetId = (short)this.EditorState.SelectedTileSetId,
+                    TileId = (short)tileId,
+                });
+                break;
+            case TileSetMode.Passage:
+                var tilePassageTypes = this.TileSet.TilePassageTypes;
+                if ((e.Button & MouseButtons.Left) != 0)
+                {
+                    switch (tilePassageTypes[tileId])
+                    {
+                    case TilePassageType.Passable:
+                        tilePassageTypes[tileId] = TilePassageType.Impassable;
+                        break;
+                    case TilePassageType.Impassable:
+                        tilePassageTypes[tileId] = TilePassageType.Wall;
+                        break;
+                    case TilePassageType.Wall:
+                        tilePassageTypes[tileId] = TilePassageType.Ceil;
+                        break;
+                    case TilePassageType.Ceil:
+                        tilePassageTypes[tileId] = TilePassageType.Passable;
+                        break;
+                    }
+                }
+                else if ((e.Button & MouseButtons.Right) != 0)
+                {
+                    switch (tilePassageTypes[tileId])
+                    {
+                    case TilePassageType.Passable:
+                        tilePassageTypes[tileId] = TilePassageType.Ceil;
+                        break;
+                    case TilePassageType.Impassable:
+                        tilePassageTypes[tileId] = TilePassageType.Passable;
+                        break;
+                    case TilePassageType.Wall:
+                        tilePassageTypes[tileId] = TilePassageType.Impassable;
+                        break;
+                    case TilePassageType.Ceil:
+                        tilePassageTypes[tileId] = TilePassageType.Wall;
+                        break;
+                    }
+                }
+                break;
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
+            if (this.EditorState.TileSetMode != TileSetMode.Normal)
+            {
+                return;
+            }
             if (this.IsSelectingTiles)
             {
                 this.SetSelectedTileEnd(e.Location);
@@ -340,25 +419,85 @@ namespace Shrimp
                     Height = e.ClipRectangle.Height,
                 },
                 GraphicsUnit.Pixel);
-
-            SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
-            switch (selectedTiles.SelectedTilesType)
+            if (EditorState.TileSetMode == TileSetMode.Passage)
             {
-            case SelectedTilesType.Single:
-            case SelectedTilesType.Rectangle:
-                Tile tile = selectedTiles.Tile;
-                if (tile.TileSetId == this.EditorState.SelectedTileSetId)
+                g.FillRectangle(new SolidBrush(Color.FromArgb(128, 0, 0, 0)), e.ClipRectangle);
+            }
+
+            switch (EditorState.TileSetMode)
+            {
+            case TileSetMode.Normal:
+                SelectedTiles selectedTiles = this.EditorState.SelectedTiles;
+                switch (selectedTiles.SelectedTilesType)
                 {
-                    int tileId = tile.TileId;
-                    Util.DrawFrame(g, new Rectangle
+                case SelectedTilesType.Single:
+                case SelectedTilesType.Rectangle:
+                    Tile tile = selectedTiles.Tile;
+                    if (tile.TileSetId == this.EditorState.SelectedTileSetId)
                     {
-                        X = tileId % Util.PaletteHorizontalCount * Util.PaletteGridSize
+                        int tileId = tile.TileId;
+                        Util.DrawFrame(g, new Rectangle
+                        {
+                            X = tileId % Util.PaletteHorizontalCount * Util.PaletteGridSize
+                                + this.AutoScrollPosition.X,
+                            Y = tileId / Util.PaletteHorizontalCount * Util.PaletteGridSize
+                                + this.AutoScrollPosition.Y,
+                            Width = Util.PaletteGridSize * selectedTiles.Width,
+                            Height = Util.PaletteGridSize * selectedTiles.Height,
+                        });
+                    }
+                    break;
+                }
+                break;
+            case TileSetMode.Passage:
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                Pen passablePen = new Pen(Color.FromArgb(192, 64, 255, 64), 3);
+                Pen impassablePen = new Pen(Color.FromArgb(192, 255, 64, 64), 3);
+                Pen wallPen = new Pen(Color.FromArgb(192, 128, 128, 255), 3);
+                Pen ceilPen = new Pen(Color.FromArgb(192, 255, 255, 128), 3);
+                var tilePassageTypes = this.TileSet.TilePassageTypes;
+                for (int i = 0; i < tilePassageTypes.Length; i++)
+                {
+                    Rectangle tileRect = new Rectangle
+                    {
+                        X = i % Util.PaletteHorizontalCount * Util.PaletteGridSize
                             + this.AutoScrollPosition.X,
-                        Y = tileId / Util.PaletteHorizontalCount * Util.PaletteGridSize
+                        Y = i / Util.PaletteHorizontalCount * Util.PaletteGridSize
                             + this.AutoScrollPosition.Y,
-                        Width = Util.PaletteGridSize * selectedTiles.Width,
-                        Height = Util.PaletteGridSize * selectedTiles.Height,
-                    });
+                        Width = Util.PaletteGridSize,
+                        Height = Util.PaletteGridSize,
+                    };
+                    if (!tileRect.IntersectsWith(e.ClipRectangle))
+                    {
+                        continue;
+                    }
+                    switch (tilePassageTypes[i])
+                    {
+                    case TilePassageType.Passable:
+                        g.DrawEllipse(passablePen,
+                            tileRect.X + 10, tileRect.Y + 10, tileRect.Width - 20, tileRect.Height - 20);
+                        break;
+                    case TilePassageType.Impassable:
+                        Point point11 = new Point(tileRect.X + 10, tileRect.Y + 10);
+                        Point point22 = new Point
+                        {
+                            X = point11.X + tileRect.Width - 20,
+                            Y = point11.Y + tileRect.Height - 20,
+                        };
+                        Point point12 = new Point(point11.X, point22.Y);
+                        Point point21 = new Point(point22.X, point11.Y);
+                        g.DrawLine(impassablePen, point11, point22);
+                        g.DrawLine(impassablePen, point12, point21);
+                        break;
+                    case TilePassageType.Wall:
+                        g.DrawRectangle(wallPen, new Rectangle(
+                            tileRect.X + 10, tileRect.Y + 10, tileRect.Width - 20, tileRect.Height - 20));
+                        break;
+                    case TilePassageType.Ceil:
+                        g.DrawRectangle(ceilPen, new Rectangle(
+                            tileRect.X + 10, tileRect.Y + 10, tileRect.Width - 20, tileRect.Height - 20));
+                        break;
+                    }
                 }
                 break;
             }
