@@ -11,8 +11,8 @@ EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSpri
     float dx = cos(-angle * PI / 180.0);
     float dy = sin(-angle * PI / 180.0);
 
-    float speedX = speed * dx /std::fabs(dx) + std::fabs(dy);
-    float speedY = speed * dy /std::fabs(dx) + std::fabs(dy);
+    float speedX = speed * dx /(std::fabs(dx) + std::fabs(dy));
+    float speedY = speed * dy /(std::fabs(dx) + std::fabs(dy));
 
     GLSprite::SpriteDescriptor spriteDescriptor = pParentGLSprite->mSpriteDescriptor;
 
