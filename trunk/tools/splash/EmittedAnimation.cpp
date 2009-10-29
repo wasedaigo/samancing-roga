@@ -8,8 +8,8 @@
 EmittedAnimation::EmittedAnimation(AnimationModel* pAnimationModel, const GLSprite* pParentGLSprite, float speed, int angle)
    :       mCounter(0)
 {
-    float dx = cos(-angle * PI / 180.0);
-    float dy = sin(-angle * PI / 180.0);
+    float dx = cos(angle * PI / 180.0);
+    float dy = sin(angle * PI / 180.0);
 
     float speedX = speed * dx /(std::fabs(dx) + std::fabs(dy));
     float speedY = speed * dy /(std::fabs(dx) + std::fabs(dy));
