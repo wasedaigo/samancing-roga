@@ -4,8 +4,8 @@
 #include <QTableWidget>
 #include <QPoint>
 #include "DataModels/KeyFrame.h"
+#include "DataModels/AnimationModel.h"
 
-class AnimationModel;
 class KeyFrameData;
 class QTimelineWidget : public QTableWidget
 {
@@ -75,6 +75,7 @@ private:
  int mSelectedRow;
  bool mDragging;
  KeyFrameData* mpCopyKeyFrameData;
+ AnimationModel::EventList mCopyEventList;
  KeyFrame::KeyFramePosition mKeyFramePosition;
 };
 

@@ -136,6 +136,20 @@ void AnimationModel::setAnimationID(QString id)
     }
 }
 
+int AnimationModel::getLastEventFrameNo()
+{
+    int lastFrameNo = -1;
+    for(QHash<int, AnimationModel::EventList>::iterator iter = mEvents.begin() ; mEvents.end() != iter ; iter++)
+    {
+        if (iter.key() > lastFrameNo)
+        {
+            lastFrameNo = iter.key();
+        }
+    }
+
+    return lastFrameNo;
+}
+
 int AnimationModel::getMaxFrameCount(int lineNo) const
 {
     int max = 0;
@@ -172,6 +186,12 @@ AnimationModel::EventList AnimationModel::getEventList(int frameNo) const
     {
         return EventList();
     }
+}
+
+void AnimationModel::setEventList(int frameNo, AnimationModel::EventList eventList)
+{
+    mEvents[frameNo] = eventList;
+    emit refreshTimeLine();
 }
 
 void AnimationModel::setEventText(int frameNo, int index, QString text)
@@ -352,43 +372,85 @@ void AnimationModel::insertEmptyKeyFrame(int lineNo, int frameNo)
 
 void AnimationModel::addFrameLength(int lineNo, int frameNo, int value)
 {
-    if (lineNo >= MaxLineNo){return;}
-    if (value >= 0)
+    if (lineNo > MaxLineNo) {return;}
+    if (lineNo == MaxLineNo)
     {
-        int index = getPreviousKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
-        for (int i = index + 1; i < mKeyFrames[lineNo].count(); i++)
+        // Event frames control
+        int lastFrameNo = getLastEventFrameNo();
+        if (lastFrameNo > 0)
         {
-            mKeyFrames[lineNo][i]->mFrameNo += value;
+            for (int i = lastFrameNo + 1; i > frameNo; i--)
+            {
+                if (mEvents.contains(i - 1) && !mEvents.contains(i))
+                {
+                    mEvents.insert(i, mEvents[i - 1]);
+                    mEvents.remove(i - 1);
+                }
+            }
         }
 
         emit refreshTimeLine();
+    }
+    else
+    {
+        if (value >= 0)
+        {
+            int index = getPreviousKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
+            for (int i = index + 1; i < mKeyFrames[lineNo].count(); i++)
+            {
+                mKeyFrames[lineNo][i]->mFrameNo += value;
+            }
+
+            emit refreshTimeLine();
+        }
     }
 }
 
 void AnimationModel::reduceFrameLength(int lineNo, int frameNo)
 {
-    if (lineNo >= MaxLineNo){return;}
-    int endKeyFrameIndex = getNextKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
-    
-    // If it cannot reduce frame length more, return it
-    if (
-            endKeyFrameIndex > 0 &&
-            mKeyFrames[lineNo][endKeyFrameIndex]->mFrameNo - mKeyFrames[lineNo][endKeyFrameIndex - 1]->mFrameNo <= 1
-    )
-    {
-        return;
-    }
+    if (lineNo > MaxLineNo) {return;}
 
-    // If keyframe exists on this timeline
-    if (endKeyFrameIndex >= 0)
+    if (lineNo == MaxLineNo)
     {
-        // Move position of keyframes effected
-        for (int i = endKeyFrameIndex; i < mKeyFrames[lineNo].count(); i++)
+        int lastFrameNo = getLastEventFrameNo();
+        if (lastFrameNo > 0)
         {
-            mKeyFrames[lineNo][i]->mFrameNo -= 1;
+            for (int i = frameNo; i < lastFrameNo; i++)
+            {
+                if (!mEvents.contains(i) && mEvents.contains(i + 1))
+                {
+                    mEvents.insert(i, mEvents[i + 1]);
+                    mEvents.remove(i + 1);
+                }
+            }
         }
 
         emit refreshTimeLine();
+    }
+    else
+    {
+        int endKeyFrameIndex = getNextKeyFrameIndex(lineNo, frameNo, KeyFrameData::TweenAttribute_any);
+
+        // If it cannot reduce frame length more, return it
+        if (
+                endKeyFrameIndex > 0 &&
+                mKeyFrames[lineNo][endKeyFrameIndex]->mFrameNo - mKeyFrames[lineNo][endKeyFrameIndex - 1]->mFrameNo <= 1
+        )
+        {
+            return;
+        }
+
+        // If keyframe exists on this timeline
+        if (endKeyFrameIndex >= 0)
+        {
+            // Move position of keyframes effected
+            for (int i = endKeyFrameIndex; i < mKeyFrames[lineNo].count(); i++)
+            {
+                mKeyFrames[lineNo][i]->mFrameNo -= 1;
+            }
+
+            emit refreshTimeLine();
+        }
     }
 }
 
@@ -397,11 +459,18 @@ void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
     // Remove frames
     for (int i = endFrameNo; i >= startFrameNo; i--)
     {
-        int keyframeIndex = getKeyFrameIndex(lineNo, i);
-        if (keyframeIndex >= 0)
+        if (lineNo == MaxLineNo)
         {
-            delete mKeyFrames[lineNo][keyframeIndex];
-            mKeyFrames[lineNo].removeAt(keyframeIndex);
+            mEvents.remove(i);
+        }
+        else
+        {
+            int keyframeIndex = getKeyFrameIndex(lineNo, i);
+            if (keyframeIndex >= 0)
+            {
+                delete mKeyFrames[lineNo][keyframeIndex];
+                mKeyFrames[lineNo].removeAt(keyframeIndex);
+            }
         }
     }
 
@@ -1012,7 +1081,7 @@ bool AnimationModel::saveData()
         Json::Value events;
         for(QHash<int, AnimationModel::EventList>::iterator iter = mEvents.begin() ; mEvents.end() != iter ; iter++)
         {
-            int lineNo = iter.key();
+            int frameNo = iter.key();
             AnimationModel::EventList eventList = static_cast<AnimationModel::EventList>(*iter);
             Json::Value list;
             for (int i = 0; i < eventList.mList.count(); i++)
@@ -1020,7 +1089,7 @@ bool AnimationModel::saveData()
                 list[static_cast<unsigned int>(i)] = eventList.mList[i].toStdString();
             }
 
-            events[QString::number(lineNo).toStdString()] = list;
+            events[QString::number(frameNo).toStdString()] = list;
         }
         root["events"] = events;
     }
