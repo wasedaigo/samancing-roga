@@ -41,10 +41,13 @@ public:
 
     void clearPixmapHash();
 
+    int getLastEventFrameNo();
     int getMaxFrameCount(int lineNo) const;
     int getMaxFrameCount() const;
 
     EventList getEventList(int frameNo) const;
+    void setEventList(int frameNo, EventList eventList);
+
     void setEventText(int frameNo, int index, QString text);
 
     KeyFrame* getKeyFrame(int lineNo, int frameNo) const;

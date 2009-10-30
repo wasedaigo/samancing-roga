@@ -31,6 +31,7 @@ public:
 public slots:
     void setEnabled(bool enabled);
     void refreshTree();
+    void refreshEventList();
 
 private slots:
     // animation list control
@@ -48,7 +49,7 @@ private slots:
     // Animation Panel Control
 
     void onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2);
-    void refreshEventList();
+
     void setWorkingDirectory();
 
 protected:

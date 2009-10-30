@@ -43,6 +43,7 @@ void MainWindow::setupConnections()
     connect(ui->treeRefreshButton, SIGNAL(clicked()), this, SLOT(refreshTree()));
 
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refreshEventList()));
+    connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refreshEventList()));
 }
 
 void MainWindow::setupModels()
@@ -140,6 +141,7 @@ void MainWindow::onAnimationSelected(int index)
  Animation treeview control
 
 ---------------------------------------------------------------------*/
+
 void MainWindow::onSelectionChanged(const QItemSelection& item1, const QItemSelection& item2)
 {
     QModelIndexList indexes = item1.indexes();

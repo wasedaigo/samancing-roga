@@ -136,21 +136,35 @@ void QTimelineWidget::contextMenu(const QPoint &pos) {
 void QTimelineWidget::copyFrame()
 {
     KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
-    KeyFrame* pKeyFrame = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
 
-    if (pKeyFrame && pKeyFrame->mpKeyFrameData)
+    if (currentPosition.mLineNo == AnimationModel::MaxLineNo )
     {
-        delete mpCopyKeyFrameData;
-        mpCopyKeyFrameData = new KeyFrameData(*pKeyFrame->mpKeyFrameData);
+        mCopyEventList = mpAnimationModel->getEventList(currentPosition.mFrameNo);
+    }
+    else
+    {
+        KeyFrame* pKeyFrame = mpAnimationModel->getKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo);
+
+        if (pKeyFrame && pKeyFrame->mpKeyFrameData)
+        {
+            delete mpCopyKeyFrameData;
+            mpCopyKeyFrameData = new KeyFrameData(*pKeyFrame->mpKeyFrameData);
+        }
     }
 }
 
 void QTimelineWidget::pasteFrame()
-{
-    if (mpCopyKeyFrameData)
+{   KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
+    if (currentPosition.mLineNo == AnimationModel::MaxLineNo )
     {
-        KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
-        mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, new KeyFrameData(*mpCopyKeyFrameData));
+        mpAnimationModel->setEventList(currentPosition.mFrameNo, mCopyEventList);
+    }
+    else
+    {
+        if (mpCopyKeyFrameData)
+        {
+            mpAnimationModel->setKeyFrame(currentPosition.mLineNo, currentPosition.mFrameNo, new KeyFrameData(*mpCopyKeyFrameData));
+        }
     }
 }
 

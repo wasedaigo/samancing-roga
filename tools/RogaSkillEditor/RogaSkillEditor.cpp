@@ -476,7 +476,11 @@ bool RogaSkillEditor::saveSkillData()
                     if (pWidgetItem)
                     {
                         QVariant data = pWidgetItem->data(Qt::EditRole);
-                        damages[static_cast<int>(i)][damageFields[j].toStdString()] = data.toString().toStdString();
+                        QString t = data.toString();
+                        if (t != "")
+                        {
+                            damages[static_cast<int>(i)][damageFields[j].toStdString()] = t.toStdString();
+                        }
                     }
                 }
             }
