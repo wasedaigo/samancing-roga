@@ -964,6 +964,11 @@ bool AnimationModel::saveData()
                     keyframeData["facingOption"] = GLSprite::facingOptionTypeSting[pKeyFrameData->mSpriteDescriptor.mFacingOptionType].toStdString();
                 }
 
+                if (pKeyFrameData->mSpriteDescriptor.mPositionTypeOption != KeyFrameData::PositionTypeOption_Center)
+                {
+                    keyframeData["positionTypeOption"] = KeyFrameData::positionTypeOptionString[pKeyFrameData->mSpriteDescriptor.mPositionTypeOption].toStdString();
+                }
+
                 if (pKeyFrameData->mSpriteDescriptor.mPositionType != KeyFrameData::PositionType_None)
                 {
                     keyframeData["positionType"] = KeyFrameData::positionTypeString[pKeyFrameData->mSpriteDescriptor.mPositionType].toStdString();
@@ -1187,6 +1192,11 @@ bool AnimationModel::loadData(QString path)
                     pKeyFrameData->mSpriteDescriptor.mBlur = keyframe["blur"].asInt();
                 }
                 pKeyFrameData->mSpriteDescriptor.mFacingOptionType = GLSprite::getFacingOptionTypeByString(QString::fromStdString(keyframe["facingOption"].asString()));
+
+                if (keyframe["positionTypeOption"].isString())
+                {
+                    pKeyFrameData->mSpriteDescriptor.mPositionTypeOption = KeyFrameData::getPositionTypeOptionByString(QString::fromStdString(keyframe["positionTypeOption"].asString()));
+                }
 
                 if (keyframe["positionType"].isString())
                 {

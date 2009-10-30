@@ -1,6 +1,7 @@
 #include "KeyFrameData.h"
 #include "GLSprite.h"
 
+
 QString KeyFrameData::swapTargetTypeString[KeyFrameData::SwapTargetType_COUNT] =
 {
     "none",
@@ -18,6 +19,33 @@ KeyFrameData::SwapTargetType KeyFrameData::getSwapTargetTypeByString(QString typ
         }
     }
     return SwapTargetType_None;
+}
+
+QString KeyFrameData::positionTypeOptionString[KeyFrameData::PositionTypeOption_COUNT] =
+{
+    "top_left",
+    "top_center",
+    "top_right",
+
+    "center_left",
+    "center",
+    "center_right",
+
+    "bottom_left",
+    "bottom_center",
+    "bottom_right"
+};
+
+KeyFrameData::PositionTypeOption KeyFrameData::getPositionTypeOptionByString(QString typeString)
+{
+    for (int i = 0; i < PositionTypeOption_COUNT; i++)
+    {
+        if (typeString == positionTypeOptionString[i])
+        {
+            return static_cast<KeyFrameData::PositionTypeOption>(i);
+        }
+    }
+    return PositionTypeOption_Center;
 }
 
 

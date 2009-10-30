@@ -27,6 +27,8 @@ public slots:
 
     void setBlendType(int index);
     void setPositionType(int value);
+    void setPositionTypeOption(int value);
+
     void setFacingOptionType(int value);
     void setBlur(int value);
 
@@ -67,6 +69,8 @@ signals:
 
     void blendTypeChanged(int value);
     void positionTypeChanged(int value);
+    void positionTypeOptionChanged(int value);
+
     void facingOptionTypeChanged(int value);
     void blurChanged(int value);
 

@@ -63,6 +63,8 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mBlendType = GLSprite::eBT_Alpha;
     spriteDescriptor.mFacingOptionType = FacingOptionType_none;
     spriteDescriptor.mPositionType = KeyFrameData::PositionType_None;
+    spriteDescriptor.mPositionTypeOption = KeyFrameData::PositionTypeOption_Center;
+
     spriteDescriptor.mBlur = 0;
     spriteDescriptor.mCenter.mX = 0;
     spriteDescriptor.mCenter.mY = 0;

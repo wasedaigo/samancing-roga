@@ -616,6 +616,62 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>-</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="positionTypeOptionComboBox">
+               <item>
+                <property name="text">
+                 <string>TopLeft</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>TopCenter</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>TopRight</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CenterLeft</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Center</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CenterRight</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>BottomLeft</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>BottomCenter</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>BottomRight</string>
+                </property>
+               </item>
+              </widget>
+             </item>
             </layout>
            </item>
           </layout>
