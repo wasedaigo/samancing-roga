@@ -80,6 +80,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setBlendType(int)));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setFacingOptionType(int)));
     connect(m_ui->positionTypeComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setPositionType(int)));
+    connect(m_ui->positionTypeOptionComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setPositionTypeOption(int)));
 
     connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setEmitter(bool)));
     connect(m_ui->minEmitSpeedSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setMinEmitSpeed(double)));
@@ -127,6 +128,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->blendTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->facingOptionCombobox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->positionTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->positionTypeOptionComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
 
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -189,6 +191,7 @@ void AnimationViewer::blockSignals(bool block)
     m_ui->rotationXSpinBox->blockSignals(block);
     m_ui->blurSpinBox->blockSignals(block);
     m_ui->positionTypeComboBox->blockSignals(block);
+    m_ui->positionTypeOptionComboBox->blockSignals(block);
     m_ui->emitterCheckBox->blockSignals(block);
     m_ui->facingOptionCombobox->blockSignals(block);
     m_ui->blendTypeComboBox->blockSignals(block);
@@ -232,6 +235,7 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->rotationTweenTypeComboBox->setCurrentIndex(pKeyFrameData->mTweenTypes[KeyFrameData::TweenAttribute_rotation]);
         m_ui->blurSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mBlur);
         m_ui->positionTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mPositionType);
+        m_ui->positionTypeOptionComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mPositionTypeOption);
 
         m_ui->facingOptionCombobox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mFacingOptionType);
         m_ui->blendTypeComboBox->setCurrentIndex(pKeyFrameData->mSpriteDescriptor.mBlendType);
@@ -241,6 +245,9 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->maxEmitSpeedSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mMaxEmitSpeed);
         m_ui->minEmitAngleSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mMinEmitAngle);
         m_ui->maxEmitAngleSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mMaxEmitAngle);
+
+        bool positionTypeOptionEnabled = m_ui->positionTypeComboBox->currentIndex() != 0;
+        m_ui->positionTypeOptionComboBox->setEnabled(positionTypeOptionEnabled);
 
         if (pKeyFrameData->mSpriteDescriptor.isImage())
         {

@@ -24,6 +24,21 @@ public:
         PositionType_COUNT
     };
 
+    enum PositionTypeOption
+    {
+        PositionTypeOption_TopLeft,
+        PositionTypeOption_TopCenter,
+        PositionTypeOption_TopRight,
+        PositionTypeOption_CenterLeft,
+        PositionTypeOption_Center,
+        PositionTypeOption_CenterRight,
+        PositionTypeOption_BottomLeft,
+        PositionTypeOption_BottomCenter,
+        PositionTypeOption_BottomRight,
+
+        PositionTypeOption_COUNT
+    };
+
     enum TweenType
     {
         eTT_None,
@@ -59,9 +74,12 @@ public:
 
     static QString swapTargetTypeString[SwapTargetType_COUNT];
     static QString positionTypeString[PositionType_COUNT];
+    static QString positionTypeOptionString[PositionTypeOption_COUNT];
     static QString tweenAttributeSting[TweenAttribute_COUNT];
     static QString tweenTypeSting[eTT_COUNT];
 
+
+    static PositionTypeOption getPositionTypeOptionByString(QString typeString);
     static SwapTargetType getSwapTargetTypeByString(QString typeString);
     static PositionType getPositionTypeByString(QString typeString);
     static TweenType getTweenTypeByString(QString typeString);
