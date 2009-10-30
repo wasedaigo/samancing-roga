@@ -28,6 +28,7 @@ AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAni
 {
     setAutoFillBackground(false);
 
+
     connect(mpAnimationModel, SIGNAL(refreshTimeLine()), this, SLOT(refresh()));
     connect(mpAnimationModel, SIGNAL(selectedKeyFramePositionChanged(int, int)), this, SLOT(refresh()));
     connect(mpAnimationModel, SIGNAL(targetPositionMoved(int, int)), this, SLOT(refresh()));
@@ -464,6 +465,12 @@ void AnimationViewerPanel::swapSourceTexture()
         QString path = mpAnimationModel->getSelectedSourcePath();
         if (path != "")
         {
+            if (ResourceManager::getFileType(path) == ResourceManager::FileType_Animation)
+            {
+                // Animation is not swappable!
+                mpSelectedCelModel->setSwapTargetType(KeyFrameData::SwapTargetType_None);
+            }
+
             mpSelectedCelModel->setSourceTexture(path, mpAnimationModel->mSelectedPaletTextureSrcRect);
             refresh();
         }
