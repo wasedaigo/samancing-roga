@@ -67,6 +67,7 @@ public:
 
     GLSprite::SpriteDescriptor mSpriteDescriptor;
     SwapTargetType mSwapTargetType;
+    bool mHideActor;
     TweenType mTweenTypes[TweenAttribute_COUNT];
     void copyAttribute(TweenAttribute tweenAttribute, KeyFrameData* item);
     bool hasTween() const;

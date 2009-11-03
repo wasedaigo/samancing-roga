@@ -36,6 +36,7 @@ SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_scale], ScaleTweenType, scaleTwe
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_alpha], AlphaTweenType, alphaTweenType,  int, KeyFrameData::TweenType);
 SETSLOT(TweenTypes[KeyFrameData::TweenAttribute_color], ColorTweenType, colorTweenType,  int, KeyFrameData::TweenType);
 SETSLOT(SwapTargetType, SwapTargetType, swapTargetType,  int, KeyFrameData::SwapTargetType);
+SETSLOT(HideActor, HideActor, hideActor,  bool, bool);
 SETSLOT(SpriteDescriptor.mPositionType, PositionType, positionType, int, int);
 SETSLOT(SpriteDescriptor.mPositionTypeOption, PositionTypeOption, positionTypeOption, int, int);
 

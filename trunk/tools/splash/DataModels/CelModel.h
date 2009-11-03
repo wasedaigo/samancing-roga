@@ -57,6 +57,7 @@ public slots:
     void setPriority(double value);
 
     void setSwapTargetType(int value);
+    void setHideActor(bool value);
 
 signals:
     void sourceTextureChanged(QString path, QRect rect);
@@ -100,7 +101,7 @@ signals:
     void priorityChanged(double value);
 
     void swapTargetTypeChanged(int value);
-
+    void hideActorChanged(bool value);
 private:
     KeyFrameData* mpKeyFrameData;
 };
