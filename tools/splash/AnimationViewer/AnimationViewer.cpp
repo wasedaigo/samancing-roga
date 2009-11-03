@@ -92,7 +92,10 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
 
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterX(int)));
     connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterY(int)));
+
+    // Special
     connect(m_ui->swapTargetComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setSwapTargetType(int)));
+    connect(m_ui->hideActorCheckbox, SIGNAL(toggled(bool)), mpSelectedCelModel, SLOT(setHideActor(bool)));
 
     // Selected Model changed
     connect(mpSelectedCelModel, SIGNAL(alphaChanged(double)), m_ui->alphaSpinBox, SLOT(setValue(double)));
@@ -130,6 +133,7 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->positionTypeComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->positionTypeOptionComboBox, SIGNAL(currentIndexChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->emitterCheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->hideActorCheckbox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
 
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
@@ -193,6 +197,7 @@ void AnimationViewer::blockSignals(bool block)
     m_ui->positionTypeComboBox->blockSignals(block);
     m_ui->positionTypeOptionComboBox->blockSignals(block);
     m_ui->emitterCheckBox->blockSignals(block);
+    m_ui->hideActorCheckbox->blockSignals(block);
     m_ui->facingOptionCombobox->blockSignals(block);
     m_ui->blendTypeComboBox->blockSignals(block);
     m_ui->centerXSpinBox->blockSignals(block);
@@ -245,6 +250,8 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->maxEmitSpeedSpinBox->setValue((double)pKeyFrameData->mSpriteDescriptor.mMaxEmitSpeed);
         m_ui->minEmitAngleSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mMinEmitAngle);
         m_ui->maxEmitAngleSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mMaxEmitAngle);
+
+        m_ui->hideActorCheckbox->setChecked(pKeyFrameData->mHideActor);
 
         bool positionTypeOptionEnabled = m_ui->positionTypeComboBox->currentIndex() != 0;
         m_ui->positionTypeOptionComboBox->setEnabled(positionTypeOptionEnabled);

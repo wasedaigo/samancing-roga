@@ -729,7 +729,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
             </property>
             <property name="iconSize">
@@ -746,7 +746,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/palette.png</normaloff>:/resource/palette.png</iconset>
             </property>
             <property name="iconSize">
@@ -763,7 +763,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../ui.qrc">
+             <iconset>
               <normaloff>:/resource/play.png</normaloff>:/resource/play.png</iconset>
             </property>
             <property name="iconSize">
@@ -847,6 +847,13 @@
                </widget>
               </item>
              </layout>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="hideActorCheckbox">
+              <property name="text">
+               <string>Hide Actor</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -993,8 +1000,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../ui.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

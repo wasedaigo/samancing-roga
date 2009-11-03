@@ -108,6 +108,7 @@ KeyFrameData::KeyFrameData()
         mTweenTypes[i] = eTT_None;
     }
     mSwapTargetType = SwapTargetType_None;
+    mHideActor = false;
 }
 
 void KeyFrameData::copyAttribute(KeyFrameData::TweenAttribute tweenAttribute, KeyFrameData* item)

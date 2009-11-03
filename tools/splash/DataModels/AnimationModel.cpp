@@ -1004,6 +1004,11 @@ bool AnimationModel::saveData()
                     keyframeData["swapTargetType"] = KeyFrameData::swapTargetTypeString[pKeyFrameData->mSwapTargetType].toStdString();
                 }
 
+                if (pKeyFrameData->mHideActor)
+                {
+                    keyframeData["hideActor"] = pKeyFrameData->mHideActor;
+                }
+
                 if (pKeyFrameData->mSpriteDescriptor.mBlendType != GLSprite::eBT_Alpha)
                 {
                     keyframeData["blendType"] = GLSprite::blendTypeSting[pKeyFrameData->mSpriteDescriptor.mBlendType].toStdString();
@@ -1230,6 +1235,11 @@ bool AnimationModel::loadData(QString path)
                 if (keyframe["swapTargetType"].isString())
                 {
                     pKeyFrameData->mSwapTargetType = KeyFrameData::getSwapTargetTypeByString(QString::fromStdString(keyframe["swapTargetType"].asString()));
+                }
+
+                if (keyframe["hideActor"].isBool())
+                {
+                    pKeyFrameData->mHideActor = keyframe["hideActor"].asBool();
                 }
 
                 // Blend
