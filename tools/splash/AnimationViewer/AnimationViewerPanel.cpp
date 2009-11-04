@@ -24,7 +24,9 @@ AnimationViewerPanel::AnimationViewerPanel(QWidget* parent, AnimationModel* pAni
           mIsAnimationPlaying(false),
           mCelGrabbed(false),
           mTargetGrabbed(false),
-          mShowAnimationUI(true)
+          mShowAnimationUI(true),
+          mShowTarget(true),
+          mShowCamera(true)
 {
     setAutoFillBackground(false);
 
@@ -50,6 +52,17 @@ void AnimationViewerPanel::setShowAnimationUI(bool showUI)
     refresh();
 }
 
+void AnimationViewerPanel::setShowTarget(bool value)
+{
+    mShowTarget = value;
+    refresh();
+}
+
+void AnimationViewerPanel::setShowCamera(bool value)
+{
+    mShowCamera = value;
+    refresh();
+}
 void AnimationViewerPanel::playAnimation()
 {
     mIsAnimationPlaying = true;
@@ -57,7 +70,7 @@ void AnimationViewerPanel::playAnimation()
 
 void AnimationViewerPanel::stopAnimation()
 {
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
     {
         while (!mEmittedAnimationList[lineNo].empty()) { delete mEmittedAnimationList[lineNo].takeFirst();}
     }
@@ -81,7 +94,7 @@ void AnimationViewerPanel::gotoNextFrame()
 bool AnimationViewerPanel::isAnimationExist() const
 {
     bool emittedAnimationExists = false;
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
     {
         if (!mEmittedAnimationList[lineNo].empty())
         {
@@ -160,7 +173,7 @@ void AnimationViewerPanel::refresh()
     mGlSpriteList = mpAnimationModel->createGLSpriteListAt(NULL, mpAnimationModel->getCurrentKeyFramePosition().mFrameNo);
 
     mRenderSpriteList.append(mGlSpriteList);
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
     {
         for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
         {
@@ -211,10 +224,36 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         mpAnimationModel->executeCommand(currentPosition.mFrameNo);
     }
 
+    // Update target pos
     QList<const GLSprite*>::Iterator iter = mRenderSpriteList.begin();
     while (iter != mRenderSpriteList.end())
     {
         const GLSprite* glSprite = (GLSprite*)*iter;
+        if (glSprite->mLineNo == AnimationModel::LINE_target)
+        {
+            GLSprite::Point2 pt = spTargetSprite->mSpriteDescriptor.mPosition;
+            pt.mX = glSprite->mSpriteDescriptor.mPosition.mX;
+            pt.mY = glSprite->mSpriteDescriptor.mPosition.mY;
+            spTargetSprite->mSpriteDescriptor.mPosition = pt;
+        }
+        iter++;
+    }
+
+    iter = mRenderSpriteList.begin();
+    while (iter != mRenderSpriteList.end())
+    {
+        const GLSprite* glSprite = (GLSprite*)*iter;
+        if (!mShowTarget && glSprite->mLineNo == AnimationModel::LINE_target)
+        {
+            iter++;
+            continue;
+        }
+
+        if (!mShowCamera && glSprite->mLineNo == AnimationModel::LINE_camera)
+        {
+           iter++;
+           continue;
+        }
 
         // render sprite
         painter.translate(centerPoint.x(), centerPoint.y());
@@ -224,6 +263,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         }
 
         painter.translate(-centerPoint.x(), -centerPoint.y());
+
 
         if (glSprite && !mIsAnimationPlaying && mShowAnimationUI)
         {
@@ -236,7 +276,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
     if (mIsAnimationPlaying)
     {
         // update emitted animations
-        for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+        for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
         {
             for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
             {

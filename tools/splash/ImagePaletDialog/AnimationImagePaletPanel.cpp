@@ -37,7 +37,7 @@ AnimationImagePaletPanel::~AnimationImagePaletPanel()
 bool AnimationImagePaletPanel::isAnimationExist() const
 {
     bool emittedAnimationExists = false;
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
     {
         if (!mEmittedAnimationList[lineNo].empty())
         {
@@ -99,7 +99,7 @@ void AnimationImagePaletPanel::paintEvent(QPaintEvent *event)
                 }
 
                 // update emitted animationlist
-                for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+                for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
                 {
                     for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
                     {
@@ -256,7 +256,7 @@ void AnimationImagePaletPanel::resetAnimation()
 {
     mRenderSpriteList.clear();
     mAnimationFrameNo = 0;
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
     {
         while (!mEmittedAnimationList[lineNo].empty()) { delete mEmittedAnimationList[lineNo].takeFirst();}
     }
@@ -286,7 +286,7 @@ void AnimationImagePaletPanel::onTick()
             mGlSpriteList = mpPlayingAnimationModel->createGLSpriteListAt(NULL, mAnimationFrameNo);
 
             mRenderSpriteList.append(mGlSpriteList);
-            for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+            for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
             {
                 for (int i = mEmittedAnimationList[lineNo].count() - 1; i >= 0; i--)
                 {

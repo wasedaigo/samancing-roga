@@ -34,6 +34,8 @@ protected:
 public slots:
     void refresh();
     void setShowAnimationUI(bool showUI);
+    void setShowTarget(bool value);
+    void setShowCamera(bool value);
 
 signals:
     void celSelected(KeyFrameData* pKeyFrameData);
@@ -67,8 +69,10 @@ private:
     bool mIsAnimationPlaying;
     bool mCelGrabbed;
     bool mTargetGrabbed;
-    QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::MaxLineNo];
+    QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::LINE_COUNT];
     bool mShowAnimationUI;
+    bool mShowTarget;
+    bool mShowCamera;
 };
 
 #endif // AnimationViewerPanel_H

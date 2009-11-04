@@ -19,7 +19,10 @@ Q_OBJECT
 public:
     enum
     {
-        MaxLineNo = 8
+        LINE_target = 8,
+        LINE_camera = 9,
+
+        LINE_COUNT = 10
     };
 
     struct EventList
@@ -102,6 +105,7 @@ public:
     QRect mSelectedPaletTextureSrcRect;
 
     const QWidget* mpParent;
+
 private:
     void readCommand(QString command);
     QString mAnimationName;
@@ -116,7 +120,7 @@ private:
     GLSprite* tweenFrame(const GLSprite* parentGLSprite, int lineNo, int frameNo) const;
 
     // Key Frames
-    QList<KeyFrame*> mKeyFrames[MaxLineNo];
+    QList<KeyFrame*> mKeyFrames[LINE_COUNT];
     QHash<int, EventList> mEvents;
 
     QString mSelectedSourcePath;
@@ -142,5 +146,6 @@ signals:
     void fileChanged();
     void selectedKeyFramePositionChanged(int lineNo, int frameNo);
 };
+extern GLSprite* spTargetSprite;
 
 #endif // ANIMATIONMODEL_H

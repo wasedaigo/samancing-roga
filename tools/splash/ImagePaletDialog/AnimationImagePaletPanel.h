@@ -62,7 +62,7 @@ private:
     QTimer* mpAnimationPlayTimer;
     int mAnimationFrameNo;
 
-    QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::MaxLineNo];
+    QList<EmittedAnimation*> mEmittedAnimationList[AnimationModel::LINE_COUNT];
 };
 
 #endif // ANIMATIONIMAGEPALETPANEL_H

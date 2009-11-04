@@ -94,11 +94,7 @@ QTimelineWidget::QTimelineWidget(AnimationModel* pAnimationModel, QWidget *paren
     this->setAlternatingRowColors(true);
     this->setColumnCount(100);
 
-    this->setRowCount(AnimationModel::MaxLineNo + 1);
-    
-    //this->verticalHeaderItem(8)->setText("E");
-
-    //this->setShowGrid(false);
+    this->setRowCount(AnimationModel::LINE_COUNT + 1);
 
     this->setEditTriggers(0);
     this->setSelectionMode(QAbstractItemView::NoSelection);
@@ -137,7 +133,7 @@ void QTimelineWidget::copyFrame()
 {
     KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
 
-    if (currentPosition.mLineNo == AnimationModel::MaxLineNo )
+    if (currentPosition.mLineNo == AnimationModel::LINE_COUNT )
     {
         mCopyEventList = mpAnimationModel->getEventList(currentPosition.mFrameNo);
     }
@@ -155,7 +151,7 @@ void QTimelineWidget::copyFrame()
 
 void QTimelineWidget::pasteFrame()
 {   KeyFrame::KeyFramePosition currentPosition = mpAnimationModel->getCurrentKeyFramePosition();
-    if (currentPosition.mLineNo == AnimationModel::MaxLineNo )
+    if (currentPosition.mLineNo == AnimationModel::LINE_COUNT )
     {
         mpAnimationModel->setEventList(currentPosition.mFrameNo, mCopyEventList);
     }
@@ -238,7 +234,7 @@ void QTimelineWidget::refreshTimeLine()
     int leftColumn = this->columnAt(visibleRect.left()) - 1;
     int rightColumn = this->columnAt(visibleRect.right());
 
-    for (int lineNo = 0; lineNo < AnimationModel::MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < AnimationModel::LINE_COUNT; lineNo++)
     {
         const QList<KeyFrame*>& keyframeList = mpAnimationModel->getKeyFrameList(lineNo);
 
@@ -301,7 +297,7 @@ void QTimelineWidget::refreshTimeLine()
         AnimationModel::EventList list = mpAnimationModel->getEventList(i);
         if (list.mList.count() > 0)
         {
-            setCellItem(AnimationModel::MaxLineNo, i, CellType_key);
+            setCellItem(AnimationModel::LINE_COUNT, i, CellType_key);
         }
     }
 
@@ -378,7 +374,9 @@ void QTimelineWidget::refreshTimeLine()
          this->item(row, column)->setBackground(sBrushes[selection][cellType]);
      }
 
-     this->setVerticalHeaderItem(8, new QTableWidgetItem(QString("E")));
+     this->setVerticalHeaderItem(AnimationModel::LINE_target, new QTableWidgetItem(QString("T")));
+     this->setVerticalHeaderItem(AnimationModel::LINE_camera, new QTableWidgetItem(QString("C")));
+     this->setVerticalHeaderItem(AnimationModel::LINE_COUNT, new QTableWidgetItem(QString("E")));
  }
 
  void QTimelineWidget::setKeyFrame(int row, int column)
