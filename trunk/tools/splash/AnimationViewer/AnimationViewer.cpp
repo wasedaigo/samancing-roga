@@ -139,6 +139,9 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->showAnimationUICheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowAnimationUI(bool)));
+    connect(m_ui->showCameraCheckbox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowCamera(bool)));
+    connect(m_ui->showTargetCheckbox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowTarget(bool)));
+
     connect(m_ui->loopPlayCheckbox, SIGNAL(toggled(bool)), this, SLOT(setLoopPlay(bool)));
 
     // Cel selection

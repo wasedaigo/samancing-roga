@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>694</width>
-    <height>374</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    <string>Splash</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="ui.qrc">
     <normaloff>:/resource/splash.ico</normaloff>:/resource/splash.ico</iconset>
   </property>
   <property name="locale">
@@ -73,7 +73,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="ui.qrc">
             <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
           </property>
          </widget>
@@ -87,7 +87,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="ui.qrc">
             <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
           </property>
          </widget>
@@ -104,7 +104,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="ui.qrc">
             <normaloff>:/resource/refresh.png</normaloff>:/resource/refresh.png</iconset>
           </property>
          </widget>
@@ -205,7 +205,7 @@
                <item>
                 <widget class="QTableWidget" name="eventTableWidget">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -213,7 +213,7 @@
                  <property name="maximumSize">
                   <size>
                    <width>200</width>
-                   <height>100</height>
+                   <height>160</height>
                   </size>
                  </property>
                  <property name="columnCount">
@@ -239,7 +239,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset>
+                    <iconset resource="ui.qrc">
                      <normaloff>:/resource/add.png</normaloff>:/resource/add.png</iconset>
                    </property>
                   </widget>
@@ -250,7 +250,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset>
+                    <iconset resource="ui.qrc">
                      <normaloff>:/resource/remove.png</normaloff>:/resource/remove.png</iconset>
                    </property>
                   </widget>
@@ -332,6 +332,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="ui.qrc"/>
+ </resources>
  <connections/>
 </ui>

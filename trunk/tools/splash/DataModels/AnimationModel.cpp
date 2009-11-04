@@ -34,7 +34,7 @@ field = LERP(startValue, endValue, frameNo, startFrameNo, endFrameNo)
 ////
 
 static QPixmap* spTargetPixmap = NULL;
-static GLSprite* spTargetSprite = NULL;
+GLSprite* spTargetSprite = NULL;
 static QPixmap* spCenterPointPixmap = NULL;
 static GLSprite* spCenterPointSprite = NULL;
 
@@ -164,7 +164,7 @@ int AnimationModel::getMaxFrameCount(int lineNo) const
 int AnimationModel::getMaxFrameCount() const
 {
     int max = 0;
-    for (int i = 0; i < MaxLineNo; i++)
+    for (int i = 0; i < LINE_COUNT; i++)
     {
         int t = getMaxFrameCount(i);
         if (t > max)
@@ -205,7 +205,7 @@ void AnimationModel::setEventText(int frameNo, int index, QString text)
 
 KeyFrame* AnimationModel::getKeyFrame(int lineNo, int frameNo) const
 {
-    if (lineNo >= MaxLineNo || lineNo < 0 || frameNo < 0){return NULL;}
+    if (lineNo >= LINE_COUNT || lineNo < 0 || frameNo < 0){return NULL;}
     for (int i = 0; i < mKeyFrames[lineNo].count(); i++)
     {
         if (mKeyFrames[lineNo][i]->mFrameNo == frameNo)
@@ -323,7 +323,7 @@ void AnimationModel::removeEvent(int frameNo, int index)
 // set new key frame
 void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2& position)
 {
-    if (lineNo >= MaxLineNo){return;}
+    if (lineNo >= LINE_COUNT){return;}
     // if a keframe already exists, don't add any keyframe
     if (getKeyFrameIndex(lineNo, frameNo) == -1)
     {
@@ -343,7 +343,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, const GLSprite::Point2
 
 void AnimationModel::setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyframeData)
 {
-    if (lineNo >= MaxLineNo){return;}
+    if (lineNo >= LINE_COUNT){return;}
     // if a keframe already exists, don't add any keyframe
     if (getKeyFrameIndex(lineNo, frameNo) == -1)
     {
@@ -357,7 +357,7 @@ void AnimationModel::setKeyFrame(int lineNo, int frameNo, KeyFrameData* pKeyfram
 
 void AnimationModel::insertEmptyKeyFrame(int lineNo, int frameNo)
 {
-    if (lineNo >= MaxLineNo){return;}
+    if (lineNo >= LINE_COUNT){return;}
     // if a keframe already exists, don't add any keyframe
     if (getKeyFrameIndex(lineNo, frameNo) == -1)
     {
@@ -372,8 +372,8 @@ void AnimationModel::insertEmptyKeyFrame(int lineNo, int frameNo)
 
 void AnimationModel::addFrameLength(int lineNo, int frameNo, int value)
 {
-    if (lineNo > MaxLineNo) {return;}
-    if (lineNo == MaxLineNo)
+    if (lineNo > LINE_COUNT) {return;}
+    if (lineNo == LINE_COUNT)
     {
         // Event frames control
         int lastFrameNo = getLastEventFrameNo();
@@ -408,9 +408,9 @@ void AnimationModel::addFrameLength(int lineNo, int frameNo, int value)
 
 void AnimationModel::reduceFrameLength(int lineNo, int frameNo)
 {
-    if (lineNo > MaxLineNo) {return;}
+    if (lineNo > LINE_COUNT) {return;}
 
-    if (lineNo == MaxLineNo)
+    if (lineNo == LINE_COUNT)
     {
         int lastFrameNo = getLastEventFrameNo();
         if (lastFrameNo > 0)
@@ -459,7 +459,7 @@ void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
     // Remove frames
     for (int i = endFrameNo; i >= startFrameNo; i--)
     {
-        if (lineNo == MaxLineNo)
+        if (lineNo == LINE_COUNT)
         {
             mEvents.remove(i);
         }
@@ -479,7 +479,7 @@ void AnimationModel::clearFrames(int lineNo, int startFrameNo, int endFrameNo)
 
 void AnimationModel::clearAllKeyFrames()
 {
-    for (int lineNo = 0;  lineNo < MaxLineNo; lineNo++)
+    for (int lineNo = 0;  lineNo < LINE_COUNT; lineNo++)
     {
         for (int frameNo = mKeyFrames[lineNo].count() - 1; frameNo >= 0; frameNo--)
         {
@@ -564,7 +564,7 @@ const QList<const GLSprite*> AnimationModel::createGLSpriteListAt(const GLSprite
 {
     QList<const GLSprite*> glSpriteList;
     const GLSprite* pGLSprite = parentGLSprite;
-    for (int lineNo = 0; lineNo < MaxLineNo; lineNo++)
+    for (int lineNo = 0; lineNo < LINE_COUNT; lineNo++)
     {
         pGLSprite = createGLSpriteAt(parentGLSprite, frameNo, lineNo);
         if (pGLSprite)
@@ -934,7 +934,7 @@ bool AnimationModel::saveData()
 
     // save keyframes
     Json::Value keyframesData;
-    for (int i = 0; i < MaxLineNo; i++)
+    for (int i = 0; i < LINE_COUNT; i++)
     {
         //if no data exists in this line, ignore it.
         if(mKeyFrames[i].count() == 0)

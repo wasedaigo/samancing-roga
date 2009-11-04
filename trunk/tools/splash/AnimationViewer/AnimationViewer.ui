@@ -685,7 +685,7 @@
        <property name="title">
         <string>Tool option</string>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QVBoxLayout" name="verticalLayout_8">
         <property name="spacing">
          <number>2</number>
         </property>
@@ -693,24 +693,55 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="QCheckBox" name="loopPlayCheckbox">
-          <property name="text">
-           <string>Loop Play</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <widget class="QCheckBox" name="loopPlayCheckbox">
+            <property name="text">
+             <string>Loop Play</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showAnimationUICheckBox">
+            <property name="text">
+             <string>Show Animation UI</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="showAnimationUICheckBox">
-          <property name="text">
-           <string>Show Animation UI</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_17">
+          <item>
+           <widget class="QCheckBox" name="showTargetCheckbox">
+            <property name="text">
+             <string>Show Target</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showCameraCheckbox">
+            <property name="text">
+             <string>Show Camera</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_14"/>
      </item>
      <item>
       <widget class="QGroupBox" name="verticalGroupBox">
@@ -729,7 +760,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../ui.qrc">
               <normaloff>:/resource/disk.png</normaloff>:/resource/disk.png</iconset>
             </property>
             <property name="iconSize">
@@ -746,7 +777,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../ui.qrc">
               <normaloff>:/resource/palette.png</normaloff>:/resource/palette.png</iconset>
             </property>
             <property name="iconSize">
@@ -763,7 +794,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../ui.qrc">
               <normaloff>:/resource/play.png</normaloff>:/resource/play.png</iconset>
             </property>
             <property name="iconSize">
@@ -1000,6 +1031,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../ui.qrc"/>
+ </resources>
  <connections/>
 </ui>
