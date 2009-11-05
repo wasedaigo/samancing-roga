@@ -183,6 +183,11 @@
           </item>
           <item>
            <property name="text">
+            <string>Aim Target Group Center</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Chain</string>
            </property>
           </item>
