@@ -18,7 +18,7 @@ enum PoseType
     PoseType_COUNT
 };
 
-// Immunity setting
+// Pose type
 static QString poseTypeString[PoseType_COUNT] = {
     "Attack", "Magic"
     };
@@ -58,7 +58,7 @@ enum SkillType
     SkillType_COUNT
 };
 
-// Immunity setting
+// Skill type setting
 static QString skillTypeString[SkillType_COUNT] = {
     "Knife", "Sword", "Rapier", "Spear", "Mace", "Axe", "Bow", "Shield", "Wind", "Fire", "Thunder", "Earth", "Ice", "Water", "Monster"
     };
@@ -74,36 +74,6 @@ static SkillType getSkillTypeFromString(QString key)
     }
 
     return SkillType_Knife;
-}
-
-// Immunity setting
-enum ImmunityRate
-{
-    ImmunityRate_SuperWeak,
-    ImmunityRate_Weak,
-    ImmunityRate_None,
-    ImmunityRate_Resist,
-    ImmunityRate_Invulnerable,
-    ImmunityRate_Absorb,
-
-    ImmunityRate_COUNT
-};
-
-static int immunityRate[ImmunityRate_COUNT] = {-250, -100, 0, 50, 100, 200};
-static QString immunityRateType[ImmunityRate_COUNT] = {"Super weak", "Weak", "None", "Resist", "Invulnerable", "Absorb"};
-static int getIndexOfImmunityRateType(QString key)
-{
-    int num = 0;
-    for (int i = 0; i < ImmunityRate_COUNT; i++)
-    {
-        if (key == immunityRateType[i])
-        {
-            num = i;
-            break;
-        }
-    }
-
-    return num;
 }
 
 #define DAMAGE_FIELD_COUNT 6
@@ -215,16 +185,6 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     }
     m_ui->skillTypeCombobox->setModel(mpSkillTypeModel);
 
-    // Setup Immunity Comboboxes
-    mpImmunityRateTypeModel = new QStandardItemModel();
-    for (int i = 0; i < ImmunityRate_COUNT; i++)
-    {
-        mpImmunityRateTypeModel->appendRow(new QStandardItem(immunityRateType[i]));
-    }
-
-    m_ui->undeadCombobox->setModel(mpImmunityRateTypeModel);
-    m_ui->undeadCombobox->setCurrentIndex(ImmunityRate_None);
-
     // setup short cuts
     m_ui->actionSave->setShortcut(QKeySequence("Ctrl+s"));
 
@@ -236,7 +196,6 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
 RogaSkillEditor::~RogaSkillEditor()
 {
     delete mpSkillTypeModel;
-    delete mpImmunityRateTypeModel;
     delete m_ui;
 }
 
@@ -399,7 +358,6 @@ void RogaSkillEditor::clearUI()
 
     m_ui->chainableCheckbox->setChecked(false);
     m_ui->chainStartFrameCombobox->setValue(0);
-    m_ui->chainDurationCombobox->setValue(0);
 
     m_ui->skillTypeCombobox->setCurrentIndex(0);
     m_ui->poseTypeCombobox->setCurrentIndex(0);
@@ -442,7 +400,6 @@ bool RogaSkillEditor::saveSkillData()
 
             mSkillDataRoot[skillID]["chainable"] = m_ui->chainableCheckbox->isChecked();
             mSkillDataRoot[skillID]["chainStartFrame"] = m_ui->chainStartFrameCombobox->value();
-            mSkillDataRoot[skillID]["chainDuration"] = m_ui->chainDurationCombobox->value();
 
 
             mSkillDataRoot[skillID]["poseType"] = poseTypeString[m_ui->poseTypeCombobox->currentIndex()].toStdString();
@@ -549,10 +506,6 @@ void RogaSkillEditor::loadSkillData()
                 if(skillData["chainStartFrame"].isInt())
                 {
                     m_ui->chainStartFrameCombobox->setValue(skillData["chainStartFrame"].asInt());
-                }
-                if(skillData["chainDuration"].isInt())
-                {
-                    m_ui->chainDurationCombobox->setValue(skillData["chainDuration"].asInt());
                 }
 
                 if(skillData["poseType"].isString())
