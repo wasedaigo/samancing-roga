@@ -49,7 +49,7 @@ private:
     Ui::RogaSkillEditor *m_ui;
 
     QStandardItemModel* mpSkillTypeModel;
-    QStandardItemModel* mpImmunityRateTypeModel;
+
     QString mSkillDataPath;
     QString mSelectedID;
     Json::Value mSkillDataRoot;

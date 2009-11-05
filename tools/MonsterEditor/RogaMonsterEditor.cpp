@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QPainter>
 #include <QPoint>
+#include <QStandardItemModel>
 
 #include "ImageViewer.h"
 
@@ -17,6 +18,39 @@
 #define FACE_ICON_HEIGHT 48
 #define FACE_ICON_PATH "Images/UI/UI_Faces.png"
 
+
+
+// Immunity setting
+enum ImmunityRate
+{
+    ImmunityRate_SuperWeak,
+    ImmunityRate_Weak,
+    ImmunityRate_None,
+    ImmunityRate_Resist,
+    ImmunityRate_Invulnerable,
+    ImmunityRate_Absorb,
+
+    ImmunityRate_COUNT
+};
+
+static int immunityRate[ImmunityRate_COUNT] = {-250, -100, 0, 50, 100, 200};
+static QString immunityRateType[ImmunityRate_COUNT] = {"Super weak", "Weak", "None", "Resist", "Invulnerable", "Absorb"};
+static int getIndexOfImmunityRateType(QString key)
+{
+    int num = 0;
+    for (int i = 0; i < ImmunityRate_COUNT; i++)
+    {
+        if (key == immunityRateType[i])
+        {
+            num = i;
+            break;
+        }
+    }
+
+    return num;
+}
+
+// Equip Skill setting
 #define EQUIP_SKILL_FIELD_COUNT 2
 static QString equipSkillFields[EQUIP_SKILL_FIELD_COUNT] = {"SkillID", "count"};
 static int getIndexOfEquipSkillsField(QString key)
@@ -71,6 +105,7 @@ RogaMonsterEditor::RogaMonsterEditor(QWidget *parent) :
 
 RogaMonsterEditor::~RogaMonsterEditor()
 {
+    delete mpImmunityRateTypeModel;
     delete mpFaceIconViewer;
     delete mpMonsterGraphicViewer;
     delete m_ui;
@@ -79,6 +114,7 @@ RogaMonsterEditor::~RogaMonsterEditor()
 // First time function
 void RogaMonsterEditor::init()
 {
+
     QString initPath = FileLoader::getInitpath();
 
     Json::Value initData = FileLoader::getInitOptionData();
@@ -89,6 +125,15 @@ void RogaMonsterEditor::init()
     loadUIFaceImage();
     m_ui->monsterListWidget->setCurrentRow(0);
     MonsterLoad(0);
+
+    // Setup Immunity Comboboxes
+    mpImmunityRateTypeModel = new QStandardItemModel();
+    for (int i = 0; i < ImmunityRate_COUNT; i++)
+    {
+        mpImmunityRateTypeModel->appendRow(new QStandardItem(immunityRateType[i]));
+    }
+    m_ui->undeadCombobox->setModel(mpImmunityRateTypeModel);
+    m_ui->undeadCombobox->setCurrentIndex(ImmunityRate_None);
 }
 
 // Helper function

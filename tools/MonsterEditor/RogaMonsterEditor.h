@@ -11,6 +11,7 @@ namespace Ui {
 }
 
 class ImageViewer;
+class QStandardItemModel;
 class RogaMonsterEditor : public QMainWindow {
     Q_OBJECT
 public:
@@ -63,6 +64,7 @@ private:
     Json::Value mMonsterDataRoot;
 
     bool mChanged;
+    QStandardItemModel* mpImmunityRateTypeModel;
 };
 
 #endif // ROGAMonsterEDITOR_H
