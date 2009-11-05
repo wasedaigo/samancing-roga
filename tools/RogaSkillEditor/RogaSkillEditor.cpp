@@ -110,8 +110,8 @@ static int getIndexOfTargetSelectionType(QString key)
     return num;
 }
 
-#define MULTI_TARGET_TYPE_COUNT 4
-static QString multiTargetType[MULTI_TARGET_TYPE_COUNT] = {"aimTarget", "aimGrid", "chain", "drain"};
+#define MULTI_TARGET_TYPE_COUNT 5
+static QString multiTargetType[MULTI_TARGET_TYPE_COUNT] = {"aimTarget", "aimGrid", "targetGroupCenter", "chain", "drain"};
 static int getIndexOfMultiTargetType(QString key)
 {
     int num = 0;
