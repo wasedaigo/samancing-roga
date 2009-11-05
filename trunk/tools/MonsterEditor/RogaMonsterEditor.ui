@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>746</width>
+    <width>820</width>
     <height>627</height>
    </rect>
   </property>
@@ -118,6 +118,37 @@
         </item>
         <item>
          <widget class="QLineEdit" name="IDEdit"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Spawn Animation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="spawnAnimationEdit">
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Death Animation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="deathAnimationEdit"/>
         </item>
        </layout>
       </item>
@@ -584,7 +615,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>746</width>
+     <width>820</width>
      <height>20</height>
     </rect>
    </property>

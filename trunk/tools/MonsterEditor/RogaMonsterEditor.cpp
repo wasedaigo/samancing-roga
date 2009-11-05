@@ -134,6 +134,7 @@ void RogaMonsterEditor::init()
     }
     m_ui->undeadCombobox->setModel(mpImmunityRateTypeModel);
     m_ui->undeadCombobox->setCurrentIndex(ImmunityRate_None);
+
 }
 
 // Helper function
@@ -238,6 +239,8 @@ void RogaMonsterEditor::clearUI()
     }
     m_ui->nameEdit->setText("");
     m_ui->IDEdit->setText("");
+    m_ui->spawnAnimationEdit->setText("");
+    m_ui->deathAnimationEdit->setText("");
     m_ui->attackSpinBox->setValue(0);
     m_ui->defenseSpinBox->setValue(0);
     m_ui->lifeSpinBox->setValue(1);
@@ -438,6 +441,9 @@ bool RogaMonsterEditor::saveMonsterData()
             QString monsterFilePath = getRelativeMonsterGraphicPath(mpMonsterGraphicViewer->getLoadedFilePath());
             monsterData["monsterGraphic"] = monsterFilePath.toStdString();
 
+            monsterData["spawnAnimation"] = m_ui->spawnAnimationEdit->text().toStdString();
+            monsterData["deathAnimation"] = m_ui->deathAnimationEdit->text().toStdString();
+
             // List of equip skills
             Json::Value& equipSkills = monsterData["equipSkills"];
             for (int i = 0; i < m_ui->tableWidget->rowCount(); i++)
@@ -515,6 +521,16 @@ void RogaMonsterEditor::loadMonsterData()
                 {
                     QString monsterFilePath = QString::fromStdString(MonsterData["monsterGraphic"].asString());
                     loadMonsterImage(monsterFilePath);
+                }
+
+                if(!MonsterData["spawnAnimation"].isNull())
+                {
+                    m_ui->spawnAnimationEdit->setText(QString::fromStdString(MonsterData["spawnAnimation"].asString()));
+                }
+
+                if(!MonsterData["deathAnimation"].isNull())
+                {
+                    m_ui->deathAnimationEdit->setText(QString::fromStdString(MonsterData["deathAnimation"].asString()));
                 }
 
                 Json::Value& equipSkills = MonsterData["equipSkills"];
