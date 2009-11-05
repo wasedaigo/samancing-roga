@@ -224,7 +224,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         mpAnimationModel->executeCommand(currentPosition.mFrameNo);
     }
 
-    // Update target pos
+    // Update target info
     QList<const GLSprite*>::Iterator iter = mRenderSpriteList.begin();
     while (iter != mRenderSpriteList.end())
     {
@@ -235,6 +235,8 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
             pt.mX = glSprite->mSpriteDescriptor.mPosition.mX;
             pt.mY = glSprite->mSpriteDescriptor.mPosition.mY;
             spTargetSprite->mSpriteDescriptor.mPosition = pt;
+
+            spTargetSprite->mSpriteDescriptor.mTextureSrcRect = glSprite->mSpriteDescriptor.mTextureSrcRect;
         }
         iter++;
     }
@@ -256,13 +258,22 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
         }
 
         // render sprite
-        painter.translate(centerPoint.x(), centerPoint.y());
+        // Move rendering position depends on targeting position option
+        int dx = 0;
+        int dy = 0;
+//        if (glSprite->mLineNo == AnimationModel::LINE_target)
+//        {
+//            dx = glSprite->mSpriteDescriptor.mTextureSrcRect.width() / 2;
+//            dy = glSprite->mSpriteDescriptor.mTextureSrcRect.height() / 2;
+//        }
+
+        painter.translate(centerPoint.x() + dx, centerPoint.y() + dy);
         if (glSprite)
         {
             glSprite->render(QPoint(0, 0), painter,AnimationModel::getTargetSprite(), mIsAnimationPlaying, mEmittedAnimationList);
         }
 
-        painter.translate(-centerPoint.x(), -centerPoint.y());
+        painter.translate(-centerPoint.x() - dx, -centerPoint.y() - dy);
 
 
         if (glSprite && !mIsAnimationPlaying && mShowAnimationUI)
@@ -437,7 +448,6 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
 
     mTargetGrabbed  = false;
     mCelGrabbed = false;
-    grabTarget(relativePressedPosition);
 
     // only for edit mode
     if (!mIsAnimationPlaying)
@@ -449,12 +459,9 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
             return;
         }
 
-        if (!mTargetGrabbed)
-        {
-            grabCel(relativePressedPosition);
-        }
+        grabCel(relativePressedPosition);
 
-        if(!mCelGrabbed && !mTargetGrabbed)
+        if(!mCelGrabbed)
         {
             QString path1 = mpAnimationModel->getLoadedAnimationPath();
             QString path2 = mpAnimationModel->getSelectedSourcePath();
@@ -492,6 +499,11 @@ void AnimationViewerPanel::mousePressEvent(QMouseEvent *event)
             }
           }
         }
+    }
+
+    if (!mCelGrabbed)
+    {
+        grabTarget(relativePressedPosition);
     }
 }
 
@@ -547,7 +559,7 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
         // Move cel if it is selected
         if (pKeyFrameData)
         {
-            if (pKeyFrameData->mSpriteDescriptor.mPositionType != KeyFrameData::PositionType_None)
+            if (pKeyFrameData->mSpriteDescriptor.mPositionType != GLSprite::PositionType_None)
             {
                 newPosX -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
                 newPosY -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;

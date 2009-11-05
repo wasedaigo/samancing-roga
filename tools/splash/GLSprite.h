@@ -13,6 +13,29 @@ class QPixmap;
 class GLSprite
 {
 public:
+    enum PositionType
+    {
+        PositionType_None,
+        PositionType_RelativeToTarget,
+        PositionType_RelativeToTargetOrigin,
+
+        PositionType_COUNT
+    };
+
+    enum PositionTypeOption
+    {
+        PositionTypeOption_TopLeft,
+        PositionTypeOption_TopCenter,
+        PositionTypeOption_TopRight,
+        PositionTypeOption_CenterLeft,
+        PositionTypeOption_Center,
+        PositionTypeOption_CenterRight,
+        PositionTypeOption_BottomLeft,
+        PositionTypeOption_BottomCenter,
+        PositionTypeOption_BottomRight,
+
+        PositionTypeOption_COUNT
+    };
 
     enum FacingOptionType
     {
@@ -181,6 +204,57 @@ public:
         QPoint center() const
         {
             return QPointF(textureCenter().x() + mCenter.mX, textureCenter().y() + mCenter.mY).toPoint();
+        }
+
+        QPoint getPosition() const
+        {
+            int dx = 0;
+            int dy = 0;
+
+            if (mPositionType != PositionType_None)
+            {
+                switch(mPositionTypeOption)
+                {
+                    case PositionTypeOption_TopLeft:
+                        dx = -1;
+                        dy = -1;
+                    break;
+                    case PositionTypeOption_TopCenter:
+                        dx = 0;
+                        dy = -1;
+                    break;
+                    case PositionTypeOption_TopRight:
+                        dx = 1;
+                        dy = -1;
+                    break;
+                    break;
+                    case PositionTypeOption_CenterLeft:
+                        dx = -1;
+                        dy = 0;
+                    break;
+                    case PositionTypeOption_Center:
+                        dx = 0;
+                        dy = 0;
+                    break;
+                    case PositionTypeOption_CenterRight:
+                        dx = 1;
+                        dy = 0;
+                    break;
+                    case PositionTypeOption_BottomLeft:
+                        dx = -1;
+                        dy = 1;
+                    break;
+                    case PositionTypeOption_BottomCenter:
+                        dx = 0;
+                        dy = 1;
+                    break;
+                    case PositionTypeOption_BottomRight:
+                        dx = 1;
+                        dy = 1;
+                    break;
+                }
+            }
+            return QPointF(mPosition.mX + dx * mTextureSrcRect.width(), mPosition.mY + dy * mTextureSrcRect.height()).toPoint();
         }
     };
 
