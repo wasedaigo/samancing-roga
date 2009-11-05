@@ -36,6 +36,25 @@ static PoseType getPoseTypeFromString(QString key)
     return PoseType_Attack;
 }
 
+// Skill type setting
+#define RANGE_EFFECT_COUNT 8
+static QString rangeEffectString[RANGE_EFFECT_COUNT] = {
+    "-", "A", "B", "C", "D", "E", "F"
+    };
+
+static int getRangeEffectFromString(QString key)
+{
+    for (int i = 0; i < RANGE_EFFECT_COUNT; i++)
+    {
+        if (key == rangeEffectString[i])
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
 //Skill Type setting
 enum SkillType
 {
@@ -176,8 +195,17 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
     connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveSelected()));
     connect(m_ui->actionSave_As, SIGNAL(triggered()), this, SLOT(onSaveAsSelected()));
 
-    // Setup Skill Type combobox
+    // Range effect model
+    mpRangeEffectModel = new QStandardItemModel();
+    for (int i = 0; i < RANGE_EFFECT_COUNT; i++)
+    {
+        mpRangeEffectModel->appendRow(new QStandardItem(rangeEffectString[i]));
+    }
+    m_ui->sRangeCombobox->setModel(mpRangeEffectModel);
+    m_ui->mRangeCombobox->setModel(mpRangeEffectModel);
+    m_ui->lRangeCombobox->setModel(mpRangeEffectModel);
 
+    // Setup Skill Type combobox
     mpSkillTypeModel = new QStandardItemModel();
     for (int i = 0; i < SkillType_COUNT; i++)
     {
@@ -195,6 +223,7 @@ RogaSkillEditor::RogaSkillEditor(QWidget *parent) :
 
 RogaSkillEditor::~RogaSkillEditor()
 {
+    delete mpRangeEffectModel;
     delete mpSkillTypeModel;
     delete m_ui;
 }
@@ -361,6 +390,9 @@ void RogaSkillEditor::clearUI()
 
     m_ui->skillTypeCombobox->setCurrentIndex(0);
     m_ui->poseTypeCombobox->setCurrentIndex(0);
+    m_ui->sRangeCombobox->setCurrentIndex(0);
+    m_ui->mRangeCombobox->setCurrentIndex(0);
+    m_ui->lRangeCombobox->setCurrentIndex(0);
 }
 
 bool RogaSkillEditor::saveSkillData()
@@ -404,6 +436,9 @@ bool RogaSkillEditor::saveSkillData()
 
             mSkillDataRoot[skillID]["poseType"] = poseTypeString[m_ui->poseTypeCombobox->currentIndex()].toStdString();
             mSkillDataRoot[skillID]["skillType"] = skillTypeString[m_ui->skillTypeCombobox->currentIndex()].toStdString();
+            mSkillDataRoot[skillID]["sRangeEffect"] = rangeEffectString[m_ui->sRangeCombobox->currentIndex()].toStdString();
+            mSkillDataRoot[skillID]["mRangeEffect"] = rangeEffectString[m_ui->mRangeCombobox->currentIndex()].toStdString();
+            mSkillDataRoot[skillID]["lRangeEffect"] = rangeEffectString[m_ui->lRangeCombobox->currentIndex()].toStdString();
 
             // radio group 1
             mSkillDataRoot[skillID]["TargetDataOne"]["targetSelectionType"] = targetSelectionType[m_ui->OneSelectionTypeComboBox->currentIndex()].toStdString();
@@ -511,6 +546,21 @@ void RogaSkillEditor::loadSkillData()
                 if(skillData["poseType"].isString())
                 {
                     m_ui->poseTypeCombobox->setCurrentIndex((int)getPoseTypeFromString(QString::fromStdString(skillData["poseType"].asString())));
+                }
+
+                if(skillData["sRangeEffect"].isString())
+                {
+                    m_ui->sRangeCombobox->setCurrentIndex((int)getRangeEffectFromString(QString::fromStdString(skillData["sRangeEffect"].asString())));
+                }
+
+                if(skillData["mRangeEffect"].isString())
+                {
+                    m_ui->mRangeCombobox->setCurrentIndex((int)getRangeEffectFromString(QString::fromStdString(skillData["mRangeEffect"].asString())));
+                }
+
+                if(skillData["lRangeEffect"].isString())
+                {
+                    m_ui->lRangeCombobox->setCurrentIndex((int)getRangeEffectFromString(QString::fromStdString(skillData["lRangeEffect"].asString())));
                 }
 
                 if(skillData["skillType"].isString())
