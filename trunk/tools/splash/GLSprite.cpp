@@ -62,8 +62,8 @@ GLSprite::SpriteDescriptor GLSprite::makeDefaultSpriteDescriptor()
     spriteDescriptor.mSourcePath = "";
     spriteDescriptor.mBlendType = GLSprite::eBT_Alpha;
     spriteDescriptor.mFacingOptionType = FacingOptionType_none;
-    spriteDescriptor.mPositionType = KeyFrameData::PositionType_None;
-    spriteDescriptor.mPositionTypeOption = KeyFrameData::PositionTypeOption_Center;
+    spriteDescriptor.mPositionType = GLSprite::PositionType_None;
+    spriteDescriptor.mPositionTypeOption = GLSprite::PositionTypeOption_Center;
 
     spriteDescriptor.mBlur = 0;
     spriteDescriptor.mCenter.mX = 0;
@@ -134,6 +134,7 @@ GLSprite::GLSprite(const GLSprite* pGLSprite, const AnimationModel* pAnimationMo
           mEmitted(false)
 {
 }
+
 
 QTransform GLSprite::getParentTransform() const
 {
