@@ -259,6 +259,13 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         bool positionTypeOptionEnabled = m_ui->positionTypeComboBox->currentIndex() != 0;
         m_ui->positionTypeOptionComboBox->setEnabled(positionTypeOptionEnabled);
 
+        bool specialCelSelected = (mpAnimationModel->getCurrentKeyFramePosition().mLineNo == AnimationModel::LINE_target || mpAnimationModel->getCurrentKeyFramePosition().mLineNo == AnimationModel::LINE_camera);
+
+        m_ui->blurSpinBox->setEnabled(!specialCelSelected);
+        m_ui->facingOptionCombobox->setEnabled(!specialCelSelected);
+        m_ui->positionTypeOptionComboBox->setEnabled(!specialCelSelected);
+        m_ui->positionTypeComboBox->setEnabled(!specialCelSelected);
+
         if (pKeyFrameData->mSpriteDescriptor.isImage())
         {
             // Check box
