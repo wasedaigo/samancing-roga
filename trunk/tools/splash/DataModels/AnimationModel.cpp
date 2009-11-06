@@ -621,16 +621,37 @@ void AnimationModel::setFinalPosition(const GLSprite* parentGLSprite, GLSprite::
 {
     if(spriteDescriptor.mPositionType != GLSprite::PositionType_None)
     {
-        // Transform current position based on target point
+        QPoint point = spriteDescriptor.getPosition(spTargetSprite);
+        if(spriteDescriptor.mPositionType == GLSprite::PositionType_RelativeToTarget)
+        {
+            // Transform current position based on target point
+            if(parentGLSprite)
+            {
+                point = point * spTargetSprite->getCombinedTransform() * parentGLSprite->getCombinedTransform().inverted();
+            }
+            else
+            {
+                point = point * spTargetSprite->getTransform();
+            }
 
-        QPoint point = spriteDescriptor.getPosition();
-        if(parentGLSprite)
-        {
-            point = point * spTargetSprite->getCombinedTransform() * parentGLSprite->getCombinedTransform().inverted();
         }
-        else
+        else if(spriteDescriptor.mPositionType == GLSprite::PositionType_RelativeToTargetOrigin)
         {
-            point = point * spTargetSprite->getTransform();
+            QPoint targetPoint = GLSprite::getPositionWithPositionType(QPoint(TARGET_originX, TARGET_originY), spriteDescriptor.mPositionTypeOption, spTargetSprite->mSpriteDescriptor.mTextureSrcRect.width(), spTargetSprite->mSpriteDescriptor.mTextureSrcRect.height());
+            QTransform transform;
+            transform.translate(targetPoint.x(), targetPoint.y());
+            transform.rotate(0);
+            transform.scale(0, 0);
+
+            // Transform current position based on target point
+            if(parentGLSprite)
+            {
+                point = point * transform * parentGLSprite->getCombinedTransform().inverted();
+            }
+            else
+            {
+                point = point * transform;
+            }
         }
 
         spriteDescriptor.mPosition.mX = point.x();
