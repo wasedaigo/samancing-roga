@@ -1277,8 +1277,8 @@ void AnimationModel::loadLine(int lineNo, Json::Value& line)
 
             if (!keyframe["center"].isNull())
             {
-                pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asInt();
-                pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asInt();
+                pKeyFrameData->mSpriteDescriptor.mCenter.mX = keyframe["center"][static_cast<unsigned int>(0)].asDouble();
+                pKeyFrameData->mSpriteDescriptor.mCenter.mY = keyframe["center"][1].asDouble();
             }
 
             if (!keyframe["textureRect"].isNull())

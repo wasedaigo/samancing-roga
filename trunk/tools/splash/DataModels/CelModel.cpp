@@ -54,6 +54,9 @@ SETSLOT(SpriteDescriptor.mRotation, Rotation, rotation, int, int);
 SETSLOT(SpriteDescriptor.mScale.mX, ScaleX, scaleX, double, float);
 SETSLOT(SpriteDescriptor.mScale.mY, ScaleY, scaleY, double, float);
 
+SETSLOT(SpriteDescriptor.mCenter.mX, CenterX, centerX, double, float);
+SETSLOT(SpriteDescriptor.mCenter.mY, CenterY, centerY, double, float);
+
 SETSLOT(SpriteDescriptor.mColor.mR, ColorR, colorR, double, float);
 SETSLOT(SpriteDescriptor.mColor.mG, ColorG, colorG, double, float);
 SETSLOT(SpriteDescriptor.mColor.mB, ColorB, colorB, double, float);
@@ -65,33 +68,6 @@ SETSLOT(SpriteDescriptor.mMinEmitSpeed, MinEmitSpeed, minEmitSpeed, double, floa
 SETSLOT(SpriteDescriptor.mMaxEmitSpeed, MaxEmitSpeed, maxEmitSpeed, double, float);
 SETSLOT(SpriteDescriptor.mMinEmitAngle, MinEmitAngle, minEmitAngle, int, int);
 SETSLOT(SpriteDescriptor.mMaxEmitAngle, MaxEmitAngle, maxEmitAngle, int, int);
-
-void CelModel::setCenterX(int value)
-{
-    if (mpKeyFrameData)
-    {
-        int delta = (int)mpKeyFrameData->mSpriteDescriptor.mCenter.mX - value;
-         if(delta != 0)
-        {
-            mpKeyFrameData->mSpriteDescriptor.mCenter.mX = value;
-            mpKeyFrameData->mSpriteDescriptor.mPosition.mX -= delta;
-            emit centerXChanged(value);
-            emit positionXChanged((int)mpKeyFrameData->mSpriteDescriptor.mPosition.mX);
-        }
-     }
-}
-
-void CelModel::setCenterY(int value)
-{
-    int delta = (int)mpKeyFrameData->mSpriteDescriptor.mCenter.mY - value;
-     if(delta != 0)
-    {
-        mpKeyFrameData->mSpriteDescriptor.mCenter.mY = value;
-        mpKeyFrameData->mSpriteDescriptor.mPosition.mY -= delta;
-        emit centerYChanged(value);
-        emit positionYChanged((int)mpKeyFrameData->mSpriteDescriptor.mPosition.mY);
-    }
-}
 
 void CelModel::setSourceTexture(QString path, QRect rect)
 {
