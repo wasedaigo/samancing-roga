@@ -316,7 +316,7 @@ void GLSprite::render(QPoint offset, QPainter& painter, const GLSprite* pTargetS
     QRect srcRect = mSpriteDescriptor.mTextureSrcRect;
 
     // Where it actually render the iamge
-    QPointF dstPoint = -mSpriteDescriptor.getCenterInPixel() + offset;
+    QPointF dstPoint = QPointF(-mSpriteDescriptor.mCenter.mX, -mSpriteDescriptor.mCenter.mY) - mSpriteDescriptor.textureCenter() + offset;
     QPixmap* pQPixmap;
     if (mpPixmap)
     {
@@ -479,7 +479,7 @@ QRect GLSprite::getRect() const
 
 bool GLSprite::contains(QPoint point) const
 {
-    //point += mSpriteDescriptor.textureCenter();
-    point += mSpriteDescriptor.getCenterInPixel();
+    point += QPoint((int)(mSpriteDescriptor.mCenter.mX), (int)(mSpriteDescriptor.mCenter.mY));
+    point += mSpriteDescriptor.textureCenter();
     return getRect().contains(point, true);
 }

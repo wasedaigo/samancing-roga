@@ -444,21 +444,18 @@
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="centerXSpinBox">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
+              <widget class="QSpinBox" name="centerXSpinBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
                <property name="minimum">
-                <double>-99.000000000000000</double>
+                <number>-9999</number>
                </property>
                <property name="maximum">
-                <double>99.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
+                <number>9999</number>
                </property>
               </widget>
              </item>
@@ -476,21 +473,21 @@
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="centerYSpinBox">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
+              <widget class="QSpinBox" name="centerYSpinBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
                <property name="minimum">
-                <double>-99.000000000000000</double>
+                <number>-9999</number>
                </property>
                <property name="maximum">
-                <double>99.000000000000000</double>
+                <number>9999</number>
                </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
+               <property name="value">
+                <number>0</number>
                </property>
               </widget>
              </item>

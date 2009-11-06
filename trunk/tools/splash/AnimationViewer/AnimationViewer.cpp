@@ -90,8 +90,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
 
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setBlur(int)));
 
-    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setCenterX(double)));
-    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(double)), mpSelectedCelModel, SLOT(setCenterY(double)));
+    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterX(int)));
+    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpSelectedCelModel, SLOT(setCenterY(int)));
 
     // Special
     connect(m_ui->swapTargetComboBox, SIGNAL(currentIndexChanged(int)), mpSelectedCelModel, SLOT(setSwapTargetType(int)));
@@ -111,8 +111,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(mpSelectedCelModel, SIGNAL(colorGChanged(double)), m_ui->colorSpinBoxG, SLOT(setValue(double)));
     connect(mpSelectedCelModel, SIGNAL(colorBChanged(double)), m_ui->colorSpinBoxB, SLOT(setValue(double)));
 
-    connect(mpSelectedCelModel, SIGNAL(centerXChanged(double)), m_ui->centerXSpinBox, SLOT(setValue(double)));
-    connect(mpSelectedCelModel, SIGNAL(centerYChanged(double)), m_ui->centerYSpinBox, SLOT(setValue(double)));
+    connect(mpSelectedCelModel, SIGNAL(centerXChanged(int)), m_ui->centerXSpinBox, SLOT(setValue(int)));
+    connect(mpSelectedCelModel, SIGNAL(centerYChanged(int)), m_ui->centerYSpinBox, SLOT(setValue(int)));
 
     connect(mpSelectedCelModel, SIGNAL(swapTargetTypeChanged(int)), m_ui->swapTargetComboBox, SLOT(setCurrentIndex(int)));
 
@@ -136,8 +136,8 @@ AnimationViewer::AnimationViewer(QWidget* parent, AnimationModel* animationModel
     connect(m_ui->hideActorCheckbox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(refresh()));
 
     connect(m_ui->blurSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
-    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
-    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(double)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->centerXSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
+    connect(m_ui->centerYSpinBox, SIGNAL(valueChanged(int)), mpAnimationViewerPanel, SLOT(refresh()));
     connect(m_ui->showAnimationUICheckBox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowAnimationUI(bool)));
     connect(m_ui->showCameraCheckbox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowCamera(bool)));
     connect(m_ui->showTargetCheckbox, SIGNAL(toggled(bool)), mpAnimationViewerPanel, SLOT(setShowTarget(bool)));
@@ -271,8 +271,8 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
             // Check box
             m_ui->centerXSpinBox->setEnabled(true);
             m_ui->centerYSpinBox->setEnabled(true);
-            m_ui->centerXSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mCenter.mX);
-            m_ui->centerYSpinBox->setValue(pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+            m_ui->centerXSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mX);
+            m_ui->centerYSpinBox->setValue((int)pKeyFrameData->mSpriteDescriptor.mCenter.mY);
 
             // special
             m_ui->swapTargetComboBox->setEnabled(true);
