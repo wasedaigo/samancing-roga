@@ -181,6 +181,8 @@ void AnimationViewerPanel::refresh()
             pt.mY = pTargetMonsterSprite->mSpriteDescriptor.mPosition.mY + AnimationModel::TARGET_originY;
             spTargetSprite->mSpriteDescriptor.mPosition = pt;
             spTargetSprite->mSpriteDescriptor.mTextureSrcRect = pTargetMonsterSprite->mSpriteDescriptor.mTextureSrcRect;
+            spTargetSprite->mSpriteDescriptor.mCenter.mX = 0;
+            spTargetSprite->mSpriteDescriptor.mCenter.mY = 0;
         }
         delete pTargetMonsterSprite;
     }
@@ -284,8 +286,7 @@ void AnimationViewerPanel::renderCelSprites(const QPoint& centerPoint, QPainter&
 
         if (glSprite && !mIsAnimationPlaying && mShowAnimationUI)
         {
-            QPoint renderPoint = centerPoint - glSprite->mSpriteDescriptor.getCenterInPixel();// + QPoint(glSprite->mSpriteDescriptor.mTextureSrcRect.width()/2, glSprite->mSpriteDescriptor.mTextureSrcRect.height()/2);
-            renderCelBox(painter, glSprite, renderPoint);
+            renderCelBox(painter, glSprite, centerPoint - glSprite->mSpriteDescriptor.center());
         }
 
     iter++;
@@ -355,8 +356,8 @@ void AnimationViewerPanel::renderCenterPointSprite(const GLSprite* pGlSprite, co
         // render center point
         GLSprite* centerPointSprite = AnimationModel::getCenterPointSprite();
         QPointF offset = QPointF(
-                pGlSprite->mSpriteDescriptor.mPosition.mX + pGlSprite->mSpriteDescriptor.getCenterInPixel().x(),
-                pGlSprite->mSpriteDescriptor.mPosition.mY + pGlSprite->mSpriteDescriptor.getCenterInPixel().y()
+                (pGlSprite->mSpriteDescriptor.mPosition.mX + pGlSprite->mSpriteDescriptor.center().x()),
+                (pGlSprite->mSpriteDescriptor.mPosition.mY + pGlSprite->mSpriteDescriptor.center().y())
         );
 
         QPoint centerPointCenterPoint = centerPoint + offset.toPoint();
@@ -542,8 +543,8 @@ void AnimationViewerPanel::setCenterPoint(QMouseEvent *event)
     if (pKeyFrameData && pKeyFrameData->mSpriteDescriptor.isImage())
     {
         QPoint centerPoint = getCenterPoint();
-        double centerX = (event->x() - centerPoint.x()) / (double)pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.width();// - pKeyFrameData->mSpriteDescriptor.mPosition.mX + pKeyFrameData->mSpriteDescriptor.mCenter.mX);
-        double centerY = (event->y() - centerPoint.y()) / (double)pKeyFrameData->mSpriteDescriptor.mTextureSrcRect.height();// - pKeyFrameData->mSpriteDescriptor.mPosition.mY + pKeyFrameData->mSpriteDescriptor.mCenter.mY);
+        int centerX = (int)(event->x() - centerPoint.x() - pKeyFrameData->mSpriteDescriptor.mPosition.mX + pKeyFrameData->mSpriteDescriptor.mCenter.mX);
+        int centerY = (int)(event->y() - centerPoint.y() - pKeyFrameData->mSpriteDescriptor.mPosition.mY + pKeyFrameData->mSpriteDescriptor.mCenter.mY);
 
         mpSelectedCelModel->setCenterX(centerX);// / pKeyFrameData->mSpriteDescriptor.textureCenter().x());
         mpSelectedCelModel->setCenterY(centerY);// / pKeyFrameData->mSpriteDescriptor.textureCenter().y());
@@ -559,8 +560,7 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
 
     if (event->modifiers() & Qt::ControlModifier)
     {
-        // Not useful anymore
-        //setCenterPoint(event);
+        setCenterPoint(event);
     }
     else if (mCelGrabbed)
     {
@@ -579,7 +579,6 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
                 newPosX -= AnimationModel::TARGET_originX;
                 newPosY -= AnimationModel::TARGET_originY;
             }
-
             mpSelectedCelModel->setPositionX(newPosX);
             mpSelectedCelModel->setPositionY(newPosY);
         }
