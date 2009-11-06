@@ -128,8 +128,8 @@ public:
     {
         QString mSourcePath;
 
-        int mPositionType;
-        int mPositionTypeOption;
+        PositionType mPositionType;
+        PositionTypeOption mPositionTypeOption;
         FacingOptionType mFacingOptionType;
         int mBlur;
         QRect mTextureSrcRect; // only valid when it is not a child animation
@@ -206,58 +206,17 @@ public:
             return QPointF(textureCenter().x() + mCenter.mX, textureCenter().y() + mCenter.mY).toPoint();
         }
 
-        QPoint getPosition() const
+        QPoint getPosition(const GLSprite* pTargetSprite) const
         {
-            int dx = 0;
-            int dy = 0;
-
             if (mPositionType != PositionType_None)
             {
-                switch(mPositionTypeOption)
-                {
-                    case PositionTypeOption_TopLeft:
-                        dx = -1;
-                        dy = -1;
-                    break;
-                    case PositionTypeOption_TopCenter:
-                        dx = 0;
-                        dy = -1;
-                    break;
-                    case PositionTypeOption_TopRight:
-                        dx = 1;
-                        dy = -1;
-                    break;
-                    break;
-                    case PositionTypeOption_CenterLeft:
-                        dx = -1;
-                        dy = 0;
-                    break;
-                    case PositionTypeOption_Center:
-                        dx = 0;
-                        dy = 0;
-                    break;
-                    case PositionTypeOption_CenterRight:
-                        dx = 1;
-                        dy = 0;
-                    break;
-                    case PositionTypeOption_BottomLeft:
-                        dx = -1;
-                        dy = 1;
-                    break;
-                    case PositionTypeOption_BottomCenter:
-                        dx = 0;
-                        dy = 1;
-                    break;
-                    case PositionTypeOption_BottomRight:
-                        dx = 1;
-                        dy = 1;
-                    break;
-                }
+                return getPositionWithPositionType(QPointF(mPosition.mX, mPosition.mY), mPositionTypeOption, pTargetSprite->mSpriteDescriptor.mTextureSrcRect.width(), pTargetSprite->mSpriteDescriptor.mTextureSrcRect.height());
             }
-            return QPointF(mPosition.mX + dx * mTextureSrcRect.width(), mPosition.mY + dy * mTextureSrcRect.height()).toPoint();
+            return QPointF(mPosition.mX, mPosition.mY).toPoint();
         }
     };
 
+    static QPoint getPositionWithPositionType(QPointF basePosition, PositionTypeOption positionTypeOption, int width, int height);
     static QString blendTypeSting[eBT_COUNT];
     static BlendType getBlendTypeByString(QString typeString) ;
     static QString facingOptionTypeSting[eBT_COUNT];

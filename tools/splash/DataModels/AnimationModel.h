@@ -17,6 +17,13 @@ class AnimationModel : public QObject
 Q_OBJECT
 
 public:
+
+    enum
+    {
+        TARGET_originX = -150,
+        TARGET_originY = 0
+    };
+
     enum
     {
         LINE_target = 8,
