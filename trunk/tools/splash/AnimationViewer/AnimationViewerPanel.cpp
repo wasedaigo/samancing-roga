@@ -160,22 +160,6 @@ void AnimationViewerPanel::refresh()
 
         if (pKeyframe)
         {
-            // Target position is fixed if we want to manipulate target graphics...!
-            if (keyframePosition.mLineNo == AnimationModel::LINE_target && keyframePosition.mFrameNo == 0)
-            {
-                if (mpSelectedCelModel->getKeyFrameDataReference())
-                {
-                    if (mpSelectedCelModel->getKeyFrameDataReference()->mSpriteDescriptor.mPosition.mX != 0)
-                    {
-                        mpSelectedCelModel->setPositionX(0);
-                    }
-                    if (mpSelectedCelModel->getKeyFrameDataReference()->mSpriteDescriptor.mPosition.mY != 0)
-                    {
-                        mpSelectedCelModel->setPositionY(0);
-                    }
-                }
-            }
-
             mpSelectedCelModel->setKeyFrameDataReference(pKeyframe->mpKeyFrameData);
             emit celSelected(pKeyframe->mpKeyFrameData);
         }
@@ -583,11 +567,19 @@ void AnimationViewerPanel::mouseMoveEvent(QMouseEvent *event)
         // Move cel if it is selected
         if (pKeyFrameData)
         {
+            const KeyFrame::KeyFramePosition& keyframePosition = mpAnimationModel->getCurrentKeyFramePosition();
             if (pKeyFrameData->mSpriteDescriptor.mPositionType != GLSprite::PositionType_None)
             {
                 newPosX -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mX;
                 newPosY -= (int)mpAnimationModel->getTargetSprite()->mSpriteDescriptor.mPosition.mY;
             }
+
+            if(keyframePosition.mLineNo == AnimationModel::LINE_target)
+            {
+                newPosX -= AnimationModel::TARGET_originX;
+                newPosY -= AnimationModel::TARGET_originY;
+            }
+
             mpSelectedCelModel->setPositionX(newPosX);
             mpSelectedCelModel->setPositionY(newPosY);
         }
