@@ -32,8 +32,8 @@ public slots:
     void setFacingOptionType(int value);
     void setBlur(int value);
 
-    void setCenterX(int value);
-    void setCenterY(int value);
+    void setCenterX(double value);
+    void setCenterY(double value);
 
     void setPositionX(int value);
     void setPositionY(int value);
@@ -75,8 +75,8 @@ signals:
     void facingOptionTypeChanged(int value);
     void blurChanged(int value);
 
-    void centerXChanged(int value);
-    void centerYChanged(int value);
+    void centerXChanged(double value);
+    void centerYChanged(double value);
 
     void positionXChanged(int value);
     void positionYChanged(int value);

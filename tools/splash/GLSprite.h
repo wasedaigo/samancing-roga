@@ -214,6 +214,14 @@ public:
             }
             return QPointF(mPosition.mX, mPosition.mY).toPoint();
         }
+
+        QPoint getCenterInPixel() const
+        {
+            int x = (int)(mCenter.mX * mTextureSrcRect.width() / 2 + mTextureSrcRect.width() / 2);
+            int y = (int)(mCenter.mY * mTextureSrcRect.height() / 2 + mTextureSrcRect.height() / 2);
+
+            return QPoint(x, y);
+        }
     };
 
     static QPoint getPositionWithPositionType(QPointF basePosition, PositionTypeOption positionTypeOption, int width, int height);
