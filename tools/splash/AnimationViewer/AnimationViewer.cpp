@@ -264,6 +264,8 @@ void AnimationViewer::onCelSelected(KeyFrameData* pKeyFrameData)
         m_ui->blurSpinBox->setEnabled(!specialCelSelected);
         m_ui->facingOptionCombobox->setEnabled(!specialCelSelected);
         m_ui->positionTypeOptionComboBox->setEnabled(!specialCelSelected);
+
+        specialCelSelected = (mpAnimationModel->getCurrentKeyFramePosition().mLineNo == AnimationModel::LINE_target);
         m_ui->positionTypeComboBox->setEnabled(!specialCelSelected);
 
         if (pKeyFrameData->mSpriteDescriptor.isImage())
