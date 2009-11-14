@@ -180,7 +180,7 @@ void AnimationViewerPanel::refresh()
             pt.mX = pTargetMonsterSprite->mSpriteDescriptor.mPosition.mX + AnimationModel::TARGET_originX;
             pt.mY = pTargetMonsterSprite->mSpriteDescriptor.mPosition.mY + AnimationModel::TARGET_originY;
             spTargetSprite->mSpriteDescriptor.mPosition = pt;
-            spTargetSprite->mSpriteDescriptor.mTextureSrcRect = pTargetMonsterSprite->mSpriteDescriptor.mTextureSrcRect;
+            //spTargetSprite->mSpriteDescriptor.mTextureSrcRect = pTargetMonsterSprite->mSpriteDescriptor.mTextureSrcRect;
             spTargetSprite->mSpriteDescriptor.mCenter.mX = 0;
             spTargetSprite->mSpriteDescriptor.mCenter.mY = 0;
         }
