@@ -494,8 +494,12 @@ namespace Shrimp
                             tileRect.X + 10, tileRect.Y + 10, tileRect.Width - 20, tileRect.Height - 20));
                         break;
                     case TilePassageType.Ceil:
-                        g.DrawRectangle(ceilPen, new Rectangle(
-                            tileRect.X + 10, tileRect.Y + 10, tileRect.Width - 20, tileRect.Height - 20));
+                        g.DrawLines(ceilPen, new[] {
+                            new Point(tileRect.X + tileRect.Width / 2,  tileRect.Y + 10),
+                            new Point(tileRect.X + 10,                  tileRect.Y + tileRect.Height - 10),
+                            new Point(tileRect.X + tileRect.Width - 10, tileRect.Y + tileRect.Height - 10),
+                            new Point(tileRect.X + tileRect.Width / 2,  tileRect.Y + 10),
+                        });
                         break;
                     }
                 }
