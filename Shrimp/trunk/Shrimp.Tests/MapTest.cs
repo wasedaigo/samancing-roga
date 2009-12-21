@@ -17,7 +17,7 @@ namespace Shrimp.Tests
         {
             ViewModel viewModel = new ViewModel();
             MapCollection mapCollection = new MapCollection(viewModel);
-            Map map1 = new Map(mapCollection);
+            Map map1 = new Map(mapCollection, 1);
             map1.Width = 100;
             map1.Height = 200;
             map1.CreateSettingTilesCommand(0, 1, 2,
@@ -41,7 +41,7 @@ namespace Shrimp.Tests
             Assert.AreEqual(8, bytes2[(5 + 6 * map1.Width) * 4 + 2]);
             Assert.AreEqual(0, bytes2[(5 + 6 * map1.Width) * 4 + 3]);
 
-            Map map2 = new Map(mapCollection);
+            Map map2 = new Map(mapCollection, 2);
             Assert.AreEqual(Map.MinWidth, map2.Width);
             Assert.AreEqual(Map.MinHeight, map2.Height);
             map2.LoadJson(token);
@@ -57,7 +57,7 @@ namespace Shrimp.Tests
         {
             ViewModel viewModel = new ViewModel();
             MapCollection mapCollection = new MapCollection(viewModel);
-            Map map1 = new Map(mapCollection);
+            Map map1 = new Map(mapCollection, 1);
             map1.Width = 100;
             map1.Height = 100;
             Tile[] tiles1 = new[]
