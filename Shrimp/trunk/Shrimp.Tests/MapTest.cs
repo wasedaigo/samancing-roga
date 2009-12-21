@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shrimp;
+using Shrimp.Models;
 
 namespace Shrimp.Tests
 {

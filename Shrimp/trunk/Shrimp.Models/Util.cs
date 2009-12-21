@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Shrimp
+namespace Shrimp.Models
 {
     public static class Util
     {

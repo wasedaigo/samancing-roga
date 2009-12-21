@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Shrimp
+namespace Shrimp.Models
 {
     public interface IIndexable<T> : IEnumerable<T>
     {

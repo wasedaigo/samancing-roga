@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Shrimp
+namespace Shrimp.Models
 {
     public class TileSetCollection : Model
     {

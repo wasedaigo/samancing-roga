@@ -7,7 +7,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Shrimp
+namespace Shrimp.Models
 {
     public abstract class Model : IModel
     {
