@@ -11,51 +11,23 @@ namespace Shrimp
 {
     internal class TileSet : Model
     {
-        public TileSet(TileSetCollection tileSetCollection)
+        public TileSet(TileSetCollection tileSetCollection, int id)
         {
             this.TileSetCollection = tileSetCollection;
+            this.Id = id;
+            this.OriginalBitmap = new Bitmap(this.ImageFileFullPath);
+            this.SetTilePassageTypes(new ObservedArray<TilePassageType>(this.Width * this.Height));
             this.Clear();
         }
 
         private TileSetCollection TileSetCollection;
 
-        public int Id
-        {
-            get { return this.TileSetCollection.GetId(this); }
-        }
+        public int Id { get; private set; }
 
         public string ImageFileName
         {
-            get { return this.imageFileName; }
-            set
-            {
-                if (this.imageFileName != value)
-                {
-                    if (this.OriginalBitmap != null)
-                    {
-                        this.OriginalBitmap.Dispose();
-                    }
-                    foreach (Bitmap bitmap in this.Bitmaps.Values)
-                    {
-                        bitmap.Dispose();
-                    }
-                    this.Bitmaps.Clear();
-                    this.SetTilePassageTypes(null);
-                    this.imageFileName = value;
-                    if (this.imageFileName != null)
-                    {
-                        this.OriginalBitmap = new Bitmap(this.ImageFileFullPath);
-                        this.SetTilePassageTypes(new ObservedArray<TilePassageType>(this.Width * this.Height));
-                    }
-                    else
-                    {
-                        this.OriginalBitmap = null;
-                    }
-                    this.OnUpdated(new UpdatedEventArgs(this.GetProperty(_ => _.ImageFileName)));
-                }
-            }
+            get { return this.Id.ToString() + ".png"; }
         }
-        private string imageFileName;
 
         public string ImageFileFullPath
         {
@@ -157,7 +129,6 @@ namespace Shrimp
 
         public override void Clear()
         {
-            this.ImageFileName = null;
         }
 
         public override JToken ToJson()
@@ -171,10 +142,6 @@ namespace Shrimp
         {
             this.Clear();
             JToken token;
-            if ((token = json["ImageFileName"]) != null)
-            {
-                this.ImageFileName = token.Value<string>();
-            }
             if (this.TilePassageTypes != null)
             {
                 if ((token = json["TilePassageTypes"]) != null)

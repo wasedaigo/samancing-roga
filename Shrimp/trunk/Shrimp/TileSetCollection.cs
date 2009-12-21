@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -45,11 +46,6 @@ namespace Shrimp
             get { return this.TileSets.Keys; }
         }
 
-        public int GetId(TileSet tileSet)
-        {
-            return this.TileSets.First(p => p.Value == tileSet).Key;
-        }
-
         public override void Clear()
         {
             this.TileSets.Clear();
@@ -71,7 +67,7 @@ namespace Shrimp
             foreach (JObject j in json as JArray)
             {
                 int id = j.Value<int>("Id");
-                TileSet tileSet = new TileSet(this);
+                TileSet tileSet = new TileSet(this, id);
                 tileSet.LoadJson(j["Value"]);
                 this.TileSets.Add(id, tileSet);
             }
@@ -85,10 +81,13 @@ namespace Shrimp
             var registeredFiles = this.TileSets.Select(p => p.Value.ImageFileName).ToArray();
             foreach (string file in files.Except(registeredFiles))
             {
-                int id = Util.GetNewId(this.TileSets.Keys);
-                TileSet tileSet = new TileSet(this);
-                tileSet.ImageFileName = Path.GetFileName(file);
-                this.TileSets.Add(id, tileSet);
+                Match match = (new Regex(@"^(\d+)\.png$", RegexOptions.IgnoreCase)).Match(file);
+                if (match.Success)
+                {
+                    int id = int.Parse(match.Groups[1].Value);
+                    TileSet tileSet = new TileSet(this, id);
+                    this.TileSets.Add(id, tileSet);
+                }
             }
         }
 
