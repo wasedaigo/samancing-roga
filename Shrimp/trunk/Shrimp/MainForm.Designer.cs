@@ -56,8 +56,6 @@
             this.Scale2ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.Scale4ToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.Scale8ToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.DatabaseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -210,9 +208,7 @@
             this.Scale1ToolStripButton,
             this.Scale2ToolStripButton,
             this.Scale4ToolStripButton,
-            this.Scale8ToolStripButton,
-            this.toolStripSeparator5,
-            this.DatabaseToolStripButton});
+            this.Scale8ToolStripButton});
             this.ToolStrip.Location = new System.Drawing.Point(0, 0);
             this.ToolStrip.Name = "ToolStrip";
             this.ToolStrip.Size = new System.Drawing.Size(792, 41);
@@ -361,21 +357,6 @@
             this.Scale8ToolStripButton.Size = new System.Drawing.Size(31, 38);
             this.Scale8ToolStripButton.Text = "1/8";
             // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 41);
-            // 
-            // DatabaseToolStripButton
-            // 
-            this.DatabaseToolStripButton.Image = global::Shrimp.Properties.Resources.Database;
-            this.DatabaseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.DatabaseToolStripButton.Name = "DatabaseToolStripButton";
-            this.DatabaseToolStripButton.Size = new System.Drawing.Size(67, 38);
-            this.DatabaseToolStripButton.Text = "Database";
-            this.DatabaseToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.DatabaseToolStripButton.Click += new System.EventHandler(this.DatabaseToolStripButton_Click);
-            // 
             // OpenFileDialog
             // 
             this.OpenFileDialog.Filter = "Project File (*.json)|*.json|All Files (*.*)|*.*";
@@ -424,7 +405,6 @@
         private System.Windows.Forms.ToolStripButton SaveToolStripButton;
         private MapTreeView MapTreeView;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton DatabaseToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton PenToolStripButton;
         private System.Windows.Forms.ToolStripComboBox TileSetsToolStripComboBox;
@@ -434,7 +414,6 @@
         private System.Windows.Forms.ToolStripButton EventToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripButton UndoToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripButton Scale1ToolStripButton;
         private System.Windows.Forms.ToolStripButton Scale2ToolStripButton;
         private System.Windows.Forms.ToolStripButton Scale4ToolStripButton;

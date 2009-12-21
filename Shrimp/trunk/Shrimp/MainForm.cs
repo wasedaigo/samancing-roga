@@ -137,8 +137,6 @@ namespace Shrimp
 
         private ViewModel ViewModel;
 
-        private DatabaseDialog DatabaseDialog = new DatabaseDialog();
-
         private MapEditor MapEditor;
 
         private IEnumerable<ToolStripButton> LayerModeSwitchers
@@ -209,7 +207,6 @@ namespace Shrimp
             {
                 item.Enabled = isOpened;
             }
-            this.DatabaseToolStripButton.Enabled = isOpened;
             this.TileSetPalette.Enabled = isOpened;
             this.TileSetPaletteToolStrip.Enabled = isOpened;
             this.PassageToolStripButton.Enabled = isOpened;
@@ -413,13 +410,6 @@ namespace Shrimp
             Debug.Assert(this.ViewModel.IsUndoable);
             Debug.Assert(this.ViewModel.EditorState.Map != null);
             this.ViewModel.Undo();
-            Debug.Assert(this.ViewModel.IsOpened);
-        }
-
-        private void DatabaseToolStripButton_Click(object sender, EventArgs e)
-        {
-            Debug.Assert(this.ViewModel.IsOpened);
-            this.DatabaseDialog.ShowDialog();
             Debug.Assert(this.ViewModel.IsOpened);
         }
 
