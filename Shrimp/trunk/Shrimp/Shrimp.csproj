@@ -163,10 +163,10 @@
     <Content Include="ProjectTemplate\Graphics\Tiles\Copyright.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplate\Graphics\Tiles\SampleA.png">
+    <Content Include="ProjectTemplate\Graphics\Tiles\1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplate\Graphics\Tiles\SampleB.png">
+    <Content Include="ProjectTemplate\Graphics\Tiles\2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Readme.txt">
