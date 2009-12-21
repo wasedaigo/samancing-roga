@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Shrimp
 {
-    internal static class Util
+    public static class Util
     {
         public const int PaletteGridSize = 32;
         public const int PaletteHorizontalCount = 8;

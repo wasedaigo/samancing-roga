@@ -9,19 +9,19 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal enum LayerMode
+    public enum LayerMode
     {
         Layer1,
         Layer2,
         Event,
     }
 
-    internal enum DrawingMode
+    public enum DrawingMode
     {
         Pen,
     }
 
-    internal enum ScaleMode
+    public enum ScaleMode
     {
         Scale1,
         Scale2,
@@ -29,20 +29,20 @@ namespace Shrimp
         Scale8,
     }
 
-    internal enum TileSetMode
+    public enum TileSetMode
     {
         Normal,
         Passage,
     }
 
-    internal enum SelectedTilesType
+    public enum SelectedTilesType
     {
         Single,
         Rectangle,
         Picker,
     }
     
-    internal class SelectedTiles
+    public class SelectedTiles
     {
         public static SelectedTiles Single(Tile tile)
         {
@@ -93,7 +93,7 @@ namespace Shrimp
         public int Height { get; private set; }
     }
 
-    internal class EditorState : Model
+    public class EditorState : Model
     {
         public EditorState(ViewModel viewModel)
         {
@@ -316,7 +316,7 @@ namespace Shrimp
 
         private Stack<ICommand> Commands = new Stack<ICommand>();
 
-        internal void AddCommand(ICommand command)
+        public void AddCommand(ICommand command)
         {
             this.Commands.Push(command);
             this.OnIsUndoableChanged(EventArgs.Empty);

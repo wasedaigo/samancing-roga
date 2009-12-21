@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class TileSet : Model
+    public class TileSet : Model
     {
         public TileSet(TileSetCollection tileSetCollection, int id)
         {
@@ -152,7 +152,7 @@ namespace Shrimp
         }
     }
 
-    internal enum TilePassageType
+    public enum TilePassageType
     {
         Passable,
         Impassable,

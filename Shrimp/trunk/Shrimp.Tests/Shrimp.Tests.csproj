@@ -64,6 +64,10 @@
     <Compile Include="TileTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Shrimp.Models\Shrimp.Models.csproj">
+      <Project>{F143745F-8E0C-4DD0-A0FE-C780680D95A7}</Project>
+      <Name>Shrimp.Models</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shrimp\Shrimp.csproj">
       <Project>{FB9AD555-3E33-484D-B448-5D22EFE207DB}</Project>
       <Name>Shrimp</Name>

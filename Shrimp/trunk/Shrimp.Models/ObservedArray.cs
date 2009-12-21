@@ -7,13 +7,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal interface IIndexable<T> : IEnumerable<T>
+    public interface IIndexable<T> : IEnumerable<T>
     {
         T this[int index] { get; set; }
         int Length { get; }
     }
 
-    internal class ObservedArray<T> : Model, IIndexable<T> where T : IComparable
+    public class ObservedArray<T> : Model, IIndexable<T> where T : IComparable
     {
         public ObservedArray(int size)
         {

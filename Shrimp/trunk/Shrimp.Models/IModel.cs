@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal interface IModel
+    public interface IModel
     {
         void Clear();
 
@@ -19,7 +19,7 @@ namespace Shrimp
         void LoadJson(JToken json);
     }
 
-    internal class UpdatedEventArgs : EventArgs
+    public class UpdatedEventArgs : EventArgs
     {
         public UpdatedEventArgs()
             : this(null)
@@ -49,7 +49,7 @@ namespace Shrimp
         public UpdatedEventArgs InnerUpdatedEventArgs { get; private set; }
     }
 
-    internal static class IModelExtensions
+    public static class IModelExtensions
     {
         public static string GetProperty<T, TResult>(this T obj, Expression<Func<T, TResult>> expr) where T : IModel
         {

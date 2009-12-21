@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class MapCollection : Model
+    public class MapCollection : Model
     {
         private class Node
         {
@@ -183,11 +183,6 @@ namespace Shrimp
             return map != null;
         }
 
-        public int GetId(Map map)
-        {
-            return this.Nodes.Where(n => n.Parent != null).First(n => n.Map == map).Id;
-        }
-
         public bool IsExpanded(int id)
         {
             return this.GetNode(id).IsExpanded;
@@ -221,7 +216,7 @@ namespace Shrimp
                 throw new ArgumentException("Invalid id", "parentId");
             }
             int id = Util.GetNewId(this.Nodes.Select(n => n.Id));
-            Node node = new Node(id, new Map(this), false);
+            Node node = new Node(id, new Map(this, id), false);
             node.Parent = this.GetNode(parentId);
             node.Parent.Children.Add(node);
             this.OnNodeAdded(new NodeEventArgs(id));
@@ -305,9 +300,10 @@ namespace Shrimp
 
         private void AddNodeFromJson(Node parentNode, JObject json)
         {
-            Map map = new Map(this);
+            int id = json.Value<int>("Id");
+            Map map = new Map(this, id);
             map.LoadJson(json["Map"]);
-            Node node = new Node(json.Value<int>("Id"), map, json.Value<bool>("IsExpanded"));
+            Node node = new Node(id, map, json.Value<bool>("IsExpanded"));
             parentNode.Children.Add(node);
             node.Parent = parentNode;
             foreach (JObject childJson in json["Children"])
@@ -344,7 +340,7 @@ namespace Shrimp
         }
     }
 
-    internal class NodeEventArgs : EventArgs
+    public class NodeEventArgs : EventArgs
     {
         public NodeEventArgs(int nodeId)
         {

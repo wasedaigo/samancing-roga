@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class TileSetCollection : Model
+    public class TileSetCollection : Model
     {
         public TileSetCollection(ViewModel viewModel)
         {

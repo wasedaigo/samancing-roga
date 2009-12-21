@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrimp", "Shrimp\Shrimp.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrimp.Tests", "Shrimp.Tests\Shrimp.Tests.csproj", "{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrimp.Models", "Shrimp.Models\Shrimp.Models.csproj", "{F143745F-8E0C-4DD0-A0FE-C780680D95A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +20,10 @@ Global
 		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DFE2C29-7953-466E-BE4F-A66B9EEF4F90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F143745F-8E0C-4DD0-A0FE-C780680D95A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F143745F-8E0C-4DD0-A0FE-C780680D95A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F143745F-8E0C-4DD0-A0FE-C780680D95A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F143745F-8E0C-4DD0-A0FE-C780680D95A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

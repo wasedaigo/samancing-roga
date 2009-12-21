@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal abstract class Model : IModel
+    public abstract class Model : IModel
     {
         public abstract void Clear();
 

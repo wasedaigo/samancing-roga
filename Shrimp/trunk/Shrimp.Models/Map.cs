@@ -9,11 +9,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class Map : Model
+    public class Map : Model
     {
-        public Map(MapCollection mapCollection)
+        public Map(MapCollection mapCollection, int id)
         {
             this.MapCollection = mapCollection;
+            this.Id = id;
             this.Clear();
         }
 
@@ -31,10 +32,7 @@ namespace Shrimp
             get { return this.MapCollection.ViewModel; }
         }
 
-        public int Id
-        {
-            get { return this.MapCollection.GetId(this); }
-        }
+        public int Id { get; private set; }
 
         public string Name
         {

@@ -1,0 +1,6 @@
+C:\Users\hajime\Documents\Visual Studio 2008\Projects\Shrimp\Shrimp.Models\bin\Debug\Shrimp.Models.dll
+C:\Users\hajime\Documents\Visual Studio 2008\Projects\Shrimp\Shrimp.Models\bin\Debug\Shrimp.Models.pdb
+C:\Users\hajime\Documents\Visual Studio 2008\Projects\Shrimp\Shrimp.Models\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\hajime\Documents\Visual Studio 2008\Projects\Shrimp\Shrimp.Models\obj\Debug\Shrimp.Models.dll
+C:\Users\hajime\Documents\Visual Studio 2008\Projects\Shrimp\Shrimp.Models\obj\Debug\Shrimp.Models.pdb
+C:\Users\hajime\Documents\Visual Studio 2008\Projects\Shrimp\Shrimp.Models\bin\Debug\Newtonsoft.Json.dll

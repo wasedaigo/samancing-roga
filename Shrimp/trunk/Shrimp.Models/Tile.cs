@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Shrimp
 {
-    internal struct Tile
+    public struct Tile
     {
         private byte TileSetIdLower;
         private byte TileSetIdUpper;

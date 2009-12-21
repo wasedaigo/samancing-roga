@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class ViewModel
+    public class ViewModel
     {
         public ViewModel()
         {

@@ -35,7 +35,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -53,23 +52,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command.cs" />
     <Compile Include="DatabaseModelEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DatabaseModelEditor.Designer.cs">
       <DependentUpon>DatabaseModelEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="EditorState.cs" />
-    <Compile Include="IModel.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Map.cs" />
-    <Compile Include="MapCollection.cs" />
     <Compile Include="MapDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,9 +76,6 @@
     <Compile Include="MapEditor.Designer.cs">
       <DependentUpon>MapEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model.cs" />
-    <Compile Include="ObservedArray.cs" />
-    <Compile Include="Project.cs" />
     <Compile Include="MapTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -95,11 +86,6 @@
       <DependentUpon>NewProjectDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="Tile.cs" />
-    <Compile Include="TileSet.cs" />
-    <Compile Include="TileSetCollection.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="DatabaseModelEditor.resx">
       <DependentUpon>DatabaseModelEditor.cs</DependentUpon>
@@ -157,9 +143,6 @@
     <Compile Include="NativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="ProjectTemplate\Graphics\Tiles\Copyright.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -187,6 +170,12 @@
     <None Include="Resources\toggle_small_collapse.png" />
     <None Include="Resources\toggle_small.png" />
     <None Include="Resources\bin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shrimp.Models\Shrimp.Models.csproj">
+      <Project>{F143745F-8E0C-4DD0-A0FE-C780680D95A7}</Project>
+      <Name>Shrimp.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

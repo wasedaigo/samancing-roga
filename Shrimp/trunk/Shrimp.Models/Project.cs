@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Shrimp
 {
-    internal class Project : Model
+    public class Project : Model
     {
         public Project()
         {
