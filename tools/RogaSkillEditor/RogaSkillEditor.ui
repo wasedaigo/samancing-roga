@@ -348,6 +348,46 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>CoolDown</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="cooldownSpinBox">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>Damage List</string>
@@ -374,7 +414,7 @@
         </column>
         <column>
          <property name="text">
-          <string>Hit</string>
+          <string>Hit(%)</string>
          </property>
         </column>
         <column>
@@ -390,6 +430,16 @@
         <column>
          <property name="text">
           <string>DamageDef</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>BufType</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>BufChance(%)</string>
          </property>
         </column>
        </widget>
