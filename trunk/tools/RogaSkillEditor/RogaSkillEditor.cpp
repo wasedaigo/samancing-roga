@@ -95,8 +95,8 @@ static SkillType getSkillTypeFromString(QString key)
     return SkillType_Knife;
 }
 
-#define DAMAGE_FIELD_COUNT 6
-static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "hit", "critical", "attr", "damagedef"};
+#define DAMAGE_FIELD_COUNT 8
+static QString damageFields[DAMAGE_FIELD_COUNT] = {"min", "max", "hit", "critical", "attr", "damagedef", "bufType", "bufChance"};
 static int getIndexOfDamageField(QString key)
 {
     int num = 0;
@@ -430,6 +430,8 @@ bool RogaSkillEditor::saveSkillData()
                 mSkillDataRoot[skillID]["AOEValue"] = AOETypes[m_ui->AOEComboBox->currentIndex()].toStdString();
             }
 
+            mSkillDataRoot[skillID]["cooldown"] =  m_ui->cooldownSpinBox->value();
+
             mSkillDataRoot[skillID]["chainable"] = m_ui->chainableCheckbox->isChecked();
             mSkillDataRoot[skillID]["chainStartFrame"] = m_ui->chainStartFrameCombobox->value();
 
@@ -521,6 +523,15 @@ void RogaSkillEditor::loadSkillData()
                 if(!skillData["multiTargetType"].isNull())
                 {
                      m_ui->multiTargetCombox->setCurrentIndex(getIndexOfMultiTargetType(QString::fromStdString(mSkillDataRoot[skillID]["multiTargetType"].asString())));
+                }
+
+                if(!skillData["cooldown"].isNull())
+                {
+                    m_ui->cooldownSpinBox->setValue(skillData["cooldown"].asInt());
+                }
+                else
+                {
+                    m_ui->cooldownSpinBox->setValue(1);
                 }
 
                 if(!skillData["AOEValue"].isNull())
