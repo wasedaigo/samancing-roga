@@ -8,7 +8,7 @@
 
 #include "FileLoader.h"
 
-#define SKILL_DATA_DIRECTORY QString("GameData/Animations/Battle/Skills/")
+#define SKILL_DATA_DIRECTORY QString("GameData/Animations/Battle/")
 
 //Pose Type setting
 enum PoseType
@@ -421,8 +421,14 @@ bool RogaSkillEditor::saveSkillData()
             mSkillDataRoot.removeMember(skillID);
             mSkillDataRoot[skillID]["name"] = m_ui->nameEdit->text().toStdString();
             mSkillDataRoot[skillID]["desc"] = m_ui->descEdit->toPlainText().toStdString();
-            mSkillDataRoot[skillID]["castingAnimation"] = SKILL_DATA_DIRECTORY.append(m_ui->castingAnimationEdit->text()).toStdString();
-            mSkillDataRoot[skillID]["skillAnimation"] = SKILL_DATA_DIRECTORY.append(m_ui->skillAnimationEdit->text()).toStdString();
+            if (!m_ui->castingAnimationEdit->text().isEmpty())
+            {
+                mSkillDataRoot[skillID]["castingAnimation"] = SKILL_DATA_DIRECTORY.append(m_ui->castingAnimationEdit->text()).toStdString();
+            }
+            if (!m_ui->skillAnimationEdit->text().isEmpty())
+            {
+                mSkillDataRoot[skillID]["skillAnimation"] = SKILL_DATA_DIRECTORY.append(m_ui->skillAnimationEdit->text()).toStdString();
+            }
 
             mSkillDataRoot[skillID]["multiTargetType"] = multiTargetType[m_ui->multiTargetCombox->currentIndex()].toStdString();
             if(m_ui->AOECheckBox->isChecked())
